@@ -139,15 +139,15 @@ FUNCTION o_kriging,X,Y,Z,X0,Y0,sill,range,nugget
   RETURN, result
 END
 
-
-
-
-
 ;##################################################################
 ;                  main program
 ;##################################################################
 
 PRO gnspi
+  COMPILE_OPT idl2, hidden
+
+  e = ENVI(/HEADLESS)
+  ENVI_BATCH_STATUS_WINDOW, /ON
 
   t0=SYSTIME(1)                  ;the initial time of program running
   
@@ -660,6 +660,3 @@ PRO gnspi
   PRINT, 'time used:', FLOOR((SYSTIME(1)-t0)/3600), 'h',FLOOR(((SYSTIME(1)-t0) MOD 3600)/60),'m',(SYSTIME(1)-t0) MOD 60,'s'
   
 END
-
-
-
