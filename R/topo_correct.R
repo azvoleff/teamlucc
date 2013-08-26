@@ -2,6 +2,17 @@ PLOT_WIDTH <- 3.25
 PLOT_HEIGHT <- 3.25
 DPI <- 300
 
+get_metadata_item <- function(metadatafile, item) {
+    if (!file.exists(metadatafile)) {
+        stop(paste('Could not find metadata file', metadatafile))
+    }
+    metadata <- read.csv(metadatafile, stringsAsFactors=FALSE)
+    rownum <- which(grepl(item, metadata$item))
+    return(metadata$value[rownum])
+}
+#metadatafile <- 'H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.txt'
+#get_metadata_item(metadatafile, 'SolarZenith')
+
 get_band_names_from_hdr <- function(hdr_file) {
     require(raster)
     txt <- readLines(hdr_file)
@@ -18,11 +29,15 @@ get_band_names_from_hdr <- function(hdr_file) {
 
 mosaicimgs <- function(baseimg, ...) {
     require(raster)
+    require(rgdal)
     dots <- list(...)
     if (length(dots) < 1) {
         stop('no mosaic images provided')
-    } else if (is.list(dots[1])) {
+    } else if (is.list(dots[[1]])) {
         img_list <- dots[[1]]
+        if (length(dots) > 1) {
+            warning('second argument is a list - but only mosaicing two images')
+        }
     } else {
         img_list <- dots
     }
@@ -35,13 +50,12 @@ mosaicimgs <- function(baseimg, ...) {
     return(mosaic_img)
 }
 library(raster)
-baseimg <- raster('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W084_dem.tif')
-mosaic_images <- list(raster('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif'),
-                  raster('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N10W084_dem.tif'),
-                  raster('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N10W085_dem.tif'))
-DEM_mosaic_img <- mosaicimgs(baseimg, mosaic_images)
+DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
+DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
+DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
+DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
+DEM_mosaic_img <- mosaicimgs(DEM1, list(DEM2, DEM3, DEM4))
 
-testtime <- proc.time()
 matchrasters <- function(baseimg, matchimg) {
     require(raster)
     if (projection(baseimg) != projection(matchimg)) {
@@ -58,23 +72,16 @@ matchrasters <- function(baseimg, matchimg) {
     #resample(
     return(outimg)
 }
-beginCluster(3)
-baseimg <- raster('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.bsq')
-matchimg <-  DEM_mosaic_img
-matched_image <- matchrasters(baseimg, matchimg)
-endCluster()
-proc.time() - testtime 
+library(raster)
+DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
+DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
+DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
+DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
+DEM_mosaic_img <- mosaicimgs(DEM1, list(DEM2, DEM3, DEM4))
 
-get_metadata_item <- function(metadatafile, item) {
-    if (!file.exists(metadatafile) {
-        stop(paste('Could not find metadata file', metadatafile))
-    }
-    metadata <- read.csv(metadatafile, stringsAsFactors=FALSE)
-    rownum <- which(grepl(item, metadata$item))
-    return(metadata$value[rownum])
-}
-#metadatafile <- 'H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.txt'
-#get_metadata_item(metadatafile, 'SolarZenith')
+baseimg <- DEM_mosaic_img
+matchimg <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
+matched_image <- matchrasters(baseimg, matchimg)
 
 topographic_corr <- function(imgfile, DEMfile, ...) {
     require(raster)
