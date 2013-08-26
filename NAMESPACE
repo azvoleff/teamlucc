@@ -1,2 +1,1 @@
-export(vim.list.args, vim.srcdir, vim.plot, vim.help, vim.interlace.rnoweb, vim.interlace.rrst, vim.openpdf, vim.print, vim.bol, vim.names, etags2ctags, vim.interlace.rmd)
-importFrom(tools, Rd2txt_options, texi2dvi)
+export(matchrasters, topographic_corr, mosaicimgs)
