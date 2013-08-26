@@ -1,4 +1,3 @@
-
 PLOT_WIDTH <- 3.25
 PLOT_HEIGHT <- 3.25
 DPI <- 300
@@ -17,23 +16,54 @@ get_band_names_from_hdr <- function(hdr_file) {
     return(band_names)
 }
 
-mosaicDEMs <- function(DEMfilelist, ...) {
+mosaicimgs <- function(baseimg, ...) {
     require(raster)
-    message(paste('Mosaicing DEMs with', DEMfilelist[1], 'as base file'))
-    for (DEMfile in DEMfilelist[2:]) {
+    dots <- list(...)
+    if (length(dots) < 1) {
+        stop('no mosaic images provided')
+    } else if (is.list(dots[1])) {
+        img_list <- dots[[1]]
+    } else {
+        img_list <- dots
+    }
+    mosaic_img <- baseimg
+    for (img in img_list) {
+        message(paste('Adding image to mosaic...'))
         # TODO: Need to ensure that projection systems match
-        mosaic_img <- mosaic(mosaic_img, raster(DEMfile), fun=mean)
+        mosaic_img <- mosaic(mosaic_img, img, fun=mean)
     }
     return(mosaic_img)
 }
+library(raster)
+baseimg <- raster('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W084_dem.tif')
+mosaic_images <- list(raster('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif'),
+                  raster('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N10W084_dem.tif'),
+                  raster('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N10W085_dem.tif'))
+DEM_mosaic_img <- mosaicimgs(baseimg, mosaic_images)
 
-matchrasters <- function(base_image_file, match_image_file) {
-    base_image <- raster(base_image_file)
-    match_image <- raster(match_image_file)
+testtime <- proc.time()
+matchrasters <- function(baseimg, matchimg) {
+    require(raster)
+    if (projection(baseimg) != projection(matchimg)) {
+        message('Coordinate systems do not match - reprojecting matchimg...')
+        matchimg <- projectRaster(matchimg, baseimg)
+    }
+    # First crop out any overlapping area
+    message('Cropping matchimg to base...')
+    outimg <- crop(matchimg, baseimg)
+    # Now extend borders of cropped raster to match base raster
+    message('Extending matchimg to base...')
+    outimg <- extend(matchimg, outimg)
+    message('Resampling matchimg to base...')
+    #resample(
+    return(outimg)
 }
-base_image <- 'H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.bsq'
-match_image <- 
-matchrasters(base_image, match_image)
+beginCluster(3)
+baseimg <- raster('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.bsq')
+matchimg <-  DEM_mosaic_img
+matched_image <- matchrasters(baseimg, matchimg)
+endCluster()
+proc.time() - testtime 
 
 get_metadata_item <- function(metadatafile, item) {
     if (!file.exists(metadatafile) {
