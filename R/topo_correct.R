@@ -1,7 +1,3 @@
-PLOT_WIDTH <- 3.25
-PLOT_HEIGHT <- 3.25
-DPI <- 300
-
 get_metadata_item <- function(metadatafile, item) {
     if (!file.exists(metadatafile)) {
         stop(paste('Could not find metadata file', metadatafile))
@@ -10,8 +6,6 @@ get_metadata_item <- function(metadatafile, item) {
     rownum <- which(grepl(item, metadata$item))
     return(metadata$value[rownum])
 }
-#metadatafile <- 'H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.txt'
-#get_metadata_item(metadatafile, 'SolarZenith')
 
 get_band_names_from_hdr <- function(hdr_file) {
     require(raster)
@@ -27,9 +21,8 @@ get_band_names_from_hdr <- function(hdr_file) {
     return(band_names)
 }
 
-mosaicimgs <- function(baseimg, ...) {
+mosaic_imgs <- function(baseimg, ...) {
     require(raster)
-    require(rgdal)
     dots <- list(...)
     if (length(dots) < 1) {
         stop('no mosaic images provided')
@@ -49,14 +42,14 @@ mosaicimgs <- function(baseimg, ...) {
     }
     return(mosaic_img)
 }
-library(raster)
-DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
-DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
-DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
-DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
-DEM_mosaic_img <- mosaicimgs(DEM1, list(DEM2, DEM3, DEM4))
+# library(raster)
+# DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
+# DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
+# DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
+# DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
+# DEM_mosaic_img <- mosaic_imgs(DEM1, list(DEM2, DEM3, DEM4))
 
-matchrasters <- function(baseimg, matchimg) {
+match_rasters <- function(baseimg, matchimg) {
     require(raster)
     if (projection(baseimg) != projection(matchimg)) {
         message('Coordinate systems do not match - reprojecting matchimg...')
@@ -68,34 +61,69 @@ matchrasters <- function(baseimg, matchimg) {
     # Now extend borders of cropped raster to match base raster
     message('Extending matchimg to base...')
     outimg <- extend(matchimg, outimg)
-    message('Resampling matchimg to base...')
-    #resample(
+    #message('Resampling matchimg to base...')
+    #resample(outimg, baseimg)
     return(outimg)
 }
-library(raster)
-DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
-DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
-DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
-DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
-DEM_mosaic_img <- mosaicimgs(DEM1, list(DEM2, DEM3, DEM4))
+# library(raster)
+# # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
+# DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
+# DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
+# DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
+# DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
+# DEM_mosaic <- mosaic_imgs(DEM1, list(DEM2, DEM3, DEM4))
+# 
+# # Crop and extend the DEM mosaic to match the Landsat image
+# L5TSR_1986 <- raster(system.file('extdata/L5TSR_1986.dat', package='LDPKR'))
+# matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 
-baseimg <- DEM_mosaic_img
-matchimg <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
-matched_image <- matchrasters(baseimg, matchimg)
-
-topographic_corr <- function(imgfile, DEMfile, ...) {
+topographic_corr <- function(img, DEM, sunelev, sunazimuth, ...) {
     require(raster)
     require(landsat)
-    img <- raster(imgfile)
-    DEM <- raster(DEMfile)
+    if (class(img) == 'SpatialGridDataFrame') {
+        stop('img must be a Raster* object')
+    }
+    if (class(DEM) == 'SpatialGridDataFrame') {
+        stop('DEM must be a Raster* object')
+    } else {
+        DEM_df <- as(DEM, "SpatialGridDataFrame")
+    }
     message('Calculating slope and aspect...')
-    DEM.slopeasp <- slopeasp(DEM)
-    sunelev <- as.numeric(get_metadata_item(extension(imgfile, 'txt'), 
-                                            'SolarZenith'))
-    sunazimuth <- as.numeric(get_metadata_item(extension(imgfile, 'txt'), 
-                                               'SolarAzimuth'))
-    message('Performing topographic correction...')
-    corr_img <- topocorr(img, DEM.slopeasp$slope, DEM.slopeasp$aspect, 
-                         sunelev=sunelev, sunazimuth=sunazimuth, ...)
+    DEM_slopeasp <- slopeasp(DEM_df)
+    corr_img <- raster()
+    for (bandnum in 1:nlayers(img)) {
+        message(paste('Performing topographic correction on band ', bandnum, 
+                      '...', sep=''))
+        img_df <- as(raster(img, layer=bandnum), 'SpatialGridDataFrame')
+        corr_df <- topocorr(img_df, DEM_slopeasp$slope, DEM_slopeasp$aspect, 
+                             sunelev=sunelev, sunazimuth=sunazimuth, ...)
+        corr_img <- addLayer(corr_img, raster(corr_df))
+    }
     return(corr_img)
 }
+# library(raster)
+# # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
+# DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
+# DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
+# DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
+# DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
+# DEM_mosaic <- mosaic_imgs(DEM1, list(DEM2, DEM3, DEM4))
+# 
+# # Crop and extend the DEM mosaic to match the Landsat image
+# L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='LDPKR')
+# L5TSR_1986 <- stack(L5TSR_1986_file)
+# matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
+# 
+# # Read sun elevation and sun azimuth from .txt metadata file accompanying the 
+# # Landsat file (as output from LDPK Python tools)
+# metadatafile <- extension(L5TSR_1986_file, 'txt')
+# sunelev <- as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
+# sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
+# 
+# # Apply the topographic correction
+# L5TSR_1986_topocorr<- topographic_corr(L5TSR_1986, matched_DEM, sunelev,
+#                                         sunazimuth, method='minslope')
+# 
+# plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
+# 
+# plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
