@@ -1,3 +1,18 @@
+#' Extract a metadata item from a metadata file in LDPK format 
+#'
+#' @export
+#' @param metadatafile a metadat file in LDPK format (ending in .txt)
+#' @param item a string giving the name of the metadata item to extract
+#' @return the meatadata item (as a string)
+#' @examples
+#' # Load an example metadata file
+#' L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='LDPKR')
+#' metadatafile <- extension(L5TSR_1986_file, 'txt')
+#'
+#' # Extract the sun angle elevation from the metadata file. Note that
+#' # get_metadata_item returns a string, so the item must be converted using
+#' # as.numeric
+#' sunelev <- as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
 get_metadata_item <- function(metadatafile, item) {
     if (!file.exists(metadatafile)) {
         stop(paste('Could not find metadata file', metadatafile))

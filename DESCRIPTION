@@ -1,10 +1,21 @@
 Package: LDPKR
 Version: 0.1
 Date: 2013-08-22
-Title: TEAM Landsat Data Processing Toolkit (R procedures)
+Title: TEAM Remote Sensing Data Processing Toolkit (R procedures)
 Author: Alex Zvoleff
 Maintainer: Alex Zvoleff <azvoleff@conservation.org>
-Depends: raster, rgdal, landsat
-Description: Routines for processing Landsat imagery for the Tropical Ecology Assessment and Monitoring (TEAM) Network.
+Depends:
+    raster,
+    rgdal,
+    landsat
+Description: Routines for processing Landsat imagery for the Tropical Ecology
+    Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
 URL: https://github.com/azvoleff/LDPKR
+Collate:
+    'get_band_names_from_hdr.R'
+    'get_metadata_item.R'
+    'match_rasters.R'
+    'mosaic_imgs.R'
+    'topographic_corr.R'
+    'glcm.R'

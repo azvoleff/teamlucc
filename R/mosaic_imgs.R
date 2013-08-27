@@ -1,3 +1,19 @@
+#' Mosaic a set of images, reprojecting images as needed.
+#'
+#' @export
+#' @param baseimg A /code{Raster*} to use as the base image. This layer will 
+#' determine the output coordinate system.
+#' @param ... Additional /code{Raster*} layers or a list of /code{Raster*} 
+#' layers to mosic with the /code{baseimg}.
+#' @return mosaic_img A mosaiced /code{Raster*} including the base image and 
+#' any additional images.
+#' @examples
+#' library(raster)
+#' DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
+#' DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
+#' DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
+#' DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
+#' DEM_mosaic_img <- mosaic_imgs(DEM1, list(DEM2, DEM3, DEM4))
 mosaic_imgs <- function(baseimg, ...) {
     require(raster)
     dots <- list(...)
@@ -19,9 +35,3 @@ mosaic_imgs <- function(baseimg, ...) {
     }
     return(mosaic_img)
 }
-# library(raster)
-# DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
-# DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
-# DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
-# DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
-# DEM_mosaic_img <- mosaic_imgs(DEM1, list(DEM2, DEM3, DEM4))

@@ -1,1 +1,5 @@
-export(matchrasters, topographic_corr, mosaicimgs)
+export(get_metadata_item)
+export(glcm)
+export(match_rasters)
+export(mosaic_imgs)
+export(topographic_corr)
