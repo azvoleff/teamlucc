@@ -7,7 +7,7 @@
 #' the /code{matchimg} will be reprojected to match the coordinate system of 
 #' the /code{baseimg}. The /code{matchimg} will then be cropped and extended to 
 #' match the extent of the /code{baseimg}.
-#' @return out_img The /code{matchimg} reprojected (if necessary), cropped, and 
+#' @return The /code{matchimg} reprojected (if necessary), cropped, and 
 #' extended to match the /code{baseimg}.
 #' @examples
 #' library(raster)

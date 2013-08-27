@@ -8,8 +8,8 @@
 #' vertical), and including the center pixel, but not taking into account 
 #' /code{d}).
 #' @param statistic A list of GLCM texture measures to calculate.
-#' @return GLCM_img A /code{RasterLayer} with the calculated requested GLCM 
-#' texture measures.
+#' @return A /code{RasterLayer} with the calculated requested GLCM texture 
+#' measures.
 #' @examples
 #' # TODO: Need an example
 glcm <- function(img, n_grey, d, w, statistic) {

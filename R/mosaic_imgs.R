@@ -5,8 +5,8 @@
 #' determine the output coordinate system.
 #' @param ... Additional /code{Raster*} layers or a list of /code{Raster*} 
 #' layers to mosic with the /code{baseimg}.
-#' @return mosaic_img A mosaiced /code{Raster*} including the base image and 
-#' any additional images.
+#' @return A mosaiced /code{Raster*} including the base image and any 
+#' additional images.
 #' @examples
 #' library(raster)
 #' DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))

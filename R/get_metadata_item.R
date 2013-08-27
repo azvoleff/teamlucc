@@ -1,9 +1,9 @@
 #' Extract a metadata item from a metadata file in LDPK format 
 #'
 #' @export
-#' @param metadatafile a metadat file in LDPK format (ending in .txt)
+#' @param metadatafile a metadata file in LDPK format (ending in .txt)
 #' @param item a string giving the name of the metadata item to extract
-#' @return the meatadata item (as a string)
+#' @return The metadata item (as a string)
 #' @examples
 #' # Load an example metadata file
 #' L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='LDPKR')
