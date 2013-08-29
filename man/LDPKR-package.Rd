@@ -1,15 +1,14 @@
 \docType{package}
-\name{LDPKR-package}
-\alias{LDPKR-package}
+\name{LDPKR}
 \alias{LDPKR}
-\title{Overview of the LDPKR package}
+\alias{LDPKR-package}
+\title{TEAM Remote Sensing Processing Tools}
 \description{A set of scripts for processing remote sensing data to support the 
   work of the Tropical Ecology Assessment and Monitoring (TEAM) Network. 
   Intended to be used in conjunction with the set of Python scripts available 
-  on \code{\link[https://github.com/azvoleff/LDPK]{github}}.
+  in the \href{https://github.com/azvoleff/LDPK}{LDPK repository} on github .
 }
-\seealso{\code{\link[raster]{raster}}, \code{\link[landsat]{landsat}}}
 \author{
 Alex Zvoleff <azvoleff@conservation.org>
 }
-\keyword{ package }
+\keyword{package}
