@@ -1,12 +1,12 @@
 \docType{package}
-\name{LDPKR}
-\alias{LDPKR}
-\alias{LDPKR-package}
+\name{teamr}
+\alias{teamr}
+\alias{teamr-package}
 \title{TEAM Remote Sensing Processing Tools}
 \description{A set of scripts for processing remote sensing data to support the 
   work of the Tropical Ecology Assessment and Monitoring (TEAM) Network. 
   Intended to be used in conjunction with the set of Python scripts available 
-  in the \href{https://github.com/azvoleff/LDPK}{LDPK repository} on github .
+  in the \href{https://github.com/azvoleff/teampy}{teampy repository} on github .
 }
 \author{
 Alex Zvoleff <azvoleff@conservation.org>
