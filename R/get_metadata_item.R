@@ -1,12 +1,12 @@
-#' Extract a metadata item from a metadata file in LDPK format 
+#' Extract a metadata item from a metadata file in team format 
 #'
 #' @export
-#' @param metadatafile a metadata file in LDPK format (ending in .txt)
+#' @param metadatafile a metadata file in team format (ending in .txt)
 #' @param item a string giving the name of the metadata item to extract
 #' @return The metadata item (as a string)
 #' @examples
 #' # Load an example metadata file
-#' L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='LDPKR')
+#' L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='teamr')
 #' metadatafile <- extension(L5TSR_1986_file, 'txt')
 #'
 #' # Extract the sun angle elevation from the metadata file. Note that

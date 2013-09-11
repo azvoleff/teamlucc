@@ -3,8 +3,8 @@
 #' @param hdr_file an ENVI format header file with a .hdr extension
 #' @return A /code{list} of band names extracted from the /code{hdr_file}
 #' @examples
-#' hdr_file <- system.file('extdata/L5TSR_1986.hdr', package='LDPKR')
-#' LDPKR:::get_band_names_from_hdr(hdr_file)
+#' hdr_file <- system.file('extdata/L5TSR_1986.hdr', package='teamr')
+#' teamr:::get_band_names_from_hdr(hdr_file)
 get_band_names_from_hdr <- function(hdr_file) {
     require(raster)
     txt <- readLines(hdr_file)

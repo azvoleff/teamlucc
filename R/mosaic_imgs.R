@@ -9,10 +9,10 @@
 #' additional images.
 #' @examples
 #' library(raster)
-#' DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='LDPKR'))
-#' DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='LDPKR'))
-#' DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='LDPKR'))
-#' DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='LDPKR'))
+#' DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='teamr'))
+#' DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='teamr'))
+#' DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='teamr'))
+#' DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='teamr'))
 #' DEM_mosaic_img <- mosaic_imgs(DEM1, list(DEM2, DEM3, DEM4))
 mosaic_imgs <- function(baseimg, ...) {
     require(raster)
