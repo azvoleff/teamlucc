@@ -26,7 +26,7 @@
 #' # Read sun elevation and sun azimuth from .txt metadata file accompanying the 
 #' # Landsat file (as output from LDPK Python tools)
 #' metadatafile <- extension(L5TSR_1986_file, 'txt')
-#' sunelev <- as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
+#' sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
 #' sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
 #' 
 #' # Apply the topographic correction
