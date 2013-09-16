@@ -23,8 +23,8 @@
 #' L5TSR_1986 <- stack(L5TSR_1986_file)
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 #' 
-#' # Read sun elevation and sun azimuth from .txt metadata file accompanying 
-#' the # Landsat file (as output from teampy Python package).
+#' # Read sun elevation and sun azimuth from .txt metadata file accompanying
+#' # the Landsat file (as output from teampy Python package).
 #' metadatafile <- extension(L5TSR_1986_file, 'txt')
 #' sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
 #' sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
