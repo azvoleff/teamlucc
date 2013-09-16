@@ -24,3 +24,4 @@ Collate:
     'tts2df.R'
     'ttsdf2raster.R'
     'teamr.R'
+    'simplify_ZOI.R'
