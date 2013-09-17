@@ -7,7 +7,8 @@ Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
     raster,
     rgdal,
-    landsat
+    landsat,
+    rgeos
 Description: Routines for processing Landsat imagery for the Tropical Ecology
     Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
