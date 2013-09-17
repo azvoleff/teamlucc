@@ -1,3 +1,22 @@
+#' Count number of vertices in an sp polygon object
+#'
+#' @param poly_obj an sp polygon object
+#' @return the number of vertices in the polygon
+#' @examples
+#' # TODO: Write an example.
+nverts <- function(poly_obj) {
+    n_verts <- sapply(poly_obj@polygons, function(y) 
+                      nrow(y@Polygons[[1]]@coords))[[1]]
+    if (is.null(n_verts)) {
+        n_verts <- 0
+    } else {
+        # Need to subtract one as the starting coordinate and ending coordinate 
+        # are identical, but appear twice - at beginning and at end of list.
+        n_verts <- n_verts - 1
+    }
+    return(n_verts)
+}
+
 #' Simplify a TEAM site ZOI polygon for use with EarthExplorer
 #'
 #' @export
@@ -20,27 +39,6 @@
 #' # TODO: Write an example. Will need to add a polygon object to the package.
 #' # ZOI_poly <- readOGR('H:/Data/TEAM/VB/Vectors', 'VB_ZOI_GEO')
 #' # simplify_ZOI(ZOI_poly, 3)
-# TODO: Might need to load 'shapefiles' package to get extent function
-
-#' Count number of vertices in an sp polygon object
-#'
-#' @param poly_obj an sp polygon object
-#' @return the number of vertices in the polygon
-#' @examples
-#' # TODO: Write an example.
-nverts <- function(poly_obj) {
-    n_verts <- sapply(poly_obj@polygons, function(y) 
-                      nrow(y@Polygons[[1]]@coords))[[1]]
-    if (is.null(n_verts)) {
-        n_verts <- 0
-    } else {
-        # Need to subtract one as the starting coordinate and ending coordinate 
-        # are identical, but appear twice - at beginning and at end of list.
-        n_verts <- n_verts - 1
-    }
-    return(n_verts)
-}
-
 simplify_ZOI <- function(ZOI_poly, max_vertices, maxit=100, multiplier=1.25, 
                          initial_tolerance='dynamic') {
     n_parts <- sapply(ZOI_poly@polygons, function(x) length(x))
