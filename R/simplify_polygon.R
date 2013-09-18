@@ -78,4 +78,3 @@ simplify_polygon <- function(poly_obj, max_vertices, maxit=100, multiplier=1.25,
 
     return (poly_obj)
 }
-
