@@ -1,11 +1,8 @@
-#' Makes a polygon shapefile to be used for digitizing training sites.
+#' Makes a polygon shapefile of image extent.
 #'
 #' @export
-#' @param raster_file Path to the raster file that will be used for training 
-#' site selection.
-#' @return The path to a polygon shapefile in the same projection system as the 
-#' input raster.
-make_training_layer <- function(raster_file, out_file) {
+#' @param raster_file Path to the raster file.
+write_raster_extent <- function(raster_file, out_file) {
     require(sp)
     train_img <- raster(raster_file)
     img_ext <- extent(train_img)
