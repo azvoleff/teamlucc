@@ -5,6 +5,7 @@ Title: TEAM Remote Sensing Data Processing Toolkit (R procedures)
 Author: Alex Zvoleff
 Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
+    sp,
     raster,
     rgdal,
     landsat,
@@ -26,3 +27,4 @@ Collate:
     'ttsdf2raster.R'
     'teamr.R'
     'simplify_polygon.R'
+    'write_raster_extent.R'

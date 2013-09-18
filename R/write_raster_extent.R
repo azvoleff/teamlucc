@@ -2,6 +2,7 @@
 #'
 #' @export
 #' @param raster_file Path to the raster file.
+#' @param out_file Filename for the output shapefile.
 write_raster_extent <- function(raster_file, out_file) {
     require(sp)
     train_img <- raster(raster_file)
@@ -19,7 +20,7 @@ write_raster_extent <- function(raster_file, out_file) {
     Sr <- SpatialPolygons(list(img_ext_poly), 
                           proj4string=CRS(proj4string(train_img)))
     # Now create the training data SpatialPolygonsDataFrame instance
-    train_df <- SpatialPolygonsDataFrame(Sr, data=data.frame(LC_Type='Extent', 
+    train_df <- SpatialPolygonsDataFrame(Sr, data=data.frame(Poly_Type='Extent', 
                                                              Notes=''))
     layer_name <- gsub('.shp$', '', basename(out_file), ignore.case=TRUE)
     writeOGR(train_df, dirname(out_file), layer_name, driver='ESRI Shapefile')
