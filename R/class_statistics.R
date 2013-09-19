@@ -3,7 +3,7 @@
 #' @export
 #' @param rast A \code{RasterLayer} from which class statistics will be 
 #' calculated.
-#' @param shp A shapefile with class polygons
+#' @param shp A shapefile with class polygons.
 #' @return A data.frame of class statistics.
 #' @examples
 #' # TODO: Add example
@@ -18,16 +18,10 @@ class_statistics <- function(rast, shp) {
     if (projection(rast) != projection(class_polys)) {
         stop('Coordinate systems do not match')
     }
-    class_stats <- data.frame(Poly_Type=unique(class_polys$Poly_Type))
-    class_stats$r_mean <- NA
-    class_stats$r_sd <- NA
-    class_stats$r_min <- NA
-    class_stats$r_max <- NA
-    class_stats$n_polys <- NA
-    class_stats$mean_n_per_poly <- NA
-    class_stats$sd_n_per_poly <- NA
-    class_stats$min_n_per_poly <- NA
-    class_stats$max_n_per_poly <- NA
+    class_stats <- data.frame(Poly_Type=unique(class_polys$Poly_Type),
+                              r_mean=NA, r_sd=NA, r_min=NA, r_max=NA,
+                              n_polys=NA, mean_n_per_poly=NA, sd_n_per_poly=NA, 
+                              min_n_per_poly=NA, max_n_per_poly=NA)
     for (n in 1:nrow(class_stats)) {
         these_polys <- class_polys[class_polys$Poly_Type == class_stats$Poly_Type[n], ]
         pixels <- extract(rast, these_polys, small=TRUE)
