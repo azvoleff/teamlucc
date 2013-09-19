@@ -29,3 +29,6 @@ Collate:
     'simplify_polygon.R'
     'write_raster_extent.R'
     'class_statistics.R'
+    'SVIs.R'
+    'extract_training_data.R'
+    'svm_classify.R'
