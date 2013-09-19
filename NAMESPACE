@@ -1,3 +1,4 @@
+export(class_statistics)
 export(get_metadata_item)
 export(glcm)
 export(match_rasters)
