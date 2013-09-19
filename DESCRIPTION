@@ -9,7 +9,8 @@ Depends:
     raster,
     rgdal,
     landsat,
-    rgeos
+    rgeos,
+    abind
 Description: Routines for processing Landsat imagery for the Tropical Ecology
     Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
