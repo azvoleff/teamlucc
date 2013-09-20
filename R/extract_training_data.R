@@ -16,7 +16,6 @@
 #' rast <- stack(img_file, bands=as.integer(c(1, 2, 3, 4)))
 #' extract_training_data(rast, shp)
 extract_training_data <- function(rast, shp) {
-    require(abind)
     layer_name <- gsub('.shp$', '', basename(shp), ignore.case=TRUE)
     class_polys <- readOGR(dirname(shp), layer_name, stringsAsFactors=FALSE)
     if (projection(rast) != projection(class_polys)) {

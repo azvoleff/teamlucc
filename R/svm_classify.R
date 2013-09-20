@@ -17,4 +17,5 @@ svm_classify <- function(raster_file, out_file) {
 # training_data <- extract_training_data(rast, shp)
 # 
 # testSVM <- svm(y ~ ., data=training_data)
- 
+
+# tune.svm()
