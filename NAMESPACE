@@ -1,3 +1,4 @@
+export(CVAPS)
 export(SVIs)
 export(class_statistics)
 export(extract_training_data)

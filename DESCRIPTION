@@ -34,3 +34,4 @@ Collate:
     'SVIs.R'
     'extract_training_data.R'
     'svm_classify.R'
+    'CVAPS.R'
