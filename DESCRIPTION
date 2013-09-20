@@ -10,7 +10,8 @@ Depends:
     rgdal,
     landsat,
     rgeos,
-    abind
+    abind,
+    e1071
 Description: Routines for processing Landsat imagery for the Tropical Ecology
     Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
