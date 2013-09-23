@@ -9,6 +9,7 @@
 #' another pass through the search loop
 #' @param m number of potential thresholds per search iteration (see Chen et 
 #' al., 2003). Recommended to leave at default value.
+#' @param maxiter maximum number of iterations of the main search process
 #' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.  
 #' Land-use/land-cover change detection using improved change-vector analysis.  
 #' Photogrammetric Engineering and Remote Sensing 69:369–380.
@@ -29,7 +30,8 @@ DFPS <- function(chg_polys, chg_img, radius=150, delta=.01, m=10) {
     Lmin <- Lmax - 2 * delta
     min_threshold <- min(chg_pixels)
     max_threshold <- max(chg_pixels)
-    while ((Lmax - Lmin) < delta) {
+    n <- 0
+    while ((Lmax - Lmin) < delta && n < maxiter) {
         p <- (max_threshold - min_threshold) / m
         thresholds <- seq(min_threshold, max_threshold, p)
         L <- c()
@@ -44,6 +46,7 @@ DFPS <- function(chg_polys, chg_img, radius=150, delta=.01, m=10) {
         max_threshold <- kmax - p
         Lmin <- min(L)
         Lmax <- max(L)
+        n <- n + 1
     }
     return(kmax)
 }
