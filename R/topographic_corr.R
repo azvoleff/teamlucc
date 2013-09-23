@@ -1,9 +1,9 @@
 #' Topographically correct a raster
 #'
 #' @export
-#' @param img An image to correct.
+#' @param x An image to correct.
 #' @param DEM A digital elevation model with the same coordinate system, 
-#' extent, and resolution as /code{img}
+#' extent, and resolution as /code{x}
 #' @param sunazimuth Sun azimuth in degrees.
 #' @param sunelev Sun elevation in degrees.
 #' @param ... Additional arguments to be passed to \code{topocorr} in the 
@@ -36,11 +36,11 @@
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' 
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
-topographic_corr <- function(img, DEM, sunelev, sunazimuth, ...) {
+topographic_corr <- function(x, DEM, sunelev, sunazimuth, ...) {
     require(raster)
     require(landsat)
-    if (class(img) == 'SpatialGridDataFrame') {
-        stop('img must be a Raster* object')
+    if (class(x) == 'SpatialGridDataFrame') {
+        stop('x must be a Raster* object')
     }
     if (class(DEM) == 'SpatialGridDataFrame') {
         stop('DEM must be a Raster* object')
@@ -50,10 +50,10 @@ topographic_corr <- function(img, DEM, sunelev, sunazimuth, ...) {
     message('Calculating slope and aspect...')
     DEM_slopeasp <- slopeasp(DEM_df)
     corr_img <- raster()
-    for (bandnum in 1:nlayers(img)) {
+    for (bandnum in 1:nlayers(x)) {
         message(paste('Performing topographic correction on band ', bandnum, 
                       '...', sep=''))
-        img_df <- as(raster(img, layer=bandnum), 'SpatialGridDataFrame')
+        img_df <- as(raster(x, layer=bandnum), 'SpatialGridDataFrame')
         corr_df <- topocorr(img_df, DEM_slopeasp$slope, DEM_slopeasp$aspect, 
                              sunelev=sunelev, sunazimuth=sunazimuth, ...)
         corr_img <- addLayer(corr_img, raster(corr_df))

@@ -1,10 +1,10 @@
 #' Mosaic a set of images, reprojecting images as needed.
 #'
 #' @export
-#' @param baseimg A /code{Raster*} to use as the base image. This layer will 
+#' @param x A /code{Raster*} to use as the base image. This layer will 
 #' determine the output coordinate system.
 #' @param ... Additional /code{Raster*} layers or a list of /code{Raster*} 
-#' layers to mosic with the /code{baseimg}.
+#' layers to mosic with the /code{x}.
 #' @return A mosaiced /code{Raster*} including the base image and any 
 #' additional images.
 #' @examples
@@ -14,7 +14,7 @@
 #' DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='teamr'))
 #' DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='teamr'))
 #' DEM_mosaic_img <- mosaic_imgs(DEM1, list(DEM2, DEM3, DEM4))
-mosaic_imgs <- function(baseimg, ...) {
+mosaic_imgs <- function(x, ...) {
     require(raster)
     dots <- list(...)
     if (length(dots) < 1) {
@@ -27,7 +27,7 @@ mosaic_imgs <- function(baseimg, ...) {
     } else {
         img_list <- dots
     }
-    mosaic_img <- baseimg
+    mosaic_img <- x
     for (img in img_list) {
         message(paste('Adding image to mosaic...'))
         # TODO: Need to ensure that projection systems match

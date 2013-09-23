@@ -1,7 +1,7 @@
 #' Function to convert TIMESAT .tts binary format to an R dataframe.
 #'
 #' @export
-#' @param tts_file_name A .tts file output by TIMESAT
+#' @param x A .tts file output by TIMESAT
 #' @return A data.frame containing 'row' and 'col' columns giving the the row 
 #' and column of a pixel in the input image to timesat, and then a number of 
 #' columns named 't1', 't2', ...'tn', where n is the total number of image 
@@ -9,10 +9,10 @@
 #' @examples
 #' # TODO: Need to add examples here, and need to include a sample TIMESAT tts 
 #' # file in the package data.
-tts2df <- function(tts_file_name) {
+tts2df <- function(x) {
     require(base) # Needed for file.info
 
-    if (missing(tts_file_name) || !grepl('[.]tts$', tolower(tts_file_name))) {
+    if (missing(x) || !grepl('[.]tts$', tolower(x))) {
         stop('must specify a .tts file')
     }
 
@@ -20,8 +20,8 @@ tts2df <- function(tts_file_name) {
     # column).
     LINE_HEADER_SIZE <- 2
 
-    tts_file_obj <- file(tts_file_name, "rb")
-    raw_vector <- readBin(tts_file_obj, n=file.info(tts_file_name)$size, raw())
+    tts_file_obj <- file(x, "rb")
+    raw_vector <- readBin(tts_file_obj, n=file.info(x)$size, raw())
     close(tts_file_obj)
 
     # This function is used to track the offset within the binary vector as readBin 

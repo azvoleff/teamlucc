@@ -1,7 +1,7 @@
 #' Function to convert TIMESAT .tpa binary format file to an R dataframe.
 #'
 #' @export
-#' @param tpa_file_name A string giving the location of a .tpa file output by 
+#' @param x A string giving the location of a .tpa file output by 
 #' TIMESAT
 #' @return A data.frame containing 14 columns: row, col, season, start, end, 
 #' length, base_value, peak_time, peak_value, amp, left_deriv, right_deriv, 
@@ -9,10 +9,10 @@
 #' @examples
 #' # TODO: Need to add examples here, and need to include a sample TIMESAT tpa 
 #' # file in the package data.
-tpa2df <- function(tpa_file_name) {
+tpa2df <- function(x) {
     require(base) # Needed for file.info
 
-    if (missing(tpa_file_name) || !grepl('[.]tpa$', tolower(tpa_file_name))) {
+    if (missing(x) || !grepl('[.]tpa$', tolower(x))) {
         stop('must specify a .tpa file')
     }
 
@@ -23,8 +23,8 @@ tpa2df <- function(tpa_file_name) {
     # column, number of seasons).
     LINE_HEADER_SIZE <- 3
 
-    tpa_file_obj <- file(tpa_file_name, "rb")
-    raw_vector <- readBin(tpa_file_obj, n=file.info(tpa_file_name)$size, raw())
+    tpa_file_obj <- file(x, "rb")
+    raw_vector <- readBin(tpa_file_obj, n=file.info(x)$size, raw())
     close(tpa_file_obj)
 
     # This function is used to track the offset within the binary vector as readBin 

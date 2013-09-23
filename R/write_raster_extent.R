@@ -1,11 +1,11 @@
 #' Makes a polygon shapefile of image extent.
 #'
 #' @export
-#' @param raster_file Path to the raster file.
+#' @param x Path to the raster file.
 #' @param out_file Filename for the output shapefile.
-write_raster_extent <- function(raster_file, out_file) {
+write_raster_extent <- function(x, out_file) {
     require(sp)
-    train_img <- raster(raster_file)
+    train_img <- raster(x)
     img_ext <- extent(train_img)
     # Need to create the shapefile with a polygon in it as R doesn't have an 
     # easy way to create and setup an empty shapefile. So make a polygon with 

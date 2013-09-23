@@ -37,8 +37,3 @@ CVAPS <- function(svm_t0, x_t0, svm_t1, x_t1) {
     # Now do double-window flexible pace search
     
 }
-
-DFPS <- function(svm_t0, x_t0, radius=150) {
-    layer_name <- gsub('.shp$', '', basename(shp), ignore.case=TRUE)
-    class_polys <- readOGR(dirname(shp), layer_name, stringsAsFactors=FALSE)
-}
