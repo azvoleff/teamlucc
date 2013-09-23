@@ -8,7 +8,7 @@
 #' @references Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector 
 #' analysis in posterior probability space: a new method for land cover change 
 #' detection. IEEE Geoscience and Remote Sensing Letters 8:317–321.
-CVAPS <- function(svm_t0, x_t0, svm_t1, x_t1) {
+CVAPS <- function(svm_t0, x_t0, svm_t1, x_t1, chg_polys) {
     # Check that x_t0 and x_t1 are matched images (identical extents and 
     # identical projections)
     
@@ -35,5 +35,5 @@ CVAPS <- function(svm_t0, x_t0, svm_t1, x_t1) {
     chg_type <- apply(dP %*% Eab, 1, function(r) which(r == max(r)))
 
     # Now do double-window flexible pace search
-    
+    DFPS(chg_polys, chg_img)
 }
