@@ -15,10 +15,12 @@ CVAPS <- function(svm_t0, x_t0, svm_t1, x_t1, chg_polys) {
     # Check that svm_t0 and svm_t1 have the same classes
     
     # Get number of classes from coefs matrix
-    n_classes <- svm_t0@coefs
+    n_classes <- svm_t0$nclasses
 
-    pred_t0 <- predict(best.tune(svm_t0), newdata=x_t0, probability=TRUE)
-    pred_t1 <- predict(best.tune(svm_t1), newdata=x_t1, probability=TRUE)
+
+    x_t1_data <- getValues(x_t1)
+
+    pred_t1 <- predict(svm_t1, newdata=x_t1_data, probability=TRUE)
     t0_prob <- pred_t0@probabilities
     t1_prob <- pred_t1@probabilities
 
