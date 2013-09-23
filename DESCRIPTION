@@ -35,3 +35,4 @@ Collate:
     'extract_training_data.R'
     'svm_classify.R'
     'CVAPS.R'
+    'DFPS.R'
