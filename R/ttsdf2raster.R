@@ -9,7 +9,7 @@
 #' @examples
 #' # TODO: Need to add examples here, and need to include a sample TIMESAT tpa 
 #' # file in the package data.
-x2raster <- function(x, base_image) {
+ttsdf2raster <- function(x, base_image) {
     # Parameters:
     # base_image should be one of the original MODIS files that was fed 
     # into TIMESAT.
