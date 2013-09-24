@@ -10,18 +10,17 @@
 #' analysis in posterior probability space: a new method for land cover change 
 #' detection. IEEE Geoscience and Remote Sensing Letters 8:317-321.
 CVAPS <- function(t0_base, t1_base, out_file_base) {
-    t0_base <- 'C:/Users/azvoleff/SkyDrive/Publications/20140115 - TEAM LULC and Biodiversity/Code/L5TSR_1986'
-    t1_base <- 'C:/Users/azvoleff/SkyDrive/Publications/20140115 - TEAM LULC and Biodiversity/Code/L5TSR_2001'
-    out_file_base <- 'C:/Users/azvoleff/SkyDrive/Publications/20140115 - TEAM LULC and Biodiversity/Code/L5TSR_1986_to_2001'
-
     t0_prob <- brick(paste(t0_base, '_probs.envi', sep=''))
     t1_prob <- brick(paste(t1_base, '_probs.envi', sep=''))
 
     if (proj4string(t0_prob) != proj4string(t1_prob)) {
-        stop('Error: t0 and t1 predicted class probability maps must have identical coordinate system')
+        stop('Error: t0 and t1 coordinate systems do not match')
+    }
+    if (extent(t0_prob) != extent(t1_prob)) {
+        stop('Error: t0 and t1 extents do not match')
     }
     if (nlayers(t0_prob) != nlayers(t1_prob)) {
-        stop('Error: t0 and t1 predicted class probability maps must have identical number of classes')
+        stop('Error: t0 and t1 probability maps have differing number of classes')
     }
     
     n_classes <- nlayers(t0_prob)
