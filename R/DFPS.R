@@ -1,23 +1,23 @@
 #' Double-Window Flexible Pace Search (DFPS) threshold determination
 #'
 #' @export
-#' @param chg_polys training polygons of change areas surrounded by
-#' no-change
-#' @param chg_img change magnitude image from \code{CVAPS}
+#' @param chg_polys \code{SpatialPolygonsDataFrame} with polygons of change 
+#' areas surrounded by windows of no-change
+#' @param chg_img change magnitude \code{RasterLayer} from \code{CVAPS}
 #' @param radius radius of no-change surrounding change area polygons
 #' @param delta the minimum difference between Lmax and Lmin that will allow 
 #' another pass through the search loop
 #' @param m number of potential thresholds per search iteration (see Chen et 
 #' al., 2003). Recommended to leave at default value.
 #' @param maxiter maximum number of iterations of the main search process
-#' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.  
-#' Land-use/land-cover change detection using improved change-vector analysis.  
-#' Photogrammetric Engineering and Remote Sensing 69:369–380.
+#' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
+#' Land-use/land-cover change detection using improved change-vector analysis.
+#' Photogrammetric Engineering and Remote Sensing 69:369-380.
 #' 
-#' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
-#' posterior probability space: a new method for land cover change detection.  
+#' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in
+#' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317–321.
-DFPS <- function(chg_polys, chg_img, radius=150, delta=.01, m=10) {
+DFPS <- function(chg_polys, chg_img, radius=150, delta=.01, m=10, maxiter=100) {
     chg_pixels <- extract(chg_img, chg_polys)
     nochg_polys <- gDifference(gBuffer(chg_polys, width=radius), chg_polys)
     nochg_pixels <- extract(chg_img, nochg_polys)

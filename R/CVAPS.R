@@ -1,13 +1,15 @@
 #' Change Vector Analysis in Posterior Probability Space
 #'
 #' @export
-#' @param svm_t0 Support Vector Machine for time 0
-#' @param x_t0 Raster object with predictor layers for time 0
-#' @param svm_t1 Support Vector Machine for time 1
-#' @param x_t1 Raster object with predictor layers for time 1
+#' @param svm_t0 Support Vector Machine (SVM) trained for time 0
+#' @param x_t0 \code{Raster*} with predictor layer(s) for time 0
+#' @param svm_t1 Support Vector Machine  (SVM) trained for time 1
+#' @param x_t1 \code{Raster*} with predictor layer(s) for time 1
+#' @param chg_polys \code{SpatialPolygonsDataFrame} with polygons of change 
+#' areas surrounded by windows of no-change
 #' @references Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector 
 #' analysis in posterior probability space: a new method for land cover change 
-#' detection. IEEE Geoscience and Remote Sensing Letters 8:317–321.
+#' detection. IEEE Geoscience and Remote Sensing Letters 8:317-321.
 CVAPS <- function(svm_t0, x_t0, svm_t1, x_t1, chg_polys) {
     # Check that x_t0 and x_t1 are matched images (identical extents and 
     # identical projections)
@@ -20,8 +22,9 @@ CVAPS <- function(svm_t0, x_t0, svm_t1, x_t1, chg_polys) {
 
     x_t1_data <- getValues(x_t1)
 
-    pred_t1 <- predict(svm_t1, newdata=x_t1_data, probability=TRUE)
+    pred_t0 <- predict(svm_t1, newdata=x_t1_data, probability=TRUE)
     t0_prob <- pred_t0@probabilities
+    pred_t1 <- predict(svm_t1, newdata=x_t1_data, probability=TRUE)
     t1_prob <- pred_t1@probabilities
 
     # May need to run getValues first before running the below calculations

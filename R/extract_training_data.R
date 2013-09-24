@@ -10,8 +10,8 @@
 #' the values at that location of each band in the raster stack. 
 #' @examples
 #' x <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
-#' y <- stack(system.file('data/L5TSR_1986_training.Rdata', package='teamr'))
-#' train_data <- extract_training_data(x, y)
+#' data(L5TSR_1986_training)
+#' train_data <- extract_training_data(x, L5TSR_1986_training)
 extract_training_data <- function(x, y) {
     if (projection(x) != projection(y)) {
         stop('Coordinate systems do not match')
