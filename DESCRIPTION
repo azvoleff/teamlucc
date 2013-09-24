@@ -36,3 +36,4 @@ Collate:
     'CVAPS.R'
     'DFPS.R'
     'teamr-package.R'
+    'change_trajectory.R'
