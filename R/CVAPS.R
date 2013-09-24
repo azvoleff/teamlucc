@@ -1,14 +1,26 @@
 #' Change Vector Analysis in Posterior Probability Space
 #'
+#' This code implements the Change Vector Analysis in Posterior Probability 
+#' Space method of Chen et al. 2011. This function produces the change 
+#' magnitude and change direction images. Use the change magnitude image in 
+#' conjunction with the time 0 and time 1 images to produce a shapefile of 
+#' change polygons, then run \code{DFPS} to use the Double Window Flexible Pace 
+#' Search method (Chen et al. 2003) to determine the threshold to use to map 
+#' areas of change and no-change.
+#'
 #' @export
 #' @param t0_base base name for time 0 classification and posterior probability 
 #' files
 #' @param t1_base base name for time 1 classification and posterior probability 
 #' files
 #' @param out_file_base the base name to use when naming the output files
-#' @references Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector 
-#' analysis in posterior probability space: a new method for land cover change 
-#' detection. IEEE Geoscience and Remote Sensing Letters 8:317-321.
+#' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
+#' Land-use/land-cover change detection using improved change-vector analysis.
+#' Photogrammetric Engineering and Remote Sensing 69:369-380.
+#' 
+#' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
+#' posterior probability space: a new method for land cover change detection.  
+#' IEEE Geoscience and Remote Sensing Letters 8:317-321.
 CVAPS <- function(t0_base, t1_base, out_file_base) {
     t0_prob <- brick(paste(t0_base, '_probs.envi', sep=''))
     t1_prob <- brick(paste(t1_base, '_probs.envi', sep=''))
