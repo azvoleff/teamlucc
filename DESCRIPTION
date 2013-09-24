@@ -35,3 +35,4 @@ Collate:
     'svm_classify.R'
     'CVAPS.R'
     'DFPS.R'
+    'teamr-package.R'
