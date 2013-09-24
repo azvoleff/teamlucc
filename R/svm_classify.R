@@ -6,8 +6,8 @@
 #' @param train_data a data table with a column labeled 'y' with the observed 
 #' classes, and one or more columns with the values of predictor(s) at each 
 #' location.
-#' @param out_file_base the base to use in naming the output files
-#' @return list with table of classAgreement output and Kappa statistics
+#' @param out_file_base the base name to use when naming the output files
+#' @return the best SVM chosen after tuning
 #' @examples
 #' x_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' data(L5TSR_1986_training)
@@ -26,7 +26,7 @@ svm_classify <- function(x, train_data, out_file_base) {
     # per class, with the predicted probabilities of class membership for each 
     # class.
     out_classes <- raster(x)
-    out_classes <- writeStart(out_classes, paste(out_file_base, '.envi', sep=''))
+    out_classes <- writeStart(out_classes, paste(out_file_base, '_classes.envi', sep=''))
     out_probs <- brick(raster(x), values=FALSE, nl=svm_best$nclasses)
     out_probs <- writeStart(out_probs, paste(out_file_base, '_probs.envi', sep=''))
     # Process over blocks (rather than row by row) to save processing time.
@@ -43,4 +43,5 @@ svm_classify <- function(x, train_data, out_file_base) {
     }
     out_classes <- writeStop(out_classes)
     out_probs <- writeStop(out_probs)
+    return(svm_best)
 }
