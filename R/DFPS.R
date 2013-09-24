@@ -31,7 +31,6 @@ DFPS <- function(chg_polys, chg_img, radius=100, delta=.01, m=10, maxiter=20) {
     max_threshold <- max(chg_pixels)
     n <- 0
     while ((Lmax - Lmin) > delta && n < maxiter) {
-        print(paste('Loop', n))
         p <- (max_threshold - min_threshold) / m
         thresholds <- seq(min_threshold, max_threshold, p)
         L <- c()
@@ -39,16 +38,13 @@ DFPS <- function(chg_polys, chg_img, radius=100, delta=.01, m=10, maxiter=20) {
             A1 <- sum(chg_pixels > threshold)
             A2 <- sum(nochg_pixels > threshold)
             # Calculate A according to equation 4 in Chen et al. 2003
-            L <- c(L, ((A1 - A2) *100)/A)
+            L <- c(L, ((A1 - A2) * 100) / A)
         }
         kmax <- thresholds[match(max(L), L)]
         min_threshold <- kmax - p
         max_threshold <- kmax + p
         Lmin <- min(L)
         Lmax <- max(L)
-        print(paste('kmax', kmax))
-        print(paste('p', p))
-        print(paste('Lmax - Lmin', Lmax - Lmin))
         n <- n + 1
     }
     return(kmax)
