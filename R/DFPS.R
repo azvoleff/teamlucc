@@ -17,13 +17,12 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in
 #' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-DFPS <- function(chg_polys, chg_img, radius=150, delta=.01, m=10, maxiter=100) {
-    chg_pixels <- extract(chg_img, chg_polys)
+DFPS <- function(chg_polys, chg_img, radius=100, delta=.01, m=10, maxiter=20) {
+    chg_pixels <- unlist(extract(chg_img, chg_polys))
     nochg_polys <- gDifference(gBuffer(chg_polys, width=radius), chg_polys)
-    nochg_pixels <- extract(chg_img, nochg_polys)
+    nochg_pixels <- unlist(extract(chg_img, nochg_polys))
     # Calculate total number of pixels (used later)
     A <- length(chg_pixels) + length(nochg_pixels)
-
     # Set initial values for Lmax and Lmin that ensure the below while loop 
     # will run.
     Lmax <- 1
@@ -31,21 +30,25 @@ DFPS <- function(chg_polys, chg_img, radius=150, delta=.01, m=10, maxiter=100) {
     min_threshold <- min(chg_pixels)
     max_threshold <- max(chg_pixels)
     n <- 0
-    while ((Lmax - Lmin) < delta && n < maxiter) {
+    while ((Lmax - Lmin) > delta && n < maxiter) {
+        print(paste('Loop', n))
         p <- (max_threshold - min_threshold) / m
         thresholds <- seq(min_threshold, max_threshold, p)
         L <- c()
         for (threshold in thresholds) {
-            A1 <- chg_pixels > threshold
-            A2 <- nochg_pixels > threshold
+            A1 <- sum(chg_pixels > threshold)
+            A2 <- sum(nochg_pixels > threshold)
             # Calculate A according to equation 4 in Chen et al. 2003
             L <- c(L, ((A1 - A2) *100)/A)
         }
-        kmax <- which(L == max(L))
+        kmax <- thresholds[match(max(L), L)]
         min_threshold <- kmax - p
-        max_threshold <- kmax - p
+        max_threshold <- kmax + p
         Lmin <- min(L)
         Lmax <- max(L)
+        print(paste('kmax', kmax))
+        print(paste('p', p))
+        print(paste('Lmax - Lmin', Lmax - Lmin))
         n <- n + 1
     }
     return(kmax)
