@@ -16,7 +16,7 @@
 #' 
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in
 #' posterior probability space: a new method for land cover change detection.
-#' IEEE Geoscience and Remote Sensing Letters 8:317–321.
+#' IEEE Geoscience and Remote Sensing Letters 8:317-321.
 DFPS <- function(chg_polys, chg_img, radius=150, delta=.01, m=10, maxiter=100) {
     chg_pixels <- extract(chg_img, chg_polys)
     nochg_polys <- gDifference(gBuffer(chg_polys, width=radius), chg_polys)
