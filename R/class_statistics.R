@@ -22,7 +22,7 @@ class_statistics <- function(x, y) {
     }
     pixels <- melt(pixels, idvar='y')
     # Set y and variable to NULL to pass R CMD CHECK without notes
-    y=variable=NULL
+    value=variable=NULL
     class_stats <- ddply(pixels, .(y, variable), summarize,
                          r_mean=mean(value),
                          r_sd=sd(value),
