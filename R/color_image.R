@@ -29,7 +29,6 @@ color_image <- function(x, cls, outfile) {
         gdalmvFlag <- 255
     }
     writeGDAL(x.sp, outfile, drivername="ENVI", type=gdaltype,
-              colorTable=list(cls_colors), catNames=list(cls[, 2]),
+              colorTables=list(cls_colors), catNames=list(cls[, 2]),
               mvFlag=gdalmvFlag)
 }
-
