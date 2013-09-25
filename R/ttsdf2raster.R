@@ -10,11 +10,6 @@
 #' # TODO: Need to add examples here, and need to include a sample TIMESAT tpa 
 #' # file in the package data.
 ttsdf2raster <- function(x, base_image) {
-    # Parameters:
-    # base_image should be one of the original MODIS files that was fed 
-    # into TIMESAT.
-    require(raster)
-
     if (missing(x) || !is.data.frame(x)) {
         stop('must specify a tts data.frame')
     } else if (missing(base_image) || !file.exists(base_image)) {

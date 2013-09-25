@@ -13,13 +13,6 @@
 #' # TODO: Need to add examples here, and need to include a sample TIMESAT tpa 
 #' # file in the package data.
 tpadf2raster <- function(x, base_image, variable) {
-    # Parameters:
-    # base_image should be one of the original MODIS files that was fed 
-    # into TIMESAT.
-    #
-    # variable can be any of the variables in the tpa dataframe.
-    require(raster)
-
     if (missing(x) || !is.data.frame(x)) {
         stop('must specify a tpa data.frame')
     } else if (missing(base_image) || !file.exists(base_image)) {

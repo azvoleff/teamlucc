@@ -10,8 +10,6 @@
 #' # TODO: Need to add examples here, and need to include a sample TIMESAT tpa 
 #' # file in the package data.
 tpa2df <- function(x) {
-    require(base) # Needed for file.info
-
     if (missing(x) || !grepl('[.]tpa$', tolower(x))) {
         stop('must specify a .tpa file')
     }

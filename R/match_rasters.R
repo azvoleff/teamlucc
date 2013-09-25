@@ -21,7 +21,6 @@
 #' L5TSR_1986 <- raster(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 match_rasters <- function(baseimg, matchimg) {
-    require(raster)
     if (projection(baseimg) != projection(matchimg)) {
         message('Coordinate systems do not match - reprojecting matchimg...')
         matchimg <- projectRaster(matchimg, baseimg)

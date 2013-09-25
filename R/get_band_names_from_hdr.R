@@ -6,7 +6,6 @@
 #' hdr_file <- system.file('extdata/L5TSR_1986.hdr', package='teamr')
 #' teamr:::get_band_names_from_hdr(hdr_file)
 get_band_names_from_hdr <- function(hdr_file) {
-    require(raster)
     txt <- readLines(hdr_file)
     line_num <- which(grepl('^band names', txt)) + 1
     band_names <- c()

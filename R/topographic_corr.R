@@ -36,8 +36,6 @@
 #' 
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 topographic_corr <- function(x, DEM, sunelev, sunazimuth, ...) {
-    require(raster)
-    require(landsat)
     if (class(x) == 'SpatialGridDataFrame') {
         stop('x must be a Raster* object')
     }

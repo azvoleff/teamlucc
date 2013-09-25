@@ -10,8 +10,6 @@
 #' # TODO: Need to add examples here, and need to include a sample TIMESAT tts 
 #' # file in the package data.
 tts2df <- function(x) {
-    require(base) # Needed for file.info
-
     if (missing(x) || !grepl('[.]tts$', tolower(x))) {
         stop('must specify a .tts file')
     }
