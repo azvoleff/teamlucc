@@ -21,6 +21,8 @@ class_statistics <- function(x, y) {
         stop('Error: class_statistics cannot yet handle Raster* objects')
     }
     pixels <- melt(pixels, idvar='y')
+    # Set y and variable to NULL to pass R CMD CHECK without notes
+    y=variable=NULL
     class_stats <- ddply(pixels, .(y, variable), summarize,
                          r_mean=mean(value),
                          r_sd=sd(value),
