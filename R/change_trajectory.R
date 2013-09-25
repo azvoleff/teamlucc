@@ -2,14 +2,19 @@
 #'
 #' @export
 #' @param initial initial cover class as \code{RasterLayer}
-#' @param chg_dir change direction \code{RasterLayer} from \code{CVAPS}
 #' @param chg_mag change magnitude \code{RasterLayer} from \code{CVAPS}
+#' @param chg_dir change direction \code{RasterLayer} from \code{CVAPS}
 #' @param out_file_base the base name to use when naming the output files
 #' @param threshold the threshold to use as a minimum when determining change 
 #' areas (can use \code{DFPS} to determine this value).
-#' @return a \code{RasterLayer} where no change areas are NA, and change areas 
-#' are coded as
-#' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
+#' @param classnames an optional vector of classnames to output with the 
+#' returned trajectory lookup table
+#' @param ignorepersistence whether to ignore persistence of a class (if 
+#' ignored all pixels where a class persists will be set to NA)
+#' @return a table of all possible trajectories, with their \code{classnames} 
+#' (if specified) and the integer codes used to indicate specific trajectories 
+#' in the output image.
+#' @references Chen, J., P. Gong, C.  He, R.  Pu, and P.  Shi.  2003.
 #' Land-use/land-cover change detection using improved change-vector analysis.
 #' Photogrammetric Engineering and Remote Sensing 69:369-380.
 #' 
