@@ -10,7 +10,9 @@ Depends:
     rgdal,
     landsat,
     rgeos,
-    e1071
+    e1071,
+    plyr,
+    reshape2
 Description: Routines for processing Landsat imagery for the Tropical Ecology
     Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
