@@ -51,7 +51,7 @@ change_trajectory <- function(initial, chg_mag, chg_dir, out_file_base,
     if (ignorepersistence) traj_lut <- traj_lut[!(traj_lut$t0_code == traj_lut$t1_code),]
     # Code trajectories by summing t0 and t1 after multiplying t1 by the number 
     # of classes.
-    traj_lut$Full_Traj_Code <- traj_lut$t0_code + traj_lut$t1_code * length(classcodes)
+    traj_lut$Code <- traj_lut$t0_code + traj_lut$t1_code * length(classcodes)
 
     out_traj <- raster(initial)
     out_traj <- writeStart(out_traj, paste(out_file_base, '_chgtraj.envi', sep=''))

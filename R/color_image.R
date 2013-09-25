@@ -4,7 +4,7 @@
 #' @param x classified image as \code{RasterLayer}
 #' @param cls two column matrix, where the first column is the class codes 
 #' (integers) and the second column is the class names
-#' @param out_file the filename to use for the output
+#' @param outfile the filename to use for the output
 #' @references
 #' #TODO: Add examples
 #' #x <- raster('L5TSR_1986_to_2001_chgtraj.envi')
@@ -21,7 +21,7 @@ color_image <- function(x, cls, outfile) {
     cls_colors <- t(col2rgb(cls[, 1]))
     # Select appropriate data type and missing value tag depending on data 
     # attributes.
-    if (max(traj_lut$Traj_Code > 254)) {
+    if (max(x.sp$layer) > 254) {
         gdaltype <- 'Int16'
         gdalmvFlag <- -32768
     } else {
