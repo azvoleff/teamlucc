@@ -19,7 +19,6 @@ Collate:
     'get_band_names_from_hdr.R'
     'get_metadata_item.R'
     'match_rasters.R'
-    'mosaic_imgs.R'
     'topographic_corr.R'
     'glcm.R'
     'tpa2df.R'
