@@ -3,7 +3,7 @@
 #' @export
 #' @param chg_polys \code{SpatialPolygonsDataFrame} with polygons of change 
 #' areas surrounded by windows of no-change
-#' @param chg_img change magnitude \code{RasterLayer} from \code{CVAPS}
+#' @param chg_mag change magnitude \code{RasterLayer} from \code{CVAPS}
 #' @param radius radius of no-change surrounding change area polygons
 #' @param delta the minimum difference between Lmax and Lmin that will allow 
 #' another pass through the search loop
@@ -17,10 +17,10 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in
 #' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-DFPS <- function(chg_polys, chg_img, radius=100, delta=.01, m=10, maxiter=20) {
-    chg_pixels <- unlist(extract(chg_img, chg_polys))
+DFPS <- function(chg_polys, chg_mag, radius=100, delta=.01, m=10, maxiter=20) {
+    chg_pixels <- unlist(extract(chg_mag, chg_polys))
     nochg_polys <- gDifference(gBuffer(chg_polys, width=radius), chg_polys)
-    nochg_pixels <- unlist(extract(chg_img, nochg_polys))
+    nochg_pixels <- unlist(extract(chg_mag, nochg_polys))
     # Calculate total number of pixels (used later)
     A <- length(chg_pixels) + length(nochg_pixels)
     # Set initial values for Lmax and Lmin that ensure the below while loop 
