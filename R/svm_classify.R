@@ -9,12 +9,12 @@
 #' @param out_file_base the base name to use when naming the output files
 #' @return the best SVM chosen after tuning
 #' @examples
-#' x_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' data(L5TSR_1986_training)
-#' train_data_1986 <- extract_training_data(x_1986, L5TSR_1986_training)
+#' train_data_1986 <- extract_training_data(L5TSR_1986, L5TSR_1986_training)
 #' \dontrun{
 #' # This code is not run because it writes to a local folder
-#' svm_classify(x_1986, train_data_1986, 'L5TSR_1986_classified')
+#' svm_classify(L5TSR_1986, train_data_1986, 'L5TSR_1986_classified')
 #' }
 svm_classify <- function(x, train_data, out_file_base) {
     svm_tune <- tune.svm(y ~ ., data=train_data,
