@@ -3,37 +3,29 @@
 #' @export
 #' @param x A \code{RasterLayer} from which class statistics will be 
 #' calculated.
-#' @param shp A shapefile with class polygons.
+#' @param y A \code{SpatialPolygonsDataFrame} with cover class 
+#' polygons
 #' @return A data.frame of class statistics.
 #' @examples
-#' # TODO: Add example
-#' # library(teamr)
-#' # shp <- 'H:/Data/TEAM/VB/Vectors/VB_training_1986_037_LT5.shp'
-#' # img_file <- 'H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.bsq'
-#' # x <- raster(img_file, band=4)
-#' # class_statistics(x, shp)
-class_statistics <- function(x, shp) {
-    layer_name <- gsub('.shp$', '', basename(shp), ignore.case=TRUE)
-    class_polys <- readOGR(dirname(shp), layer_name)
-    if (projection(x) != projection(class_polys)) {
+#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+#' data(L5TSR_1986_training)
+#' class_statistics(L5TSR_1986, L5TSR_1986_training)
+class_statistics <- function(x, y) {
+    if (projection(x) != projection(y)) {
         stop('Coordinate systems do not match')
     }
-    class_stats <- data.frame(Poly_Type=unique(class_polys$Poly_Type),
-                              r_mean=NA, r_sd=NA, r_min=NA, r_max=NA,
-                              n_polys=NA, mean_n_per_poly=NA, sd_n_per_poly=NA, 
-                              min_n_per_poly=NA, max_n_per_poly=NA)
-    for (n in 1:nrow(class_stats)) {
-        these_polys <- class_polys[class_polys$Poly_Type == class_stats$Poly_Type[n], ]
-        pixels <- extract(x, these_polys, small=TRUE)
-        class_stats$r_mean[n] <- mean(unlist(pixels))
-        class_stats$r_sd[n] <- sd(unlist(pixels))
-        class_stats$r_min[n] <- min(unlist(pixels))
-        class_stats$r_max[n] <- max(unlist(pixels))
-        class_stats$n_polys[n] <- length(these_polys)
-        class_stats$mean_n_per_poly[n] <- mean(sapply(pixels, function(x) length(!is.na(x))))
-        class_stats$sd_n_per_poly[n] <- sd(sapply(pixels, function(x) length(!is.na(x))))
-        class_stats$min_n_per_poly[n] <- min(sapply(pixels, function(x) length(!is.na(x))))
-        class_stats$max_n_per_poly[n] <- max(sapply(pixels, function(x) length(!is.na(x))))
+    if (class(y) == "SpatialPolygonsDataFrame") {
+        pixels <- extract_training_data(x, y)
+    } else if (class(y) %in% c("RasterLayer", "RasterBrick", 
+                                         "RasterStack")) {
+        stop('Error: class_statistics cannot yet handle Raster* objects')
     }
+    pixels <- melt(pixels, idvar='y')
+    class_stats <- ddply(pixels, .(y, variable), summarize,
+                         r_mean=mean(value),
+                         r_sd=sd(value),
+                         r_min=min(value),
+                         r_max=max(value),
+                         n_pixels=length(value))
     return(class_stats)
 }
