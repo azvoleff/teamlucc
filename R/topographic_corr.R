@@ -10,13 +10,12 @@
 #' \code{landsat} package.
 #' @return The topographically corrected image.
 #' @examples
-#' library(raster)
 #' # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
-#' DEM1 <- raster(system.file('extdata/ASTER_V002_LL.dat', package='teamr'))
-#' DEM2 <- raster(system.file('extdata/ASTER_V002_LR.dat', package='teamr'))
-#' DEM3 <- raster(system.file('extdata/ASTER_V002_UR.dat', package='teamr'))
-#' DEM4 <- raster(system.file('extdata/ASTER_V002_UL.dat', package='teamr'))
-#' DEM_mosaic <- mosaic_imgs(DEM1, list(DEM2, DEM3, DEM4))
+#' data(ASTER_V002_LL)
+#' data(ASTER_V002_LR)
+#' data(ASTER_V002_UR)
+#' data(ASTER_V002_UL)
+#' DEM_mosaic <- mosaic(ASTER_V002_LL, ASTER_V002_LR, ASTER_V002_UR, ASTER_V002_UL, fun='mean')
 #' 
 #' # Crop and extend the DEM mosaic to match the Landsat image
 #' L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='teamr')
