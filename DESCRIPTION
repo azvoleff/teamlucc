@@ -38,3 +38,4 @@ Collate:
     'DFPS.R'
     'teamr-package.R'
     'change_trajectory.R'
+    'color_image.R'
