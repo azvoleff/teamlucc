@@ -12,7 +12,8 @@ Depends:
     rgeos,
     e1071,
     plyr,
-    reshape2
+    reshape2,
+    snow
 Description: Routines for processing Landsat imagery for the Tropical Ecology
     Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
@@ -39,3 +40,5 @@ Collate:
     'teamr-package.R'
     'change_trajectory.R'
     'color_image.R'
+    'chg_dir.R'
+    'chg_mag.R'
