@@ -33,6 +33,9 @@ chg_dir <- function(x, y, filename="", ...) {
     }
 
     n_classes <- nlayers(x)
+    if (n_classes < 2) {
+        stop('Error: cannot calculate change probabilities for only one class')
+    }
 
     cl <- getCluster()
     on.exit(returnCluster())
