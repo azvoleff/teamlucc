@@ -44,13 +44,16 @@ chg_mag <- function(x, y, filename="", ...) {
     pb <- pbCreate(bs$n)
 
     calc_chg_mag <- function(i) {
-        x_block <- getValues(x, row=bs$row[block_num], 
-                             nrows=bs$nrows[block_num])
-        y_block <- getValues(y, row=bs$row[block_num], 
-                             nrows=bs$nrows[block_num])
+        x_block <- getValues(x, row=bs$row[i], nrows=bs$nrows[i])
+        y_block <- getValues(y, row=bs$row[i], nrows=bs$nrows[i])
         # Calculate change magnitude (eqn 3 in Chen 2011)
-        dP <- y_block - x_block
-        chgmag <- sqrt(rowSums((y_block - x_block)^2))
+        if (is.null(dim(x_block))) {
+            # Handle RasterLayer images
+            chgmag <- abs(y_block - x_block)
+        } else {
+            # Handle RasterStack or RasterBrick images
+            chgmag <- sqrt(rowSums((y_block - x_block)^2))
+        }
         return(chgmag)
     }
 
@@ -76,14 +79,12 @@ chg_mag <- function(x, y, filename="", ...) {
         d <- recvOneData(cl)
 
         # error?
-        if (! d$value$success) {
+        if (!d$value$success) {
             stop('cluster error')
         }
 
         # which block is this?
         b <- d$value$tag
-        cat('received block: ', b, '\n')
-        flush.console()
 
         if (filename != "") {
             out <- writeValues(out, d$value$value, bs$row[b])

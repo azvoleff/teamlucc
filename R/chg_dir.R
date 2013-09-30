@@ -3,7 +3,7 @@
 #' This code calculate the change direction image for the Change Vector 
 #' Analysis in Posterior Probability Space (CVAPS) method of Chen et al. 2011.  
 #' Use the change direction image in conjunction with the change magnitude 
-#' image from \code{chg_mag}, and \code{DFPS} to use the Double Window Flexible 
+#' image from \code{chg_dir}, and \code{DFPS} to use the Double Window Flexible 
 #' Pace Search method (Chen et al. 2003) to determine the threshold to use to 
 #' map areas of change and no-change.
 #'
@@ -44,11 +44,9 @@ chg_dir <- function(x, y, filename="", ...) {
     pb <- pbCreate(bs$n)
 
     calc_chg_dir <- function(i) {
-        x_block <- getValues(x, row=bs$row[block_num], 
-                             nrows=bs$nrows[block_num])
-        y_block <- getValues(y, row=bs$row[block_num], 
-                             nrows=bs$nrows[block_num])
-        # Calculate change magnitude (eqn 3 in Chen 2011)
+        x_block <- getValues(x, row=bs$row[i], nrows=bs$nrows[i])
+        y_block <- getValues(y, row=bs$row[i], nrows=bs$nrows[i])
+        # Calculate change direction (eqns 5 and 6 in Chen 2011)
         dP <- y_block - x_block
         Eab <- diag(n_classes)
         chgdir <- apply(dP %*% Eab, 1, function(r) which(r == max(r)))
@@ -77,14 +75,12 @@ chg_dir <- function(x, y, filename="", ...) {
         d <- recvOneData(cl)
 
         # error?
-        if (! d$value$success) {
+        if (!d$value$success) {
             stop('cluster error')
         }
 
         # which block is this?
         b <- d$value$tag
-        cat('received block: ', b, '\n')
-        flush.console()
 
         if (filename != "") {
             out <- writeValues(out, d$value$value, bs$row[b])
