@@ -12,7 +12,7 @@
 #' @param y time 1 posterior probability \code{Raster*}
 #' @param filename (optional) filename for output change magnitude 
 #' \code{RasterLayer}
-#' @param \code{Raster*} object with change magnitude image
+#' @return \code{Raster*} object with change magnitude image
 #' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
 #' Land-use/land-cover change detection using improved change-vector analysis.
 #' Photogrammetric Engineering and Remote Sensing 69:369-380.
