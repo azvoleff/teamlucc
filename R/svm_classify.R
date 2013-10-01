@@ -21,6 +21,14 @@ svm_classify <- function(x, train_data, out_file_base) {
                          gamma=2^seq(-1, 1, .5), cost=2^seq(2, 4, .5),
                          probability=TRUE)
     svm_best <- svm_tune$best.model
+
+
+    predict_class <- function(x, n_classes, ...) {
+        this_block <- data.frame(getValues(x, row=bs$row[block_num], nrows=bs$nrows[block_num]))
+        names(this_block) <- names(x)
+        # First write predicted classes
+        pred <- predict(svm_best, newdata=this_block, probability=TRUE)
+    }
     # Setup two rasters. out_classes wills store the predicted classes for the 
     # classified image. out_probs wills store a multiband raster with one band 
     # per class, with the predicted probabilities of class membership for each 
