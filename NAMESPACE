@@ -1,5 +1,4 @@
 export(ARVI)
-export(CVAPS)
 export(DFPS)
 export(EVI)
 export(MSAVI2)

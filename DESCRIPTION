@@ -36,7 +36,6 @@ Collate:
     'SVIs.R'
     'extract_training_data.R'
     'svm_classify.R'
-    'CVAPS.R'
     'DFPS.R'
     'teamr-package.R'
     'change_trajectory.R'
