@@ -31,6 +31,8 @@ chg_mag <- function(x, y, filename=NULL, ...) {
         stop('Error: t0 and t1 probability maps have differing number of classes')
     }
 
+    n_classes <- nlayers(x)
+
     # focal_hpc will only take one raster object as input, so stack the 
     # probability layers for time 1 and time 2 in a single RasterStack, then 
     # split them apart within the calc_chg_mag function:
@@ -42,7 +44,7 @@ chg_mag <- function(x, y, filename=NULL, ...) {
             chgmag <- abs(t2p - t1p)
         } else {
             # Handle RasterStack or RasterBrick images
-            chgmag <- sqrt(rowSums((t2p - t1p)^2))
+            chgmag <- apply(t2p - t1p, c(1, 2), function(pixel) sqrt(sum(pixel^2)))
         }
         chgmag <- array(chgmag, dim=c(dim(x)[1], dim(x)[2], 1))
         return(chgmag)
