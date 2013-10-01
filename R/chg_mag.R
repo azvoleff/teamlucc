@@ -20,8 +20,7 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
 #' posterior probability space: a new method for land cover change detection.  
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-chg_mag <- function(x, y, filename="", ...) {
-    out <- raster(x)
+chg_mag <- function(x, y, filename=NULL, ...) {
     if (proj4string(x) != proj4string(y)) {
         stop('Error: t0 and t1 coordinate systems do not match')
     }
@@ -32,81 +31,25 @@ chg_mag <- function(x, y, filename="", ...) {
         stop('Error: t0 and t1 probability maps have differing number of classes')
     }
 
-    n_classes <- nlayers(x)
-
-    cl <- getCluster()
-    on.exit(returnCluster())
-
-    nodes <- length(cl)
-
-    # Process over blocks to conserve memory and use multiple cores.
-    bs <- blockSize(x, minblocks=nodes*4)
-    pb <- pbCreate(bs$n)
-
-    calc_chg_mag <- function(i) {
-        x_block <- getValues(x, row=bs$row[i], nrows=bs$nrows[i])
-        y_block <- getValues(y, row=bs$row[i], nrows=bs$nrows[i])
-        # Calculate change magnitude (eqn 3 in Chen 2011)
-        if (is.null(dim(x_block))) {
+    # focal_hpc will only take one raster object as input, so stack the 
+    # probability layers for time 1 and time 2 in a single RasterStack, then 
+    # split them apart within the calc_chg_mag function:
+    calc_chg_mag <- function(x, n_classes, ...) {
+        t1p <- x[ , , seq(1, n_classes)]
+        t2p <- x[ , , seq(n_classes + 1, dim(x)[3])]
+        if (is.null(dim(t1p))) {
             # Handle RasterLayer images
-            chgmag <- abs(y_block - x_block)
+            chgmag <- abs(t2p - t1p)
         } else {
             # Handle RasterStack or RasterBrick images
-            chgmag <- sqrt(rowSums((y_block - x_block)^2))
+            chgmag <- sqrt(rowSums((t2p - t1p)^2))
         }
+        chgmag <- array(chgmag, dim=c(dim(x)[1], dim(x)[2], 1))
         return(chgmag)
     }
 
-    # Get all nodes going.
-    for (i in 1:nodes) {
-        sendCall(cl[[i]], calc_chg_mag, i, tag=i)
-    }
-
-    # Save to temp file if cannot hold result in memory.
-    filename <- trim(filename)
-    if (!canProcessInMemory(out) & filename == "") {
-        filename <- rasterTmpFile()
-    }
-    if (filename != "") {
-        out <- writeStart(out, filename=filename, ... )
-    } else {
-        vv <- matrix(ncol=nrow(out), nrow=ncol(out))
-    }
-
-    pb <- pbCreate(bs$n)
-    for (i in 1:bs$n) {
-        # receive results from a node
-        d <- recvOneData(cl)
-
-        # error?
-        if (!d$value$success) {
-            stop('cluster error')
-        }
-
-        # which block is this?
-        b <- d$value$tag
-
-        if (filename != "") {
-            out <- writeValues(out, d$value$value, bs$row[b])
-        } else {
-            cols <- bs$row[b]:(bs$row[b] + bs$nrows[b] - 1)
-            vv[,cols] <- matrix(d$value$value, nrow=out@ncols)
-        }
-
-        # need to send more data?
-        ni <- nodes + i
-        if (ni <= bs$n) {
-            sendCall(cl[[d$node]], calc_chg_mag, ni, tag=ni)
-        }
-        pbStep(pb)
-    }
-
-    if (filename != "") {
-        out <- writeStop(out)
-    } else {
-        out <- setValues(out, as.vector(vv))
-    }
-    pbClose(pb)
+    out <- focal_hpc(x=stack(x, y), fun=calc_chg_mag, 
+                     args=list(n_classes=n_classes), filename=filename)
 
     return(out)
 }
