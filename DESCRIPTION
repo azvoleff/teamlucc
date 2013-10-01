@@ -10,10 +10,11 @@ Depends:
     rgdal,
     landsat,
     rgeos,
-    e1071,
+    kernlab,
     plyr,
     reshape2,
-    spatial.tools
+    spatial.tools,
+    caret
 Description: Routines for processing Landsat imagery for the Tropical Ecology
     Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)

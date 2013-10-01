@@ -16,40 +16,38 @@
 #' # This code is not run because it writes to a local folder
 #' svm_classify(L5TSR_1986, train_data_1986, 'L5TSR_1986_classified')
 #' }
-svm_classify <- function(x, train_data, out_file_base) {
-    svm_tune <- tune.svm(y ~ ., data=train_data,
-                         gamma=2^seq(-1, 1, .5), cost=2^seq(2, 4, .5),
-                         probability=TRUE)
-    svm_best <- svm_tune$best.model
-
-
-    predict_class <- function(x, n_classes, ...) {
-        this_block <- data.frame(getValues(x, row=bs$row[block_num], nrows=bs$nrows[block_num]))
-        names(this_block) <- names(x)
-        # First write predicted classes
-        pred <- predict(svm_best, newdata=this_block, probability=TRUE)
+svm_classify <- function(x, train_data, out_file_base,                          
+                         pred_classes_filename=NULL, pred_prob_filename=NULL, 
+                         train_grid=NULL) {
+    print('Training SVM...')
+    if (is.null(train_grid)) {
+        sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))
+        svm_train_grid <- data.frame(.sigma=sig_dist[1], .C=2^(-2:12))
     }
-    # Setup two rasters. out_classes wills store the predicted classes for the 
-    # classified image. out_probs wills store a multiband raster with one band 
-    # per class, with the predicted probabilities of class membership for each 
-    # class.
-    out_classes <- raster(x)
-    out_classes <- writeStart(out_classes, paste(out_file_base, '_classes.envi', sep=''))
-    out_probs <- brick(raster(x), values=FALSE, nl=svm_best$nclasses)
-    out_probs <- writeStart(out_probs, paste(out_file_base, '_probs.envi', sep=''))
-    # Process over blocks (rather than row by row) to save processing time.
-    bs <- blockSize(x)
-    for (block_num in 1:bs$n) {
-        this_block <- data.frame(getValues(x, row=bs$row[block_num], nrows=bs$nrows[block_num]))
-        names(this_block) <- names(x)
-        # First write predicted classes
-        pred <- predict(svm_best, newdata=this_block, probability=TRUE)
-        writeValues(out_classes, as.numeric(pred), bs$row[block_num])
-        # Now write predicted probabilities
-        pred_probs <- attr(pred, 'prob')
-        writeValues(out_probs, pred_probs, bs$row[block_num])
+    svm_train_control <- trainControl(method="repeatedcv",
+                                      repeats=5,
+                                      classProbs=TRUE)
+    svm_train <-  train(y ~ ., data=train_data, method="svmRadial",
+                       preProc=c('center', 'scale'),
+                       tuneGrid=svm_train_grid, trControl=svm_train_control)
+
+    print('Predicting classes...')
+    calc_pred_classes <- function(x, svm_train, ...) {
+        preds <- predict(x, svm_train)
+        preds <- array(getValues(preds), dim=c(dim(x)[1], dim(x)[2], 1))
+        return(preds)
     }
-    out_classes <- writeStop(out_classes)
-    out_probs <- writeStop(out_probs)
-    return(svm_best)
+    pred_classes <- focal_hpc(x=x, fun=calc_pred_classes, args=list(svm_train), 
+                     filename=pred_classes_filename, chunk_format="raster")
+
+    print('Predicting class probabilities...')
+    calc_pred_probs <- function(x, svm_train, ...) {
+        preds <- predict(x, svm_train, type="prob", index=c(1:dim(x)[3]))
+        preds <- array(getValues(preds), dim=c(dim(x)[1], dim(x)[2], dim(x)[3]))
+        return(preds)
+    }
+    pred_probs <- focal_hpc(x=x, fun=calc_pred_probs, args=list(svm_train), 
+                            filename=pred_prob_filename, chunk_format="raster")
+
+    return(list(svm_train=svm_train, pred_classes=pred_classes, pred_probs=pred_probs))
 }
