@@ -4,9 +4,10 @@
 #' @param initial initial cover class as \code{RasterLayer}
 #' @param chg_mag change magnitude \code{RasterLayer} from \code{CVAPS}
 #' @param chg_dir change direction \code{RasterLayer} from \code{CVAPS}
-#' @param out_file_base the base name to use when naming the output files
 #' @param threshold the threshold to use as a minimum when determining change 
 #' areas (can use \code{DFPS} to determine this value).
+#' @param filename filename to save the output \code{RasterLayer} to disk 
+#' (optional)
 #' @param classnames an optional vector of classnames to output with the 
 #' returned trajectory lookup table
 #' @param ignorepersistence whether to ignore persistence of a class (if 
@@ -21,8 +22,8 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in
 #' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-change_trajectory <- function(initial, chg_mag, chg_dir, out_file_base, 
-                              threshold, classnames=NULL, 
+change_trajectory <- function(initial, chg_mag, chg_dir, threshold, 
+                              filename=NULL, classnames=NULL, 
                               ignorepersistence=FALSE) {
     if (proj4string(initial) != proj4string(chg_mag) ) {
         stop('Error: initial and chg_mag coordinate systems do not match')
@@ -53,25 +54,23 @@ change_trajectory <- function(initial, chg_mag, chg_dir, out_file_base,
     # of classes.
     traj_lut$Code <- traj_lut$t0_code + traj_lut$t1_code * length(classcodes)
 
-    out_traj <- raster(initial)
-    out_traj <- writeStart(out_traj, paste(out_file_base, '_chgtraj.envi', sep=''))
-    bs <- blockSize(initial)
-    for (block_num in 1:bs$n) {
-        initial_blk <- getValues(initial, row=bs$row[block_num], 
-                             nrows=bs$nrows[block_num])
-        chg_mag_blk <- getValues(chg_mag, row=bs$row[block_num], 
-                                 nrows=bs$nrows[block_num])
-        chg_dir_blk <- getValues(chg_dir, row=bs$row[block_num], 
-                                 nrows=bs$nrows[block_num])
-        # Code trajectories by summing t0 and t1 after multiplying t1 by the 
-        # number of classes.
+    calc_chg_traj <- function(x, classcodes, ...) {
+        initial_blk <- x[ , , 1]
+        chg_mag_blk <- x[ , , 2]
+        chg_dir_blk <- x[ , , 3]
+        # Code trajectories by summing t0 and chg_dir after multiplying chg_dir 
+        # by the number of classes.
         traj <- initial_blk + chg_dir_blk * length(classcodes)
         traj[chg_mag_blk < threshold] <- NA
         # Ignore persistence of a class if desired
         if (ignorepersistence) traj[initial_blk == chg_dir_blk] <- NA
-        writeValues(out_traj, traj, bs$row[block_num])
+        traj <- array(traj, dim=c(dim(x)[1], dim(x)[2], 1))
+        return(traj)
     }
-    out_traj <- writeStop(out_traj)
 
-    return(traj_lut)
+    out <- focal_hpc(x=stack(initial, chg_mag, chg_dir), fun=calc_chg_traj, 
+                     args=list(classcodes=classcodes), filename=filename)
+    out <- setMinMax(out)
+
+    return(list(traj_lut=traj_lut, chg_traj=out))
 }
