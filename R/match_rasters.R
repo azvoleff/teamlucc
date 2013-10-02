@@ -10,8 +10,9 @@
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @return The /code{matchimg} reprojected (if necessary), cropped, and 
 #' extended to match the /code{baseimg}.
-#' @details Note that if the two rasters need to be reprojected 
-#' \code{match_rasters} can run in parallel if \code{beginCluster
+#' @details Note that if the \code{matchimg} needs to be reprojected,
+#' \code{match_rasters} can run in parallel if \code{beginCluster()} is run 
+#' prior to running \code{match_rasters}.
 #' @examples
 #' # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
 #' data(ASTER_V002_LL)
@@ -36,7 +37,7 @@ match_rasters <- function(baseimg, matchimg, filename=NULL) {
     outimg <- extend(matchimg, outimg)
     #message('Resampling matchimg to base...')
     #resample(outimg, baseimg)
-    if !(is.null(filename)) {
+    if (!is.null(filename)) {
         writeRaster(outimg, filename)
     }
     return(outimg)
