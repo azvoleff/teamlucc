@@ -7,8 +7,11 @@
 #' the /code{matchimg} will be reprojected to match the coordinate system of 
 #' the /code{baseimg}. The /code{matchimg} will then be cropped and extended to 
 #' match the extent of the /code{baseimg}.
+#' @param filename file on disk to save \code{Raster*} to (optional)
 #' @return The /code{matchimg} reprojected (if necessary), cropped, and 
 #' extended to match the /code{baseimg}.
+#' @details Note that if the two rasters need to be reprojected 
+#' \code{match_rasters} can run in parallel if \code{beginCluster
 #' @examples
 #' # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
 #' data(ASTER_V002_LL)
@@ -20,7 +23,7 @@
 #' # Crop and extend the DEM mosaic to match the Landsat image
 #' L5TSR_1986 <- raster(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
-match_rasters <- function(baseimg, matchimg) {
+match_rasters <- function(baseimg, matchimg, filename=NULL) {
     if (projection(baseimg) != projection(matchimg)) {
         message('Coordinate systems do not match - reprojecting matchimg...')
         matchimg <- projectRaster(matchimg, baseimg)
@@ -33,5 +36,8 @@ match_rasters <- function(baseimg, matchimg) {
     outimg <- extend(matchimg, outimg)
     #message('Resampling matchimg to base...')
     #resample(outimg, baseimg)
+    if !(is.null(filename)) {
+        writeRaster(outimg, filename)
+    }
     return(outimg)
 }
