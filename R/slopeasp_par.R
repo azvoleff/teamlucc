@@ -1,0 +1,74 @@
+#' Slope and aspect calculation in parallel for DEM \code{RasterLayer}
+#'
+#' This code calculate the slope and aspect for a DEM provided as a 
+#' \code{RasterLayer}. The computations will be done in parallel if 
+#' \code{sfQuickInit()} is called before \code{slopeasp_par}.
+#'
+#' The code for calculating the slope and aspect is taken directly from the 
+#' \code{landsat} package by Sarah Goslee. See the help page for 
+#' \code{slopeasp} in the \code{landsat} package for details on the parameters.
+#'
+#' @export
+#' @param x
+#' @param EWres
+#' @param NSres
+#' @param EWkernel
+#' @param NSkernel
+#' @param smoothing
+#' @param filename
+#' @return list with two elements: 'slope' (a \code{RasteLayer} with the 
+#' calculated slope) and 'aspect',  (a \code{RasteLayer} with the calculated 
+#' aspect).
+#' @references
+#' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
+#' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
+#' http://www.jstatsoft.org/v43/i04/
+#' @examples
+#' #TODO: Write examples
+slopeasp_par <- function(x, EWres, NSres, EWkernel, NSkernel, smoothing=1, filename=NULL) {
+    if (missing(EWres)) {
+        EWres <- xres(x)
+    }
+    if (missing(NSres)) {
+        NSres <- yres(x)
+    }
+    # Make function to pass to focal_hpc for calculating gradients
+    apply_kernel <- function(x, kernel_mat, dir_res, ...) {
+        return(sum(x * kernel_mat)/dir_res)
+    }
+    if (missing(EWkernel)) {
+        EWkernel <- matrix(c(-1/8, 0, 1/8, -2/8, 0, 2/8, -1/8, 
+            0, 1/8), ncol = 3, nrow = 3, byrow = TRUE)
+    }
+    # Convert EWkernel to 3d array for use with focal_hpc (which passes 3d 
+    # arrays)
+    EWkernel <- array(EWkernel, dim=c(dim(EWkernel)[1], dim(EWkernel)[2], 1))
+    EW.mat <- focal_hpc(x, fun=apply_kernel,
+                        args=list(kernel_mat=EWkernel, dir_res=EWres),
+                        window_dims=dim(EWkernel))
+    if (missing(NSkernel)) {
+        NSkernel <- matrix(c(1/8, 2/8, 1/8, 0, 0, 0, -1/8, -2/8, 
+            -1/8), ncol = 3, nrow = 3, byrow = TRUE)
+    }
+    NSkernel <- array(NSkernel, dim=c(dim(NSkernel)[1], dim(NSkernel)[2], 1))
+    NS.mat <- focal_hpc(x, fun=apply_kernel,
+                        args=list(kernel_mat=NSkernel, dir_res=NSres),
+                        window_dims=dim(NSkernel))
+    # Make function to pass to focal_hpc for calculating slope and aspect.  
+    # Result will be returned as a layer stack, with slope in band 1, aspect in 
+    # band 2.
+    calc_slope <- function(x, smoothing, ...) {
+        EW.mat <- x[ , , 1]
+        NS.mat <- x[ , , 2]
+        slope <- atan(sqrt(EW.mat^2 + NS.mat^2)/smoothing)
+        slope <- (180/pi) * slope
+        aspect <- 180 - (180/pi) * atan(NS.mat/EW.mat) + 90 * (EW.mat/abs(EW.mat))
+        aspect[slope == 0] <- 0
+        return(array(c(slope, aspect), dim=c(dim(x)[1], dim(x)[2], 2)))
+    }
+    slopeasp_img <- focal_hpc(x=stack(EW.mat, NS.mat), fun=calc_slope,
+                        args=list(smoothing=smoothing), filename=filename)
+
+    return(list(slope=raster(slopeasp_img, layer=1),
+           aspect=raster(slopeasp_img, layer=2)))
+}

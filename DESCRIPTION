@@ -45,3 +45,4 @@ Collate:
     'chg_mag.R'
     'chg_traj.R'
     'chg_traj_stats.R'
+    'slopeasp_par.R'
