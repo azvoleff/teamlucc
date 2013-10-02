@@ -10,7 +10,7 @@
 #' classes \code{RasterLayer}. If 'NULL' (the default) a temporary file will be 
 #' used if necessary (if the size of the output raster exceeds available 
 #' memory).
-#' @param pred_prob_filename the filename to use to save the class 
+#' @param pred_probs_filename the filename to use to save the class 
 #' probabilities \code{RasterLayer} or \code{RasterBrick}. If 'NULL' (the 
 #' default) a temporary file will be used if necessary (if the size of the 
 #' output raster exceeds available memory).
@@ -32,7 +32,7 @@
 #' svm_classify(L5TSR_1986, train_data_1986)
 #' sfQuickStop()
 svm_classify <- function(x, train_data, pred_classes_filename=NULL, 
-                         pred_prob_filename=NULL, train_grid=NULL) {
+                         pred_probs_filename=NULL, train_grid=NULL) {
     print('Training SVM...')
     if (is.null(train_grid)) {
         sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))
@@ -53,6 +53,7 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
     }
     pred_classes <- focal_hpc(x=x, fun=calc_pred_classes, args=list(svm_train), 
                      filename=pred_classes_filename, chunk_format="raster")
+    pred_classes <- setMinMax(pred_classes)
 
     print('Predicting class probabilities...')
     calc_pred_probs <- function(x, svm_train, ...) {
@@ -61,7 +62,8 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
         return(preds)
     }
     pred_probs <- focal_hpc(x=x, fun=calc_pred_probs, args=list(svm_train), 
-                            filename=pred_prob_filename, chunk_format="raster")
+                            filename=pred_probs_filename, chunk_format="raster")
+    pred_probs <- setMinMax(pred_probs)
 
     return(list(svm_train=svm_train, pred_classes=pred_classes, pred_probs=pred_probs))
 }

@@ -55,6 +55,7 @@ chg_dir <- function(x, y, filename=NULL) {
 
     out <- focal_hpc(x=stack(x, y), fun=calc_chg_dir, 
                      args=list(n_classes=n_classes), filename=filename)
+    out <- setMinMax(out)
 
     return(out)
 }
