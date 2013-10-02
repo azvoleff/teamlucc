@@ -10,6 +10,7 @@ Depends:
     rgdal,
     landsat,
     rgeos,
+    e1071,
     kernlab,
     plyr,
     reshape2,

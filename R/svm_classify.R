@@ -6,19 +6,33 @@
 #' @param train_data a data table with a column labeled 'y' with the observed 
 #' classes, and one or more columns with the values of predictor(s) at each 
 #' location.
-#' @param out_file_base the base name to use when naming the output files
-#' @return the best SVM chosen after tuning
+#' @param pred_classes_filename the filename to use to save the predicted 
+#' classes \code{RasterLayer}. If 'NULL' (the default) a temporary file will be 
+#' used if necessary (if the size of the output raster exceeds available 
+#' memory).
+#' @param pred_prob_filename the filename to use to save the class 
+#' probabilities \code{RasterLayer} or \code{RasterBrick}. If 'NULL' (the 
+#' default) a temporary file will be used if necessary (if the size of the 
+#' output raster exceeds available memory).
+#' @param train_grid the training grid to be used for training the SVM. Must be 
+#' a \code{data.frame} with two columns: ".sigma" and ".C".
+#' @return a list with 3 elements: the trained SVM model, the predicted classes 
+#' \code{RasterLayer} and the class probabilities \code{RasterBrick}
+#' @details processing can be done in parallel using all available CPUs through 
+#' the use of the cluster facilities in the \code{spatial.tools} package. To 
+#' enable clustering, call \code{sfQuickInit} before running 
+#' \code{svm_classify}. To stop the cluster when finished, call 
+#' \code{sfQuickStop}.
+#'
 #' @examples
+#' sfQuickInit()
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' data(L5TSR_1986_training)
 #' train_data_1986 <- extract_training_data(L5TSR_1986, L5TSR_1986_training)
-#' \dontrun{
-#' # This code is not run because it writes to a local folder
-#' svm_classify(L5TSR_1986, train_data_1986, 'L5TSR_1986_classified')
-#' }
-svm_classify <- function(x, train_data, out_file_base,                          
-                         pred_classes_filename=NULL, pred_prob_filename=NULL, 
-                         train_grid=NULL) {
+#' svm_classify(L5TSR_1986, train_data_1986)
+#' sfQuickStop()
+svm_classify <- function(x, train_data, pred_classes_filename=NULL, 
+                         pred_prob_filename=NULL, train_grid=NULL) {
     print('Training SVM...')
     if (is.null(train_grid)) {
         sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))
