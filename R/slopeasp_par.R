@@ -9,13 +9,12 @@
 #' \code{slopeasp} in the \code{landsat} package for details on the parameters.
 #'
 #' @export
-#' @param x
-#' @param EWres
-#' @param NSres
-#' @param EWkernel
-#' @param NSkernel
-#' @param smoothing
-#' @param filename
+#' @param x DEM as \code{RasterLayer}
+#' @param EWkernel kernel to use for east-west gradient calculation
+#' @param NSkernel kernel to use for north-south gradient calculation
+#' @param smoothing positive integer for smoothing. 1 means no smoothing.
+#' @param filename output file for 2-band slope and aspect layer stack 
+#' (optional)
 #' @return list with two elements: 'slope' (a \code{RasteLayer} with the 
 #' calculated slope) and 'aspect',  (a \code{RasteLayer} with the calculated 
 #' aspect).
@@ -25,13 +24,9 @@
 #' http://www.jstatsoft.org/v43/i04/
 #' @examples
 #' #TODO: Write examples
-slopeasp_par <- function(x, EWres, NSres, EWkernel, NSkernel, smoothing=1, filename=NULL) {
-    if (missing(EWres)) {
-        EWres <- xres(x)
-    }
-    if (missing(NSres)) {
-        NSres <- yres(x)
-    }
+slopeasp_par <- function(x, EWkernel, NSkernel, smoothing=1, filename=NULL) {
+    EWres <- xres(x)
+    NSres <- yres(x)
     # Make function to pass to focal_hpc for calculating gradients
     apply_kernel <- function(x, kernel_mat, dir_res, ...) {
         return(sum(x * kernel_mat)/dir_res)
