@@ -10,8 +10,8 @@
 #'
 #' @export
 #' @param x DEM as \code{RasterLayer}
-#' @param EWkernel kernel to use for east-west gradient calculation
-#' @param NSkernel kernel to use for north-south gradient calculation
+#' @param EWkernel kernel to use for East-West gradient calculation
+#' @param NSkernel kernel to use for North-South gradient calculation
 #' @param smoothing positive integer for smoothing. 1 means no smoothing.
 #' @param filename output file for 2-band slope and aspect layer stack 
 #' (optional)
