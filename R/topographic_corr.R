@@ -24,12 +24,12 @@
 #' 
 #' # Read sun elevation and sun azimuth from .txt metadata file accompanying
 #' # the Landsat file (as output from teampy Python package).
-#' metadatafile <- extension(L5TSR_1986_file, 'txt')
+#' metadatafile - extension(L5TSR_1986_file, 'txt')
 #' sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
 #' sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
 #' 
 #' # Apply the topographic correction
-#' L5TSR_1986_topocorr<- topographic_corr(L5TSR_1986, matched_DEM, sunelev,
+#' L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, matched_DEM, sunelev,
 #'                                         sunazimuth, method='minslope')
 #' 
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
@@ -47,13 +47,13 @@ topographic_corr <- function(x, DEM, sunelev, sunazimuth, ...) {
     message('Calculating slope and aspect...')
     DEM_slopeasp <- slopeasp(DEM_df)
     corr_img <- raster()
-    for (bandnum in 1:nlayers(x)) {
-        message(paste('Performing topographic correction on band ', bandnum, 
-                      '...', sep=''))
-        img_df <- as(raster(x, layer=bandnum), 'SpatialGridDataFrame')
+    message('Performing topographic correction...')
+    corr_img <- foreach (layer=unstack(x), .combine='addLayer', .multicombine=TRUE, 
+             .init=corr_img, .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
+        img_df <- as(layer, 'SpatialGridDataFrame')
         corr_df <- topocorr(img_df, DEM_slopeasp$slope, DEM_slopeasp$aspect, 
                              sunelev=sunelev, sunazimuth=sunazimuth, ...)
-        corr_img <- addLayer(corr_img, raster(corr_df))
+        raster(corr_df)
     }
     return(corr_img)
 }
