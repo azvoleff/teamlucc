@@ -46,6 +46,7 @@ topographic_corr <- function(x, DEM, sunelev, sunazimuth, ...) {
     }
     message('Calculating slope and aspect...')
     DEM_slopeasp <- slopeasp_par(DEM)
+    print('got here 3')
     # Need to convert slope and aspect to SpatialGridDataFrame objects for 
     # topocorr. TODO: rewrite topocorr to handle RasterLayers
     slope <- as(DEM_slopeasp$slope, 'SpatialGridDataFrame')

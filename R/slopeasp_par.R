@@ -27,28 +27,31 @@
 slopeasp_par <- function(x, EWkernel, NSkernel, smoothing=1, filename=NULL) {
     EWres <- xres(x)
     NSres <- yres(x)
-    # Make function to pass to focal_hpc for calculating gradients
-    apply_kernel <- function(x, kernel_mat, dir_res, ...) {
-        return(sum(x * kernel_mat)/dir_res)
-    }
     if (missing(EWkernel)) {
         EWkernel <- matrix(c(-1/8, 0, 1/8, -2/8, 0, 2/8, -1/8, 
             0, 1/8), ncol = 3, nrow = 3, byrow = TRUE)
     }
-    # Convert EWkernel to 3d array for use with focal_hpc (which passes 3d 
-    # arrays)
-    EWkernel <- array(EWkernel, dim=c(dim(EWkernel)[1], dim(EWkernel)[2], 1))
-    EW.mat <- focal_hpc(x, fun=apply_kernel,
-                        args=list(kernel_mat=EWkernel, dir_res=EWres),
-                        window_dims=dim(EWkernel))
     if (missing(NSkernel)) {
         NSkernel <- matrix(c(1/8, 2/8, 1/8, 0, 0, 0, -1/8, -2/8, 
             -1/8), ncol = 3, nrow = 3, byrow = TRUE)
     }
+    # Convert EWkernel and NSkernel to 3d arrays for use with focal_hpc.
+    EWkernel <- array(EWkernel, dim=c(dim(EWkernel)[1], dim(EWkernel)[2], 1))
     NSkernel <- array(NSkernel, dim=c(dim(NSkernel)[1], dim(NSkernel)[2], 1))
-    NS.mat <- focal_hpc(x, fun=apply_kernel,
-                        args=list(kernel_mat=NSkernel, dir_res=NSres),
-                        window_dims=dim(NSkernel))
+    if (!identical(dim(NSkernel), dim(EWkernel))) {
+        stop('NSkernal and EWkernel must have same dimensions')
+    }
+    # Make function to pass to focal_hpc for calculating EW.mat and NW.mat.  
+    # Return a 2 band layer stack: EW.mat as band 1, NS.mat as band 2.
+    apply_kernel <- function(x, EWkernel, EWres, NSkernel, NSres, ...) {
+        EW.mat <- sum(x * EWkernel) / EWres
+        NS.mat <- sum(x * NSkernel) / NSres
+        return(c(EW.mat, NS.mat))
+    }
+    print('got here 0')
+    grad.mat <- focal_hpc(x, fun=apply_kernel,
+                          args=list(EWkernel, EWres, NSkernel, NSres),
+                          window_dims=dim(NSkernel))
     # Make function to pass to focal_hpc for calculating slope and aspect.  
     # Result will be returned as a layer stack, with slope in band 1, aspect in 
     # band 2.
@@ -61,9 +64,11 @@ slopeasp_par <- function(x, EWkernel, NSkernel, smoothing=1, filename=NULL) {
         aspect[slope == 0] <- 0
         return(array(c(slope, aspect), dim=c(dim(x)[1], dim(x)[2], 2)))
     }
-    slopeasp_img <- focal_hpc(x=stack(EW.mat, NS.mat), fun=calc_slope,
+    print('got here 1')
+    slopeasp_img <- focal_hpc(x=grad.mat, fun=calc_slope,
                         args=list(smoothing=smoothing), filename=filename)
-
+    print('got here 2')
     return(list(slope=raster(slopeasp_img, layer=1),
            aspect=raster(slopeasp_img, layer=2)))
 }
+
