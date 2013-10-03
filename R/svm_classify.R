@@ -33,7 +33,7 @@
 #' sfQuickStop()
 svm_classify <- function(x, train_data, pred_classes_filename=NULL, 
                          pred_probs_filename=NULL, train_grid=NULL) {
-    print('Training SVM...')
+    message('Training SVM...')
     if (is.null(train_grid)) {
         sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))
         svm_train_grid <- data.frame(.sigma=sig_dist[1], .C=2^(-2:12))
@@ -45,7 +45,7 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                        preProc=c('center', 'scale'),
                        tuneGrid=svm_train_grid, trControl=svm_train_control)
 
-    print('Predicting classes...')
+    message('Predicting classes...')
     calc_pred_classes <- function(x, svm_train, ...) {
         preds <- predict(x, svm_train)
         preds <- array(getValues(preds), dim=c(dim(x)[1], dim(x)[2], 1))
@@ -55,7 +55,7 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                      filename=pred_classes_filename, chunk_format="raster")
     pred_classes <- setMinMax(pred_classes)
 
-    print('Predicting class probabilities...')
+    message('Predicting class probabilities...')
     calc_pred_probs <- function(x, svm_train, ...) {
         preds <- predict(x, svm_train, type="prob", index=c(1:dim(x)[3]))
         preds <- array(getValues(preds), dim=c(dim(x)[1], dim(x)[2], dim(x)[3]))
