@@ -15,11 +15,16 @@
 #' prior to running \code{match_rasters}.
 #' @examples
 #' # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
-#' data(ASTER_V002_LL)
-#' data(ASTER_V002_LR)
-#' data(ASTER_V002_UR)
-#' data(ASTER_V002_UL)
-#' DEM_mosaic <- mosaic(ASTER_V002_LL, ASTER_V002_LR, ASTER_V002_UR, ASTER_V002_UL, fun='mean')
+#' ASTER_V002_LL <- raster(system.file('extdata/ASTER_V002_LL.dat', 
+#' package='teamr'))
+#' ASTER_V002_LR <- raster(system.file('extdata/ASTER_V002_LR.dat', 
+#' package='teamr'))
+#' ASTER_V002_UL <- raster(system.file('extdata/ASTER_V002_UL.dat', 
+#' package='teamr'))
+#' ASTER_V002_UR <- raster(system.file('extdata/ASTER_V002_UR.dat', 
+#' package='teamr'))
+#' DEM_mosaic <- mosaic(ASTER_V002_LL, ASTER_V002_LR, ASTER_V002_UR, 
+#' ASTER_V002_UL, fun='mean')
 #' 
 #' # Crop and extend the DEM mosaic to match the Landsat image
 #' L5TSR_1986 <- raster(system.file('extdata/L5TSR_1986.dat', package='teamr'))
