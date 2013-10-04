@@ -46,23 +46,30 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                        tuneGrid=svm_train_grid, trControl=svm_train_control)
 
     message('Predicting classes...')
-    calc_pred_classes <- function(x, svm_train, ...) {
-        preds <- predict(x, svm_train)
-        preds <- array(getValues(preds), dim=c(dim(x)[1], dim(x)[2], 1))
+    calc_pred_classes <- function(in_rast, svm_train, ...) {
+        preds <- predict(in_rast, svm_train)
+        preds <- array(getValues(preds), dim=c(dim(in_rast)[1], 
+                                               dim(in_rast)[2], 1))
         return(preds)
     }
-    pred_classes <- focal_hpc(x=x, fun=calc_pred_classes, args=list(svm_train), 
-                     filename=pred_classes_filename, chunk_format="raster")
+    pred_classes <- rasterEngine(in_rast=x, fun=calc_pred_classes, 
+                                 args=list(svm_train=svm_train), 
+                                 filename=pred_classes_filename, 
+                                 chunk_format="raster")
     pred_classes <- setMinMax(pred_classes)
 
     message('Predicting class probabilities...')
-    calc_pred_probs <- function(x, svm_train, ...) {
-        preds <- predict(x, svm_train, type="prob", index=c(1:dim(x)[3]))
-        preds <- array(getValues(preds), dim=c(dim(x)[1], dim(x)[2], dim(x)[3]))
+    calc_pred_probs <- function(in_rast, svm_train, ...) {
+        preds <- predict(in_rast, svm_train, type="prob", index=c(1:dim(in_rast)[3]))
+        preds <- array(getValues(preds), dim=c(dim(in_rast)[1], 
+                                               dim(in_rast)[2], 
+                                               dim(in_rast)[3]))
         return(preds)
     }
-    pred_probs <- focal_hpc(x=x, fun=calc_pred_probs, args=list(svm_train), 
-                            filename=pred_probs_filename, chunk_format="raster")
+    pred_probs <- rasterEngine(in_rast=x, fun=calc_pred_probs, 
+                               args=list(svm_train=svm_train), 
+                               filename=pred_probs_filename, 
+                               chunk_format="raster")
     pred_probs <- setMinMax(pred_probs)
 
     return(list(svm_train=svm_train, pred_classes=pred_classes, pred_probs=pred_probs))
