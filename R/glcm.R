@@ -28,7 +28,12 @@
 #' Newly updated and rev. ed. Wiley-Interscience, Hoboken, N.J pages 540-541, 
 #' 563-566.
 #' @examples
-#' #TODO: Code examples
+#' \dontrun{
+#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+#'
+#' x <- raster(L5TSR_1986, layer=1)
+#' textures <- glcm(x)
+#' }
 glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
                  statistics=c('mean', 'variance', 'covariance', 'homogeneity', 
                              'contrast', 'dissimilarity', 'entropy', 
@@ -49,10 +54,6 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
     # Resample the image to the required number of grey levels
     x_grey <- cut(x, breaks=seq(cellStats(x, 'min'), cellStats(x, 'max'), 
                                 length.out=n_grey + 1), include.lowest=TRUE)
-
-    # DEBUG ###############
-    #rast <- matrix(getValues(x_grey), nrow=5)[c(1:4), c(2:5)]
-    # DEBUG ###############
 
     # Calculate column major indices for base and offset images
     ul_base <- c(1, 1)
@@ -150,25 +151,3 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
 
     return(texture_img)
 }
-# DEBUG ####################
-library(teamr)
-L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
-x <- raster(L5TSR_1986, layer=1)
-# x <- raster(matrix(c(0, 0, 0, 0, 0,
-#               0, 0, 0, 2, 0,
-#               0, 0, 2, 2, 0,
-#               1, 1, 2, 3, 0,
-#               1, 1, 2, 3, 0), nrow=5))
-statistics <- c('mean', 'variance', 'covariance', 'homogeneity', 'contrast', 
-                'entropy', 'second_moment', 'correlation')
-window <- c(3, 3)
-shift <- c(1, 1)
-n_grey <- 32
-
-sfQuickInit(4)
-timing <- proc.time()
-textures <- glcm(x, statistics=statistics)
-print(proc.time() - timing)
-writeRaster(textures, 'L5TSR_1986_GLCM_TEXTURES_mine.envi')
-sfQuickStop()
-# DEBUG ####################
