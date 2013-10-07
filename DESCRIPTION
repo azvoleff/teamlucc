@@ -46,3 +46,4 @@ Collate:
     'chg_traj.R'
     'chg_traj_stats.R'
     'slopeasp_par.R'
+    'mix_model.R'
