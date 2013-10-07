@@ -16,7 +16,8 @@ Depends:
     reshape2,
     spatial.tools,
     caret,
-    foreach
+    foreach,
+    Rcpp
 Description: Routines for processing Landsat imagery for the Tropical Ecology
     Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)

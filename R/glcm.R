@@ -35,8 +35,8 @@
 #' }
 glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
                  statistics=c('mean', 'variance', 'covariance', 'homogeneity', 
-                             'contrast', 'dissimilarity', 'entropy', 
-                             'second_moment', 'correlation')) {
+                              'contrast', 'dissimilarity', 'entropy', 
+                              'second_moment', 'correlation')) {
     if (length(window) != 2) {
         stop('window must be integer vector of length 2')
     }
@@ -62,13 +62,13 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
     if (shift[2] < 0) {ul_base[2] <- ul_base[2] + abs(shift[2])}
     ul_offset <- ul_base + shift
     base_cols <- matrix(rep(ul_base[2] + seq(1, window[2]), window[1]) - 1, 
-                         nrow=window[1], byrow=TRUE)
+                        nrow=window[1], byrow=TRUE)
     base_rows <- matrix(rep(ul_base[1] + seq(1, window[1]), window[2]) - 1, 
-                         nrow=window[1])
+                        nrow=window[1])
     offset_cols <- matrix(rep(ul_offset[2] + seq(1, window[2]), window[1]) - 1, 
-                         nrow=window[1], byrow=TRUE)
+                          nrow=window[1], byrow=TRUE)
     offset_rows <- matrix(rep(ul_offset[1] + seq(1, window[1]), window[2]) - 1, 
-                         nrow=window[1])
+                          nrow=window[1])
     offset_indices <- (offset_cols - 1) * (window[1]+abs(shift[1])) + offset_rows
     base_indices <- (base_cols - 1) * (window[1]+abs(shift[1])) + base_rows
 
@@ -141,11 +141,11 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
         }
     }
     texture_img <- rasterEngine(rast=x_grey, fun=calc_texture,
-                             args=list(statistics=statistics, 
-                                       base_indices=base_indices, 
-                                       offset_indices=offset_indices,
-                                       n_grey=n_grey), 
-                             window_dims=(window + abs(shift)))
+                                args=list(statistics=statistics, 
+                                          base_indices=base_indices, 
+                                          offset_indices=offset_indices,
+                                          n_grey=n_grey), 
+                                window_dims=(window + abs(shift)))
     names(texture_img) <- statistics 
     texture_img <- setMinMax(texture_img)
 
