@@ -18,7 +18,7 @@
 #' @param filename (optional) filename for output image
 #' @references Brown, M., H. G.  Lewis, and S.  R.  Gunn.  2000.  Linear 
 #' spectral mixture models and support vector machines for remote sensing.  
-#' Geoscience and Remote Sensing, IEEE Transactions on 38:2346–2360.
+#' Geoscience and Remote Sensing, IEEE Transactions on 38:2346-2360.
 mixing_model <- function(x, train_data, filename=NULL) {
     #TODO: Code this function
 }

@@ -14,7 +14,7 @@
 #' @return A /code{RasterLayer} with the calculated requested GLCM texture 
 #' measures.
 #' @references Lu, D., and M. Batistella. 2005. Exploring TM image texture and 
-#' its relationships with biomass estimation in Rondônia, Brazilian Amazon.  
+#' its relationships with biomass estimation in Rond\^{o}nia, Brazilian Amazon.  
 #' Acta Amazonica 35:249-257.
 #'
 #' Gonzalez, R. C. 2008. Digital image processing. 3rd ed. Prentice Hall, Upper 
@@ -24,9 +24,8 @@
 #' image classification. IEEE Transactions on Systems, Man and Cybernetics 
 #' SMC-3:610-621.
 #'
-#' Pratt, W. K. 2007. Digital image processing: PIKS Scientific inside4th ed., 
-#' Newly updated and rev. ed. Wiley-Interscience, Hoboken, N.J pages 540-541, 
-#' 563-566.
+#' Pratt, W. K. 2007. Digital image processing: PIKS Scientific inside. 4th ed.
+#' Wiley-Interscience, Hoboken, N.J pages 540-541, 563-566.
 #' @examples
 #' \dontrun{
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
