@@ -51,9 +51,11 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
     }
 
     # Resample the image to the required number of grey levels
+    message(paste('Resampling to', n_grey, 'grey levels'))
     x_grey <- cut(x, breaks=seq(cellStats(x, 'min'), cellStats(x, 'max'), 
                                 length.out=n_grey + 1), include.lowest=TRUE)
 
+    message('Calculating textures')
     # Calculate column major indices for base and offset images
     ul_base <- c(1, 1)
     if (shift[1] < 0) {ul_base[1] <- ul_base[1] + abs(shift[1])}
@@ -122,11 +124,11 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
         }
         if ('dissimilarity' %in% statistics) {
             #TODO: Find source for dissimilarity
-            stop('Error: dissimilarity not yet supported')
+            textures <- c(textures, sum(rowSums(Pij * abs(imat - jmat))))
         }
         if ('entropy' %in% statistics) {
-            # Defined as in Gonzalez and Woods, 2009, page 832
-            textures <- c(textures, -sum(rowSums(Pij * log2(Pij + .001))))
+            # Defined as in Haralick, 1973, page 619 (equation 9)
+            textures <- c(textures, -sum(rowSums(Pij * log(Pij + .001))))
         }
         if ('second_moment' %in% statistics) {
             # Defined as in Haralick, 1973, page 619
@@ -138,7 +140,6 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
                                                 (sqrt(sig2r) * sqrt(sig2c)))))
         }
     }
-
     texture_img <- rasterEngine(rast=x_grey, fun=calc_texture,
                              args=list(statistics=statistics, 
                                        base_indices=base_indices, 
