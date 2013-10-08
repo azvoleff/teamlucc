@@ -1,117 +1,111 @@
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 using namespace Rcpp;
 
-// Adapted from http://adv-r.had.co.nz/Rcpp.html
-NumericVector colSumsC(NumericMatrix x) {
-    int ncol = x.ncol(), nrow = x.nrow();
-    NumericVector out(ncol);
-    for (int i = 0; i < ncol; i++) {
-        double total = 0;
-        for (int j = 0; j < nrow; j++) {
-            total += x(i, j);
+bool inC(std::string x, CharacterVector y) {
+    bool is_in = false;
+    for (int i=0; i < y.size(); ++i) {
+        std::string cy = Rcpp::as<std::string>(y(i));
+        if (cy == x) {
+            is_in = true;
+            break;
         }
-        out[i] = total;
     }
-    return out;
+    return is_in;
 }
 
-// From http://adv-r.had.co.nz/Rcpp.html
-NumericVector rowSumsC(NumericMatrix x) {
-    int nrow = x.nrow(), ncol = x.ncol();
-    NumericVector out(nrow);
-    for (int i = 0; i < nrow; i++) {
-        double total = 0;
-        for (int j = 0; j < ncol; j++) {
-            total += x(i, j);
-        }
-        out[i] = total;
-    }
-    return out;
-}
-
-
+//' Calculates a glcm texture for use in the glcm.R script
+//' @export
 // [[Rcpp::export]]
-NumericVector calc_textureC(NumericMatrix rast, CharacterVector statistics, 
+NumericVector calc_texture(NumericMatrix rast, CharacterVector statistics, 
         IntegerVector base_indices, IntegerVector offset_indices,
-        Integer n_grey) {
-    NumericMatrix G(n_grey, n_grey), imat=(n_grey, n_grey),
-    jmat=(n_grey, n_grey);
-    int base_value = 0, offset_value = 0;
+        int n_grey) {
+    arma::mat Rast(rast.begin(), rast.nrow(), rast.ncol(), false); 
+    arma::mat G(n_grey, n_grey, arma::fill::zeros);
+    arma::mat Pij(n_grey, n_grey, arma::fill::zeros);
+    arma::mat imat(n_grey, n_grey, arma::fill::zeros);
+    arma::mat jmat(n_grey, n_grey, arma::fill::zeros);
     NumericVector rowsum(n_grey), colsum(n_grey), textures(statistics.size());
-    int textures_index = 0;
-    double mr, mc, sig2c, sig2r;
+    int textures_index=0, Gsum=0;
+    double mr=0, mc=0, sig2c=0, sig2r=0;
 
     for(int i=0; i < offset_indices.size(); i++) {
-        base_value = rast[,,1][base_indices];
-        offset_value = rast[,,1][offset_indices];
-        G(base_value, offset_value)++;
+        G(Rast(base_indices(i)), Rast(offset_indices(i)))++;
     }
-    Pij = G / sum(G);
 
-    // Calculate rowSums and colSums of Pij
-    rowsum = rowSumsC(G);
-    colsum = colSumsC(G);
+    // Calculate Pij from G matrix by dividing each Gij value by number of 
+    // total co-ocurrences. Also, make a matrix of i's and a matrix of j's to 
+    // be used in the below matrix calculations. These matrices are the same 
+    // shape as Pij with the entries equal to the i indices of each cell (for 
+    // the imat matrix, which is indexed over the rows) or the j indices of 
+    // each cell (for the jmat matrix, which is indexed over the columns).
+    Gsum = arma::accu(G);
+    for(int i=0; i < G.n_rows; i++) {
+        for(int j=0; j < G.n_cols; j++) {
+            imat(i, j) = i;
+            jmat(i, j) = j;
+            Pij(i, j) = G(i, j) / Gsum;
+        }
+    }
 
-    // Calculate mr and mc (forms of col and row means) and sig2r and sig2c 
-    // (measures of row and column variance)
-    mr = sum(c(1:nrow(Pij)) * rowsum);
-    mc = sum(c(1:ncol(Pij)) * colsum);
-    sig2r = sum((c(1:nrow(Pij)) - mr)^2 * rowsum);
-    sig2c = sum((c(1:ncol(Pij)) - mc)^2 * colsum);
+    rowsum = arma::sum(G, 1);
+    colsum = arma::sum(G, 0);
 
-    // Make a matrix of i's and a matrix of j's to be used in the below 
-    // matrix calculations. These matrices are the same shape as Pij with 
-    // the entries equal to the i indices of each cell (for the imat matrix, 
-    // which is indexed over the rows) or the j indices of each cell (for 
-    // the jmat matrix, which is indexed over the columns).
-    imat = matrix(rep(1:nrow(Pij), ncol(Pij)), nrow=nrow(Pij));
-    jmat = matrix(rep(1:ncol(Pij), nrow(Pij)), ncol=ncol(Pij), byrow=TRUE);
+    // Calculate mr and mc (forms of col and row means)
+    for(int i=0; i < G.n_rows; i++) {
+        mr += i * rowsum(i);
+        mc += i * colsum(i);
+    }
 
-    if ("mean" %in% statistics) {
+    if (inC("mean", statistics)) {
         // Defined as in Lu and Batistella, 2005, page 252
         textures(textures_index) = mr;
-        textures_index ++;
+        textures_index++;
     }
-    if ("variance" %in% statistics) {
+    if (inC("variance", statistics)) {
         // Defined as in Haralick, 1973, page 619 (equation 4)
-        textures(textures_index) = sum(rowSums((imat - mr)^2 * Pij));
-        textures_index ++;
+        textures(textures_index) = sum(arma::sum(pow((imat - mr), 2) * Pij, 1));
+        textures_index++;
     }
-    if ("covariance" %in% statistics) {
+    if (inC("covariance", statistics)) {
         // Defined as in Pratt, 2007, page 540
-        textures(textures_index) = sum(rowSums((imat - mr) *
-                    (jmat - mc) * Pij));
-        textures_index ++;
+        textures(textures_index) = sum(arma::sum((imat - mr) * (jmat - mc) * Pij, 1));
+        textures_index++;
     }
-    if ("homogeneity" %in% statistics) {
+    if (inC("homogeneity", statistics)) {
         // Defined as in Gonzalez and Woods, 2009, page 832
-        textures(textures_index) = sum(rowSums(Pij / (1 + abs(imat - jmat))));
-        textures_index ++;
+        textures(textures_index) = sum(arma::sum(Pij / (1 + abs(imat - jmat)), 1));
+        textures_index++;
     }
-    if ("contrast" %in% statistics) {
+    if (inC("contrast", statistics)) {
         // Defined as in Gonzalez and Woods, 2009, page 832
-        textures(textures_index) = sum(rowSums((imat - jmat)^2 * Pij));
-        textures_index ++;
+        textures(textures_index) = sum(arma::sum(pow((imat - jmat), 2) * Pij, 1));
+        textures_index++;
     }
-    if ("dissimilarity" %in% statistics) {
+    if (inC("dissimilarity", statistics)) {
         //TODO: Find source for dissimilarity
-        textures(textures_index) = sum(rowSums(Pij * abs(imat - jmat)));
-        textures_index ++;
+        textures(textures_index) = sum(arma::sum(Pij * abs(imat - jmat), 1));
+        textures_index++;
     }
-    if ("entropy" %in% statistics) {
+    if (inC("entropy", statistics)) {
         // Defined as in Haralick, 1973, page 619 (equation 9)
-        textures(textures_index) = -sum(rowSums(Pij * log(Pij + .001)));
-        textures_index ++;
+        textures(textures_index) = -sum(arma::sum(Pij * log(Pij + .001), 1));
+        textures_index++;
     }
-    if ("second_moment" %in% statistics) {
+    if (inC("second_moment", statistics)) {
         // Defined as in Haralick, 1973, page 619
-        textures(textures_index) = sum(rowSums(Pij^2));
-        textures_index ++;
+        textures(textures_index) = sum(arma::sum(pow(Pij, 2), 1));
+        textures_index++;
     }
-    if ("correlation" %in% statistics) {
+    if (inC("correlation", statistics)) {
         // Defined as in Gonzalez and Woods, 2009, page 832
-        textures(textures_index) = sum(rowSums(((imat - mr) * (jmat - mc) * Pij) /
-                    (sqrt(sig2r) * sqrt(sig2c))));
-        textures_index ++;
+        for(int i=0; i < G.n_rows; i++) {
+            // Calculate sig2r and sig2c (measures of row and column variance)
+            sig2r += pow((i - mr), 2) *  rowsum(i);
+            sig2c += pow((i - mc), 2) *  colsum(i);
+        }
+        textures(textures_index) = sum(arma::sum(((imat - mr) * (jmat - mc) * Pij) /
+                    (sqrt(sig2r) * sqrt(sig2c)), 1));
+        textures_index++;
     }
+    return(textures);
 }

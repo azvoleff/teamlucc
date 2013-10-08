@@ -72,82 +72,25 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
     offset_indices <- (offset_cols - 1) * (window[1]+abs(shift[1])) + offset_rows
     base_indices <- (base_cols - 1) * (window[1]+abs(shift[1])) + base_rows
 
-    calc_texture <- function(rast, statistics, base_indices, offset_indices, n_grey, 
-                             ...) {
-        G <- matrix(0, n_grey, n_grey)
-        co_occur <- cbind(rast[,,1][base_indices], rast[,,1][offset_indices])
-        for (n in 1:nrow(co_occur)) {
-            G[co_occur[n, 1], co_occur[n, 2]] <- G[co_occur[n, 1],
-                                                   co_occur[n, 2]] + 1
-        }
-        Pij = G / sum(G)
-
-        # Calculate rowSums and colSums of Pij
-        rowsum = rowSums(Pij)
-        colsum = colSums(Pij)
-        # Calcuate mr and mc (forms of col and row means) and sig2r and sig2c 
-        # (measures of row and column variance)
-        mr = sum(c(1:nrow(Pij)) * rowsum)
-        mc = sum(c(1:ncol(Pij)) * colsum)
-        sig2r = sum((c(1:nrow(Pij)) - mr)^2 * rowsum)
-        sig2c = sum((c(1:ncol(Pij)) - mc)^2 * colsum)
-
-        # Make a matrix of i's and a matrix of j's to be used in the below 
-        # matrix calculations. These matrices are the same shape as Pij with 
-        # the entries equal to the i indices of each cell (for the imat matrix, 
-        # which is indexed over the rows) or the j indices of each cell (for 
-        # the jmat matrix, which is indexed over the columns).
-        imat <- matrix(rep(1:nrow(Pij), ncol(Pij)), nrow=nrow(Pij))
-        jmat <- matrix(rep(1:ncol(Pij), nrow(Pij)), ncol=ncol(Pij), byrow=TRUE)
-
-        textures <- c()
-        if ('mean' %in% statistics) {
-            # Defined as in Lu and Batistella, 2005, page 252
-            textures <- c(textures, mr)
-        }
-        if ('variance' %in% statistics) {
-            # Defined as in Haralick, 1973, page 619 (equation 4)
-            textures <- c(textures, sum(rowSums((imat - mr)^2 * Pij)))
-        }
-        if ('covariance' %in% statistics) {
-            # Defined as in Pratt, 2007, page 540
-            textures <- c(textures, sum(rowSums((imat - mr) *
-                                                (jmat - mc) * Pij)))
-        }
-        if ('homogeneity' %in% statistics) {
-            # Defined as in Gonzalez and Woods, 2009, page 832
-            textures <- c(textures, sum(rowSums(Pij / (1 + abs(imat - jmat)))))
-        }
-        if ('contrast' %in% statistics) {
-            # Defined as in Gonzalez and Woods, 2009, page 832
-            textures <- c(textures, sum(rowSums((imat - jmat)^2 * Pij)))
-        }
-        if ('dissimilarity' %in% statistics) {
-            #TODO: Find source for dissimilarity
-            textures <- c(textures, sum(rowSums(Pij * abs(imat - jmat))))
-        }
-        if ('entropy' %in% statistics) {
-            # Defined as in Haralick, 1973, page 619 (equation 9)
-            textures <- c(textures, -sum(rowSums(Pij * log(Pij + .001))))
-        }
-        if ('second_moment' %in% statistics) {
-            # Defined as in Haralick, 1973, page 619
-            textures <- c(textures, sum(rowSums(Pij^2)))
-        }
-        if ('correlation' %in% statistics) {
-            # Defined as in Gonzalez and Woods, 2009, page 832
-            textures <- c(textures, sum(rowSums(((imat - mr) * (jmat - mc) * Pij) /
-                                                (sqrt(sig2r) * sqrt(sig2c)))))
-        }
-    }
     texture_img <- rasterEngine(rast=x_grey, fun=calc_texture,
                                 args=list(statistics=statistics, 
                                           base_indices=base_indices, 
                                           offset_indices=offset_indices,
                                           n_grey=n_grey), 
                                 window_dims=(window + abs(shift)))
+
     names(texture_img) <- statistics 
     texture_img <- setMinMax(texture_img)
 
     return(texture_img)
 }
+n_grey=32
+window=c(3, 3)
+shift=c(1, 1)
+statistics=c('mean', 'variance', 'covariance', 'homogeneity', 
+             'contrast', 'dissimilarity', 'entropy', 
+             'second_moment', 'correlation')
+L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+x <- raster(L5TSR_1986, layer=1)
+
+textures <- glcm(x)

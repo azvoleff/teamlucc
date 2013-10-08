@@ -17,7 +17,9 @@ Depends:
     spatial.tools,
     caret,
     foreach,
-    Rcpp
+    Rcpp (>= 0.10.1),
+    RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo
 Description: Routines for processing Landsat imagery for the Tropical Ecology
     Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
@@ -48,3 +50,4 @@ Collate:
     'chg_traj_stats.R'
     'slopeasp_par.R'
     'mix_model.R'
+    'RcppExports.R'
