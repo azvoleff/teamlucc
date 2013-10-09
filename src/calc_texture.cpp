@@ -27,12 +27,6 @@ NumericVector calc_texture(arma::mat Rast, CharacterVector statistics,
     int textures_index=0, Gsum=0;
     double mr=0, mc=0, sig2c=0, sig2r=0;
 
-    // Rcpp::Rcout << "G.n_rows = " << G.n_rows << std::endl;
-    // Rcpp::Rcout << "G.n_cols = " << G.n_cols << std::endl;
-    // Rcpp::Rcout << "Rast.n_rows = " << Rast.n_rows << std::endl;
-    // Rcpp::Rcout << "Rast.n_cols = " << Rast.n_cols << std::endl;
-    // Rcpp::Rcout << "base_indices = " << base_indices << std::endl;
-    // Rcpp::Rcout << "offset_indices = " << offset_indices << std::endl;
     for(int i=0; i < offset_indices.size(); i++) {
         // Subtract one from the below indices to correct for row and col 
         // indices starting at 0 in C++ versus 1 in R.
