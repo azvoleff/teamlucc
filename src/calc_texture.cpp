@@ -39,8 +39,8 @@ NumericVector calc_texture(NumericMatrix rast, CharacterVector statistics,
     // the imat matrix, which is indexed over the rows) or the j indices of 
     // each cell (for the jmat matrix, which is indexed over the columns).
     Gsum = arma::accu(G);
-    for(int i=0; i < G.n_rows; i++) {
-        for(int j=0; j < G.n_cols; j++) {
+    for(unsigned i=0; i < G.n_rows; i++) {
+        for(unsigned j=0; j < G.n_cols; j++) {
             imat(i, j) = i;
             jmat(i, j) = j;
             Pij(i, j) = G(i, j) / Gsum;
@@ -51,7 +51,7 @@ NumericVector calc_texture(NumericMatrix rast, CharacterVector statistics,
     colsum = arma::sum(G, 0);
 
     // Calculate mr and mc (forms of col and row means)
-    for(int i=0; i < G.n_rows; i++) {
+    for(unsigned i=0; i < G.n_rows; i++) {
         mr += i * rowsum(i);
         mc += i * colsum(i);
     }
@@ -63,12 +63,12 @@ NumericVector calc_texture(NumericMatrix rast, CharacterVector statistics,
     }
     if (inC("variance", statistics)) {
         // Defined as in Haralick, 1973, page 619 (equation 4)
-        textures(textures_index) = sum(arma::sum(pow((imat - mr), 2) * Pij, 1));
+        textures(textures_index) = sum(arma::sum(pow((imat - mr), 2) % Pij, 1));
         textures_index++;
     }
     if (inC("covariance", statistics)) {
         // Defined as in Pratt, 2007, page 540
-        textures(textures_index) = sum(arma::sum((imat - mr) * (jmat - mc) * Pij, 1));
+        textures(textures_index) = sum(arma::sum((imat - mr) % (jmat - mc) % Pij, 1));
         textures_index++;
     }
     if (inC("homogeneity", statistics)) {
@@ -78,17 +78,17 @@ NumericVector calc_texture(NumericMatrix rast, CharacterVector statistics,
     }
     if (inC("contrast", statistics)) {
         // Defined as in Gonzalez and Woods, 2009, page 832
-        textures(textures_index) = sum(arma::sum(pow((imat - jmat), 2) * Pij, 1));
+        textures(textures_index) = sum(arma::sum(pow((imat - jmat), 2) % Pij, 1));
         textures_index++;
     }
     if (inC("dissimilarity", statistics)) {
         //TODO: Find source for dissimilarity
-        textures(textures_index) = sum(arma::sum(Pij * abs(imat - jmat), 1));
+        textures(textures_index) = sum(arma::sum(Pij % abs(imat - jmat), 1));
         textures_index++;
     }
     if (inC("entropy", statistics)) {
         // Defined as in Haralick, 1973, page 619 (equation 9)
-        textures(textures_index) = -sum(arma::sum(Pij * log(Pij + .001), 1));
+        textures(textures_index) = -sum(arma::sum(Pij % log(Pij + .001), 1));
         textures_index++;
     }
     if (inC("second_moment", statistics)) {
@@ -98,12 +98,12 @@ NumericVector calc_texture(NumericMatrix rast, CharacterVector statistics,
     }
     if (inC("correlation", statistics)) {
         // Defined as in Gonzalez and Woods, 2009, page 832
-        for(int i=0; i < G.n_rows; i++) {
+        for(unsigned i=0; i < G.n_rows; i++) {
             // Calculate sig2r and sig2c (measures of row and column variance)
-            sig2r += pow((i - mr), 2) *  rowsum(i);
-            sig2c += pow((i - mc), 2) *  colsum(i);
+            sig2r += pow((i - mr), 2) * rowsum(i);
+            sig2c += pow((i - mc), 2) * colsum(i);
         }
-        textures(textures_index) = sum(arma::sum(((imat - mr) * (jmat - mc) * Pij) /
+        textures(textures_index) = sum(arma::sum(((imat - mr) % (jmat - mc) % Pij) /
                     (sqrt(sig2r) * sqrt(sig2c)), 1));
         textures_index++;
     }
