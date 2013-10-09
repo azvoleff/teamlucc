@@ -3,7 +3,7 @@
 
 #' Calculates a glcm texture for use in the glcm.R script
 #' @export
-calc_texture <- function(rast, statistics, base_indices, offset_indices, n_grey) {
-    .Call('teamr_calc_texture', PACKAGE = 'teamr', rast, statistics, base_indices, offset_indices, n_grey)
+calc_texture <- function(Rast, statistics, base_indices, offset_indices, n_grey) {
+    .Call('teamr_calc_texture', PACKAGE = 'teamr', Rast, statistics, base_indices, offset_indices, n_grey)
 }
 

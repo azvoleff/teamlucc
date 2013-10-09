@@ -16,10 +16,9 @@ bool inC(std::string x, CharacterVector y) {
 //' Calculates a glcm texture for use in the glcm.R script
 //' @export
 // [[Rcpp::export]]
-NumericVector calc_texture(NumericMatrix rast, CharacterVector statistics, 
+NumericVector calc_texture(arma::mat Rast, CharacterVector statistics, 
         IntegerVector base_indices, IntegerVector offset_indices,
         int n_grey) {
-    arma::mat Rast(rast.begin(), rast.nrow(), rast.ncol(), false); 
     arma::mat G(n_grey, n_grey, arma::fill::zeros);
     arma::mat Pij(n_grey, n_grey, arma::fill::zeros);
     arma::mat imat(n_grey, n_grey, arma::fill::zeros);
@@ -28,8 +27,16 @@ NumericVector calc_texture(NumericMatrix rast, CharacterVector statistics,
     int textures_index=0, Gsum=0;
     double mr=0, mc=0, sig2c=0, sig2r=0;
 
+    // Rcpp::Rcout << "G.n_rows = " << G.n_rows << std::endl;
+    // Rcpp::Rcout << "G.n_cols = " << G.n_cols << std::endl;
+    // Rcpp::Rcout << "Rast.n_rows = " << Rast.n_rows << std::endl;
+    // Rcpp::Rcout << "Rast.n_cols = " << Rast.n_cols << std::endl;
+    // Rcpp::Rcout << "base_indices = " << base_indices << std::endl;
+    // Rcpp::Rcout << "offset_indices = " << offset_indices << std::endl;
     for(int i=0; i < offset_indices.size(); i++) {
-        G(Rast(base_indices(i)), Rast(offset_indices(i)))++;
+        // Subtract one from the below indices to correct for row and col 
+        // indices starting at 0 in C++ versus 1 in R.
+        G(Rast(base_indices(i) - 1) - 1, Rast(offset_indices(i) - 1) - 1)++;
     }
 
     // Calculate Pij from G matrix by dividing each Gij value by number of 
