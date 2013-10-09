@@ -11,6 +11,7 @@
 #' @title TEAM Remote Sensing Processing Tools
 #' @author Alex Zvoleff, \email{azvoleff@@conservation.org}
 #' @keywords package
+#' @useDynLib teamr
 NULL
 #' Training polygons for 1986 Landsat 5 Surface Reflectance image
 #' 
