@@ -44,7 +44,6 @@ chg_mag <- function(t1p, t2p, filename=NULL) {
         chgmag <- array(chgmag, dim=c(dim(t1p)[1], dim(t1p)[2], 1))
         return(chgmag)
     }
-
     out <- rasterEngine(t1p=t1p, t2p=t2p, fun=calc_chg_mag, 
                      args=list(n_classes=n_classes), filename=filename)
     out <- setMinMax(out)
