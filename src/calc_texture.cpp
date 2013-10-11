@@ -14,7 +14,7 @@ double text_mean(mat pij, mat imat, mat jmat, double mr, double mc) {
 double text_variance(mat pij, mat imat, mat jmat, double mr, double mc) {
     //Rcpp::Rcout << "variance " << std::endl;
     // Defined as in Haralick, 1973, page 619 (equation 4)
-    return(accu(pij % square((imat - mr))));
+    return(accu(pij % square(imat - mr)));
 }
 
 double text_covariance(mat pij, mat imat, mat jmat, double mr, double mc) {
@@ -56,12 +56,12 @@ double text_second_moment(mat pij, mat imat, mat jmat, double mr, double mc) {
 double text_correlation(mat pij, mat imat, mat jmat, double mr, double mc) {
     //Rcpp::Rcout << "correlation" << std::endl;
     // Defined as in Gonzalez and Woods, 2009, page 832
-    // Calculate sig2r and sig2c (measures of row and column variance)
-    double sig2c=0, sig2r=0;
-    sig2r = sum(trans(square(linspace<vec>(1, pij.n_rows, pij.n_rows) - mr)) % sum(pij, 0));
-    sig2c = sum(square(linspace<vec>(1, pij.n_cols, pij.n_cols) - mc) % sum(pij, 1));
-    return(accu(((imat - mr) % (jmat - mc) % pij) / (sqrt(sig2r) * sqrt(sig2c))));
-    //Rcpp::Rcout << "finished correlation" << std::endl;
+    // Calculate sigr and sigc (measures of row and column std deviation)
+    double sigc=0, sigr=0;
+    sigr = sqrt(sum(trans(square(linspace<vec>(1, pij.n_rows, pij.n_rows) - mr)) % sum(pij, 0)));
+    sigc = sqrt(sum(square(linspace<vec>(1, pij.n_cols, pij.n_cols) - mc) % sum(pij, 1)));
+    //return(accu(((imat - mr) % (jmat - mc) % pij) / (sigr * sigc)));
+    return(accu((imat % jmat % pij - mr * mc) / (sigr * sigc)));
 }
 
 //' Calculates a glcm texture for use in the glcm.R script
