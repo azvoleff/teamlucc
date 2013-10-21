@@ -19,9 +19,9 @@ Imports:
     reshape2,
     spatial.tools,
     caret,
-    foreach,
+    foreach
 LinkingTo: Rcpp, RcppArmadillo
-Description: Routines for processing imagery and other spatial data for the 
+Description: Routines for processing imagery and other spatial data for the
     Tropical Ecology Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
 URL: https://github.com/azvoleff/teamr
