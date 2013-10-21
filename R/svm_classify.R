@@ -49,8 +49,8 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
     message('Predicting classes...')
     calc_pred_classes <- function(in_rast, svm_train, ...) {
         preds <- predict(in_rast, svm_train)
-        preds <- array(getValues(preds), dim=c(dim(in_rast)[1], 
-                                               dim(in_rast)[2], 1))
+        preds <- array(getValues(preds), dim=c(dim(in_rast)[2], 
+                                               dim(in_rast)[1], 1))
         return(preds)
     }
     pred_classes <- rasterEngine(in_rast=x, fun=calc_pred_classes, 
@@ -60,15 +60,18 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
     pred_classes <- setMinMax(pred_classes)
 
     message('Predicting class probabilities...')
-    calc_pred_probs <- function(in_rast, svm_train, ...) {
-        preds <- predict(in_rast, svm_train, type="prob", index=c(1:dim(in_rast)[3]))
-        preds <- array(getValues(preds), dim=c(dim(in_rast)[1], 
-                                               dim(in_rast)[2], 
-                                               dim(in_rast)[3]))
+    calc_pred_probs <- function(in_rast, svm_train, n_classes, ...) {
+        preds <- predict(in_rast, svm_train, type="prob", 
+                         index=c(1:dim(in_rast)[3]))
+        preds <- array(getValues(preds), dim=c(dim(in_rast)[2], 
+                                               dim(in_rast)[1], 
+                                               n_classes))
         return(preds)
     }
+    n_classes <- length(caret:::getClassLevels(svm_train))
     pred_probs <- rasterEngine(in_rast=x, fun=calc_pred_probs, 
-                               args=list(svm_train=svm_train), 
+                               args=list(svm_train=svm_train, 
+                                         n_classes=n_classes), 
                                filename=pred_probs_filename, 
                                chunk_format="raster")
     pred_probs <- setMinMax(pred_probs)
