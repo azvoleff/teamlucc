@@ -54,7 +54,8 @@ chg_traj <- function(initial, chg_mag, chg_dir, threshold, filename=NULL,
     # of classes.
     traj_lut$Code <- traj_lut$t0_code + traj_lut$t1_code * length(classcodes)
 
-    calc_chg_traj <- function(initial, chg_mag, chg_dir, classcodes, ...) {
+    calc_chg_traj <- function(initial, chg_mag, chg_dir, classcodes, threshold, 
+                              ignorepersistence, ...) {
         # Code trajectories by summing t0 and chg_dir after multiplying chg_dir 
         # by the number of classes.
         traj <- initial + chg_dir * length(classcodes)
@@ -64,9 +65,11 @@ chg_traj <- function(initial, chg_mag, chg_dir, threshold, filename=NULL,
         traj <- array(traj, dim=c(dim(initial)[1], dim(initial)[2], 1))
         return(traj)
     }
-
-    out <- rasterEngine(initial, chg_mag, chg_dir, fun=calc_chg_traj, 
-                     args=list(classcodes=classcodes), filename=filename)
+    out <- rasterEngine(initial=initial, chg_mag=chg_mag, chg_dir=chg_dir, 
+                        fun=calc_chg_traj, args=list(classcodes=classcodes, 
+                                                     threshold=threshold,
+                                                     ignorepersistence=ignorepersistence), 
+                        filename=filename)
     out <- setMinMax(out)
 
     return(list(traj_lut=traj_lut, chg_traj=out))
