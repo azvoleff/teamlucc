@@ -1,6 +1,7 @@
 #' Makes a polygon shapefile of image extent.
 #'
 #' @export
+#' @import rgdal
 #' @param x A \code{Raster*} object
 #' @param out_file Filename for the output shapefile.
 write_raster_extent <- function(x, out_file) {

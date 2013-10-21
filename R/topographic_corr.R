@@ -1,6 +1,7 @@
 #' Topographically correct a raster
 #'
 #' @export
+#' @import landsat
 #' @param x An image to correct.
 #' @param DEM A digital elevation model with the same coordinate system, 
 #' extent, and resolution as /code{x}

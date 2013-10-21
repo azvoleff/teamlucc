@@ -7,9 +7,12 @@ Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
     sp,
     raster,
-    rgdal,
+    Rcpp (>= 0.10.1),
+    RcppArmadillo
+Imports:
     landsat,
     rgeos,
+    rgdal,
     e1071,
     kernlab,
     plyr,
@@ -17,11 +20,9 @@ Depends:
     spatial.tools,
     caret,
     foreach,
-    Rcpp (>= 0.10.1),
-    RcppArmadillo
 LinkingTo: Rcpp, RcppArmadillo
-Description: Routines for processing Landsat imagery for the Tropical Ecology
-    Assessment and Monitoring (TEAM) Network.
+Description: Routines for processing imagery and other spatial data for the 
+    Tropical Ecology Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
 URL: https://github.com/azvoleff/teamr
 Collate:

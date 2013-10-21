@@ -1,6 +1,7 @@
 #' Assign class labels to classification file
 #'
 #' @export
+#' @import rgdal
 #' @param x classified image as \code{RasterLayer}
 #' @param cls two column matrix, where the first column is the class codes 
 #' (integers) and the second column is the class names

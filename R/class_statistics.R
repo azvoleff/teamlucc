@@ -1,6 +1,7 @@
 #' Exports statistics on pixels within each of a set of land cover classes
 #'
 #' @export
+#' @import plyr
 #' @param x A \code{RasterLayer} from which class statistics will be 
 #' calculated.
 #' @param y A \code{SpatialPolygonsDataFrame} with cover class 
