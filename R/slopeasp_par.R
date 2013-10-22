@@ -40,33 +40,28 @@ slopeasp_par <- function(dem, EWkernel, NSkernel, smoothing=1, filename=NULL) {
     if (!identical(dim(NSkernel), dim(EWkernel))) {
         stop('NSkernal and EWkernel must have same dimensions')
     }
-    # Make function to pass to rasterEngine for calculating EW.mat and NW.mat.  
-    # Return a 2 band layer stack: EW.mat as band 1, NS.mat as band 2.
-    apply_kernel <- function(rast_wind, EWkernel, EWres, NSkernel, NSres, ...) {
-        EW.mat <- sum(rast_wind * EWkernel) / EWres
-        NS.mat <- sum(rast_wind * NSkernel) / NSres
-        return(c(EW.mat, NS.mat))
-    }
-    grad.mat <- rasterEngine(rast_wind=dem, fun=apply_kernel,
-                             args=list(EWkernel=EWkernel, EWres=xres(dem), 
-                                       NSkernel=NSkernel, NSres=yres(dem)),
-                             window_dims=c(3, 3))
     # Make function to pass to rasterEngine for calculating slope and aspect.  
     # Result will be returned as a layer stack, with slope in band 1, aspect in 
     # band 2.
-    calc_slope <- function(rast_wind, smoothing, ...) {
-        EW.mat <- rast_wind[ , , 1]
-        NS.mat <- rast_wind[ , , 2]
-        slope <- atan(sqrt(EW.mat^2 + NS.mat^2)/smoothing)
-        slope <- (180/pi) * slope
-        aspect <- 180 - (180/pi) * atan(NS.mat/EW.mat) + 90 * (EW.mat/abs(EW.mat))
+    calc_slope_aspect <- function(rast_wind, EWkernel, EWres, NSkernel, NSres, 
+                                  smoothing, ...) {
+        # First calculate the gradient
+        EW.mat <- sum(rast_wind * EWkernel) / EWres
+        NS.mat <- sum(rast_wind * NSkernel) / NSres
+        # Now calculate the slope and aspect
+        slope <- atan(sqrt(EW.mat^2 + NS.mat^2) / smoothing)
+        slope <- (180 / pi) * slope
+        aspect <- 180 - (180 / pi) * atan(NS.mat / EW.mat) + 90 * (EW.mat / 
+                                                                   abs(EW.mat))
         aspect[slope == 0] <- 0
-        return(array(c(slope, aspect), dim=c(dim(rast_wind)[1], dim(rast_wind)[2], 2)))
+        return(c(slope, aspect))
     }
-    slopeasp_img <- rasterEngine(rast_wind=grad.mat, fun=calc_slope,
-                                 args=list(smoothing=smoothing), 
-                                 filename=filename)
+    slopeasp_img <- rasterEngine(rast_wind=dem, fun=calc_slope_aspect,
+                                 args=list(EWkernel=EWkernel, EWres=xres(dem), 
+                                           NSkernel=NSkernel, NSres=yres(dem),
+                                           smoothing=smoothing),
+                                 window_dims=c(3, 3), filename=filename)
     return(list(slope=raster(slopeasp_img, layer=1),
-           aspect=raster(slopeasp_img, layer=2)))
+                aspect=raster(slopeasp_img, layer=2)))
 }
 
