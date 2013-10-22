@@ -6,6 +6,26 @@
 
 using namespace Rcpp;
 
+// calc_slope_aspect
+Rcpp::NumericVector calc_slope_aspect(arma::mat Rast, arma::mat EWkernel, float EWres, arma::mat NSkernel, float NSres, float smoothing);
+RcppExport SEXP teamr_calc_slope_aspect(SEXP RastSEXP, SEXP EWkernelSEXP, SEXP EWresSEXP, SEXP NSkernelSEXP, SEXP NSresSEXP, SEXP smoothingSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< arma::mat >::type Rast(RastSEXP );
+        Rcpp::traits::input_parameter< arma::mat >::type EWkernel(EWkernelSEXP );
+        Rcpp::traits::input_parameter< float >::type EWres(EWresSEXP );
+        Rcpp::traits::input_parameter< arma::mat >::type NSkernel(NSkernelSEXP );
+        Rcpp::traits::input_parameter< float >::type NSres(NSresSEXP );
+        Rcpp::traits::input_parameter< float >::type smoothing(smoothingSEXP );
+        Rcpp::NumericVector __result = calc_slope_aspect(Rast, EWkernel, EWres, NSkernel, NSres, smoothing);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // calc_texture
 Rcpp::NumericVector calc_texture(arma::mat Rast, Rcpp::CharacterVector statistics, arma::vec base_indices, arma::vec offset_indices, int n_grey);
 RcppExport SEXP teamr_calc_texture(SEXP RastSEXP, SEXP statisticsSEXP, SEXP base_indicesSEXP, SEXP offset_indicesSEXP, SEXP n_greySEXP) {
