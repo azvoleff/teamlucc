@@ -37,7 +37,7 @@
 glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
                  statistics=c('mean', 'variance', 'covariance', 'homogeneity', 
                               'contrast', 'dissimilarity', 'entropy', 
-                              'second_moment', 'correlation')) {
+                              'second_moment', 'correlation'), ...) {
     if (length(window) != 2) {
         stop('window must be integer vector of length 2')
     }
@@ -93,7 +93,7 @@ glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
                                           base_indices=base_indices, 
                                           offset_indices=offset_indices,
                                           n_grey=n_grey), 
-                                window_dims=(window + abs(shift)))
+                                window_dims=(window + abs(shift)), ...)
 
     names(texture_img) <- statistics 
     texture_img <- setMinMax(texture_img)

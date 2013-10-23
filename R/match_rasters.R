@@ -29,7 +29,7 @@
 #' # Crop and extend the DEM mosaic to match the Landsat image
 #' L5TSR_1986 <- raster(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
-match_rasters <- function(baseimg, matchimg, filename=NULL) {
+match_rasters <- function(baseimg, matchimg, filename=NULL, overwrite=FALSE) {
     if (projection(baseimg) != projection(matchimg)) {
         message('Coordinate systems do not match - reprojecting matchimg...')
         matchimg <- projectRaster(matchimg, baseimg)
@@ -43,7 +43,7 @@ match_rasters <- function(baseimg, matchimg, filename=NULL) {
     #message('Resampling matchimg to base...')
     #resample(outimg, baseimg)
     if (!is.null(filename)) {
-        writeRaster(outimg, filename)
+        writeRaster(outimg, filename, overwrite=overwrite)
     }
     return(outimg)
 }

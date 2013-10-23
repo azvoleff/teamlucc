@@ -41,7 +41,8 @@
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' 
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
-topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
+topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method, 
+                             filename=NULL, overwrite=FALSE,
                              ...) {
     if (class(x) == 'SpatialGridDataFrame') {
         stop('x must be a Raster* object')
@@ -66,4 +67,7 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
         raster(corr_df)
     }
     return(corr_img)
+    if (!is.null(filename)) {
+        writeRaster(corr_img, filename, overwrite)
+    }
 }

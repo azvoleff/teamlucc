@@ -25,7 +25,7 @@
 #' http://www.jstatsoft.org/v43/i04/
 #' @examples
 #' #TODO: Write examples
-slopeasp_par <- function(DEM, EWkernel, NSkernel, smoothing=1, filename=NULL) {
+slopeasp_par <- function(DEM, EWkernel, NSkernel, smoothing=1, filename=NULL, ...) {
     if (class(DEM) == 'SpatialGridDataFrame') {
         stop('DEM must be a Raster* object')
     } else {
@@ -59,7 +59,7 @@ slopeasp_par <- function(DEM, EWkernel, NSkernel, smoothing=1, filename=NULL) {
                                  args=list(EWkernel=EWkernel, EWres=xres(DEM), 
                                            NSkernel=NSkernel, NSres=yres(DEM),
                                            smoothing=smoothing),
-                                 window_dims=c(3, 3), filename=filename)
+                                 window_dims=c(3, 3), filename=filename, ...)
     return(list(slope=raster(slopeasp_img, layer=1),
                 aspect=raster(slopeasp_img, layer=2)))
 }
