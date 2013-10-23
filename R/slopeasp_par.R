@@ -58,4 +58,3 @@ slopeasp_par <- function(dem, EWkernel, NSkernel, smoothing=1, filename=NULL) {
     return(list(slope=raster(slopeasp_img, layer=1),
                 aspect=raster(slopeasp_img, layer=2)))
 }
-

@@ -57,11 +57,12 @@ topographic_corr <- function(x, DEM, sunelev, sunazimuth, ...) {
     slope <- as(DEM_slopeasp$slope, 'SpatialGridDataFrame')
     aspect <- as(DEM_slopeasp$aspect, 'SpatialGridDataFrame')
     message('Performing topographic correction...')
-    corr_img <- foreach(layer=unstack(x), .combine='addLayer', .multicombine=TRUE, 
-             .init=raster(), .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
+    corr_img <- foreach(layer=unstack(x), .combine='addLayer', 
+                        .multicombine=TRUE, .init=raster(), 
+                        .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
         img_df <- as(layer, 'SpatialGridDataFrame')
-        corr_df <- topocorr(img_df, slope, aspect, 
-                             sunelev=sunelev, sunazimuth=sunazimuth, ...)
+        corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
+                            sunazimuth=sunazimuth, ...)
         raster(corr_df)
     }
     return(corr_img)

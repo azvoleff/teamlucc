@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // calc_slope_aspect
-Rcpp::NumericVector calc_slope_aspect(arma::mat Rast, arma::mat EWkernel, float EWres, arma::mat NSkernel, float NSres, float smoothing);
+Rcpp::NumericVector calc_slope_aspect(arma::mat Rast, arma::mat EWkernel, double EWres, arma::mat NSkernel, double NSres, double smoothing);
 RcppExport SEXP teamr_calc_slope_aspect(SEXP RastSEXP, SEXP EWkernelSEXP, SEXP EWresSEXP, SEXP NSkernelSEXP, SEXP NSresSEXP, SEXP smoothingSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -15,10 +15,10 @@ BEGIN_RCPP
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< arma::mat >::type Rast(RastSEXP );
         Rcpp::traits::input_parameter< arma::mat >::type EWkernel(EWkernelSEXP );
-        Rcpp::traits::input_parameter< float >::type EWres(EWresSEXP );
+        Rcpp::traits::input_parameter< double >::type EWres(EWresSEXP );
         Rcpp::traits::input_parameter< arma::mat >::type NSkernel(NSkernelSEXP );
-        Rcpp::traits::input_parameter< float >::type NSres(NSresSEXP );
-        Rcpp::traits::input_parameter< float >::type smoothing(smoothingSEXP );
+        Rcpp::traits::input_parameter< double >::type NSres(NSresSEXP );
+        Rcpp::traits::input_parameter< double >::type smoothing(smoothingSEXP );
         Rcpp::NumericVector __result = calc_slope_aspect(Rast, EWkernel, EWres, NSkernel, NSres, smoothing);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
