@@ -10,7 +10,7 @@
 #'
 #' @export
 #' @import landsat spatial.tools
-#' @param dem DEM as \code{RasterLayer}
+#' @param DEM DEM as \code{RasterLayer}
 #' @param EWkernel kernel to use for East-West gradient calculation
 #' @param NSkernel kernel to use for North-South gradient calculation
 #' @param smoothing positive integer for smoothing. 1 means no smoothing.
@@ -25,7 +25,12 @@
 #' http://www.jstatsoft.org/v43/i04/
 #' @examples
 #' #TODO: Write examples
-slopeasp_par <- function(dem, EWkernel, NSkernel, smoothing=1, filename=NULL) {
+slopeasp_par <- function(DEM, EWkernel, NSkernel, smoothing=1, filename=NULL) {
+    if (class(DEM) == 'SpatialGridDataFrame') {
+        stop('DEM must be a Raster* object')
+    } else {
+        DEM_df <- as(DEM, "SpatialGridDataFrame")
+    }
     if (missing(EWkernel)) {
         EWkernel <- matrix(c(-1/8, 0, 1/8, -2/8, 0, 2/8, -1/8, 
             0, 1/8), ncol = 3, nrow = 3, byrow = TRUE)
@@ -50,9 +55,9 @@ slopeasp_par <- function(dem, EWkernel, NSkernel, smoothing=1, filename=NULL) {
         calc_slope_aspect(rast_wind[, , 1], EWkernel, EWres, NSkernel, NSres, 
                           smoothing)
     }
-    slopeasp_img <- rasterEngine(rast_wind=dem, fun=calc_slope_aspect_wrapper,
-                                 args=list(EWkernel=EWkernel, EWres=xres(dem), 
-                                           NSkernel=NSkernel, NSres=yres(dem),
+    slopeasp_img <- rasterEngine(rast_wind=DEM, fun=calc_slope_aspect_wrapper,
+                                 args=list(EWkernel=EWkernel, EWres=xres(DEM), 
+                                           NSkernel=NSkernel, NSres=yres(DEM),
                                            smoothing=smoothing),
                                  window_dims=c(3, 3), filename=filename)
     return(list(slope=raster(slopeasp_img, layer=1),

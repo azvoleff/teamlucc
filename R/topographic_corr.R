@@ -41,28 +41,28 @@
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' 
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
-topographic_corr <- function(x, DEM, sunelev, sunazimuth, ...) {
+topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
+                             ...) {
     if (class(x) == 'SpatialGridDataFrame') {
         stop('x must be a Raster* object')
     }
-    if (class(DEM) == 'SpatialGridDataFrame') {
-        stop('DEM must be a Raster* object')
-    } else {
-        DEM_df <- as(DEM, "SpatialGridDataFrame")
-    }
-    message('Calculating slope and aspect...')
-    DEM_slopeasp <- slopeasp_par(DEM)
+    slope <- as(slopeaspect$slope, 'SpatialGridDataFrame')
+    aspect <- as(slopeaspect$aspect, 'SpatialGridDataFrame')
     # Need to convert slope and aspect to SpatialGridDataFrame objects for 
     # topocorr. TODO: rewrite topocorr to handle RasterLayers
-    slope <- as(DEM_slopeasp$slope, 'SpatialGridDataFrame')
-    aspect <- as(DEM_slopeasp$aspect, 'SpatialGridDataFrame')
     message('Performing topographic correction...')
     corr_img <- foreach(layer=unstack(x), .combine='addLayer', 
                         .multicombine=TRUE, .init=raster(), 
                         .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
         img_df <- as(layer, 'SpatialGridDataFrame')
-        corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
-                            sunazimuth=sunazimuth, ...)
+        if (method == 'minnaert_full') {
+            minnaert_data <- minnaert(img_df, slope, aspect, sunelev=sunelev, 
+                                      sunazimuth=sunazimuth, ...)
+            corr_df <- minnaert_data$minnaert
+        } else {
+            corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
+                                sunazimuth=sunazimuth, method, ...)
+        }
         raster(corr_df)
     }
     return(corr_img)
