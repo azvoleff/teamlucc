@@ -5,7 +5,7 @@ TEAM Data Processing Tools (R)
 Overview
 _______________________________________________________________________________
 
-The `teamr` package is designed to facilitate the work of the Tropical Ecology 
+The ``teamr`` package is designed to facilitate the work of the Tropical Ecology 
 Assessment and Monitoring (TEAM) Network.
 The `TEAM Network <http://www.teamnetwork.org/>`_ is a global network of sites 
 in tropical forests focused on collecting standardized real-time data measuring 
@@ -28,17 +28,17 @@ github
 
 Package Installation
 _______________________________________________________________________________
-The easiest way to install the (beta version) of the `teamr` package is using 
+The easiest way to install the (beta version) of the ``teamr`` package is using 
 the `devtools
 <http://cran.r-project.org/web/packages/devtools/index.html>`_ package from 
-Hadley Wickham.  After installing `devtools` from CRAN, type:
+Hadley Wickham.  After installing ``devtools`` from CRAN, type:
 
 .. code:: R
 
    install_github('teamr', username='azvoleff')
 
-at the R prompt to install the package. As the `teamr` package contains C++ 
-code, you will need to have the the appropriate version of
+at the R prompt to install ``teamr``. As ``teamr`` contains C++ code, you will need 
+to have the the appropriate version of
 `Rtools
 <http://cran.r-project.org/bin/windows/Rtools/>`_ installed for your version of 
 R.
