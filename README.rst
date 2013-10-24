@@ -24,7 +24,24 @@ The toolkit is still under active development. Follow the `TEAM website
 <http://www.teamnetwork.org/>`_ for news, and the `toolkit project page on 
 github
 <https://github.com/azvoleff/teamr>`_ for the latest version of the code.
- 
+
+
+Package Installation
+_______________________________________________________________________________
+The easiest way to install the (beta version) of the `teamr` package is using 
+the `devtools
+<http://cran.r-project.org/web/packages/devtools/index.html>`_ package from 
+Hadley Wickham.  After installing `devtools` from CRAN, type:
+
+.. code:: R
+   install_github('teamr', username='azvoleff')
+
+at the R prompt to install the package. As the `teamr` package contains C++ 
+code, you will need to have the the appropriate version of
+`Rtools
+<http://cran.r-project.org/bin/windows/Rtools/>`_ installed for your version of 
+R.
+
 Author Contact Information
 _______________________________________________________________________________
 
