@@ -34,6 +34,7 @@ the `devtools
 Hadley Wickham.  After installing `devtools` from CRAN, type:
 
 .. code:: R
+
    install_github('teamr', username='azvoleff')
 
 at the R prompt to install the package. As the `teamr` package contains C++ 
