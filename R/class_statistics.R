@@ -2,6 +2,7 @@
 #'
 #' @export
 #' @import plyr
+#' @importFrom reshape2 melt
 #' @param x A \code{RasterLayer} from which class statistics will be 
 #' calculated.
 #' @param y A \code{SpatialPolygonsDataFrame} with cover class 

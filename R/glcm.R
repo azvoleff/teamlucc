@@ -12,6 +12,7 @@
 #' any (one or more) of the following: 'mean', 'variance', 'covariance', 
 #' 'homogeneity', 'contrast', 'dissimilarity', 'entropy', 'second_moment', 
 #' 'correlation'.
+#' @param ... additional parameters to pass to rasterEngine
 #' @return A /code{RasterLayer} with the calculated requested GLCM texture 
 #' measures.
 #' @references Lu, D., and M. Batistella. 2005. Exploring TM image texture and 

@@ -26,6 +26,7 @@
 #' \code{sfQuickStop}.
 #'
 #' @examples
+#' library(spatial.tools)
 #' sfQuickInit()
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' data(L5TSR_1986_training)

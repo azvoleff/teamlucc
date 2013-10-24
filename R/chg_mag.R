@@ -13,6 +13,7 @@
 #' @param t2p time 1 posterior probability \code{Raster*}
 #' @param filename (optional) filename for output change magnitude 
 #' \code{RasterLayer}
+#' @param ... additional parameters to pass to rasterEngine
 #' @return \code{Raster*} object with change magnitude image
 #' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
 #' Land-use/land-cover change detection using improved change-vector analysis.

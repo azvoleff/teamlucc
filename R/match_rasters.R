@@ -8,6 +8,7 @@
 #' the /code{baseimg}. The /code{matchimg} will then be cropped and extended to 
 #' match the extent of the /code{baseimg}.
 #' @param filename file on disk to save \code{Raster*} to (optional)
+#' @param overwrite whether to overwrite \code{filename} if it already exists
 #' @return The /code{matchimg} reprojected (if necessary), cropped, and 
 #' extended to match the /code{baseimg}.
 #' @details Note that if the \code{matchimg} needs to be reprojected,

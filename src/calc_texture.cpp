@@ -65,7 +65,26 @@ double text_correlation(mat pij, mat imat, mat jmat, double mr, double mc) {
 }
 
 //' Calculates a glcm texture for use in the glcm.R script
+//'
+//' This function is called by the \code{\link{glcm}} function. It is 
+//' not intended to be used directly.
+//'
 //' @export
+//' @param Rast a matrix containing the pixels to be used in the texture 
+//' calculation
+//' @param statistics a list of strings naming the texture statistics to 
+//' calculate
+//' @param base_indices a list of column-major indices giving the cells
+//' included in the base image
+//' @param offset_indices base_indices a list of column-major indices giving 
+//' the cells ' included in the offset image
+//' @param n_grey number of grey levels to use in texture calculation
+//' @return a list of length equal to the length of the \code{statistics} input 
+//' parameter, containing the selected textures measures
+//' @references
+//' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
+//' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
+//' http://www.jstatsoft.org/v43/i04/
 // [[Rcpp::export]]
 Rcpp::NumericVector calc_texture(arma::mat Rast,
         Rcpp::CharacterVector statistics, arma::vec base_indices,

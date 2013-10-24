@@ -16,6 +16,7 @@
 #' @param smoothing positive integer for smoothing. 1 means no smoothing.
 #' @param filename output file for 2-band slope and aspect layer stack 
 #' (optional)
+#' @param ... additional parameters to pass to rasterEngine
 #' @return list with two elements: 'slope' (a \code{RasteLayer} with the 
 #' calculated slope) and 'aspect',  (a \code{RasteLayer} with the calculated 
 #' aspect).

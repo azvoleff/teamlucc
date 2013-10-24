@@ -1,12 +1,22 @@
 #' Topographically correct a raster
 #'
+#' Performs topographic correction using \code{\link{topocorr}} from the 
+#' \code{\link{Landsat}} package.
+#'
 #' @export
 #' @import landsat foreach
 #' @param x An image to correct.
-#' @param DEM A digital elevation model with the same coordinate system, 
-#' extent, and resolution as /code{x}
-#' @param sunazimuth Sun azimuth in degrees.
 #' @param sunelev Sun elevation in degrees.
+#' @param sunazimuth Sun azimuth in degrees.
+#' @param slopeaspect \code{RasterBrick} or \code{RasterStack} with two layers. 
+#' First layer should be the slope, second layer should be aspect. The slope 
+#' and aspect are defined as in \code{slopeasp} in the \code{\link{landsat}} 
+#' package. \code{\link{slopeasp_par}} will output the slope and aspect using 
+#' the proper definition and as a \code{RasterBrick}.
+#' @param method the topographic correction method to use. See the help for 
+#' \code{\link{topocorr}}.
+#' @param filename file on disk to save \code{Raster*} to (optional)
+#' @param overwrite whether to overwrite \code{filename} if it already exists
 #' @param ... Additional arguments to be passed to \code{topocorr} in the 
 #' \code{landsat} package.
 #' @return The topographically corrected image.
@@ -34,9 +44,10 @@
 #' sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
 #' sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
 #' 
+#' slopeaspect <- slopeasp_par(matched_DEM)
 #' # Apply the topographic correction
-#' L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, matched_DEM, sunelev,
-#'                                         sunazimuth, method='minslope')
+#' L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, sunelev, sunazimuth,
+#'                                         slopeaspect, method='minslope')
 #' 
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' 
