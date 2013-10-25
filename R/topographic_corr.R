@@ -1,7 +1,7 @@
 #' Topographically correct a raster
 #'
-#' Performs topographic correction using \code{\link{landsat::topocorr}} from 
-#' the \code{Landsat} package.
+#' Performs topographic correction using \code{\link{topocorr}} from the 
+#' \code{Landsat} package.
 #'
 #' @export
 #' @import landsat foreach
@@ -14,7 +14,7 @@
 #' \code{\link{slopeasp_par}} will output the slope and aspect using the proper 
 #' definition and as a \code{RasterBrick}.
 #' @param method the topographic correction method to use. See the help for 
-#' \code{\link{landsat::topocorr}}.
+#' \code{\link{topocorr}}.
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param overwrite whether to overwrite \code{filename} if it already exists
 #' @param ... Additional arguments to be passed to \code{topocorr} in the 
