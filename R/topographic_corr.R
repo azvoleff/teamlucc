@@ -1,7 +1,7 @@
 #' Topographically correct a raster
 #'
-#' Performs topographic correction using \code{\link{topocorr}} from the 
-#' \code{\link{Landsat}} package.
+#' Performs topographic correction using \code{\link{landsat::topocorr}} from 
+#' the \code{Landsat} package.
 #'
 #' @export
 #' @import landsat foreach
@@ -10,11 +10,11 @@
 #' @param sunazimuth Sun azimuth in degrees.
 #' @param slopeaspect \code{RasterBrick} or \code{RasterStack} with two layers. 
 #' First layer should be the slope, second layer should be aspect. The slope 
-#' and aspect are defined as in \code{slopeasp} in the \code{\link{landsat}} 
-#' package. \code{\link{slopeasp_par}} will output the slope and aspect using 
-#' the proper definition and as a \code{RasterBrick}.
+#' and aspect are defined as in \code{slopeasp} in the \code{landsat} package.  
+#' \code{\link{slopeasp_par}} will output the slope and aspect using the proper 
+#' definition and as a \code{RasterBrick}.
 #' @param method the topographic correction method to use. See the help for 
-#' \code{\link{topocorr}}.
+#' \code{\link{landsat::topocorr}}.
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param overwrite whether to overwrite \code{filename} if it already exists
 #' @param ... Additional arguments to be passed to \code{topocorr} in the 
@@ -63,6 +63,8 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
     # Need to convert slope and aspect to SpatialGridDataFrame objects for 
     # topocorr. TODO: rewrite topocorr to handle RasterLayers
     message('Performing topographic correction...')
+    # Set layer to NULL to pass R CMD CHECK without notes
+    layer=NULL
     corr_img <- foreach(layer=unstack(x), .combine='addLayer', 
                         .multicombine=TRUE, .init=raster(), 
                         .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
