@@ -60,7 +60,9 @@ slopeasp_par <- function(DEM, EWkernel, NSkernel, smoothing=1, filename=NULL, ..
                                  args=list(EWkernel=EWkernel, EWres=xres(DEM), 
                                            NSkernel=NSkernel, NSres=yres(DEM),
                                            smoothing=smoothing),
-                                 window_dims=c(3, 3), filename=filename, ...)
-    return(list(slope=raster(slopeasp_img, layer=1),
-                aspect=raster(slopeasp_img, layer=2)))
+                                 window_dims=c(3, 3), filename=filename,
+                                 outbands=2, ...)
+    names(slopeasp_img) <- c('slope', 'aspect')
+    setMinMax(slopeasp_img)
+    return(slopeasp_img)
 }
