@@ -52,3 +52,4 @@ Collate:
     'slopeasp_par.R'
     'mix_model.R'
     'RcppExports.R'
+    'slopeasp_seq.R'
