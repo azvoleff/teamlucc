@@ -7,6 +7,7 @@
 #' (integers) and the second column is the class names
 #' @param outfile the filename to use for the output
 #' @references
+#' @examples
 #' #TODO: Add examples
 #' #x <- raster('L5TSR_1986_to_2001_chgtraj.envi')
 #' #cls <- cbind(traj_lut$Traj_Code,

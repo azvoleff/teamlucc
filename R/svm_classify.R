@@ -57,7 +57,7 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
     pred_classes <- rasterEngine(in_rast=x, fun=calc_pred_classes, 
                                  args=list(svm_train=svm_train), 
                                  filename=pred_classes_filename, 
-                                 chunk_format="raster")
+                                 chunk_format="raster", outbands=1)
     pred_classes <- setMinMax(pred_classes)
 
     message('Predicting class probabilities...')
