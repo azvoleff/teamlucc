@@ -45,7 +45,7 @@ slopeasp_seq <- function(DEM, EWkernel, NSkernel, smoothing=1, filename='',
                              NSkernel=NSkernel, smoothing=smoothing)
     slope <- as(slopeasp_spdf$slope, 'RasterLayer')
     aspect <- as(slopeasp_spdf$aspect, 'RasterLayer')
-    slopeasp_img <- brick(slope, aspect, filename=filename, 
+    slopeasp_img <- brick(stack(slope, aspect), filename=filename, 
                           overwrite=overwrite)
     names(slopeasp_img) <- c('slope', 'aspect')
     return(slopeasp_img)
