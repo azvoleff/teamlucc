@@ -17,9 +17,7 @@
 #' @param filename output file for 2-band slope and aspect layer stack 
 #' (optional)
 #' @param ... additional parameters to pass to rasterEngine
-#' @return list with two elements: 'slope' (a \code{RasteLayer} with the 
-#' calculated slope) and 'aspect',  (a \code{RasteLayer} with the calculated 
-#' aspect).
+#' @return RasterBrick with two layers: 'slope' and 'aspect'
 #' @references
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
@@ -27,10 +25,8 @@
 #' @examples
 #' #TODO: Write examples
 slopeasp_par <- function(DEM, EWkernel, NSkernel, smoothing=1, filename=NULL, ...) {
-    if (class(DEM) == 'SpatialGridDataFrame') {
-        stop('DEM must be a Raster* object')
-    } else {
-        DEM_df <- as(DEM, "SpatialGridDataFrame")
+    if (class(DEM) != 'RasterLayer') {
+        stop('DEM must be a RasterLayer')
     }
     if (missing(EWkernel)) {
         EWkernel <- matrix(c(-1/8, 0, 1/8, -2/8, 0, 2/8, -1/8, 
