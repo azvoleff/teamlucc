@@ -8,7 +8,8 @@
 #' \code{slopeasp} in the \code{landsat} package for details on the parameters.
 #'
 #' @export
-#' @import landsat spatial.tools
+#' @import spatial.tools
+#' @importFrom landsat slopeasp
 #' @param DEM DEM as \code{RasterLayer}
 #' @param EWkernel kernel to use for East-West gradient calculation
 #' @param NSkernel kernel to use for North-South gradient calculation

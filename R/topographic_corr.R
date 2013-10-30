@@ -4,7 +4,8 @@
 #' \code{Landsat} package.
 #'
 #' @export
-#' @import landsat foreach
+#' @import foreach
+#' @importFrom landsat topocorr
 #' @param x An image to correct.
 #' @param sunelev Sun elevation in degrees.
 #' @param sunazimuth Sun azimuth in degrees.
