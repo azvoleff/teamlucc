@@ -5,7 +5,7 @@
 #'
 #' @export
 #' @import foreach
-#' @importFrom landsat topocorr
+#' @importFrom landsat topocorr minnaert
 #' @param x An image to correct.
 #' @param sunelev Sun elevation in degrees.
 #' @param sunazimuth Sun azimuth in degrees.
@@ -18,6 +18,7 @@
 #' \code{\link{topocorr}}.
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param overwrite whether to overwrite \code{filename} if it already exists
+#' @param inparallel whether to run correction in parallel using \code{foreach}
 #' @param ... Additional arguments to be passed to \code{topocorr} in the 
 #' \code{landsat} package.
 #' @return The topographically corrected image.
@@ -54,7 +55,7 @@
 #' 
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method, 
-                             filename=NULL, overwrite=FALSE,
+                             filename=NULL, overwrite=FALSE, inparallel=FALSE,
                              ...) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')
@@ -62,28 +63,45 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
     if (!(class(slopeaspect) %in% c('RasterBrick', 'RasterStack'))) {
         stop('slopeaspect must be a RasterBrick or RasterStack object')
     }
-    slope <- as(raster(slopeaspect, layer=1), 'SpatialGridDataFrame')
-    aspect <- as(raster(slopeaspect, layer=2), 'SpatialGridDataFrame')
     # Need to convert slope and aspect to SpatialGridDataFrame objects for 
     # topocorr. TODO: rewrite topocorr to handle RasterLayers
-    # Set layer to NULL to pass R CMD CHECK without notes
-    layer=NULL
-    corr_img <- foreach(layer=unstack(x), .combine='addLayer', 
-                        .multicombine=TRUE, .init=raster(), 
-                        .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
-        img_df <- as(layer, 'SpatialGridDataFrame')
-        if (method == 'minnaert_full') {
-            minnaert_data <- minnaert(img_df, slope, aspect, sunelev=sunelev, 
-                                      sunazimuth=sunazimuth, ...)
-            corr_df <- minnaert_data$minnaert
-        } else {
-            corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
-                                sunazimuth=sunazimuth, method, ...)
+    slope <- as(raster(slopeaspect, layer=1), 'SpatialGridDataFrame')
+    aspect <- as(raster(slopeaspect, layer=2), 'SpatialGridDataFrame')
+    if (inparallel == TRUE) {
+        # Set layer to NULL to pass R CMD CHECK without notes
+        layer=NULL
+        corr_img <- foreach(layer=unstack(x), .combine='addLayer', 
+                            .multicombine=TRUE, .init=raster(), 
+                            .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
+            img_df <- as(layer, 'SpatialGridDataFrame')
+            if (method == 'minnaert_full') {
+                minnaert_data <- minnaert(img_df, slope, aspect, sunelev=sunelev, 
+                                          sunazimuth=sunazimuth, ...)
+                corr_df <- minnaert_data$minnaert
+            } else {
+                corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
+                                    sunazimuth=sunazimuth, method, ...)
+            }
+            raster(corr_df)
         }
-        raster(corr_df)
+    } else {
+        corr_layers <- c()
+        for (layer_num in 1:nlayers(x)) {
+            img_df <- as(raster(x, layer=layer_num), 'SpatialGridDataFrame')
+            if (method == 'minnaert_full') {
+                minnaert_data <- minnaert(img_df, slope, aspect, sunelev=sunelev, 
+                                          sunazimuth=sunazimuth, ...)
+                corr_df <- minnaert_data$minnaert
+            } else {
+                corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
+                                    sunazimuth=sunazimuth, method, ...)
+            }
+            corr_layers <- c(corr_layers, list(raster(corr_df)))
+        }
+        corr_img <- stack(corr_layers)
+    }
+    if (!is.null(filename)) {
+        writeRaster(corr_img, filename, overwrite=overwrite)
     }
     return(corr_img)
-    if (!is.null(filename)) {
-        writeRaster(corr_img, filename, overwrite)
-    }
 }
