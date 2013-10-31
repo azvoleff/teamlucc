@@ -62,8 +62,8 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
     if (!(class(slopeaspect) %in% c('RasterBrick', 'RasterStack'))) {
         stop('slopeaspect must be a RasterBrick or RasterStack object')
     }
-    slope <- as(slopeaspect$slope, 'SpatialGridDataFrame')
-    aspect <- as(slopeaspect$aspect, 'SpatialGridDataFrame')
+    slope <- as(raster(slopeaspect, layer=1), 'SpatialGridDataFrame')
+    aspect <- as(raster(slopeaspect, layer=2), 'SpatialGridDataFrame')
     # Need to convert slope and aspect to SpatialGridDataFrame objects for 
     # topocorr. TODO: rewrite topocorr to handle RasterLayers
     # Set layer to NULL to pass R CMD CHECK without notes
