@@ -87,6 +87,7 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
     } else {
         corr_layers <- c()
         for (layer_num in 1:nlayers(x)) {
+            message(paste0('Running topocorr on layer ', layer_num, ' of ', nlayers(x), '...'))
             img_df <- as(raster(x, layer=layer_num), 'SpatialGridDataFrame')
             if (method == 'minnaert_full') {
                 minnaert_data <- minnaert(img_df, slope, aspect, sunelev=sunelev, 
