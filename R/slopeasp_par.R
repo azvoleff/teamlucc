@@ -10,6 +10,8 @@
 #'
 #' @export
 #' @import spatial.tools
+#' @import Rcpp
+#' @import RcppArmadillo
 #' @param DEM DEM as \code{RasterLayer}
 #' @param EWkernel kernel to use for East-West gradient calculation
 #' @param NSkernel kernel to use for North-South gradient calculation

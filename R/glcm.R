@@ -2,6 +2,8 @@
 #'
 #' @export
 #' @import spatial.tools
+#' @import Rcpp
+#' @import RcppArmadillo
 #' @param layer a /code{RasterLayer}
 #' @param n_grey number of grey levels to use in texture calculation
 #' @param window the window size to consider for texture calculation as a two 
