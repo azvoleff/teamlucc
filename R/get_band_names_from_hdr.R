@@ -1,5 +1,6 @@
 #' Extract the band names listed in an ENVI format header file (.hdr)
 #'
+#' @export
 #' @param hdr_file an ENVI format header file with a .hdr extension
 #' @return A /code{list} of band names extracted from the /code{hdr_file}
 #' @examples
