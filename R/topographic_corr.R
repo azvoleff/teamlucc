@@ -19,8 +19,10 @@
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param overwrite whether to overwrite \code{filename} if it already exists
 #' @param inparallel whether to run correction in parallel using \code{foreach}
-#' @param ... Additional arguments to be passed to \code{topocorr} in the 
-#' \code{landsat} package.
+#' @param usesample whether to subsample the data with \code{gridsample} 
+#' (useful when handling very large images)
+#' @param ... Additional arguments to be passed to \code{topocorr_samp} or (if 
+#' "minnaert_full" is the chosen method) to \code{minnaert_samp}
 #' @return The topographically corrected image.
 #' @examples
 #' # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
