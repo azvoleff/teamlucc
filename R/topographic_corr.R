@@ -55,8 +55,8 @@
 #' 
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method, 
-                             filename=NULL, overwrite=FALSE, inparallel=FALSE,
-                             ...) {
+                             filename=NULL, overwrite=FALSE, inparallel=FALSE, 
+                             usesample=FALSE, ...) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')
     }
@@ -75,12 +75,15 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
                             .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
             img_df <- as(layer, 'SpatialGridDataFrame')
             if (method == 'minnaert_full') {
-                minnaert_data <- minnaert(img_df, slope, aspect, sunelev=sunelev, 
-                                          sunazimuth=sunazimuth, ...)
+                minnaert_data <- minnaert_samp(img_df, slope, aspect, 
+                                               sunelev=sunelev, 
+                                               sunazimuth=sunazimuth, 
+                                               usesample=usesample, ...)
                 corr_df <- minnaert_data$minnaert
             } else {
                 corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
-                                    sunazimuth=sunazimuth, method, ...)
+                                    sunazimuth=sunazimuth, method, usesample,
+                                    ...)
             }
             raster(corr_df)
         }
@@ -90,8 +93,10 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
             message(paste0('Running topocorr on layer ', layer_num, ' of ', nlayers(x), '...'))
             img_df <- as(raster(x, layer=layer_num), 'SpatialGridDataFrame')
             if (method == 'minnaert_full') {
-                minnaert_data <- minnaert(img_df, slope, aspect, sunelev=sunelev, 
-                                          sunazimuth=sunazimuth, ...)
+                minnaert_data <- minnaert_samp(img_df, slope, aspect, 
+                                               sunelev=sunelev, 
+                                               sunazimuth=sunazimuth, 
+                                               usesample=usesample, ...)
                 corr_df <- minnaert_data$minnaert
             } else {
                 corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
