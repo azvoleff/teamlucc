@@ -15,6 +15,7 @@ Imports:
     rgdal,
     e1071,
     kernlab,
+    mgcv,
     plyr,
     reshape2,
     spatial.tools,
@@ -54,3 +55,5 @@ Collate:
     'RcppExports.R'
     'slopeasp_seq.R'
     'gridsample.R'
+    'topocorr_samp.R'
+    'minnaert_samp.R'
