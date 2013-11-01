@@ -53,3 +53,4 @@ Collate:
     'mix_model.R'
     'RcppExports.R'
     'slopeasp_seq.R'
+    'gridsample.R'
