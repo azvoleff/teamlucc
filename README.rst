@@ -25,7 +25,6 @@ The toolkit is still under active development. Follow the `TEAM website
 github
 <https://github.com/azvoleff/teamr>`_ for the latest version of the code.
 
-
 Package Installation
 _______________________________________________________________________________
 The easiest way to install the (beta version) of the ``teamr`` package is using 
