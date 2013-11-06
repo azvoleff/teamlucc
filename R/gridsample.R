@@ -17,6 +17,7 @@
 #' @return either a vector of sampled values of length \code{horizcells} * 
 #' \code{vertcells} * \code{nsamp}, or, if \code{returnindices} is TRUE, a 
 #' \code{data.frame} with two columns: "value" and "index"
+#' @note TODO: Recode in C++ for speed.
 #' @examples
 #' # Make a 100x100 matrix
 #' x <- matrix(1:10000, nrow=100)
