@@ -20,8 +20,9 @@
 #' that are equal to zero to avoid division by zero resulting in Inf values
 #' @param slopeclass the slope classes to calculate k for
 #' @param coverclass used to calculate k for specific cover class (optional)
-#' @param usesample whether to use a sample of the data for calculation of k 
-#' for Minnaert correction. See \code{\link{gridsample}}.
+#' @param sampleindices (optional) row-major indices of sample pixels to use in 
+#' the calculation of k values for the Minnaert correction. See
+#' \code{\link{gridsample}}.
 #' @return \code{RasterLayer} with topographically corrected data
 #' @references
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
@@ -30,7 +31,7 @@
 minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
                           IL.epsilon=0.000001, slopeclass=c(1, 5, 10, 15, 20, 
                                                             25, 30, 45), 
-                          coverclass=NULL, usesample=FALSE, ...) {
+                          coverclass=NULL, sampleindices=NULL, ...) {
     # all inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
@@ -45,22 +46,14 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     if(is.null(coverclass)) 
         coverclass <- matrix(rep(TRUE, length(x)), nrow=nrow(x))
 
-    if (usesample) {
-        horizcells <- 10
-        vertcells <- 10
-        nsamp <- 100000 / (horizcells * vertcells)
-        # Note that rowmajor indices are needed as raster layers are stored in 
-        # rowmajor order, unlike most R objects that are addressed in column 
-        # major order
-        x_samp <- gridsample(x, nsamp=nsamp, horizcells=10, vertcells=10, 
-                             returnindices=TRUE, rowmajor=TRUE)
-        K <- data.frame(x=as.vector(x_samp$value),
-                        IL=IL[x_samp$index], 
-                        slope=slope[x_samp$index])
+    if (!is.null(sampleindices)) {
+        K <- data.frame(x=x[sampleindices],
+                        IL=IL[sampleindices], 
+                        slope=slope[sampleindices])
         # Remember that the sample indices are row-major (as they were drawn 
         # for a RasterLayer), so the coverclass matrix needs to be transposed 
         # as it is stored in column-major order
-        coverclass <- t(coverclass)[x_samp$index]
+        coverclass <- t(coverclass)[sampleindices]
     } else {
         K <- data.frame(x=getValues(x), IL=getValues(IL), 
                         slope=getValues(slope))
