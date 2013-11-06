@@ -57,3 +57,4 @@ Collate:
     'gridsample.R'
     'topocorr_samp.R'
     'minnaert_samp.R'
+    'accuracy.R'
