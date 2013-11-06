@@ -11,7 +11,7 @@
 #' @import spatial.tools
 #' @param t1p time 0 posterior probability \code{Raster*}
 #' @param t2p time 1 posterior probability \code{Raster*}
-#' @param filename (optional) filename for output change magnitude 
+#' @param filename (optional) filename for output change magnitude
 #' \code{RasterLayer}
 #' @param ... additional parameters to pass to rasterEngine
 #' @return \code{Raster*} object with change magnitude image
@@ -22,6 +22,7 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
 #' posterior probability space: a new method for land cover change detection.  
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
+#'
 chg_mag <- function(t1p, t2p, filename=NULL, ...) {
     if (proj4string(t1p) != proj4string(t2p)) {
         stop('Error: t0 and t1 coordinate systems do not match')

@@ -15,10 +15,8 @@
 #' @param rowmajor if returnindices=TRUE, whether to return indices in 
 #' row-major format (default is column-major). Row-major format is useful in 
 #' conjunction with \code{Raster*} objects.
-#' @param whether to sample with replacement (within each grid cell)
-#' @return either a vector of sampled values of length \code{horizcells} * 
-#' \code{vertcells} * \code{nsamp}, or, if \code{returnindices} is TRUE, a 
-#' \code{data.frame} with two columns: "value" and "index"
+#' @param replace whether to sample with replacement (within each grid cell)
+#' @return vector of sample indices
 #' @note TODO: Recode in C++ for speed.
 #' @examples
 #' # Make a 100x100 matrix
@@ -28,7 +26,7 @@
 #' # default parameters).
 #' y <- gridsample(x)
 gridsample <- function(x, horizcells=10, vertcells=10, nsamp=10, 
-                       returnindices=FALSE, rowmajor=FALSE, replace=FALSE) {
+                       rowmajor=FALSE, replace=FALSE) {
     # horizstart is a vector of column numbers of the first column in each cell 
     # in the grid
     horizstart <- round(seq(1, ncol(x), ncol(x) / horizcells))

@@ -1,10 +1,10 @@
 #' Topographic correction for satellite imagery
 #'
-#' Perform topographic correction using a number of alternative methods. This 
-#' code is taken directly from the \code{landsat} package by Sarah Goslee. The 
-#' code has been altered from the \code{landsat} version to allow the option of 
-#' using a sample of pixels for calculation of k in the Minnaert correction 
-#' (useful when dealing with large images).
+#' Perform topographic correction using a number of different methods. This 
+#' code is modified from the code in the \code{landsat} package by Sarah 
+#' Goslee.  This version of the code has been altered from the \code{landsat} 
+#' version to allow the option of using a sample of pixels for calculation of k 
+#' in the Minnaert correction (useful when dealing with large images).
 #' 
 #' See the help page for \code{topocorr} in the \code{landsat} package for 
 #' details on the parameters.
@@ -12,13 +12,18 @@
 #' @export
 #' @import spatial.tools
 #' @importFrom landsat slopeasp
-#' @param DEM DEM as \code{RasterLayer}
-#' @param EWkernel kernel to use for East-West gradient calculation
-#' @param NSkernel kernel to use for North-South gradient calculation
-#' @param smoothing positive integer for smoothing. 1 means no smoothing.
-#' @param filename output file for 2-band slope and aspect layer stack 
-#' (optional)
-#' @param overwrite whether to overwrite output file if it exists
+#' @param x image as a \code{RasterLayer}
+#' @param slope the slope as a \code{RasterLayer}
+#' @param aspect the aspect as a \code{RasterLayer}
+#' @param sunelev sun elevation in degrees
+#' @param sunazimuth sun azimuth in degrees
+#' @param method the method to use for the topographic correction:
+#' cosine, improvedcosine, minnaert, minslope, ccorrection, gamma, SCS, or 
+#' illumination
+#' @param na.value the value used to code no data values
+#' @param GRASS.aspect is aspect defined according to GRASS convetion
+#' @param IL.epsilon a small amount to add to calculated illumination values 
+#' that are equal to zero to avoid division by zero resulting in Inf values
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
 #' regression models used for some topographic correction methods (like 
 #' Minnaert). Useful when handling very large images. See
@@ -79,13 +84,12 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
         if(all(x[slope >= targetslope] < 0, na.rm=TRUE)) {
             K <- 1
         } else {
-            if (usesample) {
+            if (!is.null(sampleindices)) {
                 horizcells <- 10
                 vertcells <- 10
                 nsamp <- 100000 / (horizcells * vertcells)
                 x_samp <- gridsample(x[slope >= targetslope], nsamp=nsamp, 
-                                     horizcells=10, vertcells=10, 
-                                     returnindices=TRUE)
+                                     horizcells=10, vertcells=10)
                 K <- data.frame(y = as.vector(x_samp$value),
                                 x = as.vector(IL[slope >= 
                                               targetslope][x_samp$index]) / 
@@ -118,13 +122,12 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
         if(all(x[slope >= targetslope] < 0, na.rm=TRUE)) {
             K <- 1
         } else {
-            if (usesample) {
+            if (!is.null(sampleindices)) {
                 horizcells <- 10
                 vertcells <- 10
                 nsamp <- 100000 / (horizcells * vertcells)
                 x_samp <- gridsample(x[slope >= targetslope], nsamp=nsamp, 
-                                     horizcells=10, vertcells=10, 
-                                     returnindices=TRUE)
+                                     horizcells=10, vertcells=10)
                 K <- data.frame(y = as.vector(x_samp$value),
                                 x = as.vector(IL[slope >= 
                                               targetslope][x_samp$index]) / 
@@ -148,9 +151,12 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
         xout <- x * cos(slope) * (cos(sunzenith) / (IL * cos(slope))) ^ K
     } else if(method == 5) {
         ## C correction
-        x_samp <- gridsample(x, nsamp=nsamp, horizcells=10, vertcells=10, 
-                             returnindices=TRUE)
+        if (!is.null(sampleindices)) {
+        x_samp <- gridsample(x, nsamp=nsamp, horizcells=10, vertcells=10)
         band.lm <- lm(as.vector(x_samp$value) ~ as.vector(IL[x_samp$index]))
+        } else {
+            band.lm <- lm(as.vector(x) ~ as.vector(IL))
+        }
         C <- coefficients(band.lm)[[1]]/coefficients(band.lm)[[2]]
 
         xout <- x * (cos(sunzenith) + C) / (IL + C)

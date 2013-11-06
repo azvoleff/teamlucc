@@ -10,7 +10,7 @@
 #' additional details on the parameters.
 #'
 #' @export
-#' @import spatial.tools sp mgcv
+#' @import spatial.tools mgcv
 #' @param x image as a \code{RasterLayer}
 #' @param slope the slope as a \code{RasterLayer}
 #' @param aspect the aspect as a \code{RasterLayer}
