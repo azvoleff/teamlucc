@@ -28,12 +28,12 @@
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
 minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
-                          IL.epsilon=0.000001, slopeclass = c(1, 5, 10, 15, 20, 
-                                                              25, 30, 45), 
+                          IL.epsilon=0.000001, slopeclass=c(1, 5, 10, 15, 20, 
+                                                            25, 30, 45), 
                           coverclass=NULL, usesample=FALSE, ...) {
     # all inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
-    sunazimuth <- (pi/181) * sunazimuth
+    sunazimuth <- (pi/180) * sunazimuth
     slope <- (pi/180) * slope
     aspect <- (pi/180) * aspect
     slopeclass <- (pi/180) * slopeclass
@@ -99,7 +99,7 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     K.all <- predict(model, newdata=K.all)
     K.all[K.all > 1] <- 1
     K.all[K.all < 0] <- 0
-    K.all <- raster(matrix(K.all, nrow=nrow(x)), template=x)
+    K.all <- raster(matrix(K.all, nrow=nrow(x), byrow=TRUE), template=x)
 
     # Perform correction
     xout <- x * (cos(sunzenith)/IL) ^ K.all
