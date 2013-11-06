@@ -19,7 +19,7 @@
 #' @param IL.epsilon a small amount to add to calculated illumination values 
 #' that are equal to zero to avoid division by zero resulting in Inf values
 #' @param slopeclass the slope classes to calculate k for
-#' @param coverclass used to calculate k for specific cover classes (optional)
+#' @param coverclass used to calculate k for specific cover class (optional)
 #' @param usesample whether to use a sample of the data for calculation of k 
 #' for Minnaert correction. See \code{\link{gridsample}}.
 #' @return \code{RasterLayer} with topographically corrected data
@@ -43,18 +43,24 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     IL[IL == 0] <- IL.epsilon
 
     if(is.null(coverclass)) 
-        coverclass <- rep(TRUE, length(x))
+        coverclass <- matrix(rep(TRUE, length(x)), nrow=nrow(x))
 
     if (usesample) {
         horizcells <- 10
         vertcells <- 10
         nsamp <- 100000 / (horizcells * vertcells)
+        # Note that rowmajor indices are needed as raster layers are stored in 
+        # rowmajor order, unlike most R objects that are addressed in column 
+        # major order
         x_samp <- gridsample(x, nsamp=nsamp, horizcells=10, vertcells=10, 
-                             returnindices=TRUE)
+                             returnindices=TRUE, rowmajor=TRUE)
         K <- data.frame(x=as.vector(x_samp$value),
-                        IL=getValues(IL)[x_samp$index], 
-                        slope=getValues(slope)[x_samp$index])
-        coverclass <- coverclass[x_samp$index]
+                        IL=IL[x_samp$index], 
+                        slope=slope[x_samp$index])
+        # Remember that the sample indices are row-major (as they were drawn 
+        # for a RasterLayer), so the coverclass matrix needs to be transposed 
+        # as it is stored in column-major order
+        coverclass <- t(coverclass)[x_samp$index]
     } else {
         K <- data.frame(x=getValues(x), IL=getValues(IL), 
                         slope=getValues(slope))
@@ -72,16 +78,16 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     targetslope <- atan(.05)
     allcoef <- coefficients(lm(log10(K$x)[K$slope >= targetslope] ~ log10(K$IL/cos(sunzenith))[K$slope >= targetslope]))[[2]]
 
-    results <- data.frame(matrix(0, nrow=length(slopeclass)-1, ncol=3))
+    results <- data.frame(matrix(0, nrow=length(slopeclass) - 1, ncol=3))
     colnames(results) <- c("midpoint", "n", "k")
-    results[,1] <- diff(slopeclass)/2 + slopeclass[1:length(slopeclass)-1]
+    results[, 1] <- diff(slopeclass)/2 + slopeclass[1:length(slopeclass) - 1]
 
     # don't use slopes outside slopeclass range
     K.cut <- as.numeric(cut(K$slope, slopeclass))
     if(nrow(results) != length(table(K.cut))) {
         stop("slopeclass is inappropriate for these data (empty classes)\n")
     }
-    results[,2] <- table(K.cut)
+    results[, 2] <- table(K.cut)
 
     for(i in sort(unique(K.cut[!is.na(K.cut)]))) {
         results[i, 3] <- coefficients(lm(log10(K$x)[K.cut == i] ~ 

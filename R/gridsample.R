@@ -14,6 +14,9 @@
 #' @param nsamp how many samples to draw from each grid cell
 #' @param returnindices whether to also return the indices of the sample values 
 #' (as column major indices of x)
+#' @param rowmajor if returnindices=TRUE, whether to return indices in 
+#' row-major format (default is column-major). row-major format may be useful 
+#' in conjunction with \code{RasterLayers}.
 #' @return either a vector of sampled values of length \code{horizcells} * 
 #' \code{vertcells} * \code{nsamp}, or, if \code{returnindices} is TRUE, a 
 #' \code{data.frame} with two columns: "value" and "index"
@@ -26,7 +29,7 @@
 #' # default parameters).
 #' y <- gridsample(x)
 gridsample <- function(x, horizcells=10, vertcells=10, nsamp=10, 
-                       returnindices=FALSE) {
+                       returnindices=FALSE, rowmajor=FALSE) {
     # horizstart is a vector of column numbers of the first column in each cell 
     # in the grid
     horizstart <- round(seq(1, ncol(x), ncol(x) / horizcells))
@@ -75,7 +78,7 @@ gridsample <- function(x, horizcells=10, vertcells=10, nsamp=10,
                 xcell <- getValuesBlock(x, row=vertstart[vertcellnum],
                                         nrows=cell_nrows,
                                         col=horizstart[horizcellnum],
-                                        ncols=cell_ncols)
+                                        ncols=cell_ncols, format='matrix')
             } else {
                 xcell <- x[vertstart[vertcellnum]:vertend[vertcellnum],
                            horizstart[horizcellnum]:horizend[horizcellnum]]
@@ -99,6 +102,9 @@ gridsample <- function(x, horizcells=10, vertcells=10, nsamp=10,
         cell1row <- cell1row + cell_nrows
     }
     if (returnindices) {
+        if (rowmajor) {
+            retindices <- ((retindices - 1) %% nrow(x)) * ncol(x) + ((retindices - 1) %/% nrow(x) + 1)
+        }
         return(data.frame(value=retvals, index=retindices))
     } else {
         return(retvals)
