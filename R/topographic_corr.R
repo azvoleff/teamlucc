@@ -6,14 +6,14 @@
 #' @export
 #' @import foreach
 #' @importFrom landsat topocorr minnaert
-#' @param x An image to correct.
-#' @param sunelev Sun elevation in degrees.
-#' @param sunazimuth Sun azimuth in degrees.
-#' @param slopeaspect \code{RasterBrick} or \code{RasterStack} with two layers. 
-#' First layer should be the slope, second layer should be aspect. The slope 
-#' and aspect are defined as in \code{slopeasp} in the \code{landsat} package.  
-#' \code{\link{slopeasp_par}} will output the slope and aspect using the proper 
-#' definition and as a \code{RasterBrick}.
+#' @param x an image to correct
+#' @param sunelev sun elevation in degrees
+#' @param sunazimuth sun azimuth in degrees
+#' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
+#' layers.  First layer should be the slope, second layer should be aspect. The 
+#' slope and aspect are defined as in \code{slopeasp} in the \code{landsat} 
+#' package.  \code{\link{slopeasp_par}} will output the slope and aspect using 
+#' the proper definition and as a \code{RasterBrick}.
 #' @param method the topographic correction method to use. See the help for 
 #' \code{\link{topocorr}}.
 #' @param filename file on disk to save \code{Raster*} to (optional)
@@ -67,44 +67,42 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
     }
     # Need to convert slope and aspect to SpatialGridDataFrame objects for 
     # topocorr. TODO: rewrite topocorr to handle RasterLayers
-    slope <- as(raster(slopeaspect, layer=1), 'SpatialGridDataFrame')
-    aspect <- as(raster(slopeaspect, layer=2), 'SpatialGridDataFrame')
+    slope <- raster(slopeaspect, layer=1)
+    aspect <- raster(slopeaspect, layer=2)
     if (inparallel == TRUE) {
         # Set layer to NULL to pass R CMD CHECK without notes
-        layer=NULL
-        corr_img <- foreach(layer=unstack(x), .combine='addLayer', 
+        uncorr_layer=NULL
+        corr_img <- foreach(uncorr_layer=unstack(x), .combine='addLayer', 
                             .multicombine=TRUE, .init=raster(), 
                             .packages=c('raster', 'rgdal', 'landsat')) %dopar% {
-            img_df <- as(layer, 'SpatialGridDataFrame')
             if (method == 'minnaert_full') {
-                minnaert_data <- minnaert_samp(img_df, slope, aspect, 
+                minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
                                                sunazimuth=sunazimuth, 
                                                usesample=usesample, ...)
-                corr_df <- minnaert_data$minnaert
+                corr_layer <- minnaert_data$minnaert
             } else {
-                corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
-                                    sunazimuth=sunazimuth, method, usesample,
-                                    ...)
+                corr_layer <- topocorr(uncorr_layer, slope, aspect, 
+                                       sunelev=sunelev, sunazimuth=sunazimuth, 
+                                       method, usesample, ...)
             }
-            raster(corr_df)
         }
     } else {
         corr_layers <- c()
         for (layer_num in 1:nlayers(x)) {
             message(paste0('Running topocorr on layer ', layer_num, ' of ', nlayers(x), '...'))
-            img_df <- as(raster(x, layer=layer_num), 'SpatialGridDataFrame')
+            uncorr_layer <- raster(x, layer=layer_num)
             if (method == 'minnaert_full') {
-                minnaert_data <- minnaert_samp(img_df, slope, aspect, 
+                minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
                                                sunazimuth=sunazimuth, 
                                                usesample=usesample, ...)
-                corr_df <- minnaert_data$minnaert
+                corr_layer <- minnaert_data$minnaert
             } else {
-                corr_df <- topocorr(img_df, slope, aspect, sunelev=sunelev, 
+                corr_layer <- topocorr(uncorr_layer, slope, aspect, sunelev=sunelev, 
                                     sunazimuth=sunazimuth, method, ...)
             }
-            corr_layers <- c(corr_layers, list(raster(corr_df)))
+            corr_layers <- c(corr_layers, list(corr_layer))
         }
         corr_img <- stack(corr_layers)
     }
