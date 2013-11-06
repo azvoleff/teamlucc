@@ -44,8 +44,8 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                                       repeats=5,
                                       classProbs=TRUE)
     svm_train <-  train(y ~ ., data=train_data, method="svmRadial",
-                       preProc=c('center', 'scale'),
-                       tuneGrid=svm_train_grid, trControl=svm_train_control)
+                        preProc=c('center', 'scale'),
+                        tuneGrid=svm_train_grid, trControl=svm_train_control)
 
     message('Predicting classes...')
     calc_pred_classes <- function(in_rast, svm_train, ...) {
