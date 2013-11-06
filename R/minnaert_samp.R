@@ -31,7 +31,7 @@
 minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
                           IL.epsilon=0.000001, slopeclass=c(1, 5, 10, 15, 20, 
                                                             25, 30, 45), 
-                          coverclass=NULL, sampleindices=NULL, ...) {
+                          coverclass=NULL, sampleindices=NULL) {
     # all inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth

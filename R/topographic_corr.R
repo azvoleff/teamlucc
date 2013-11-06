@@ -19,10 +19,10 @@
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param overwrite whether to overwrite \code{filename} if it already exists
 #' @param inparallel whether to run correction in parallel using \code{foreach}
-#' @param usesample whether to subsample the data with \code{gridsample} 
-#' (useful when handling very large images)
-#' @param ... Additional arguments to be passed to \code{topocorr_samp} or (if 
-#' "minnaert_full" is the chosen method) to \code{minnaert_samp}
+#' @param sampleindices (optional) row-major indices of sample pixels to use in 
+#' regression models used for some topographic correction methods (like 
+#' Minnaert). Useful when handling very large images. See
+#' \code{\link{gridsample}} for one method of calculating these indices.
 #' @return The topographically corrected image.
 #' @examples
 #' # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
@@ -58,7 +58,7 @@
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method, 
                              filename=NULL, overwrite=FALSE, inparallel=FALSE, 
-                             usesample=FALSE, ...) {
+                             sampleindices=NULL) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')
     }
@@ -79,12 +79,12 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
                 minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
                                                sunazimuth=sunazimuth, 
-                                               usesample=usesample, ...)
+                                               sampleindices=sampleindices)
                 corr_layer <- minnaert_data$minnaert
             } else {
                 corr_layer <- topocorr(uncorr_layer, slope, aspect, 
                                        sunelev=sunelev, sunazimuth=sunazimuth, 
-                                       method, usesample, ...)
+                                       method=method, sampleindices=sampleindices)
             }
         }
     } else {
@@ -96,11 +96,14 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
                 minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
                                                sunazimuth=sunazimuth, 
-                                               usesample=usesample, ...)
+                                               sampleindices=sampleindices)
                 corr_layer <- minnaert_data$minnaert
             } else {
-                corr_layer <- topocorr(uncorr_layer, slope, aspect, sunelev=sunelev, 
-                                    sunazimuth=sunazimuth, method, ...)
+                corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
+                                            sunelev=sunelev, 
+                                            sunazimuth=sunazimuth, 
+                                            method=method, 
+                                            sampleindices=sampleindices)
             }
             corr_layers <- c(corr_layers, list(corr_layer))
         }

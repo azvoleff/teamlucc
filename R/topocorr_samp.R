@@ -19,6 +19,10 @@
 #' @param filename output file for 2-band slope and aspect layer stack 
 #' (optional)
 #' @param overwrite whether to overwrite output file if it exists
+#' @param sampleindices (optional) row-major indices of sample pixels to use in 
+#' regression models used for some topographic correction methods (like 
+#' Minnaert). Useful when handling very large images. See
+#' \code{\link{gridsample}} for one method of calculating these indices.
 #' @return RasterBrick with two layers: 'slope' and 'aspect'
 #' @references
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
@@ -26,7 +30,8 @@
 #' http://www.jstatsoft.org/v43/i04/
 topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine", 
                           na.value=NA, GRASS.aspect=FALSE, IL.epsilon=0.000001,
-                          usesample=FALSE) {
+                          sampleindices=NULL) {
+    stop('topocorr_samp is not yet supported. try using method="minnaert_full")')
     ## aspect may be GRASS output: counterclockwise from east
     ## or nonGRASS output: clockwise from north
     ## require the latter for further calculations
