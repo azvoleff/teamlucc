@@ -3,6 +3,9 @@
 #' @export
 #' @param red red \code{RasterLayer}
 #' @param nir near-infrared \code{RasterLayer}
+#' @examples
+#' data(L5TSR_1986)
+#' NDVI(red=raster(L5TSR_1986, layer=2), nir=raster(L5TSR_1986, layer=3))
 NDVI <- function(red, nir) {
   NDVI <- (nir - red) / (nir + red)
 }
@@ -18,6 +21,8 @@ NDVI <- function(red, nir) {
 #' saturation. Pages 1966-1968 vol.4 Geoscience and Remote Sensing, 1997.
 #' IGARSS '97. Remote Sensing - A Scientific Vision for Sustainable
 #' Development., 1997 IEEE International.
+#' @examples
+#' #TODO: include an image with a blue layer
 EVI <- function(blue, red, nir) {
   EVI <- 2.5*((nir - red) / (nir + 6.*red - 7.5*blue + 1.))
 }
@@ -30,7 +35,10 @@ EVI <- function(blue, red, nir) {
 #' @references Qi, J., A. Chehbouni, A. R. Huete, Y. H. Kerr, and S.
 #' Sorooshian. 1994. A modified soil adjusted vegetation index. Remote Sensing
 #' of Environment 48:119-126.
-MSAVI2 <- function( red, nir) {
+#' @examples
+#' data(L5TSR_1986)
+#' MSAVI2(red=raster(L5TSR_1986, layer=2), nir=raster(L5TSR_1986, layer=3))
+MSAVI2 <- function(red, nir) {
   MSAVI2 <- (2.*nir + 1 - sqrt((2.*nir + 1.)^2. - 8.*(nir - red)))/2.
 }
 
@@ -43,6 +51,8 @@ MSAVI2 <- function( red, nir) {
 #' @references Kaufman, Y. J., and D. Tanre. 1996. Strategy for direct and
 #' indirect methods for correcting the aerosol effect on remote sensing: from
 #' AVHRR to EOS-MODIS. Remote Sensing of Environment:65-79.
+#' @examples
+#' #TODO: include an image with a blue layer
 ARVI <- function(blue, red, nir) {
     ARVI <- (nir - 2.*red - blue) / (nir + 2.*red - blue)
 }

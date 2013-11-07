@@ -33,6 +33,8 @@
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
+#' @examples
+#' #TODO: add examples
 topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine", 
                           na.value=NA, GRASS.aspect=FALSE, IL.epsilon=0.000001,
                           sampleindices=NULL) {

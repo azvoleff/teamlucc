@@ -3,9 +3,6 @@
 #' @export
 #' @param hdr_file an ENVI format header file with a .hdr extension
 #' @return A /code{list} of band names extracted from the /code{hdr_file}
-#' @examples
-#' hdr_file <- system.file('extdata/L5TSR_1986.hdr', package='teamr')
-#' teamr:::get_band_names_from_hdr(hdr_file)
 get_band_names_from_hdr <- function(hdr_file) {
     txt <- readLines(hdr_file)
     line_num <- which(grepl('^band names', txt)) + 1

@@ -15,20 +15,12 @@
 #' \code{match_rasters} can run in parallel if \code{beginCluster()} is run 
 #' prior to running \code{match_rasters}.
 #' @examples
-#' # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
-#' ASTER_V002_LL <- raster(system.file('extdata/ASTER_V002_LL.dat', 
-#' package='teamr'))
-#' ASTER_V002_LR <- raster(system.file('extdata/ASTER_V002_LR.dat', 
-#' package='teamr'))
-#' ASTER_V002_UL <- raster(system.file('extdata/ASTER_V002_UL.dat', 
-#' package='teamr'))
-#' ASTER_V002_UR <- raster(system.file('extdata/ASTER_V002_UR.dat', 
-#' package='teamr'))
-#' DEM_mosaic <- mosaic(ASTER_V002_LL, ASTER_V002_LR, ASTER_V002_UR, 
-#' ASTER_V002_UL, fun='mean')
+#' # Mosaic the two ASTER DEM tiles needed to a Landsat image
+#' data(ASTER_V002_EAST, ASTER_V002_WEST)
+#' DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 #' 
 #' # Crop and extend the DEM mosaic to match the Landsat image
-#' L5TSR_1986 <- raster(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+#' data(L5TSR_1986)
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 match_rasters <- function(baseimg, matchimg, filename=NULL, overwrite=FALSE) {
     if (projection(baseimg) != projection(matchimg)) {

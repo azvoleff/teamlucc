@@ -28,8 +28,7 @@
 #' @examples
 #' library(spatial.tools)
 #' sfQuickInit()
-#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
-#' data(L5TSR_1986_training)
+#' data(L5TSR_1986, L5TSR_1986_training)
 #' train_data_1986 <- extract_training_data(L5TSR_1986, L5TSR_1986_training)
 #' svm_classify(L5TSR_1986, train_data_1986)
 #' sfQuickStop()

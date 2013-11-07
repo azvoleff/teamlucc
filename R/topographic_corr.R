@@ -27,21 +27,12 @@
 #' \code{\link{gridsample}} for one method of calculating these indices.
 #' @return The topographically corrected image.
 #' @examples
-#' # Mosaic the four ASTER DEM tiles needed to cover the Landsat image
-#' ASTER_V002_LL <- raster(system.file('extdata/ASTER_V002_LL.dat', 
-#' package='teamr'))
-#' ASTER_V002_LR <- raster(system.file('extdata/ASTER_V002_LR.dat', 
-#' package='teamr'))
-#' ASTER_V002_UL <- raster(system.file('extdata/ASTER_V002_UL.dat', 
-#' package='teamr'))
-#' ASTER_V002_UR <- raster(system.file('extdata/ASTER_V002_UR.dat', 
-#' package='teamr'))
-#' DEM_mosaic <- mosaic(ASTER_V002_LL, ASTER_V002_LR, ASTER_V002_UR, 
-#' ASTER_V002_UL, fun='mean')
+#' # Mosaic the two ASTER DEM tiles needed to a Landsat image
+#' data(ASTER_V002_EAST, ASTER_V002_WEST)
+#' DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 #' 
 #' # Crop and extend the DEM mosaic to match the Landsat image
-#' L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='teamr')
-#' L5TSR_1986 <- stack(L5TSR_1986_file)
+#' data(L5TSR_1986)
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 #' 
 #' # Read sun elevation and sun azimuth from .txt metadata file accompanying
@@ -50,13 +41,13 @@
 #' sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
 #' sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
 #' 
-#' slopeaspect <- slopeasp_par(matched_DEM)
+#' slopeaspect <- slopeasp_seq(matched_DEM)
 #' # Apply the topographic correction
-#' L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, sunelev, sunazimuth,
-#'                                         slopeaspect, method='minslope')
+#' L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, slopeaspect, sunelev, 
+#'                                         sunazimuth, slopeaspect, 
+#'                                         method='minslope')
 #' 
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
-#' 
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
                              filename=NULL, overwrite=FALSE, inparallel=FALSE, 
