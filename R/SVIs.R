@@ -4,8 +4,8 @@
 #' @param red red \code{RasterLayer}
 #' @param nir near-infrared \code{RasterLayer}
 #' @examples
-#' data(L5TSR_1986)
-#' NDVI(red=raster(L5TSR_1986, layer=2), nir=raster(L5TSR_1986, layer=3))
+#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+#' NDVI(red=raster(L5TSR_1986, layer=3), nir=raster(L5TSR_1986, layer=4))
 NDVI <- function(red, nir) {
   NDVI <- (nir - red) / (nir + red)
 }
@@ -22,7 +22,9 @@ NDVI <- function(red, nir) {
 #' IGARSS '97. Remote Sensing - A Scientific Vision for Sustainable
 #' Development., 1997 IEEE International.
 #' @examples
-#' #TODO: include an image with a blue layer
+#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+#' EVI(blue=raster(L5TSR_1986, layer=1), red=raster(L5TSR_1986, layer=3), 
+#'      nir=raster(L5TSR_1986, layer=4))
 EVI <- function(blue, red, nir) {
   EVI <- 2.5*((nir - red) / (nir + 6.*red - 7.5*blue + 1.))
 }
@@ -36,7 +38,7 @@ EVI <- function(blue, red, nir) {
 #' Sorooshian. 1994. A modified soil adjusted vegetation index. Remote Sensing
 #' of Environment 48:119-126.
 #' @examples
-#' data(L5TSR_1986)
+#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' MSAVI2(red=raster(L5TSR_1986, layer=2), nir=raster(L5TSR_1986, layer=3))
 MSAVI2 <- function(red, nir) {
   MSAVI2 <- (2.*nir + 1 - sqrt((2.*nir + 1.)^2. - 8.*(nir - red)))/2.
@@ -52,7 +54,9 @@ MSAVI2 <- function(red, nir) {
 #' indirect methods for correcting the aerosol effect on remote sensing: from
 #' AVHRR to EOS-MODIS. Remote Sensing of Environment:65-79.
 #' @examples
-#' #TODO: include an image with a blue layer
+#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+#' ARVI(blue=raster(L5TSR_1986, layer=1), red=raster(L5TSR_1986, layer=3), 
+#'      nir=raster(L5TSR_1986, layer=4))
 ARVI <- function(blue, red, nir) {
     ARVI <- (nir - 2.*red - blue) / (nir + 2.*red - blue)
 }

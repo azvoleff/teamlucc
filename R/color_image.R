@@ -8,11 +8,6 @@
 #' @param outfile the filename to use for the output
 #' @examples
 #' #TODO: Add examples
-#' #x <- raster('L5TSR_1986_to_2001_chgtraj.envi')
-#' #cls <- cbind(traj_lut$Traj_Code,
-#' #             paste(traj_lut$t0_name, traj_lut$t1_name, sep='-'))
-#' #outfile <- 'L5TSR_1986_to_2001_chgtraj_colored.envi'
-#' #color_image(img, cls, outfile)
 color_image <- function(x, cls, outfile) {
     # Reclassify image so it is coded from 0 - length(cls[1]). ENVI and 
     # other classification file formats rely on the codes being sequential, 

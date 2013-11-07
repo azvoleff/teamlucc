@@ -9,7 +9,8 @@
 #' response ('y') as the first column, with the remaining columns containing 
 #' the values at that location of each band in the raster stack. 
 #' @examples
-#' data(L5TSR_1986, L5TSR_1986_training)
+#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
+#' data(L5TSR_1986_training)
 #' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_training)
 extract_training_data <- function(x, y) {
     if (projection(x) != projection(y)) {
