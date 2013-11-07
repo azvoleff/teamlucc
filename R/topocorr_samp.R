@@ -36,25 +36,21 @@
 topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine", 
                           na.value=NA, GRASS.aspect=FALSE, IL.epsilon=0.000001,
                           sampleindices=NULL) {
-    stop('topocorr_samp is not yet supported. try using method="minnaert_full")')
     ## aspect may be GRASS output: counterclockwise from east
     ## or nonGRASS output: clockwise from north
     ## require the latter for further calculations
     ## because sunazimuth is always measured clockwise from north
     if(GRASS.aspect) {
-        aspect <- as.matrix(aspect)
         aspect <- -1 * aspect + 90
         aspect <- (aspect + 360) %% 360
     }
 
     # all inputs are in degrees, but we need radians
-    slope <- (pi/180) * as.matrix(slope)
-    aspect <- (pi/180) * as.matrix(aspect)
+    slope <- (pi/180) * slope
+    aspect <- (pi/180) * aspect
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
 
-    x.orig <- x
-    x <- as.matrix(x)
     x[x == na.value] <- NA
 
     IL <- cos(slope) * cos(sunzenith) + sin(slope) * sin(sunzenith) * cos(sunazimuth - aspect)
@@ -73,7 +69,7 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
         xout <- x * (cos(sunzenith)/IL)
     } else if(method == 2) {
         ## Improved cosine method
-        ILmean <- mean(as.vector(IL), na.rm=TRUE)
+        ILmean <- cellStats(IL, stat='mean', na.rm=TRUE)
         xout <- x + (x * (ILmean - IL)/ILmean)
     } else if(method == 3) {
         ## Minnaert
@@ -85,19 +81,11 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
             K <- 1
         } else {
             if (!is.null(sampleindices)) {
-                horizcells <- 10
-                vertcells <- 10
-                nsamp <- 100000 / (horizcells * vertcells)
-                x_samp <- gridsample(x[slope >= targetslope], nsamp=nsamp, 
-                                     horizcells=10, vertcells=10)
-                K <- data.frame(y = as.vector(x_samp$value),
-                                x = as.vector(IL[slope >= 
-                                              targetslope][x_samp$index]) / 
-                                              cos(sunzenith))
+                K <- data.frame(y=x[slope >= targetslope][sampleindices],
+                                x=IL[slope >= targetslope][sampleindices]/cos(sunzenith))
             } else {
-                K <- data.frame(y = as.vector(x[slope >= targetslope]), x = 
-                                as.vector(IL[slope >= 
-                                          targetslope])/cos(sunzenith))
+                K <- data.frame(y=x[slope >= targetslope],
+                                x=IL[slope >= targetslope]/cos(sunzenith))
             }
             # IL can be <=0 under certain conditions
             # but that makes it impossible to take log10 so remove those 
@@ -123,19 +111,11 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
             K <- 1
         } else {
             if (!is.null(sampleindices)) {
-                horizcells <- 10
-                vertcells <- 10
-                nsamp <- 100000 / (horizcells * vertcells)
-                x_samp <- gridsample(x[slope >= targetslope], nsamp=nsamp, 
-                                     horizcells=10, vertcells=10)
-                K <- data.frame(y = as.vector(x_samp$value),
-                                x = as.vector(IL[slope >= 
-                                              targetslope][x_samp$index]) / 
-                                              cos(sunzenith))
+                K <- data.frame(y=x[slope >= targetslope][sampleindices],
+                                x=IL[slope >= targetslope][sampleindices] / cos(sunzenith))
             } else {
-                K <- data.frame(y=as.vector(x[slope >= targetslope]), 
-                                x=as.vector(IL[slope >= 
-                                            targetslope])/cos(sunzenith))
+                K <- data.frame(y=x[slope >= targetslope], 
+                                x=IL[slope >= targetslope]/cos(sunzenith))
             }
             # IL can be <=0 under certain conditions
             # but that makes it impossible to take log10 so remove those elements
@@ -152,10 +132,9 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
     } else if(method == 5) {
         ## C correction
         if (!is.null(sampleindices)) {
-        x_samp <- gridsample(x, nsamp=nsamp, horizcells=10, vertcells=10)
-        band.lm <- lm(as.vector(x_samp$value) ~ as.vector(IL[x_samp$index]))
+            band.lm <- lm(x[sampleindices] ~ IL[sampleindices])
         } else {
-            band.lm <- lm(as.vector(x) ~ as.vector(IL))
+            band.lm <- lm(getValues(x) ~ getValues(IL))
         }
         C <- coefficients(band.lm)[[1]]/coefficients(band.lm)[[2]]
 
@@ -176,12 +155,6 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
     ## if slope is zero, reflectance does not change
     if(method != 8) 
         xout[slope == 0 & !is.na(slope)] <- x[slope == 0 & !is.na(slope)]
-
-    ## if x was a SpatialGridDataFrame, return an object of the same class
-    if(class(x.orig) == "SpatialGridDataFrame") {
-        x.orig@data[,1] <- as.vector(xout)
-        xout <- x.orig
-    }
 
     return(xout)
 }
