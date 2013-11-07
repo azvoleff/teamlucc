@@ -71,7 +71,7 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
     # topocorr. TODO: rewrite topocorr to handle RasterLayers
     slope <- raster(slopeaspect, layer=1)
     aspect <- raster(slopeaspect, layer=2)
-    if (inparallel == TRUE) {
+    if (inparallel == TRUE && (nlayers(x) > 1)) {
         # Set layer to NULL to pass R CMD CHECK without notes
         uncorr_layer=NULL
         corr_img <- foreach(uncorr_layer=unstack(x), .combine='addLayer', 
@@ -85,15 +85,19 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
                 corr_layer <- minnaert_data$minnaert
             } else {
                 corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
-                                       sunelev=sunelev, sunazimuth=sunazimuth, 
-                                       method=method, sampleindices=sampleindices)
+                                            sunelev=sunelev, sunazimuth=sunazimuth, 
+                                            method=method, sampleindices=sampleindices)
             }
         }
     } else {
         corr_layers <- c()
         for (layer_num in 1:nlayers(x)) {
             message(paste0('Running topocorr on layer ', layer_num, ' of ', nlayers(x), '...'))
-            uncorr_layer <- raster(x, layer=layer_num)
+            if (nlayers(x) > 1) {
+                uncorr_layer <- raster(x, layer=layer_num)
+            } else {
+                uncorr_layer <- x
+            }
             if (method == 'minnaert_full') {
                 minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
@@ -109,7 +113,11 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
             }
             corr_layers <- c(corr_layers, list(corr_layer))
         }
-        corr_img <- stack(corr_layers)
+        if (nlayers(x) > 1) {
+            corr_img <- stack(corr_layers)
+        } else {
+            corr_img <- corr_layers[[1]]
+        }
     }
     if (!is.null(filename)) {
         writeRaster(corr_img, filename, overwrite=overwrite)
