@@ -119,4 +119,3 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
 
     list(allcoef=allcoef, classcoef=results, model=model, minnaert=xout)
 }
-
