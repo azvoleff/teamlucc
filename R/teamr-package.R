@@ -36,24 +36,12 @@ NULL
 #' Subset of ASTER Digital Elevation Model V002
 #' 
 #' @docType data
-#' @name ASTER_V002_LL
-#' @seealso ASTER_V002_LR, ASTER_V002_UL, ASTER_V002_UR
+#' @name ASTER_V002_WEST
+#' @seealso ASTER_V002_EAST
 NULL
 #' Subset of ASTER Digital Elevation Model V002
 #' 
 #' @docType data
-#' @name ASTER_V002_LR
-#' @seealso ASTER_V002_LL, ASTER_V002_UL, ASTER_V002_UR
-NULL
-#' Subset of ASTER Digital Elevation Model V002
-#'
-#' @docType data
-#' @name ASTER_V002_UL
-#' @seealso ASTER_V002_LL, ASTER_V002_LR, ASTER_V002_UR
-NULL
-#' Subset of ASTER Digital Elevation Model V002
-#' 
-#' @docType data
-#' @name ASTER_V002_UR
-#' @seealso ASTER_V002_LL, ASTER_V002_LR, ASTER_V002_UL
+#' @name ASTER_V002_EAST
+#' @seealso ASTER_V002_WEST
 NULL
