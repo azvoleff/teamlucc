@@ -5,6 +5,6 @@
 #' @export
 #' @param x classification results
 #' @return list of accuracy statistics
-chg_dir <- function(x) {
+accuracy <- function(x) {
     #TODO: Code function
 }
