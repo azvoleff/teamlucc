@@ -16,6 +16,8 @@
 #' @param aspect the aspect as a \code{RasterLayer}
 #' @param sunelev sun elevation in degrees
 #' @param sunazimuth sun azimuth in degrees
+#' @param na.value the value used to code no data values
+#' @param GRASS.aspect is aspect defined according to GRASS convetion
 #' @param IL.epsilon a small amount to add to calculated illumination values 
 #' that are equal to zero to avoid division by zero resulting in Inf values
 #' @param slopeclass the slope classes to calculate k for
@@ -29,9 +31,20 @@
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
 minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
-                          IL.epsilon=0.000001, slopeclass=c(1, 5, 10, 15, 20, 
-                                                            25, 30, 45), 
+                          na.value=NA, GRASS.aspect=FALSE, IL.epsilon=0.000001,
+                          slopeclass=c(1, 5, 10, 15, 20, 25, 30, 45), 
                           coverclass=NULL, sampleindices=NULL) {
+    ## aspect may be GRASS output: counterclockwise from east
+    ## or nonGRASS output: clockwise from north
+    ## require the latter for further calculations
+    ## because sunazimuth is always measured clockwise from north
+    if(GRASS.aspect) {
+        aspect <- -1 * aspect + 90
+        aspect <- (aspect + 360) %% 360
+    }
+
+    x[x == na.value] <- NA
+
     # all inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
