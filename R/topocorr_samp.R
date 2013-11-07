@@ -56,6 +56,12 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
     IL <- cos(slope) * cos(sunzenith) + sin(slope) * sin(sunzenith) * cos(sunazimuth - aspect)
     IL[IL == 0] <- IL.epsilon
 
+    if (!is.null(sampleindices) && !(method %in% c('minnaert', 'minslope', 
+                                                   'ccorrection'))) {
+        warning(paste0('sampleindices are not used when method is "', method,
+                       '". Ignoring sampleindices.'))
+    }
+
     METHODS <- c("cosine", "improvedcosine", "minnaert", "minslope", 
                  "ccorrection", "gamma", "SCS", "illumination")
     method <- pmatch(method, METHODS)
@@ -63,6 +69,7 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
         stop("invalid method")
     if (method == -1) 
         stop("ambiguous method")
+
 
     if(method == 1){
         ## Cosine method
