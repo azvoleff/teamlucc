@@ -1,19 +1,21 @@
 #' Topographically correct a raster
 #'
-#' Performs topographic correction using \code{\link{topocorr}} from the 
-#' \code{Landsat} package.
+#' Performs topographic correction using code based on \code{\link{topocorr}} 
+#' from the \code{Landsat} package. The code in this package has been modifed 
+#' from \code{\link{topocorr}} to allow using a subsample of the image for 
+#' Minnaert k calculations, and to provide the option of running the 
+#' topographic correction in parallel using \code{\link{foreach}}.
 #'
 #' @export
 #' @import foreach
-#' @importFrom landsat topocorr minnaert
 #' @param x an image to correct
-#' @param sunelev sun elevation in degrees
-#' @param sunazimuth sun azimuth in degrees
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
 #' layers.  First layer should be the slope, second layer should be aspect. The 
 #' slope and aspect are defined as in \code{slopeasp} in the \code{landsat} 
 #' package.  \code{\link{slopeasp_par}} will output the slope and aspect using 
 #' the proper definition and as a \code{RasterBrick}.
+#' @param sunelev sun elevation in degrees
+#' @param sunazimuth sun azimuth in degrees
 #' @param method the topographic correction method to use. See the help for 
 #' \code{\link{topocorr}}.
 #' @param filename file on disk to save \code{Raster*} to (optional)
@@ -56,7 +58,7 @@
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' 
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
-topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method, 
+topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
                              filename=NULL, overwrite=FALSE, inparallel=FALSE, 
                              sampleindices=NULL) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
@@ -82,7 +84,7 @@ topographic_corr <- function(x, sunelev, sunazimuth, slopeaspect, method,
                                                sampleindices=sampleindices)
                 corr_layer <- minnaert_data$minnaert
             } else {
-                corr_layer <- topocorr(uncorr_layer, slope, aspect, 
+                corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
                                        sunelev=sunelev, sunazimuth=sunazimuth, 
                                        method=method, sampleindices=sampleindices)
             }
