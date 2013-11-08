@@ -7,7 +7,7 @@
 #' topographic correction in parallel using \code{\link{foreach}}.
 #'
 #' @export
-#' @import foreach
+#' @import raster foreach
 #' @param x an image to correct
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
 #' layers.  First layer should be the slope, second layer should be aspect. The 
@@ -37,6 +37,7 @@
 #' 
 #' # Read sun elevation and sun azimuth from .txt metadata file accompanying
 #' # the Landsat file (as output from teampy Python package).
+#' L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='teamr')
 #' metadatafile <- extension(L5TSR_1986_file, 'txt')
 #' sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
 #' sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
@@ -44,8 +45,7 @@
 #' slopeaspect <- slopeasp_seq(matched_DEM)
 #' # Apply the topographic correction
 #' L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, slopeaspect, sunelev, 
-#'                                         sunazimuth, slopeaspect, 
-#'                                         method='minslope')
+#'                                         sunazimuth, method='minslope')
 #' 
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
