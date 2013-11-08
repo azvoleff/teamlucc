@@ -7,17 +7,19 @@
 #' calculated.
 #' @param y A \code{SpatialPolygonsDataFrame} with cover class 
 #' polygons
+#' @param classcol the name of the column containing the response variable (for 
+#' example the land cover type of each pixel)
 #' @return A data.frame of class statistics.
 #' @examples
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
-#' data(L5TSR_1986_training)
-#' class_statistics(L5TSR_1986, L5TSR_1986_training)
-class_statistics <- function(x, y) {
+#' data(L5TSR_1986_2001_training)
+#' class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "t1_class")
+class_statistics <- function(x, y, classcol) {
     if (projection(x) != projection(y)) {
         stop('Coordinate systems do not match')
     }
     if (class(y) == "SpatialPolygonsDataFrame") {
-        pixels <- extract_training_data(x, y)
+        pixels <- extract_training_data(x, y, classcol)
     } else if (class(y) %in% c("RasterLayer", "RasterBrick", 
                                          "RasterStack")) {
         stop('Error: class_statistics cannot yet handle Raster* objects')
