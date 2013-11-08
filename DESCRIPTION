@@ -17,7 +17,7 @@ Imports:
     mgcv,
     plyr,
     reshape2,
-    spatial.tools,
+    spatial.tools (>= 1.2.2),
     caret,
     foreach,
     sp
