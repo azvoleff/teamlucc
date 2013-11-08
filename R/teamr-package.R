@@ -13,25 +13,18 @@
 #' @keywords package
 #' @useDynLib teamr
 NULL
-#' Training polygons for 1986 Landsat 5 Surface Reflectance image
+#' Training polygons for 1986 and 2001 Landsat 5 Surface Reflectance images
 #' 
-#' Polygons digitized from 2001 Landsat 5 Surface Reflectance image from the 
-#' Landsat Climate Data Record archive. The training polygons can be used for 
-#' testing classification algorithms.
+#' Polygons digitized from 1986 and 2001 Landsat 5 Surface Reflectance image 
+#' from the Landsat Climate Data Record archive. The training polygons can be 
+#' used for testing classification algorithms.
+#'
+#' There are three columns in the dataset. "t1_class" is the cover class for 
+#' the pixels in the polygon from the 1986 image. "t2_class" is the cover class 
+#' for the pixels in the polygon from the 2001 image.
 #'
 #' @docType data
-#' @name L5TSR_1986_training
-#' @seealso L5TSR_2001_training
-NULL
-#' Training polygons for 2001 Landsat 5 Surface Reflectance image
-#' 
-#' Polygons digitized from 2001 Landsat 5 Surface Reflectance image from the 
-#' Landsat Climate Data Record archive. The training polygons can be used for 
-#' testing classification algorithms.
-#'
-#' @docType data
-#' @name L5TSR_2001_training
-#' @seealso L5TSR_1986_training
+#' @name L5TSR_1986_2001_training
 NULL
 #' Subset of ASTER Digital Elevation Model V002
 #' 
