@@ -26,27 +26,34 @@
 #' \code{sfQuickStop}.
 #'
 #' @examples
-#' library(spatial.tools)
-#' sfQuickInit()
+#' # Load example datasets
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' data(L5TSR_1986_2001_training)
 #' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training, 
 #'                                     "t1_class")
-#' svm_classify(L5TSR_1986, train_data)
-#' sfQuickStop()
+#' # Supply a small training grid for svm_classify to save processing time for 
+#' # the purposes of this example - in normal use, train_grid can be left 
+#' # unspecified.
+#' svmout <- svm_classify(L5TSR_1986, train_data, 
+#'                        train_grid=data.frame(.sigma=.0495, .C=2^(-2:2)))
+#'
+#' # Examine output from svm_classify
+#' svmout$svm_train
+#' plot(svmout$pred_classes)
+#' plot(svmout$pred_probs)
 svm_classify <- function(x, train_data, pred_classes_filename=NULL, 
                          pred_probs_filename=NULL, train_grid=NULL) {
     message('Training SVM...')
     if (is.null(train_grid)) {
         sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))
-        svm_train_grid <- data.frame(.sigma=sig_dist[1], .C=2^(-2:12))
+        train_grid <- data.frame(.sigma=sig_dist[1], .C=2^(-6:12))
     }
     svm_train_control <- trainControl(method="repeatedcv",
                                       repeats=5,
                                       classProbs=TRUE)
     svm_train <-  train(y ~ ., data=train_data, method="svmRadial",
                         preProc=c('center', 'scale'),
-                        tuneGrid=svm_train_grid, trControl=svm_train_control)
+                        tuneGrid=train_grid, trControl=svm_train_control)
 
     message('Predicting classes...')
     calc_pred_classes <- function(in_rast, svm_train, ...) {
@@ -60,11 +67,13 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                                  filename=pred_classes_filename, 
                                  chunk_format="raster", outbands=1)
     pred_classes <- setMinMax(pred_classes)
+    names(pred_classes) <- 'cover'
 
     message('Predicting class probabilities...')
     calc_pred_probs <- function(in_rast, svm_train, n_classes, ...) {
         preds <- predict(in_rast, svm_train, type="prob", 
-                         index=c(1:dim(in_rast)[3]))
+                         index=c(1:n_classes))
+        layernames <- names(preds)
         preds <- array(getValues(preds), dim=c(dim(in_rast)[2], 
                                                dim(in_rast)[1], 
                                                n_classes))
@@ -77,6 +86,7 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                                filename=pred_probs_filename, 
                                chunk_format="raster")
     pred_probs <- setMinMax(pred_probs)
+    names(pred_probs) <- caret:::getClassLevels(svm_train)
 
     return(list(svm_train=svm_train, pred_classes=pred_classes, pred_probs=pred_probs))
 }
