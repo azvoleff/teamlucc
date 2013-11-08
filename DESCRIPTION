@@ -5,7 +5,6 @@ Title: TEAM Remote Sensing Data Processing Toolkit (R procedures)
 Author: Alex Zvoleff
 Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
-    sp,
     raster
 Imports:
     Rcpp (>= 0.10.1),
@@ -20,7 +19,8 @@ Imports:
     reshape2,
     spatial.tools,
     caret,
-    foreach
+    foreach,
+    sp
 LinkingTo: Rcpp, RcppArmadillo
 Description: Routines for processing imagery and other spatial data for the
     Tropical Ecology Assessment and Monitoring (TEAM) Network.
