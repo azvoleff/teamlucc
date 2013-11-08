@@ -1,7 +1,6 @@
 #' Match the coordinate system and extent of two rasters
 #'
 #' @export
-#' @import raster
 #' @param baseimg A /code{Raster*} to use as the base image. This layer will 
 #' determine the output coordinate system.
 #' @param matchimg A /code{Raster*} to match to the base image. If necessary 

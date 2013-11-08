@@ -1,7 +1,7 @@
 #' Makes a polygon shapefile of a \code{Raster*} extent.
 #'
 #' @export
-#' @import raster rgdal
+#' @import rgdal
 #' @param x A \code{Raster*} object
 #' @param out_file Filename for the output shapefile
 #' @param fields list of fields to include in the output shapefile

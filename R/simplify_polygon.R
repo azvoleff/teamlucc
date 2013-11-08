@@ -20,7 +20,7 @@ nverts <- function(poly_obj) {
 #' Simplify a polygon to contain less than a certain number of vertices
 #'
 #' @export
-#' @import sp rgeos
+#' @import rgeos
 #' @param poly_obj a polygon as an sp object
 #' @param max_vertices the maximum number of vertices to allow in the 
 #' simplified polygon

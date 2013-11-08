@@ -8,7 +8,7 @@
 #' map areas of change and no-change.
 #'
 #' @export
-#' @import raster spatial.tools
+#' @import spatial.tools
 #' @param t1p time 0 posterior probability \code{Raster*}
 #' @param t2p time 1 posterior probability \code{Raster*}
 #' @param filename (optional) filename for output change direction

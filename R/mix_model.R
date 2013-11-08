@@ -8,7 +8,6 @@
 #' map areas of change and no-change.
 #'
 #' @export
-#' @import raster
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
 #' @param train_data a data table with a column labeled 'y' with the observed 

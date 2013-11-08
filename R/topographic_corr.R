@@ -7,7 +7,7 @@
 #' topographic correction in parallel using \code{\link{foreach}}.
 #'
 #' @export
-#' @import raster foreach
+#' @import foreach
 #' @param x an image to correct
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
 #' layers.  First layer should be the slope, second layer should be aspect. The 

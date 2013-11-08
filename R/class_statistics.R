@@ -1,7 +1,7 @@
 #' Exports statistics on pixels within each of a set of land cover classes
 #'
 #' @export
-#' @import raster plyr
+#' @import plyr
 #' @importFrom reshape2 melt
 #' @param x A \code{RasterLayer} from which class statistics will be 
 #' calculated.

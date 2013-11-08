@@ -1,10 +1,9 @@
 #' Extract training data for use in a classification
 #'
 #' @export
-#' @import raster
-#' @param x a \code{Raster*} object from which training data will be 
-#' extracted. Training data will be extracted from each layer in a 
-#' \code{RasterBrick} or \code{RasterStack}.
+#' @param x a \code{Raster*} object from which training data will be extracted. 
+#' Training data will be extracted from each layer in a \code{RasterBrick} or 
+#' \code{RasterStack}.
 #' @param polys a \code{SpatialPolygonsDataFrame} with training data polygons
 #' @param classcol the name of the column containing the response variable (for 
 #' example the land cover type of each pixel)

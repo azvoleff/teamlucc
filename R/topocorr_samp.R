@@ -10,7 +10,7 @@
 #' details on the parameters.
 #'
 #' @export
-#' @import raster spatial.tools
+#' @import spatial.tools
 #' @importFrom landsat slopeasp
 #' @param x image as a \code{RasterLayer}
 #' @param slope the slope as a \code{RasterLayer}
