@@ -1,6 +1,7 @@
 #' Calculate change-trajectory statistics
 #'
 #' @export
+#' @import raster
 #' @param traj a list (as output by \code{chg_traj} with two elements: 
 #' traj_lut (a lookup table of change trajectory codes) and chg_traj (a 
 #' \code{RasterLayer} of change trajectory codes.

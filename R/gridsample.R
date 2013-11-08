@@ -6,6 +6,7 @@
 #' cell.
 #'
 #' @export
+#' @import raster
 #' @param x a matrix or RasterLayer to draw sample from
 #' @param horizcells how many cells to break the raster in horizontally (over 
 #' the columns)

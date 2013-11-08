@@ -1,6 +1,7 @@
 #' Function to convert TIMESAT .tpa data.frame to an R raster. 
 #'
 #' @export
+#' @import raster
 #' @param x A TPA data.frame as output by tpa2df
 #' @param base_image A string giving the location of a raster file to use 
 #' for georeferencing the output raster. Use one of the original raster files 
