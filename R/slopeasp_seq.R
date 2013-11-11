@@ -18,6 +18,7 @@
 #' (optional)
 #' @param overwrite whether to overwrite output file if it exists
 #' @return RasterBrick with two layers: 'slope' and 'aspect'
+#' @author Sarah Goslee and Alex Zvoleff
 #' @references
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  

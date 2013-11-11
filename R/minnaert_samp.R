@@ -26,6 +26,7 @@
 #' the calculation of k values for the Minnaert correction. See
 #' \code{\link{gridsample}}.
 #' @return \code{RasterLayer} with topographically corrected data
+#' @author Sarah Goslee and Alex Zvoleff
 #' @references
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
