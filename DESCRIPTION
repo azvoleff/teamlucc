@@ -1,8 +1,8 @@
 Package: teamr
 Version: 0.1
-Date: 2013-08-22
+Date: 2013-11-11
 Title: TEAM Remote Sensing Data Processing Toolkit (R procedures)
-Author: Alex Zvoleff
+Authors@R: c(person("Alex", "Zvoleff", email="azvoleff@conservation.org", role=c("aut", "cre")))
 Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
     raster
@@ -26,6 +26,7 @@ Description: Routines for processing imagery and other spatial data for the
     Tropical Ecology Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
 URL: https://github.com/azvoleff/teamr
+BugReports: https://github.com/azvoleff/teamr/issues
 Collate:
     'get_band_names_from_hdr.R'
     'get_metadata_item.R'
@@ -58,3 +59,4 @@ Collate:
     'topocorr_samp.R'
     'minnaert_samp.R'
     'accuracy.R'
+    'split_class.R'
