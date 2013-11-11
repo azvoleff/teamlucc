@@ -35,25 +35,23 @@ chg_dir <- function(t1p, t2p, filename=NULL, ...) {
     }
 
     n_classes <- nlayers(t1p)
-    if (n_classes < 2) {
+    if (n_classes == 1) {
         stop('Error: cannot calculate change probabilities for only one class')
     }
 
     calc_chg_dir <- function(t1p, t2p, n_classes, ...) {
         # Calculate change direction (eqns 5 and 6 in Chen 2011)
         dP <- array(t2p - t1p, dim=c(dim(t1p)[1], dim(t1p)[2], n_classes))
-        #Eab <- dP %*% diag(n_classes)
-        unit_vecs <- array(diag(n_classes), dim=c(3, 3))
+        unit_vecs <- array(diag(n_classes), dim=c(n_classes, n_classes))
         Eab <- apply(dP, c(1, 2), function(pixel) pixel %*% unit_vecs)
         chgdir <- apply(Eab, c(2, 3),
                         function(pixel) which(pixel == max(pixel)))
         chgdir <- array(chgdir, dim=c(dim(t1p)[1], dim(t1p)[2], 1))
         return(chgdir)
     }
-
     out <- rasterEngine(t1p=t1p, t2p=t2p, fun=calc_chg_dir, 
-                     args=list(n_classes=n_classes), filename=filename,
-                     outbands=1, ...)
+                        args=list(n_classes=n_classes), filename=filename,
+                        outbands=1, ...)
     out <- setMinMax(out)
 
     return(out)
