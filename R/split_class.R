@@ -2,10 +2,9 @@
 #'
 #' @export
 #' @importFrom mclust Mclust
-#' @param ignorepersistence whether to ignore persistence of a class (if 
-#' @return list object with two elements: 'clusts', a vector of cluster 
-#' assignments for the clustered training data, and 'Mclust', the output from 
-#' running \code{Mclust} from the \code{Mclust} package.
+#' @param train_data a data table with a column labeled 'y' with the observed 
+#' classes, and one or more columns with the values of predictor(s) at each 
+#' location.
 split_class <- function(train_data) {
     #TODO: Mclust()
 }
