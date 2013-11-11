@@ -24,7 +24,7 @@
 #' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
 chg_traj <- function(initial, chg_mag, chg_dir, threshold, filename=NULL, 
-                     classnames=NULL, ignorepersistence=FALSE) {
+                     classnames=NULL, ignorepersistence=TRUE) {
     if (proj4string(initial) != proj4string(chg_mag) ) {
         stop('Error: initial and chg_mag coordinate systems do not match')
     } else if (proj4string(initial) != proj4string(chg_dir) ) {
