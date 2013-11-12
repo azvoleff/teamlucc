@@ -104,15 +104,14 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
 
     model <- with(results, gam(k ~ s(midpoint, k=length(midpoint) - 1)))
 
-    K.all <- data.frame(midpoint=getValues(slope))
+    names(slope) <- 'midpoint'
     # if slope is greater than modeled range, use maximum of modeled range
-    K.all[K.all > max(slopeclass)] <- max(slopeclass)
+    slope[slope > max(slopeclass)] <- max(slopeclass)
     # if slope is less than modeled range, treat it as flat
-    K.all[K.all < min(slopeclass)] <- 0
-    K.all <- predict(model, newdata=K.all)
+    slope[slope < min(slopeclass)] <- 0
+    K.all <- predict(slope, model)
     K.all[K.all > 1] <- 1
     K.all[K.all < 0] <- 0
-    K.all <- raster(matrix(K.all, nrow=nrow(x), byrow=TRUE), template=x)
 
     # Perform correction
     xout <- x * (cos(sunzenith)/IL) ^ K.all
