@@ -81,10 +81,6 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     K <- K[K$x > 0, ]
     K <- K[K$IL > 0, ]
 
-    ## calculate overall K value; only use points with greater than 5% slope
-    targetslope <- atan(.05)
-    allcoef <- coefficients(lm(log10(K$x)[K$slope >= targetslope] ~ log10(K$IL/cos(sunzenith))[K$slope >= targetslope]))[[2]]
-
     results <- data.frame(matrix(0, nrow=length(slopeclass) - 1, ncol=3))
     colnames(results) <- c("midpoint", "n", "k")
     results[, 1] <- diff(slopeclass)/2 + slopeclass[1:length(slopeclass) - 1]
@@ -117,5 +113,5 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     xout <- x * (cos(sunzenith)/IL) ^ K.all
     xout[K.all == 0 & !is.na(K.all)] <- x[K.all == 0 & !is.na(K.all)] # don't correct flat areas
 
-    list(allcoef=allcoef, classcoef=results, model=model, minnaert=xout)
+    list(classcoef=results, model=model, minnaert=xout, sampleindices=sampleindices)
 }
