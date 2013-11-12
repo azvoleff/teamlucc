@@ -63,7 +63,7 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
     slope <- raster(slopeaspect, layer=1)
     aspect <- raster(slopeaspect, layer=2)
     if (inparallel == TRUE && (nlayers(x) > 1)) {
-        # Set layer to NULL to pass R CMD CHECK without notes
+        # Set uncorr_layer to NULL to pass R CMD CHECK without notes
         uncorr_layer=NULL
         corr_img <- foreach(uncorr_layer=unstack(x), .combine='addLayer', 
                             .multicombine=TRUE, .init=raster(), 
