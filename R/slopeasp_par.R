@@ -60,6 +60,6 @@ slopeasp_par <- function(DEM, EWkernel, NSkernel, smoothing=1, filename=NULL, ..
                                  window_dims=c(3, 3), filename=filename,
                                  outbands=2, ...)
     names(slopeasp_img) <- c('slope', 'aspect')
-    setMinMax(slopeasp_img)
+
     return(slopeasp_img)
 }

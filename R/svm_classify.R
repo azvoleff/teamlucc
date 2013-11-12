@@ -66,7 +66,6 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                                  args=list(svm_train=svm_train), 
                                  filename=pred_classes_filename, 
                                  chunk_format="raster", outbands=1)
-    pred_classes <- setMinMax(pred_classes)
     names(pred_classes) <- 'cover'
 
     message('Predicting class probabilities...')
@@ -85,7 +84,6 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                                          n_classes=n_classes), 
                                filename=pred_probs_filename, 
                                chunk_format="raster")
-    pred_probs <- setMinMax(pred_probs)
     names(pred_probs) <- caret:::getClassLevels(svm_train)
 
     return(list(svm_train=svm_train, pred_classes=pred_classes, pred_probs=pred_probs))

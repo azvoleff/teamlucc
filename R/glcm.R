@@ -93,7 +93,6 @@ glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
                                 outbands=length(statistics), ...)
 
     names(texture_img) <- statistics 
-    texture_img <- setMinMax(texture_img)
 
     return(texture_img)
 }

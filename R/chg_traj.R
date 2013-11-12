@@ -70,7 +70,6 @@ chg_traj <- function(initial, chg_mag, chg_dir, threshold, filename=NULL,
                                                      threshold=threshold,
                                                      ignorepersistence=ignorepersistence), 
                         filename=filename)
-    out <- setMinMax(out)
 
     return(list(traj_lut=traj_lut, chg_traj=out))
 }
