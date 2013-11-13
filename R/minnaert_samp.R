@@ -1,3 +1,49 @@
+#' Calculates a model of K
+#' @import mgcv
+.calc_k_model <- function(x, IL, slope, sampleindices, slopeclass,
+                          coverclass, sunzenith) {
+    if (!is.null(sampleindices)) {
+        K <- data.frame(x=x[sampleindices],
+                        IL=IL[sampleindices], 
+                        slope=slope[sampleindices])
+        # Remember that the sample indices are row-major (as they were drawn 
+        # for a RasterLayer), so the coverclass matrix needs to be transposed 
+        # as it is stored in column-major order
+        coverclass <- t(coverclass)[sampleindices]
+    } else {
+        K <- data.frame(x=getValues(x), IL=getValues(IL), 
+                        slope=getValues(slope))
+    }
+
+    ## K is between 0 and 1
+    # IL can be <=0 under certain conditions
+    # but that makes it impossible to take log10 so remove those elements
+    K <- K[coverclass, ]
+    K <- K[!apply(K, 1, function(rowvals) any(is.na(rowvals))),]
+    K <- K[K$x > 0, ]
+    K <- K[K$IL > 0, ]
+
+    k_table <- data.frame(matrix(0, nrow=length(slopeclass) - 1, ncol=3))
+    colnames(k_table) <- c("midpoint", "n", "k")
+    k_table[, 1] <- diff(slopeclass)/2 + slopeclass[1:length(slopeclass) - 1]
+
+    # don't use slopes outside slopeclass range
+    K.cut <- as.numeric(cut(K$slope, slopeclass))
+    if(nrow(k_table) != length(table(K.cut))) {
+        stop("slopeclass is inappropriate for these data (empty classes)\n")
+    }
+    k_table[, 2] <- table(K.cut)
+
+    for(i in sort(unique(K.cut[!is.na(K.cut)]))) {
+        k_table[i, 3] <- coefficients(lm(log10(K$x)[K.cut == i] ~ 
+                                         log10(K$IL/cos(sunzenith))[K.cut == 
+                                                                    i]))[[2]]
+    }
+    model <- with(k_table, gam(k ~ s(midpoint, k=length(midpoint) - 1)))
+
+    return(list(model=model, k_table=k_table))
+}
+
 #' Topographic correction for satellite imagery using Minnaert method
 #'
 #' Perform topographic correction using the Minnaert method. This code is 
@@ -10,7 +56,7 @@
 #' additional details on the parameters.
 #'
 #' @export
-#' @import spatial.tools mgcv
+#' @import spatial.tools
 #' @param x image as a \code{RasterLayer}
 #' @param slope the slope as a \code{RasterLayer}
 #' @param aspect the aspect as a \code{RasterLayer}
@@ -54,58 +100,21 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     slopeclass <- (pi/180) * slopeclass
 
     IL <- cos(slope) * cos(sunzenith) + sin(slope) * sin(sunzenith) *
-            cos(sunazimuth - aspect)
+    cos(sunazimuth - aspect)
     IL[IL == 0] <- IL.epsilon
 
     if(is.null(coverclass)) 
         coverclass <- matrix(rep(TRUE, length(x)), nrow=nrow(x))
 
-    if (!is.null(sampleindices)) {
-        K <- data.frame(x=x[sampleindices],
-                        IL=IL[sampleindices], 
-                        slope=slope[sampleindices])
-        # Remember that the sample indices are row-major (as they were drawn 
-        # for a RasterLayer), so the coverclass matrix needs to be transposed 
-        # as it is stored in column-major order
-        coverclass <- t(coverclass)[sampleindices]
-    } else {
-        K <- data.frame(x=getValues(x), IL=getValues(IL), 
-                        slope=getValues(slope))
-    }
-
-    ## K is between 0 and 1
-    # IL can be <=0 under certain conditions
-    # but that makes it impossible to take log10 so remove those elements
-    K <- K[coverclass, ]
-    K <- K[!apply(K, 1, function(rowvals) any(is.na(rowvals))),]
-    K <- K[K$x > 0, ]
-    K <- K[K$IL > 0, ]
-
-    results <- data.frame(matrix(0, nrow=length(slopeclass) - 1, ncol=3))
-    colnames(results) <- c("midpoint", "n", "k")
-    results[, 1] <- diff(slopeclass)/2 + slopeclass[1:length(slopeclass) - 1]
-
-    # don't use slopes outside slopeclass range
-    K.cut <- as.numeric(cut(K$slope, slopeclass))
-    if(nrow(results) != length(table(K.cut))) {
-        stop("slopeclass is inappropriate for these data (empty classes)\n")
-    }
-    results[, 2] <- table(K.cut)
-
-    for(i in sort(unique(K.cut[!is.na(K.cut)]))) {
-        results[i, 3] <- coefficients(lm(log10(K$x)[K.cut == i] ~ 
-                                         log10(K$IL/cos(sunzenith))[K.cut == 
-                                                                    i]))[[2]]
-    }
-
-    model <- with(results, gam(k ~ s(midpoint, k=length(midpoint) - 1)))
+    k_model <- .calc_k_model(x, IL, slope, sampleindices, slopeclass, coverclass, 
+                           sunzenith)
 
     names(slope) <- 'midpoint'
     # if slope is greater than modeled range, use maximum of modeled range
     slope[slope > max(slopeclass)] <- max(slopeclass)
     # if slope is less than modeled range, treat it as flat
     slope[slope < min(slopeclass)] <- 0
-    K.all <- predict(slope, model)
+    K.all <- predict(slope, k_model$model)
     K.all[K.all > 1] <- 1
     K.all[K.all < 0] <- 0
 
@@ -113,5 +122,5 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     xout <- x * (cos(sunzenith)/IL) ^ K.all
     xout[K.all == 0 & !is.na(K.all)] <- x[K.all == 0 & !is.na(K.all)] # don't correct flat areas
 
-    list(classcoef=results, model=model, minnaert=xout, sampleindices=sampleindices)
+    list(classcoef=k_model$k_table, model=k_model$model, minnaert=xout, sampleindices=sampleindices)
 }
