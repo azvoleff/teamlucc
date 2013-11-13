@@ -42,8 +42,9 @@ slopeasp_seq <- function(DEM, EWkernel, NSkernel, smoothing=1, filename='',
     if (!identical(dim(NSkernel), dim(EWkernel))) {
         stop('NSkernel and EWkernel must have same dimensions')
     }
-    slopeasp_spdf <- slopeasp(DEM_df, EWres=xres(DEM), EWkernel, NSres=yres(DEM), 
-                             NSkernel=NSkernel, smoothing=smoothing)
+    slopeasp_spdf <- slopeasp(DEM_df, EWres=xres(DEM), EWkernel, 
+                              NSres=yres(DEM), NSkernel=NSkernel, 
+                              smoothing=smoothing)
     slope <- as(slopeasp_spdf$slope, 'RasterLayer')
     aspect <- as(slopeasp_spdf$aspect, 'RasterLayer')
     slopeasp_img <- brick(stack(slope, aspect), filename=filename, 
