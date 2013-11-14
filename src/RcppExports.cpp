@@ -46,8 +46,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // calc_texture_full_image
-arma::cube calc_texture_full_image(arma::mat rast, Rcpp::CharacterVector statistics, arma::vec base_indices, arma::vec offset_indices, int n_grey, arma::vec window_dims);
-RcppExport SEXP teamr_calc_texture_full_image(SEXP rastSEXP, SEXP statisticsSEXP, SEXP base_indicesSEXP, SEXP offset_indicesSEXP, SEXP n_greySEXP, SEXP window_dimsSEXP) {
+arma::cube calc_texture_full_image(arma::mat rast, Rcpp::CharacterVector statistics, arma::vec base_indices, arma::vec offset_indices, int n_grey, arma::vec window_dims, arma::vec center_coord);
+RcppExport SEXP teamr_calc_texture_full_image(SEXP rastSEXP, SEXP statisticsSEXP, SEXP base_indicesSEXP, SEXP offset_indicesSEXP, SEXP n_greySEXP, SEXP window_dimsSEXP, SEXP center_coordSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -58,7 +58,8 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< arma::vec >::type offset_indices(offset_indicesSEXP );
         Rcpp::traits::input_parameter< int >::type n_grey(n_greySEXP );
         Rcpp::traits::input_parameter< arma::vec >::type window_dims(window_dimsSEXP );
-        arma::cube __result = calc_texture_full_image(rast, statistics, base_indices, offset_indices, n_grey, window_dims);
+        Rcpp::traits::input_parameter< arma::vec >::type center_coord(center_coordSEXP );
+        arma::cube __result = calc_texture_full_image(rast, statistics, base_indices, offset_indices, n_grey, window_dims, center_coord);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

@@ -62,4 +62,3 @@ Collate:
     'minnaert_samp.R'
     'accuracy.R'
     'split_class.R'
-    'glcm_norasterengine.R'

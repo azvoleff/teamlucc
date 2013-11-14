@@ -96,6 +96,10 @@ Rcpp::NumericVector calc_texture(arma::mat Rast,
     Rcpp::NumericVector textures(statistics.size());
     double mr=0, mc=0;
 
+    // Convert R 1 based indices C++ 0 based indices
+    base_indices = base_indices - 1;
+    offset_indices = offset_indices - 1;
+
     std::map<std::string, double (*)(mat, mat, mat, double, double)> stat_func_map;
     stat_func_map["mean"] = text_mean;
     stat_func_map["variance"] = text_variance;
@@ -110,7 +114,7 @@ Rcpp::NumericVector calc_texture(arma::mat Rast,
     for(unsigned i=0; i < offset_indices.size(); i++) {
         // Subtract one from the below indices to correct for row and col 
         // indices starting at 0 in C++ versus 1 in R.
-        G(Rast(base_indices(i) - 1) - 1, Rast(offset_indices(i) - 1) - 1)++;
+        G(Rast(base_indices(i)) - 1, Rast(offset_indices(i)) - 1)++;
     }
     pij = G / accu(G);
 
@@ -129,7 +133,7 @@ Rcpp::NumericVector calc_texture(arma::mat Rast,
 
     // Loop over the selected statistics, using the stat_func_map map to map 
     // each selected statistic to the appropriate texture function.
-    for(unsigned i=0; i < stat_func_map.size(); i++) {
+    for(signed i=0; i < statistics.size(); i++) {
         pfunc f = stat_func_map[Rcpp::as<std::string>(statistics(i))];
         textures(i) = (*f)(pij, imat, jmat, mr, mc);
     }
@@ -163,13 +167,21 @@ Rcpp::NumericVector calc_texture(arma::mat Rast,
 // [[Rcpp::export]]
 arma::cube calc_texture_full_image(arma::mat rast,
         Rcpp::CharacterVector statistics, arma::vec base_indices,
-        arma::vec offset_indices, int n_grey, arma::vec window_dims) {
+        arma::vec offset_indices, int n_grey, arma::vec window_dims,
+        arma::vec center_coord) {
     mat pij(n_grey, n_grey, fill::zeros);
     mat imat(n_grey, n_grey, fill::zeros);
     mat jmat(n_grey, n_grey, fill::zeros);
     mat window(window_dims(0), window_dims(1), fill::zeros);
+    mat G(n_grey, n_grey, fill::zeros);
+    // textures cube will hold the calculated texture statistics
     cube textures(rast.n_rows, rast.n_cols, statistics.size(), fill::zeros);
     double mr=0, mc=0;
+
+    // Convert R 1 based indices C++ 0 based indices
+    center_coord = center_coord - 1;
+    base_indices = base_indices - 1;
+    offset_indices = offset_indices - 1;
 
     std::map<std::string, double (*)(mat, mat, mat, double, double)> stat_func_map;
     stat_func_map["mean"] = text_mean;
@@ -182,38 +194,43 @@ arma::cube calc_texture_full_image(arma::mat rast,
     stat_func_map["second_moment"] = text_second_moment;
     stat_func_map["correlation"] = text_correlation;
 
-    for(unsigned row=0; row < (rast.n_rows - window_dims(0)); row++) {
-        for(unsigned col=0; col < (rast.n_cols - window_dims(1)); col++) {
-            window = rast.submat(span(row, row + window_dims(0)),
-                                 span(col, col + window_dims(1)));
+    // Make a matrix of i's and a matrix of j's to be used in the below matrix 
+    // calculations. These matrices are the same shape as pij with the entries 
+    // equal to the i indices of each cell (for the imat matrix, which is 
+    // indexed over the rows) or the j indices of each cell (for the jmat 
+    // matrix, which is indexed over the columns). Note that linspace<mat> 
+    // makes a column vector.
+    imat = repmat(linspace<vec>(1, G.n_rows, G.n_rows), 1, G.n_cols);
+    jmat = trans(imat);
 
-            mat G(n_grey, n_grey, fill::zeros);
+    for(unsigned row=0; row < (rast.n_rows - window_dims(0)); row++) {
+        if (row % 250 == 0 ) {
+            Rcpp::Rcout << "Row: " << row << std::endl;
+        }
+
+        for(unsigned col=0; col < (rast.n_cols - window_dims(1)); col++) {
+            window = rast.submat(row, col, row + window_dims(0) - 1,
+                                 col + window_dims(1) - 1);
+
+            G.fill(0);
             for(unsigned i=0; i < offset_indices.size(); i++) {
                 // Subtract one from the below indices to correct for row and col 
                 // indices starting at 0 in C++ versus 1 in R.
-                G(window(base_indices(i) - 1) - 1, window(offset_indices(i) - 1) - 1)++;
+                G(window(base_indices(i)) - 1, window(offset_indices(i)) - 1)++;
             }
             pij = G / accu(G);
 
-            // Make a matrix of i's and a matrix of j's to be used in the below matrix 
-            // calculations. These matrices are the same shape as pij with the entries 
-            // equal to the i indices of each cell (for the imat matrix, which is 
-            // indexed over the rows) or the j indices of each cell (for the jmat 
-            // matrix, which is indexed over the columns). Note that linspace<mat> 
-            // makes a column vector.
-            imat = repmat(linspace<vec>(1, G.n_rows, G.n_rows), 1, G.n_cols);
-            jmat = trans(imat);
-            // Calculate mr and mc (forms of col and row means), see Gonzalez and 
-            // Woods, 2009, page 832
+            // Calculate mr and mc (forms of col and row means), see Gonzalez 
+            // and Woods, 2009, page 832
             mr = sum(trans(linspace<vec>(1, G.n_rows, G.n_rows)) % sum(pij, 0));
             mc = sum(linspace<vec>(1, G.n_cols, G.n_cols) % sum(pij, 1));
 
             // Loop over the selected statistics, using the stat_func_map map to map 
             // each selected statistic to the appropriate texture function.
-            for(unsigned i=0; i < stat_func_map.size(); i++) {
+            for(signed i=0; i < statistics.size(); i++) {
                 pfunc f = stat_func_map[Rcpp::as<std::string>(statistics(i))];
-                textures(row + round(window_dims(0) / 2),
-                         col + round(window_dims(1) / 2), i) = (*f)(pij, imat, jmat, mr, mc);
+                textures(row + center_coord(0),
+                         col + center_coord(1), i) = (*f)(pij, imat, jmat, mr, mc);
             }
 
         }

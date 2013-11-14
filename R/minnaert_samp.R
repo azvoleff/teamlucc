@@ -1,4 +1,3 @@
-#' Calculates a model of K
 #' @import mgcv
 .calc_k_model <- function(x, IL, slope, sampleindices, slopeclass,
                           coverclass, sunzenith) {
