@@ -39,7 +39,6 @@ Collate:
     'tpadf2raster.R'
     'tts2df.R'
     'ttsdf2raster.R'
-    'teamr.R'
     'simplify_polygon.R'
     'write_raster_extent.R'
     'class_statistics.R'
