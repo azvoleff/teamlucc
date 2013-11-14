@@ -12,6 +12,11 @@
 #' any (one or more) of the following: 'mean', 'variance', 'covariance', 
 #' 'homogeneity', 'contrast', 'dissimilarity', 'entropy', 'second_moment', 
 #' 'correlation'.
+#' @param useRasterEngine whether to use \code{\link{rasterEngine}} from the 
+#' \code{spatial.tools} package for parallel computation of GLCM texture 
+#' measures (currently slow) or a (currently faster) all C++ GLCM 
+#' implementation.  Note that the all C++ implementation requires significantly 
+#' more memory than the RasterEngine implementation.
 #' @param ... additional parameters to pass to rasterEngine
 #' @return A /code{RasterLayer} with the calculated requested GLCM texture 
 #' measures.
@@ -53,9 +58,9 @@ glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
     # Resample the image to the required number of grey levels
     message(paste('Resampling to', n_grey, 'grey levels...'))
     layer <- raster::cut(layer, breaks=seq(cellStats(layer, 'min'), 
-                                                cellStats(layer, 'max'), 
-                                                length.out=n_grey + 1), 
-                              include.lowest=TRUE)
+                                           cellStats(layer, 'max'), 
+                                           length.out=n_grey + 1), 
+                         include.lowest=TRUE)
 
     message('Calculating textures...')
     # Calculate column major indices for base and offset images
