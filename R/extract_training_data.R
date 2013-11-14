@@ -16,7 +16,7 @@
 #' data(L5TSR_1986_2001_training)
 #' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training, 
 #'                                     "t1_class")
-extract_training_data <- function(x, polys, classcol) {
+extract_training_data <- function(x, polys, classcol, trainfrac=.7) {
     if (projection(x) != projection(polys)) {
         stop('Coordinate systems do not match')
     }
