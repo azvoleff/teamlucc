@@ -73,7 +73,7 @@ calc_texture <- function(Rast, statistics, base_indices, offset_indices, n_grey)
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
-calc_texture_full_image <- function(rast, statistics, base_indices, offset_indices, n_grey, window_dims, center_coord) {
-    .Call('teamr_calc_texture_full_image', PACKAGE = 'teamr', rast, statistics, base_indices, offset_indices, n_grey, window_dims, center_coord)
+calc_texture_full_image <- function(rast, statistics, n_grey, window_dims, shift) {
+    .Call('teamr_calc_texture_full_image', PACKAGE = 'teamr', rast, statistics, n_grey, window_dims, shift)
 }
 

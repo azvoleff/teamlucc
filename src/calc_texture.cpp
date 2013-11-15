@@ -166,22 +166,18 @@ Rcpp::NumericVector calc_texture(arma::mat Rast,
 //' http://www.jstatsoft.org/v43/i04/
 // [[Rcpp::export]]
 arma::cube calc_texture_full_image(arma::mat rast,
-        Rcpp::CharacterVector statistics, arma::vec base_indices,
-        arma::vec offset_indices, int n_grey, arma::vec window_dims,
-        arma::vec center_coord) {
-    mat pij(n_grey, n_grey, fill::zeros);
-    mat imat(n_grey, n_grey, fill::zeros);
-    mat jmat(n_grey, n_grey, fill::zeros);
-    mat window(window_dims(0), window_dims(1), fill::zeros);
+        Rcpp::CharacterVector statistics, int n_grey,
+        arma::vec window_dims, arma::vec shift) {
+    mat pij(n_grey, n_grey);
+    mat imat(n_grey, n_grey);
+    mat jmat(n_grey, n_grey);
+    mat base_window(window_dims(0), window_dims(1));
+    mat offset_window(window_dims(0), window_dims(1));
     mat G(n_grey, n_grey, fill::zeros);
+    vec base_ul(2), offset_ul(2), center_coord(2);
+    double mr, mc;
     // textures cube will hold the calculated texture statistics
-    cube textures(rast.n_rows, rast.n_cols, statistics.size(), fill::zeros);
-    double mr=0, mc=0;
-
-    // Convert R 1 based indices C++ 0 based indices
-    center_coord = center_coord - 1;
-    base_indices = base_indices - 1;
-    offset_indices = offset_indices - 1;
+    cube textures(rast.n_rows, rast.n_cols, statistics.size());
 
     std::map<std::string, double (*)(mat, mat, mat, double, double)> stat_func_map;
     stat_func_map["mean"] = text_mean;
@@ -194,6 +190,18 @@ arma::cube calc_texture_full_image(arma::mat rast,
     stat_func_map["second_moment"] = text_second_moment;
     stat_func_map["correlation"] = text_correlation;
 
+    // Calculate the base upper left (ul) coords and offset upper left coords 
+    // as row, column with zero based indices.
+    base_ul = vec("0 0");
+    if (shift[0] < 0) {
+        base_ul[0] = base_ul[0] + abs(shift[0]);
+    }
+    if (shift[1] < 0) {
+        base_ul[1] = base_ul[1] + abs(shift[1]);
+    }
+    offset_ul = base_ul + shift;
+    center_coord = base_ul + round(window_dims / 2);
+
     // Make a matrix of i's and a matrix of j's to be used in the below matrix 
     // calculations. These matrices are the same shape as pij with the entries 
     // equal to the i indices of each cell (for the imat matrix, which is 
@@ -203,20 +211,25 @@ arma::cube calc_texture_full_image(arma::mat rast,
     imat = repmat(linspace<vec>(1, G.n_rows, G.n_rows), 1, G.n_cols);
     jmat = trans(imat);
 
-    for(unsigned row=0; row < (rast.n_rows - window_dims(0)); row++) {
-        if (row % 250 == 0 ) {
-            Rcpp::Rcout << "Row: " << row << std::endl;
-        }
-
-        for(unsigned col=0; col < (rast.n_cols - window_dims(1)); col++) {
-            window = rast.submat(row, col, row + window_dims(0) - 1,
-                                 col + window_dims(1) - 1);
+    for(unsigned row=0; row < (rast.n_rows - abs(shift(0)) - ceil(window_dims(0)/2)); row++) {
+        // if (row %250 == 0 ) {
+        //     Rcpp::Rcout << "Row: " << row << std::endl;
+        // }
+        for(unsigned col=0; col < (rast.n_cols - abs(shift(1)) - ceil(window_dims(1)/2)); col++) {
+            base_window = rast.submat(row + base_ul(0),
+                                      col + base_ul(1),
+                                      row + base_ul(0) + window_dims(0) - 1,
+                                      col + base_ul(1) + window_dims(1) - 1);
+            offset_window = rast.submat(row + offset_ul(0),
+                                        col + offset_ul(1),
+                                        row + offset_ul(0) + window_dims(0) - 1,
+                                        col + offset_ul(1) + window_dims(1) - 1);
 
             G.fill(0);
-            for(unsigned i=0; i < offset_indices.size(); i++) {
+            for(unsigned i=0; i < base_window.n_elem; i++) {
                 // Subtract one from the below indices to correct for row and col 
                 // indices starting at 0 in C++ versus 1 in R.
-                G(window(base_indices(i)) - 1, window(offset_indices(i)) - 1)++;
+                G(base_window(i) - 1, offset_window(i) - 1)++;
             }
             pij = G / accu(G);
 
@@ -236,5 +249,22 @@ arma::cube calc_texture_full_image(arma::mat rast,
         }
     }
 
+    // // Fill border areas of textures cube with nan if the areas should have 
+    // // invalid values, as the memory storing the textures cube was not 
+    // // initialized with any particular fill value (for speed).
+    // if (shift(0) < 0) {
+    //     textures(span(0, abs(shift(0)) - 1),
+    //              span(0, textures.n_cols), span::all) = datum::nan;
+    // } else if (shift(0) > 0) {
+    //     textures(span(textures.n_rows - shift(0) + 1, textures.n_rows),
+    //              span(0, textures.n_cols), span::all) = datum::nan; }
+    // if (shift(1) < 0) {
+    //     textures(span(0, textures.n_rows),
+    //              span(0, abs(shift(1)) - 1), span::all) = datum::nan;
+    // } else if (shift(1) > 0) {
+    //     textures(span(0, textures.n_rows),
+    //              span(textures.n_cols - shift(1) + 1, textures.n_cols),
+    //              span::all) = datum::nan;
+    // }
     return(textures);
 }
