@@ -55,35 +55,26 @@ svm_classify <- function(x, train_data, pred_classes_filename=NULL,
                         preProc=c('center', 'scale'),
                         tuneGrid=train_grid, trControl=svm_train_control)
 
-    message('Predicting classes...')
-    calc_pred_classes <- function(in_rast, svm_train, ...) {
-        preds <- predict(in_rast, svm_train)
-        preds <- array(getValues(preds), dim=c(dim(in_rast)[2], 
-                                               dim(in_rast)[1], 1))
-        return(preds)
-    }
-    pred_classes <- rasterEngine(in_rast=x, fun=calc_pred_classes, 
-                                 args=list(svm_train=svm_train), 
-                                 filename=pred_classes_filename, 
-                                 chunk_format="raster", outbands=1)
-    names(pred_classes) <- 'cover'
-
-    message('Predicting class probabilities...')
-    calc_pred_probs <- function(in_rast, svm_train, n_classes, ...) {
-        preds <- predict(in_rast, svm_train, type="prob", 
-                         index=c(1:n_classes))
-        layernames <- names(preds)
+    message('Predicting classes and class probabilities...')
+    calc_preds <- function(in_rast, svm_train, n_classes, ...) {
+        pred_classes <- predict(in_rast, svm_train)
+        pred_probs <- predict(in_rast, svm_train, type="prob", 
+                              index=c(1:n_classes))
+        preds <- stack(pred_classes, pred_probs)
         preds <- array(getValues(preds), dim=c(dim(in_rast)[2], 
                                                dim(in_rast)[1], 
-                                               n_classes))
+                                               n_classes + 1))
         return(preds)
     }
     n_classes <- length(caret:::getClassLevels(svm_train))
-    pred_probs <- rasterEngine(in_rast=x, fun=calc_pred_probs, 
+    preds <- rasterEngine(in_rast=x, fun=calc_preds, 
                                args=list(svm_train=svm_train, 
                                          n_classes=n_classes), 
                                filename=pred_probs_filename, 
                                chunk_format="raster")
+    pred_classes <- raster(preds, layer=1)
+    names(pred_classes) <- 'cover'
+    pred_probs <- dropLayer(preds, 1)
     names(pred_probs) <- caret:::getClassLevels(svm_train)
 
     return(list(svm_train=svm_train, pred_classes=pred_classes, pred_probs=pred_probs))
