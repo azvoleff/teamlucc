@@ -23,6 +23,8 @@ Imports:
     foreach,
     sp,
     mclust
+Suggests:
+    testthat
 LinkingTo: Rcpp, RcppArmadillo
 Description: Routines for processing imagery and other spatial data for the
     Tropical Ecology Assessment and Monitoring (TEAM) Network.

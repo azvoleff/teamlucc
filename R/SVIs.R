@@ -5,7 +5,9 @@
 #' @param nir near-infrared \code{RasterLayer}
 #' @examples
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
-#' NDVI(red=raster(L5TSR_1986, layer=3), nir=raster(L5TSR_1986, layer=4))
+#' NDVI_img <- NDVI(red=raster(L5TSR_1986, layer=3), nir=raster(L5TSR_1986, 
+#'                 layer=4))
+#' plot(NDVI_img)
 NDVI <- function(red, nir) {
   NDVI <- (nir - red) / (nir + red)
 }
@@ -23,10 +25,11 @@ NDVI <- function(red, nir) {
 #' Development., 1997 IEEE International.
 #' @examples
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
-#' EVI(blue=raster(L5TSR_1986, layer=1), red=raster(L5TSR_1986, layer=3), 
-#'      nir=raster(L5TSR_1986, layer=4))
+#' EVI_img <- EVI(blue=raster(L5TSR_1986, layer=1), red=raster(L5TSR_1986, layer=3), 
+#'                nir=raster(L5TSR_1986, layer=4))
+#' plot(EVI_img)
 EVI <- function(blue, red, nir) {
-  EVI <- 2.5*((nir - red) / (nir + 6.*red - 7.5*blue + 1.))
+  EVI <- (2.5*(nir - red)) / (1 + nir + 6*red - 7.5*blue)
 }
 
 #' Calculates the Modified Soil-Adjusted Vegetation Index (MSAVI)
@@ -39,9 +42,11 @@ EVI <- function(blue, red, nir) {
 #' of Environment 48:119-126.
 #' @examples
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
-#' MSAVI2(red=raster(L5TSR_1986, layer=2), nir=raster(L5TSR_1986, layer=3))
+#' MSAVI2_img <- MSAVI2(red=raster(L5TSR_1986, layer=3), nir=raster(L5TSR_1986, 
+#'                      layer=4))
+#' plot(MSAVI2_img)
 MSAVI2 <- function(red, nir) {
-  MSAVI2 <- (2.*nir + 1 - sqrt((2.*nir + 1.)^2. - 8.*(nir - red)))/2.
+  MSAVI2 <- (2*nir + 1 - sqrt((2*nir + 1)^2 - 8*(nir - red)))/2
 }
 
 #' Calculates the Atmospherically Resistant Vegetation Index (ARVI)
@@ -55,8 +60,9 @@ MSAVI2 <- function(red, nir) {
 #' AVHRR to EOS-MODIS. Remote Sensing of Environment:65-79.
 #' @examples
 #' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
-#' ARVI(blue=raster(L5TSR_1986, layer=1), red=raster(L5TSR_1986, layer=3), 
-#'      nir=raster(L5TSR_1986, layer=4))
+#' ARVI_img <- ARVI(blue=raster(L5TSR_1986, layer=1), red=raster(L5TSR_1986, 
+#'                  layer=3), nir=raster(L5TSR_1986, layer=4))
+#' plot(ARVI_img)
 ARVI <- function(blue, red, nir) {
-    ARVI <- (nir - 2.*red - blue) / (nir + 2.*red - blue)
+    ARVI <- (nir - 2*red - blue) / (nir + 2*red - blue)
 }

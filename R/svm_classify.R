@@ -35,7 +35,7 @@
 #' # the purposes of this example - in normal use, train_grid can be left 
 #' # unspecified.
 #' svmout <- svm_classify(L5TSR_1986, train_data, 
-#'                        train_grid=data.frame(.sigma=.0495, .C=2^(-2:2)))
+#'                        train_grid=data.frame(.sigma=.0495, .C=0.5))
 #'
 #' # Examine output from svm_classify
 #' svmout$svm_train

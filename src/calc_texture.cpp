@@ -151,13 +151,11 @@ Rcpp::NumericVector calc_texture(arma::mat Rast,
 //' calculation
 //' @param statistics a list of strings naming the texture statistics to 
 //' calculate
-//' @param base_indices a list of column-major indices giving the cells
-//' included in the base image
-//' @param offset_indices base_indices a list of column-major indices giving 
-//' the cells ' included in the offset image
 //' @param n_grey number of grey levels to use in texture calculation
 //' @param window_dims 2 element list with row and column dimensions of the
 //' texture window
+//' @param shift a length 2 vector with the number of cells to shift when
+//' computing co-ocurrency matrices
 //' @return a list of length equal to the length of the \code{statistics} input 
 //' parameter, containing the selected textures measures
 //' @references
