@@ -32,13 +32,21 @@ gridsample <- function(x, horizcells=10, vertcells=10, nsamp=10,
     horizstart <- round(seq(1, ncol(x), ncol(x) / horizcells))
     # horizend is a vector of column numbers of the last column in each cell in 
     # the grid
-    horizend <- c((horizstart -1)[2:length(horizstart)], ncol(x))
+    if (length(horizstart) > 1) {
+        horizend <- c((horizstart - 1)[2:length(horizstart)], ncol(x))
+    } else {
+        horizend <- c(ncol(x))
+    }
     # vertstart is a vector of row numbers of the first row in each cell in the 
     # grid
     vertstart <- round(seq(1, nrow(x), nrow(x) / vertcells))
     # vertend is a vector of row numbers of the last row in each cell in the
     # grid
-    vertend <- c((vertstart -1)[2:length(vertstart)], nrow(x))
+    if (length(vertstart) > 1) {
+        vertend <- c((vertstart - 1)[2:length(vertstart)], nrow(x))
+    } else {
+        vertend <- c(nrow(x))
+    }
     # retvalues is a vector to store the sample values chosen from x
     # sampindices is a vector to store the column major indices of the locations 
     # of each sampled value in x
