@@ -173,9 +173,9 @@ arma::cube calc_texture_full_image(arma::mat rast,
     mat offset_window(window_dims(0), window_dims(1));
     mat G(n_grey, n_grey, fill::zeros);
     vec base_ul(2), offset_ul(2), center_coord(2);
-    double mr, mc;
+    double mr, mc, base_window_mean;
     // textures cube will hold the calculated texture statistics
-    cube textures(rast.n_rows, rast.n_cols, statistics.size());
+    cube textures(rast.n_rows, rast.n_cols, statistics.size(), fill::zeros);
 
     std::map<std::string, double (*)(mat, mat, mat, double, double)> stat_func_map;
     stat_func_map["mean"] = text_mean;
@@ -198,7 +198,12 @@ arma::cube calc_texture_full_image(arma::mat rast,
         base_ul[1] = base_ul[1] + abs(shift[1]);
     }
     offset_ul = base_ul + shift;
-    center_coord = base_ul + round(window_dims / 2);
+    center_coord = base_ul + floor(window_dims / 2);
+     
+    // Rcpp::Rcout << "round(window_dims / 2): " << floor(window_dims / 2) << std::endl;
+    // Rcpp::Rcout << "base_ul: " << base_ul[0] << ", " << base_ul[1] << std::endl;
+    // Rcpp::Rcout << "offset_ul: " << offset_ul[0] << ", " << offset_ul[1] << std::endl;
+    // Rcpp::Rcout << "center_coord: " << center_coord[0] << ", " << center_coord[1] << std::endl;
 
     // Make a matrix of i's and a matrix of j's to be used in the below matrix 
     // calculations. These matrices are the same shape as pij with the entries 
@@ -233,36 +238,34 @@ arma::cube calc_texture_full_image(arma::mat rast,
 
             // Calculate mr and mc (forms of col and row means), see Gonzalez 
             // and Woods, 2009, page 832
-            mr = sum(trans(linspace<vec>(1, G.n_rows, G.n_rows)) % sum(pij, 0));
-            mc = sum(linspace<vec>(1, G.n_cols, G.n_cols) % sum(pij, 1));
+            mr = sum(linspace<vec>(1, G.n_cols, G.n_cols) % sum(pij, 1));
+            mc = sum(trans(linspace<vec>(1, G.n_rows, G.n_rows)) % sum(pij, 0));
+
+            base_window_mean = accu(base_window) / base_window.size();
+
+            // Rcpp::Rcout << "mr vec" << std::endl;
+            // trans(linspace<vec>(1, G.n_rows, G.n_rows)).print();
+            // Rcpp::Rcout << "mc vec" << std::endl;
+            // linspace<vec>(1, G.n_cols, G.n_cols).print();
+            // Rcpp::Rcout << "imat" << std::endl;
+            // imat.print();
+            // Rcpp::Rcout << "jmat" << std::endl;
+            // jmat.print();
 
             // Loop over the selected statistics, using the stat_func_map map to map 
             // each selected statistic to the appropriate texture function.
             for(signed i=0; i < statistics.size(); i++) {
-                pfunc f = stat_func_map[Rcpp::as<std::string>(statistics(i))];
-                textures(row + center_coord(0),
-                         col + center_coord(1), i) = (*f)(pij, imat, jmat, mr, mc);
+                if (statistics(i) == "mean") {
+                    textures(row + center_coord(0),
+                             col + center_coord(1), i) = base_window_mean;
+                } else {
+                    pfunc f = stat_func_map[Rcpp::as<std::string>(statistics(i))];
+                    textures(row + center_coord(0),
+                             col + center_coord(1), i) = (*f)(pij, imat, jmat, mr, mc);
+                }
             }
 
         }
     }
-
-    // // Fill border areas of textures cube with nan if the areas should have 
-    // // invalid values, as the memory storing the textures cube was not 
-    // // initialized with any particular fill value (for speed).
-    // if (shift(0) < 0) {
-    //     textures(span(0, abs(shift(0)) - 1),
-    //              span(0, textures.n_cols), span::all) = datum::nan;
-    // } else if (shift(0) > 0) {
-    //     textures(span(textures.n_rows - shift(0) + 1, textures.n_rows),
-    //              span(0, textures.n_cols), span::all) = datum::nan; }
-    // if (shift(1) < 0) {
-    //     textures(span(0, textures.n_rows),
-    //              span(0, abs(shift(1)) - 1), span::all) = datum::nan;
-    // } else if (shift(1) > 0) {
-    //     textures(span(0, textures.n_rows),
-    //              span(textures.n_cols - shift(1) + 1, textures.n_cols),
-    //              span::all) = datum::nan;
-    // }
     return(textures);
 }
