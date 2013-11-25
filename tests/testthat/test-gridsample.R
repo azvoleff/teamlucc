@@ -1,6 +1,6 @@
 context("gridsample")
 
-test_that("gridsample works for different size rasters", {
+test_that("gridsample works for different size matrices", {
 
     testmatrix <- matrix(1:10000, nrow=100)
 
