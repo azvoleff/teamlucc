@@ -105,8 +105,8 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     if(is.null(coverclass)) 
         coverclass <- matrix(rep(TRUE, length(x)), nrow=nrow(x))
 
-    k_model <- .calc_k_model(x, IL, slope, sampleindices, slopeclass, coverclass, 
-                           sunzenith)
+    k_model <- .calc_k_model(x, IL, slope, sampleindices, slopeclass, 
+                             coverclass, sunzenith)
 
     names(slope) <- 'midpoint'
     # if slope is greater than modeled range, use maximum of modeled range
@@ -119,7 +119,8 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
 
     # Perform correction
     xout <- x * (cos(sunzenith)/IL) ^ K.all
-    xout[K.all == 0 & !is.na(K.all)] <- x[K.all == 0 & !is.na(K.all)] # don't correct flat areas
+    # Don't correct flat areas
+    xout[K.all == 0 & !is.na(K.all)] <- x[K.all == 0 & !is.na(K.all)]
 
     list(classcoef=k_model$k_table, model=k_model$model, minnaert=xout, sampleindices=sampleindices)
 }
