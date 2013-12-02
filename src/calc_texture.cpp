@@ -12,7 +12,7 @@ double text_mean(mat pij, mat imat, mat jmat, double mu) {
 
 double text_variance(mat pij, mat imat, mat jmat, double mu) {
     // Defined as in Haralick, 1973, page 619 (equation 4)
-    return(accu(square(imat - (accu(pij) / pij.n_elem)) % pij));
+    return(accu(square(imat - mu) % pij));
 }
 
 double text_covariance(mat pij, mat imat, mat jmat, double mu) {
@@ -21,7 +21,7 @@ double text_covariance(mat pij, mat imat, mat jmat, double mu) {
 }
 
 double text_homogeneity(mat pij, mat imat, mat jmat, double mu) {
-    // Defined as in Gonzalez and Woods, 2009, page 832
+    // Defined as in Haralick, 1973, page 619 (equation 5)
     return(accu(pij / (1 + square(imat - jmat))));
 }
 
@@ -30,7 +30,6 @@ double text_contrast(mat pij, mat imat, mat jmat, double mu) {
     // Note that pij.n_rows is equivalent to n_grey
     // return(accu(square(linspace<vec>(0, pij.n_rows-1, pij.n_rows)) * (imat - 
     //                 jmat % pij)));
-    return(accu(square(imat - jmat) % pij));
     return(accu(square(linspace<vec>(0, pij.n_rows-1, pij.n_rows)) * (imat - jmat % pij)));
 }
 
@@ -145,7 +144,7 @@ arma::cube calc_texture_full_image(arma::mat rast,
                                         col + offset_ul(1),
                                         row + offset_ul(0) + window_dims(0) - 1,
                                         col + offset_ul(1) + window_dims(1) - 1);
-
+            pij.fill(0);
             for(unsigned i=0; i < base_window.n_elem; i++) {
                 // Subtract one from the below indices to correct for row and col 
                 // indices starting at 0 in C++ versus 1 in R.
@@ -154,7 +153,6 @@ arma::cube calc_texture_full_image(arma::mat rast,
             pij = pij / base_window.n_elem;
 
             mu = accu(base_window) / base_window.n_elem;
-            //mu = accu(pij) / pij.n_elem;
 
             // Loop over the selected statistics, using the stat_func_map map 
             // to map each selected statistic to the appropriate texture 
