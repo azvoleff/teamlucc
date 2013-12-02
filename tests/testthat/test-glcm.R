@@ -1,3 +1,5 @@
+library(teamr)
+library(testthat)
 context("GLCM texture calculations")
 
 set.seed(0)
@@ -28,17 +30,25 @@ unload("../../")
 install("../../")
 library(teamr)
 
-calc_texture_full_image(test_matrix, 'mean', 32, c(3,3), c(1,1))
+# calc_texture_full_image(test_matrix, 'variance', 32, c(3,3), c(1,1))
+# calc_texture_full_image(test_matrix, 'mean', 32, c(3,3), c(1,1))
+# calc_texture_full_image(test_matrix, 'homogeneity', 32, c(3,3), c(1,1))
+# calc_texture_full_image(test_matrix, 'contrast', 32, c(3,3), c(1,1))
 
 textures_teamr <- stack(apply(calc_texture_full_image(test_matrix, statistics, 
                                                       32, c(3,3), c(1,1)), 3, 
                              raster))
 names(textures_teamr) <- statistics
 
+textures_envi
+textures_teamr
+
 plot(textures_envi)
 plot(textures_teamr)
 plot(textures_envi$mean)
 plot(textures_teamr$mean)
+plot(stack(textures_envi$contrast, textures_teamr$contrast))
+plot(stack(textures_envi$variance, textures_teamr$variance))
 
 test_that("GLCM mean is correct", {
     expect_equal(get_glcm_texture('mean'),

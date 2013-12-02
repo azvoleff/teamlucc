@@ -26,11 +26,7 @@ double text_homogeneity(mat pij, mat imat, mat jmat, double mu) {
 }
 
 double text_contrast(mat pij, mat imat, mat jmat, double mu) {
-    // Defined as in Gonzalez and Woods, 2009, page 832
-    // Note that pij.n_rows is equivalent to n_grey
-    // return(accu(square(linspace<vec>(0, pij.n_rows-1, pij.n_rows)) * (imat - 
-    //                 jmat % pij)));
-    return(accu(square(linspace<vec>(0, pij.n_rows-1, pij.n_rows)) * (imat - jmat % pij)));
+    return(accu(pij % square(imat - jmat)));
 }
 
 double text_dissimilarity(mat pij, mat imat, mat jmat, double mu) {
