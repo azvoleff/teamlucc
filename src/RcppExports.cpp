@@ -27,7 +27,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // calc_texture
-Rcpp::NumericVector calc_texture(arma::mat Rast, Rcpp::CharacterVector statistics, arma::vec base_indices, arma::vec offset_indices, int n_grey);
+Rcpp::NumericVector calc_texture(arma::mat Rast, Rcpp::CharacterVector statistics, arma::uvec base_indices, arma::uvec offset_indices, int n_grey);
 RcppExport SEXP teamr_calc_texture(SEXP RastSEXP, SEXP statisticsSEXP, SEXP base_indicesSEXP, SEXP offset_indicesSEXP, SEXP n_greySEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -35,8 +35,8 @@ BEGIN_RCPP
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< arma::mat >::type Rast(RastSEXP );
         Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type statistics(statisticsSEXP );
-        Rcpp::traits::input_parameter< arma::vec >::type base_indices(base_indicesSEXP );
-        Rcpp::traits::input_parameter< arma::vec >::type offset_indices(offset_indicesSEXP );
+        Rcpp::traits::input_parameter< arma::uvec >::type base_indices(base_indicesSEXP );
+        Rcpp::traits::input_parameter< arma::uvec >::type offset_indices(offset_indicesSEXP );
         Rcpp::traits::input_parameter< int >::type n_grey(n_greySEXP );
         Rcpp::NumericVector __result = calc_texture(Rast, statistics, base_indices, offset_indices, n_grey);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
