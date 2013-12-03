@@ -20,7 +20,6 @@ data(glcm_test_raster)
 # those from EXELIS ENVI.
 data(glcm_test_raster_ENVI_textures)
 textures_teamr <- glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), statistics)
-names(textures_teamr) <- statistics
 
 test_that("GLCM mean is correct", {
     expect_equal(get_glcm_texture('mean_ENVI'),
