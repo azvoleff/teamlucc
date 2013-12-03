@@ -30,23 +30,22 @@ calc_slope_aspect <- function(Rast, EWkernel, EWres, NSkernel, NSres, smoothing)
 #' This function is called by the \code{\link{glcm}} function. It is 
 #' not intended to be used directly.
 #'
-#' @export
-#' @param rast a matrix containing the pixels to be used in the texture 
+#' @param rast a matrix containing the pixels to be used in the texture
 #' calculation
-#' @param statistics a list of strings naming the texture statistics to 
-#' calculate
 #' @param n_grey number of grey levels to use in texture calculation
 #' @param window_dims 2 element list with row and column dimensions of the
 #' texture window
 #' @param shift a length 2 vector with the number of cells to shift when
 #' computing co-ocurrency matrices
+#' @param statistics a list of strings naming the texture statistics to 
+#' calculate
 #' @return a list of length equal to the length of the \code{statistics} input 
 #' parameter, containing the selected textures measures
 #' @references
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
-calc_texture_full_image <- function(rast, statistics, n_grey, window_dims, shift) {
-    .Call('teamr_calc_texture_full_image', PACKAGE = 'teamr', rast, statistics, n_grey, window_dims, shift)
+calc_texture_full_image <- function(rast, n_grey, window_dims, shift, statistics) {
+    .Call('teamr_calc_texture_full_image', PACKAGE = 'teamr', rast, n_grey, window_dims, shift, statistics)
 }
 

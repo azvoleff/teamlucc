@@ -27,18 +27,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // calc_texture_full_image
-arma::cube calc_texture_full_image(arma::mat rast, Rcpp::CharacterVector statistics, int n_grey, arma::vec window_dims, arma::vec shift);
-RcppExport SEXP teamr_calc_texture_full_image(SEXP rastSEXP, SEXP statisticsSEXP, SEXP n_greySEXP, SEXP window_dimsSEXP, SEXP shiftSEXP) {
+arma::cube calc_texture_full_image(arma::mat rast, int n_grey, arma::vec window_dims, arma::vec shift, Rcpp::CharacterVector statistics);
+RcppExport SEXP teamr_calc_texture_full_image(SEXP rastSEXP, SEXP n_greySEXP, SEXP window_dimsSEXP, SEXP shiftSEXP, SEXP statisticsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< arma::mat >::type rast(rastSEXP );
-        Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type statistics(statisticsSEXP );
         Rcpp::traits::input_parameter< int >::type n_grey(n_greySEXP );
         Rcpp::traits::input_parameter< arma::vec >::type window_dims(window_dimsSEXP );
         Rcpp::traits::input_parameter< arma::vec >::type shift(shiftSEXP );
-        arma::cube __result = calc_texture_full_image(rast, statistics, n_grey, window_dims, shift);
+        Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type statistics(statisticsSEXP );
+        arma::cube __result = calc_texture_full_image(rast, n_grey, window_dims, shift, statistics);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

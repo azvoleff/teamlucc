@@ -3,38 +3,44 @@ using namespace arma;
 
 // Define a pointer to a texture function that will be used to map selected 
 // co-occurrence statistics to the below texture calculation functions.
-typedef double (*pfunc)(mat, mat, mat, double);
+typedef double (*pfunc)(mat, mat, mat, double, double);
 
-double text_mean(mat pij, mat imat, mat jmat, double mu) {
-    // Defined as in Lu and Batistella, 2005, page 252
-    return(mu);
+double text_mean(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
+    // Defined as in Haralick as mean of mux and muy
+    return(mean_haralick);
 }
 
-double text_variance(mat pij, mat imat, mat jmat, double mu) {
+double text_mean_ENVI(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
+    // Defined as in EXELIS ENVI (as simple mean over processing window)
+    return(ENVI_mean);
+}
+            
+double text_variance(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
     // Defined as in Haralick, 1973, page 619 (equation 4)
-    return(accu(square(imat - mu) % pij));
+    return(accu(square(imat - mean_haralick) % pij));
 }
 
-double text_covariance(mat pij, mat imat, mat jmat, double mu) {
-    // Defined as in Pratt, 2007, page 540
-    return(accu((imat - mean(pij, 1)) % (jmat - mean(pij, 0)) % pij));
+double text_variance_ENVI(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
+    // Defined as in EXELIS ENVI
+    return(accu(square(imat - ENVI_mean) % pij) - 1);
 }
 
-double text_homogeneity(mat pij, mat imat, mat jmat, double mu) {
+double text_homogeneity(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
     // Defined as in Haralick, 1973, page 619 (equation 5)
     return(accu(pij / (1 + square(imat - jmat))));
 }
 
-double text_contrast(mat pij, mat imat, mat jmat, double mu) {
+double text_contrast(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
+    // Defined as in Haralick, 1973, page 619 (equation 2)
     return(accu(pij % square(imat - jmat)));
 }
 
-double text_dissimilarity(mat pij, mat imat, mat jmat, double mu) {
+double text_dissimilarity(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
     //TODO: Find source for dissimilarity
     return(accu(pij % abs(imat - jmat)));
 }
 
-double text_entropy(mat pij, mat imat, mat jmat, double mu) {
+double text_entropy(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
     // Defined as in Haralick, 1973, page 619 (equation 9)
     mat pij_log(pij);
     pij_log = mat(pij);
@@ -42,21 +48,21 @@ double text_entropy(mat pij, mat imat, mat jmat, double mu) {
     return(-accu(pij % pij_log));
 }
 
-double text_second_moment(mat pij, mat imat, mat jmat, double mu) {
+double text_second_moment(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
     // Defined as in Haralick, 1973, page 619
     return(accu(square(pij)));
 }
 
-double text_correlation(mat pij, mat imat, mat jmat, double mu) {
-    // Defined as in Gonzalez and Woods, 2009, page 832
-    // Calculate mr and mc (forms of col and row means), see Gonzalez and 
-    // Woods, 2009, page 832
+double text_correlation(mat pij, mat imat, mat jmat, double mean_haralick, double ENVI_mean) {
+    // Defined as in Gonzalez and Woods, 2009, page 832, also follows ENVI 
+    // convention of using mr and mc equal to the sum rather than (as in 
+    // Haralick 1973, eqn 3 on page 619) the mean of the pij by rows and columns
     double sigc, sigr, mr, mc;
-    mr = sum(linspace<vec>(1, pij.n_cols, pij.n_cols) % sum(pij, 1));
-    mc = sum(trans(linspace<vec>(1, pij.n_rows, pij.n_rows)) % sum(pij, 0));
+    mr = sum(linspace<colvec>(1, pij.n_cols, pij.n_cols) % sum(pij, 1));
+    mc = sum(linspace<rowvec>(1, pij.n_rows, pij.n_rows) % sum(pij, 0));
     // Calculate sigr and sigc (measures of row and column std deviation)
-    sigr = sqrt(sum(square(linspace<vec>(1, pij.n_cols, pij.n_cols) - mr) % sum(pij, 1)));
-    sigc = sqrt(sum(square(trans(linspace<vec>(1, pij.n_rows, pij.n_rows)) - mc) % sum(pij, 0)));
+    sigr = sqrt(sum(square(linspace<colvec>(1, pij.n_cols, pij.n_cols) - mr) % sum(pij, 1)));
+    sigc = sqrt(sum(square(linspace<rowvec>(1, pij.n_rows, pij.n_rows) - mc) % sum(pij, 0)));
     return((accu(imat % jmat % pij) - mr * mc) / (sigr * sigc));
 }
 
@@ -65,16 +71,15 @@ double text_correlation(mat pij, mat imat, mat jmat, double mu) {
 //' This function is called by the \code{\link{glcm}} function. It is 
 //' not intended to be used directly.
 //'
-//' @export
-//' @param rast a matrix containing the pixels to be used in the texture 
+//' @param rast a matrix containing the pixels to be used in the texture
 //' calculation
-//' @param statistics a list of strings naming the texture statistics to 
-//' calculate
 //' @param n_grey number of grey levels to use in texture calculation
 //' @param window_dims 2 element list with row and column dimensions of the
 //' texture window
 //' @param shift a length 2 vector with the number of cells to shift when
 //' computing co-ocurrency matrices
+//' @param statistics a list of strings naming the texture statistics to 
+//' calculate
 //' @return a list of length equal to the length of the \code{statistics} input 
 //' parameter, containing the selected textures measures
 //' @references
@@ -83,22 +88,24 @@ double text_correlation(mat pij, mat imat, mat jmat, double mu) {
 //' http://www.jstatsoft.org/v43/i04/
 // [[Rcpp::export]]
 arma::cube calc_texture_full_image(arma::mat rast,
-        Rcpp::CharacterVector statistics, int n_grey,
-        arma::vec window_dims, arma::vec shift) {
+        int n_grey, arma::vec window_dims, arma::vec shift,
+        Rcpp::CharacterVector statistics) {
     mat imat(n_grey, n_grey);
     mat jmat(n_grey, n_grey);
     mat base_window(window_dims(0), window_dims(1));
     mat offset_window(window_dims(0), window_dims(1));
     mat pij(n_grey, n_grey);
     vec base_ul(2), offset_ul(2), center_coord(2);
-    double mu;
+    double mean_haralick, ENVI_mean;
+
     // textures cube will hold the calculated texture statistics
     cube textures(rast.n_rows, rast.n_cols, statistics.size(), fill::zeros);
 
-    std::map<std::string, double (*)(mat, mat, mat, double)> stat_func_map;
+    std::map<std::string, double (*)(mat, mat, mat, double, double)> stat_func_map;
     stat_func_map["mean"] = text_mean;
+    stat_func_map["mean_ENVI"] = text_mean_ENVI;
     stat_func_map["variance"] = text_variance;
-    stat_func_map["covariance"] = text_covariance;
+    stat_func_map["variance_ENVI"] = text_variance_ENVI;
     stat_func_map["homogeneity"] = text_homogeneity;
     stat_func_map["contrast"] = text_contrast;
     stat_func_map["dissimilarity"] = text_dissimilarity;
@@ -124,6 +131,10 @@ arma::cube calc_texture_full_image(arma::mat rast,
     // indexed over the rows) or the j indices of each cell (for the jmat 
     // matrix, which is indexed over the columns). Note that linspace<mat> 
     // makes a column vector.
+    //imat = repmat(linspace<colvec>(1, pij.n_rows, pij.n_rows), 1, 
+    //pij.n_cols);
+    //jmat = repmat(linspace<rowvec>(1, pij.n_cols, pij.n_cols), pij.n_rows, 
+    //1);
     imat = repmat(linspace<vec>(1, pij.n_rows, pij.n_rows), 1, pij.n_cols);
     jmat = trans(imat);
 
@@ -148,7 +159,11 @@ arma::cube calc_texture_full_image(arma::mat rast,
             }
             pij = pij / base_window.n_elem;
 
-            mu = accu(base_window) / base_window.n_elem;
+            mean_haralick = (mean(linspace<colvec>(1, pij.n_rows, pij.n_rows) %
+                        sum(pij, 1)) +
+                    mean(linspace<rowvec>(1, pij.n_rows, pij.n_rows) %
+                        sum(pij, 0))) / 2;
+            ENVI_mean = mean(vectorise(base_window) - 1);
 
             // Loop over the selected statistics, using the stat_func_map map 
             // to map each selected statistic to the appropriate texture 
@@ -156,7 +171,7 @@ arma::cube calc_texture_full_image(arma::mat rast,
             for(signed i=0; i < statistics.size(); i++) {
                 pfunc f = stat_func_map[Rcpp::as<std::string>(statistics(i))];
                 textures(row + center_coord(0),
-                         col + center_coord(1), i) = (*f)(pij, imat, jmat, mu);
+                         col + center_coord(1), i) = (*f)(pij, imat, jmat, mean_haralick, ENVI_mean);
             }
 
         }
