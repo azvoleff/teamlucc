@@ -9,7 +9,9 @@
 #'                 layer=4))
 #' plot(NDVI_img)
 NDVI <- function(red, nir) {
-    return((nir - red) / (nir + red))
+    ret <- (nir - red) / (nir + red)
+    names(ret) <- 'NDVI'
+    return(ret)
 }
 
 #' Calculates the Enhanced Vegetation Index (EVI)
@@ -29,7 +31,9 @@ NDVI <- function(red, nir) {
 #'                nir=raster(L5TSR_1986, layer=4))
 #' plot(EVI_img)
 EVI <- function(blue, red, nir) {
-  return((2.5*(nir - red)) / (1 + nir + 6*red - 7.5*blue))
+    ret <- (2.5*(nir - red)) / (1 + nir + 6*red - 7.5*blue)
+    names(ret) <- 'EVI'
+    return(ret)
 }
 
 #' Calculates the Modified Soil-Adjusted Vegetation Index (MSAVI)
@@ -49,7 +53,9 @@ EVI <- function(blue, red, nir) {
 #'                     nir=raster(L5TSR_1986, layer=4))
 #' plot(MSAVI_img)
 MSAVI2 <- function(red, nir) {
-    return((2*nir + 1 - sqrt((2*nir + 1)^2 - 8*(nir - red)))/2)
+    ret <- (2*nir + 1 - sqrt((2*nir + 1)^2 - 8*(nir - red)))/2
+    names(ret) <- 'MSAVI2'
+    return(ret)
 }
 
 #' Calculates the Atmospherically Resistant Vegetation Index (ARVI)
@@ -67,5 +73,7 @@ MSAVI2 <- function(red, nir) {
 #'                  layer=3), nir=raster(L5TSR_1986, layer=4))
 #' plot(ARVI_img)
 ARVI <- function(blue, red, nir) {
-    return((nir - 2*red - blue) / (nir + 2*red - blue))
+     ret <- (nir - 2*red - blue) / (nir + 2*red - blue)
+    names(ret) <- 'ARVI'
+    return(ret)
 }
