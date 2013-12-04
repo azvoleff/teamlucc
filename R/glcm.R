@@ -59,6 +59,7 @@ glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
 
     # Resample the image to the required number of grey levels
     #message(paste('Resampling to', n_grey, 'grey levels...'))
+    layer_name <- names(layer)
     layer <- raster::cut(layer, breaks=seq(cellStats(layer, 'min'), 
                                            cellStats(layer, 'max'), 
                                            length.out=n_grey + 1), 
@@ -69,7 +70,7 @@ glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
                                            n_grey, window, shift, statistics)
     texture_img <- stack(apply(texture_img, 3, raster, template=layer))
 
-    names(texture_img) <- statistics 
+    names(texture_img) <- paste(layer_name, 'glcm', statistics, sep='_')
 
     return(texture_img)
 }
