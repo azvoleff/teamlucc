@@ -41,10 +41,6 @@ calc_slope_aspect <- function(Rast, EWkernel, EWres, NSkernel, NSres, smoothing)
 #' calculate
 #' @return a list of length equal to the length of the \code{statistics} input 
 #' parameter, containing the selected textures measures
-#' @references
-#' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
-#' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
-#' http://www.jstatsoft.org/v43/i04/
 calc_texture_full_image <- function(rast, n_grey, window_dims, shift, statistics) {
     .Call('teamr_calc_texture_full_image', PACKAGE = 'teamr', rast, n_grey, window_dims, shift, statistics)
 }
