@@ -19,6 +19,11 @@
 #' a \code{data.frame} with two columns: ".sigma" and ".C".
 #' @param classProbs whether to also calculate and return the probabilities of 
 #' membership for each class
+#' @param use_training_flag indicates whether to exclude data flagged as 
+#' testing data when training the classifier. For this to work the input 
+#' train_data \code{data.frame} must have a column named 'Training' that 
+#' indicates, for each pixel, whether that pixel is a training pixel (coded as 
+#' TRUE) or testing pixel (coded as FALSE).
 #' @return a list with 3 elements: the trained SVM model, the predicted classes 
 #' \code{RasterLayer} and the class probabilities \code{RasterBrick}
 #' @details processing can be done in parallel using all available CPUs through 
@@ -49,17 +54,28 @@
 #' }
 svm_classify <- function(x, train_data, pred_classes_filename=NULL, 
                          pred_probs_filename=NULL, train_grid=NULL,
-                         classProbs=FALSE) {
+                         classProbs=FALSE, use_training_flag=TRUE) {
     message('Training SVM...')
     if (is.null(train_grid)) {
         sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))
         train_grid <- data.frame(.sigma=sig_dist[1], .C=2^(-6:12))
     }
+    if (use_training_flag) {
+        if (!('Training' %in%names(train_data))) {
+            stop('when use_training_flag is TRUE, train_data must have a "Training" column')
+        }
+        train_data <- train_data[train_data$Training, ]
+    }
     svm_train_control <- trainControl(method="repeatedcv",
                                       repeats=5,
                                       classProbs=classProbs)
-    svm_train <-  train(y ~ ., data=train_data, method="svmRadial",
-                        preProc=c('center', 'scale'),
+    # Build the formula, excluding the training flag column (if it exists) from 
+    # the model formula
+    formula_vars <- names(train_data)
+    formula_vars <- formula_vars[!(formula_vars %in% c('y', 'Training'))]
+    svm_formula <- formula(paste('y ~', paste(formula_vars, collapse=' + ')))
+    svm_train <-  train(svm_formula, data=train_data, method="svmRadial",
+                        preProc=c('center', 'scale'), subset=train_data_1986$Training,
                         tuneGrid=train_grid, trControl=svm_train_control)
 
     message('Predicting classes...')

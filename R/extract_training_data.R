@@ -7,6 +7,8 @@
 #' @param polys a \code{SpatialPolygonsDataFrame} with training data polygons
 #' @param classcol the name of the column containing the response variable (for 
 #' example the land cover type of each pixel)
+#' @param testfrac a number from 0-1 giving the fraction of the data to be used 
+#' for testing.
 #' @return A data.frame
 #' with the training data. Each row will contain the response (the column 
 #' chosen by \code{classcol}) as the first column, with the remaining columns 
@@ -16,7 +18,7 @@
 #' data(L5TSR_1986_2001_training)
 #' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training, 
 #'                                     "t1_class")
-extract_training_data <- function(x, polys, classcol) {
+extract_training_data <- function(x, polys, classcol, testfrac=0) {
     if (projection(x) != projection(polys)) {
         stop('Coordinate systems do not match')
     }
@@ -31,5 +33,10 @@ extract_training_data <- function(x, polys, classcol) {
     pixels <- cbind(y=polys@data[match(pixels$ID, polys$ID), classcol], 
                     pixels)
     pixels <- pixels[!(names(pixels) == 'ID')]
+    pixels$Training <- TRUE
+    if (testfrac > 0) {
+        pixels$Training[sample.int(nrow(pixels),
+                                   nrow(pixels) * testfrac)] <- FALSE
+    }
     return(pixels)
 }
