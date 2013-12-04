@@ -33,6 +33,9 @@ extract_training_data <- function(x, polys, classcol, testfrac=0) {
     pixels <- cbind(y=polys@data[match(pixels$ID, polys$ID), classcol], 
                     pixels)
     pixels <- pixels[!(names(pixels) == 'ID')]
+    # Add a column with a flag indicating whether or not each pixel should be 
+    # used in training a classifier (allowing for separate training and testing 
+    # datasets).
     pixels$Training <- TRUE
     if (testfrac > 0) {
         pixels$Training[sample.int(nrow(pixels),
