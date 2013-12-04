@@ -33,5 +33,6 @@ accuracy <- function(model, test_data) {
     cont_table <- round(cont_table, digits=2)
     dimnames(cont_table) <- list(observed=dimnames(cont_table)[[1]],
                                  predicted=dimnames(cont_table)[[2]])
+
     return(cont_table)
 }
