@@ -1,0 +1,113 @@
+# An example classification using an SVM and Landsat 5 imagery
+
+```{r setup, results='hide', echo=FALSE, cache=FALSE}
+options(width=75)
+#opts_chunk$set(fig.width=4.5, fig.height=4.5, out.width='4.5in', 
+#               out.height='3in', dpi=300, dev='png')
+```
+
+## Do general setup of R session
+Load required R packages, and setup parallel computation with spatial.tools.
+
+```{r setup_libraries, cache=FALSE}
+library(teamr)
+library(spatial.tools)
+data_dir <- 'D:/azvoleff/Data/'
+sfQuickInit(2)
+```
+
+## Preprocess Landsat data
+Load the first four bands of a 1986 Landat 5 TM image subset:
+
+```{r tm_1986}
+L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='teamr')
+L5TSR_1986 <- stack(L5TSR_1986_file)
+names(L5TSR_1986) <- c('b1', 'b2', 'b3', 'b4')
+plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
+```
+
+Mosaic the four ASTER DEM tiles needed to cover the Landsat image, then crop 
+the mosaic to cover only the image subset:
+
+```{r dem_mosaic_and_crop}
+data(ASTER_V002_EAST, ASTER_V002_WEST)
+DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
+matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
+plot(matched_DEM)
+```
+
+Calculate slope and aspect from ASTER DEM subset:
+
+```{r tm_1986_slope_aspect}
+# Read sun elevation and sun azimuth from .txt metadata file accompanying
+# the Landsat file (as output from teampy Python package).
+metadatafile <- extension(L5TSR_1986_file, 'txt')
+sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
+sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
+# Apply the topographic correction
+slopeaspect <- slopeasp_seq(matched_DEM, smoothing=1.5)
+```
+
+Perform topographic correction of Landsat subset:
+
+```{r tm_1986_tc}
+# First draw a sample for the Minnaert regression
+horizcells <- 10
+vertcells <- 10
+nsamp <- 20000 / (horizcells * vertcells)
+# Note that rowmajor indices are needed as raster layers are stored in 
+# rowmajor order, unlike most R objects that are addressed in column 
+# major order
+sampleindices <- gridsample(L5TSR_1986, nsamp=nsamp, horizcells=10, 
+                            vertcells=10, rowmajor=TRUE)
+L5TSR_1986_tc <- topographic_corr(L5TSR_1986, slopeaspect, sunelev, 
+                                        sunazimuth, method='minnaert_full')
+plotRGB(L5TSR_1986_tc, stretch='lin', r=3, g=2, b=1)
+```
+
+## Setup predictors for SVM classification
+
+Calculate MSAVI2 from red and NIR bands:
+
+```{r tm_1986_MSAVI2}
+L5TSR_1986_msavi <- MSAVI2(red=raster(L5TSR_1986_tc, layer=3),
+                           nir=raster(L5TSR_1986_tc, layer=4))
+plot(L5TSR_1986_msavi)
+```
+
+Calculate textures from grey level co-occurrence matrices (GLCM) built from MSAVI2 image:
+
+```{r tm_1986_GLCM}
+L5TSR_1986_msavi_textures <- glcm(L5TSR_1986_msavi)
+plot(L5TSR_1986_msavi_textures)
+```
+
+Build layer stack of predictor layers to use in classification:
+
+```{r tm_1986_layer_stack}
+L5TSR_1986_preds <- stack(L5TSR_1986_tc,
+                          L5TSR_1986_msavi,
+                          L5TSR_1986_msavi_textures$MSAVI2_glcm_mean, 
+                          L5TSR_1986_msavi_textures$MSAVI2_glcm_variance, 
+                          L5TSR_1986_msavi_textures$MSAVI2_glcm_entropy)
+plot(L5TSR_1986_preds)
+```
+
+## Perform classification on 1986 image
+
+Run classification with support vector machine (SVM) algorithm:
+```{r tm_1986_classification}
+data(L5TSR_1986_2001_training)
+train_data_1986 <- extract_training_data(L5TSR_1986_preds, 
+                                         L5TSR_1986_2001_training, "t1_class", 
+                                         testfrac=.3)
+svm_1986 <- svm_classify(L5TSR_1986_preds, train_data_1986)
+svm_1986$svm_train
+plot(svm_1986$pred_classes)
+```
+
+Perform accuracy assessment using an independent dataset from the training data:
+
+```{r tm_1986_class_accuracy}
+accuracy(svm_1986$svm_train, train_data_1986)
+```
