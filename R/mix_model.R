@@ -1,11 +1,6 @@
 #' Fractional mixing model implemented with support vector machine (SVM)
 #'
-#' This code calculate the change magnitude image for the Change Vector 
-#' Analysis in Posterior Probability Space (CVAPS) method of Chen et al. 2011.  
-#' Use the change magnitude image in conjunction with the change direction 
-#' image from \code{chg_dir}, and \code{DFPS} to use the Double Window Flexible 
-#' Pace Search method (Chen et al. 2003) to determine the threshold to use to 
-#' map areas of change and no-change.
+#' TODO: Write docs.
 #'
 #' @export
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
