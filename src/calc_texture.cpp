@@ -82,10 +82,6 @@ double text_correlation(mat pij, mat imat, mat jmat, double mean_haralick, doubl
 //' calculate
 //' @return a list of length equal to the length of the \code{statistics} input 
 //' parameter, containing the selected textures measures
-//' @references
-//' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
-//' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
-//' http://www.jstatsoft.org/v43/i04/
 // [[Rcpp::export]]
 arma::cube calc_texture_full_image(arma::mat rast,
         int n_grey, arma::vec window_dims, arma::vec shift,
