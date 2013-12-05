@@ -14,11 +14,9 @@ get_glcm_texture <- function(statistic, ...) {
 statistics <- c('mean_ENVI', 'variance_ENVI', 'homogeneity', 'contrast', 
                 'dissimilarity', 'entropy', 'second_moment', 'correlation')
 
-data(glcm_test_raster)
 # glcm_test_raster_ENVI_textures contains the results from running ENVI on the 
 # glcm_test_raster. The below tests ensure that the results from teamr match 
 # those from EXELIS ENVI.
-data(glcm_test_raster_ENVI_textures)
 textures_teamr <- glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), statistics)
 
 test_that("GLCM mean is correct", {

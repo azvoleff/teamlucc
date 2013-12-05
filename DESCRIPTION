@@ -31,6 +31,7 @@ Description: Routines for processing imagery and other spatial data for the
 License: GPL (>= 3)
 URL: https://github.com/azvoleff/teamr
 BugReports: https://github.com/azvoleff/teamr/issues
+LazyData: true
 Collate:
     'get_band_names_from_hdr.R'
     'get_metadata_item.R'

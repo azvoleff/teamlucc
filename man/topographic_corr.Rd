@@ -54,7 +54,6 @@
 }
 \examples{
 # Mosaic the two ASTER DEM tiles needed to a Landsat image
-data(ASTER_V002_EAST, ASTER_V002_WEST)
 DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 
 # Crop and extend the DEM mosaic to match the Landsat image

@@ -30,7 +30,6 @@ Mosaic the four ASTER DEM tiles needed to cover the Landsat image, then crop
 the mosaic to cover only the image subset:
 
 ```{r dem_mosaic_and_crop}
-data(ASTER_V002_EAST, ASTER_V002_WEST)
 DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 plot(matched_DEM)
@@ -97,7 +96,6 @@ plot(L5TSR_1986_preds)
 
 Run classification with support vector machine (SVM) algorithm:
 ```{r tm_1986_classification}
-data(L5TSR_1986_2001_training)
 train_data_1986 <- extract_training_data(L5TSR_1986_preds, 
                                          L5TSR_1986_2001_training, "t1_class", 
                                          testfrac=.3)
