@@ -10,6 +10,7 @@
 #' \code{accuracy} will use only the data not used in training for evaluating 
 #' model accuracy.
 #' @return list of accuracy statistics
+#' @examples
 accuracy <- function(model, test_data) {
     if (!('Training' %in% names(test_data))) {
         warning('no Training column found - assuming none of "test_data" was used for model training')
@@ -33,6 +34,5 @@ accuracy <- function(model, test_data) {
     cont_table <- round(cont_table, digits=2)
     dimnames(cont_table) <- list(observed=dimnames(cont_table)[[1]],
                                  predicted=dimnames(cont_table)[[2]])
-
     return(cont_table)
 }
