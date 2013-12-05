@@ -9,19 +9,26 @@
 #' \code{ref_map} is provided, an observed sample matrix as calculated by 
 #' \code{accuracy}.
 #' @param ref_map (optional) a baseline reference map as a \code{RasterLayer} 
-#' to be used for converting the observed sample matrix to an estimated 
-#' population matrix (using equation 1 in Pontius and Millones 2011).
+#' to be used for converting the observed sample matrix (\code{cont_table}) to 
+#' an estimated population matrix (using equation 1 in Pontius and Millones 
+#' 2011).
 #' @param comp_map (optional) a comparison map as a \code{RasterLayer}, to be 
-#' used to convert an observed sample matrix to an estimated population matrix 
-#' (using equation 1 in Pontius and Millones 2011). If ref_map is provided to 
-#' \code{disagreement}, but comp_map is not provided, then \code{disagreement} 
-#' will assume that the class proportions in ref_map and comp_map are equal.  
-#' Testing the effects of this assumption is highly recommended.
+#' used for converting the observed sample matrix (\code{cont_table}) to an 
+#' estimated population matrix (using equation 1 in Pontius and Millones 2011).  
+#' If ref_map is provided to \code{disagreement}, but comp_map is not provided, 
+#' then \code{disagreement} will assume that the class proportions in ref_map 
+#' and comp_map are equal.  Testing the effects of this assumption is highly 
+#' recommended.
 #' @return list with two entries: Q (quantity disagreement) and A (allocation 
 #' disagreement)
 #' @references Pontius, R. G., and M. Millones. 2011. Death to Kappa: birth of 
 #' quantity disagreement and allocation disagreement for accuracy assessment.  
 #' International Journal of Remote Sensing 32:4407-4429.
-disagreement <- function(cont_t, ref_map, comp_map) {
-
+disagreement <- function(cont_t, ref_map=NULL, comp_map=NULL) {
+    if (is.null(ref_map) & (!is.null(comp_map))) {
+        stop('if comp_map is provided, ref_map must also be provided')
+    } else (!is.null(ref_map)) {
+        # cont_table is an observed sample matrix - convert it to an estimated 
+        # population matrix
+    }
 }
