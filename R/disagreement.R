@@ -27,7 +27,7 @@
 disagreement <- function(cont_t, ref_map=NULL, comp_map=NULL) {
     if (is.null(ref_map) & (!is.null(comp_map))) {
         stop('if comp_map is provided, ref_map must also be provided')
-    } else (!is.null(ref_map)) {
+    } else if (!is.null(ref_map)) {
         # cont_table is an observed sample matrix - convert it to an estimated 
         # population matrix
     }
