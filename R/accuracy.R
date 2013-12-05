@@ -22,17 +22,17 @@ accuracy <- function(model, test_data) {
     }
     observed <- test_data$y
     predicted <- predict(model, test_data)
-    cont_table <- table(observed, predicted)
-    # Get indices of the diagonal of the cont_table
+    ct <- table(observed, predicted)
+    # Get indices of the diagonal of the ct
     diag_indices <- which(diag(nlevels(observed)) == TRUE)
-    users_acc <- (cont_table[diag_indices] / colSums(cont_table))  * 100
-    prod_acc <- (cont_table[diag_indices] / rowSums(cont_table)) * 100
-    overall_acc <- (sum(cont_table[diag_indices]) / sum(cont_table)) * 100
-    cont_table <- addmargins(cont_table)
-    cont_table <- rbind(cont_table, Users=c(users_acc, NA))
-    cont_table <- cbind(cont_table, Producers=c(prod_acc, NA, overall_acc))
-    cont_table <- round(cont_table, digits=2)
-    dimnames(cont_table) <- list(observed=dimnames(cont_table)[[1]],
-                                 predicted=dimnames(cont_table)[[2]])
-    return(cont_table)
+    users_acc <- (ct[diag_indices] / colSums(ct))  * 100
+    prod_acc <- (ct[diag_indices] / rowSums(ct)) * 100
+    overall_acc <- (sum(ct[diag_indices]) / sum(ct)) * 100
+    ct <- addmargins(ct)
+    ct <- rbind(ct, Users=c(users_acc, NA))
+    ct <- cbind(ct, Producers=c(prod_acc, NA, overall_acc))
+    ct <- round(ct, digits=2)
+    dimnames(ct) <- list(observed=dimnames(ct)[[1]],
+                                 predicted=dimnames(ct)[[2]])
+    return(ct)
 }
