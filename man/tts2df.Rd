@@ -1,0 +1,25 @@
+\name{tts2df}
+\alias{tts2df}
+\title{Function to convert TIMESAT .tts binary format to an R dataframe.}
+\usage{
+  tts2df(x)
+}
+\arguments{
+  \item{x}{A .tts file output by TIMESAT}
+}
+\value{
+  A data.frame containing 'row' and 'col' columns giving
+  the the row and column of a pixel in the input image to
+  timesat, and then a number of columns named 't1', 't2',
+  ...'tn', where n is the total number of image dates input
+  to TIMESAT.
+}
+\description{
+  Function to convert TIMESAT .tts binary format to an R
+  dataframe.
+}
+\examples{
+# TODO: Need to add examples here, and need to include a sample TIMESAT tts
+# file in the package data.
+}
+

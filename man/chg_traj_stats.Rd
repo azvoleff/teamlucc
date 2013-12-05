@@ -1,0 +1,23 @@
+\name{chg_traj_stats}
+\alias{chg_traj_stats}
+\title{Calculate change-trajectory statistics}
+\usage{
+  chg_traj_stats(traj)
+}
+\arguments{
+  \item{traj}{a list (as output by \code{chg_traj} with two
+  elements: traj_lut (a lookup table of change trajectory
+  codes) and chg_traj (a \code{RasterLayer} of change
+  trajectory codes.}
+}
+\value{
+  a \code{data.frame} object with change trajectory
+  statistics
+}
+\description{
+  Calculate change-trajectory statistics
+}
+\examples{
+#TODO: Add examples
+}
+

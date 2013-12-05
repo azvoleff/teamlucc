@@ -1,0 +1,44 @@
+\name{DFPS}
+\alias{DFPS}
+\title{Double-Window Flexible Pace Search (DFPS) threshold determination}
+\usage{
+  DFPS(chg_polys, chg_mag, radius = 100, delta = 0.01,
+    m = 10, maxiter = 20)
+}
+\arguments{
+  \item{chg_polys}{\code{SpatialPolygonsDataFrame} with
+  polygons of change areas surrounded by windows of
+  no-change}
+
+  \item{chg_mag}{change magnitude \code{RasterLayer} from
+  \code{CVAPS}}
+
+  \item{radius}{radius of no-change surrounding change area
+  polygons}
+
+  \item{delta}{the minimum difference between Lmax and Lmin
+  that will allow another pass through the search loop}
+
+  \item{m}{number of potential thresholds per search
+  iteration (see Chen et al., 2003). Recommended to leave
+  at default value.}
+
+  \item{maxiter}{maximum number of iterations of the main
+  search process}
+}
+\description{
+  Double-Window Flexible Pace Search (DFPS) threshold
+  determination
+}
+\references{
+  Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
+  Land-use/land-cover change detection using improved
+  change-vector analysis. Photogrammetric Engineering and
+  Remote Sensing 69:369-380.
+
+  Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change
+  vector analysis in posterior probability space: a new
+  method for land cover change detection. IEEE Geoscience
+  and Remote Sensing Letters 8:317-321.
+}
+

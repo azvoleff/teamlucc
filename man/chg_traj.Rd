@@ -1,0 +1,52 @@
+\name{chg_traj}
+\alias{chg_traj}
+\title{Calculate change-trajectory image}
+\usage{
+  chg_traj(initial, chg_mag, chg_dir, threshold,
+    filename = NULL, classnames = NULL,
+    ignorepersistence = TRUE)
+}
+\arguments{
+  \item{initial}{initial cover class as \code{RasterLayer}}
+
+  \item{chg_mag}{change magnitude \code{RasterLayer} from
+  \code{CVAPS}}
+
+  \item{chg_dir}{change direction \code{RasterLayer} from
+  \code{CVAPS}}
+
+  \item{threshold}{the threshold to use as a minimum when
+  determining change areas (can use \code{DFPS} to
+  determine this value).}
+
+  \item{filename}{filename to save the output
+  \code{RasterLayer} to disk (optional)}
+
+  \item{classnames}{an optional vector of classnames to
+  output with the returned trajectory lookup table}
+
+  \item{ignorepersistence}{whether to ignore persistence of
+  a class (if ignored all pixels where a class persists
+  will be set to NA)}
+}
+\value{
+  a table of all possible trajectories, with their
+  \code{classnames} (if specified) and the integer codes
+  used to indicate specific trajectories in the output
+  image.
+}
+\description{
+  Calculate change-trajectory image
+}
+\references{
+  Chen, J., P. Gong, C.  He, R.  Pu, and P.  Shi.  2003.
+  Land-use/land-cover change detection using improved
+  change-vector analysis. Photogrammetric Engineering and
+  Remote Sensing 69:369-380.
+
+  Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change
+  vector analysis in posterior probability space: a new
+  method for land cover change detection. IEEE Geoscience
+  and Remote Sensing Letters 8:317-321.
+}
+
