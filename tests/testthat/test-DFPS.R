@@ -1,1 +1,1 @@
-context("DFPS calculations")
+context("DFPS")
