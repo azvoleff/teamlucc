@@ -12,8 +12,8 @@ and population.
 The TEAM Data Processing Tools are a collection of scripts written in R and 
 Python to facilitate the processing and analysis of TEAM data and remote 
 sensing imagery of TEAM sites for measuring change in ecosystems from the 
-plot-landscape scales.  This package includes the R scripts in the toolkit.  
-The [teampy package](https://github.com/azvoleff/teampy) includes the Python 
+plot-landscape scales. This package includes the R scripts in the toolkit. The 
+[teampy package](https://github.com/azvoleff/teampy) includes the Python 
 scripts that are part of the toolkit. Both packages are required in order to 
 use the toolkit.
 
@@ -26,7 +26,7 @@ code.
 
 The easiest way to install the (beta version) of the `teamr` package is using 
 the [devtools](http://cran.r-project.org/web/packages/devtools/index.html) 
-package from Hadley Wickham.  After installing `devtools` from CRAN, type:
+package from Hadley Wickham. After installing `devtools` from CRAN, type:
 
 ```R
 install_github('teamr', username='azvoleff')
@@ -39,10 +39,10 @@ version of R.
 
 ## Author Contact Information
 
-Alex Zvoleff, azvoleff@conservation.org
-Postdoctoral Associate
-Tropical Ecology Assessment and Monitoring (TEAM) Network
-Conservation International
-2011 Crystal Dr. Suite 500
-Arlington, VA 22202
+[Alex Zvoleff](mailto:azvoleff@conservation.org)  
+Postdoctoral Associate  
+Tropical Ecology Assessment and Monitoring (TEAM) Network  
+Conservation International  
+2011 Crystal Dr. Suite 500  
+Arlington, VA 22202  
 USA
