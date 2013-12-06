@@ -99,13 +99,13 @@ Run classification with support vector machine (SVM) algorithm:
 train_data_1986 <- extract_training_data(L5TSR_1986_preds, 
                                          L5TSR_1986_2001_training, "t1_class", 
                                          testfrac=.3)
-svm_1986 <- svm_classify(L5TSR_1986_preds, train_data_1986)
-svm_1986$svm_train
-plot(svm_1986$pred_classes)
+classification_1986_LT5SR <- svm_classify(L5TSR_1986_preds, train_data_1986)
+classification_1986_L5TSR$model
+plot(classification_1986_L5TSR$pred_classes)
 ```
 
 Perform accuracy assessment using an independent dataset from the training data:
 
 ```{r tm_1986_class_accuracy}
-accuracy(svm_1986$svm_train, train_data_1986)
+accuracy(classification_1986_L5TSR$model)
 ```
