@@ -42,7 +42,7 @@
   FALSE).}
 }
 \value{
-  a list with 3 elements: the trained SVM model, the
+  a list with 3 elements: the trained classifier, the
   predicted classes \code{RasterLayer} and the class
   probabilities \code{RasterBrick}
 }
@@ -54,8 +54,9 @@
   processing can be done in parallel using all available
   CPUs through the use of the cluster facilities in the
   \code{spatial.tools} package. To enable clustering, call
-  \code{sfQuickInit} before running \code{svm_classify}. To
-  stop the cluster when finished, call \code{sfQuickStop}.
+  \code{sfQuickInit} before running \code{classify_image}.
+  To stop the cluster when finished, call
+  \code{sfQuickStop}.
 }
 \examples{
 \dontrun{
@@ -71,8 +72,7 @@ train_data_1986 <- extract_training_data(L5TSR_1986,
 classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986,
     train_grid=data.frame(.sigma=.0495, .C=0.5), classProbs=TRUE)
 
-# Examine output from svm_classify
-classified_LT5SR_1986$svm_train
+classified_LT5SR_1986$model
 plot(classified_LT5SR_1986$pred_classes)
 plot(classified_LT5SR_1986$pred_probs)
 }

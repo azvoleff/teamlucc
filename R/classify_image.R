@@ -26,12 +26,12 @@
 #' train_data \code{data.frame} must have a column named 'Training' that 
 #' indicates, for each pixel, whether that pixel is a training pixel (coded as 
 #' TRUE) or testing pixel (coded as FALSE).
-#' @return a list with 3 elements: the trained SVM model, the predicted classes 
+#' @return a list with 3 elements: the trained classifier, the predicted classes 
 #' \code{RasterLayer} and the class probabilities \code{RasterBrick}
 #' @details processing can be done in parallel using all available CPUs through 
 #' the use of the cluster facilities in the \code{spatial.tools} package. To 
 #' enable clustering, call \code{sfQuickInit} before running 
-#' \code{svm_classify}. To stop the cluster when finished, call 
+#' \code{classify_image}. To stop the cluster when finished, call 
 #' \code{sfQuickStop}.
 #'
 #' @examples
@@ -48,15 +48,14 @@
 #' classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986, 
 #'     train_grid=data.frame(.sigma=.0495, .C=0.5), classProbs=TRUE)
 #'
-#' # Examine output from svm_classify
-#' classified_LT5SR_1986$svm_train
+#' classified_LT5SR_1986$model
 #' plot(classified_LT5SR_1986$pred_classes)
 #' plot(classified_LT5SR_1986$pred_probs)
 #' }
 classify_image <- function(x, train_data, pred_classes_filename=NULL, 
                            pred_probs_filename=NULL, train_grid=NULL,
                            classProbs=FALSE, use_training_flag=TRUE) {
-    message('Training SVM...')
+    message('Training classifier...')
     if (is.null(train_grid)) {
         sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))
         train_grid <- data.frame(.sigma=sig_dist[1], .C=2^(-6:12))
@@ -74,16 +73,16 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
     # the model formula
     formula_vars <- names(train_data)
     formula_vars <- formula_vars[!(formula_vars %in% c('y', 'Training'))]
-    svm_formula <- formula(paste('y ~', paste(formula_vars, collapse=' + ')))
-    svm_train <-  train(svm_formula, data=train_data, method="svmRadial",
-                        preProc=c('center', 'scale'), subset=train_data_1986$Training,
-                        tuneGrid=train_grid, trControl=svm_train_control)
+    model_formula <- formula(paste('y ~', paste(formula_vars, collapse=' + ')))
+    model <- train(model_formula, data=train_data, method="svmRadial",
+                   preProc=c('center', 'scale'), subset=train_data_1986$Training,
+                   tuneGrid=train_grid, trControl=svm_train_control)
 
     message('Predicting classes...')
-    calc_preds <- function(in_rast, svm_train, n_classes, classProbs, ...) {
-        preds <- predict(in_rast, svm_train)
+    calc_preds <- function(in_rast, model, n_classes, classProbs, ...) {
+        preds <- predict(in_rast, model)
         if (classProbs) {
-            pred_probs <- predict(in_rast, svm_train, type="prob", 
+            pred_probs <- predict(in_rast, model, type="prob", 
                                   index=c(1:n_classes))
             preds <- stack(preds, pred_probs)
         }
@@ -92,9 +91,9 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
                                                nlayers(preds)))
         return(preds)
     }
-    n_classes <- length(caret:::getClassLevels(svm_train))
+    n_classes <- length(caret:::getClassLevels(model))
     preds <- rasterEngine(in_rast=x, fun=calc_preds, 
-                               args=list(svm_train=svm_train, 
+                               args=list(model=model, 
                                          n_classes=n_classes,
                                          classProbs=classProbs), 
                                filename=pred_probs_filename, 
@@ -103,10 +102,9 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
     names(pred_classes) <- 'cover'
     if (classProbs) {
         pred_probs <- dropLayer(preds, 1)
-        names(pred_probs) <- caret:::getClassLevels(svm_train)
-        return(list(svm_train=svm_train, pred_classes=pred_classes, pred_probs=pred_probs))
+        names(pred_probs) <- caret:::getClassLevels(model)
+        return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs))
     } else {
-        return(list(svm_train=svm_train, pred_classes=pred_classes))
+        return(list(model=model, pred_classes=pred_classes))
     }
-
 }
