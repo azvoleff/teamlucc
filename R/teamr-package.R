@@ -65,3 +65,11 @@ NULL
 #' @docType data
 #' @name glcm_test_raster_ENVI_textures
 NULL
+#' Example output from classify_image.R
+#'
+#' This is the output from running the classification example from the
+#' \code{classify_image} function.
+#' 
+#' @docType data
+#' @name classified_LT5SR_1986
+NULL

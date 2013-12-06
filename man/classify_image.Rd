@@ -68,13 +68,13 @@ train_data_1986 <- extract_training_data(L5TSR_1986,
 # Supply a small training grid for classify_image to save processing time for
 # the purposes of this example - in normal use, train_grid can be left
 # unspecified.
-classify_image_out <- classify_image(L5TSR_1986, train_data_1986,
+classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986,
     train_grid=data.frame(.sigma=.0495, .C=0.5), classProbs=TRUE)
 
 # Examine output from svm_classify
-classify_image_out$svm_train
-plot(classify_image_out$pred_classes)
-plot(classify_image_out$pred_probs)
+classified_LT5SR_1986$svm_train
+plot(classified_LT5SR_1986$pred_classes)
+plot(classified_LT5SR_1986$pred_probs)
 }
 }
 
