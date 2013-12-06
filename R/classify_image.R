@@ -74,7 +74,7 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
     formula_vars <- formula_vars[!(formula_vars %in% c('y', 'Training'))]
     model_formula <- formula(paste('y ~', paste(formula_vars, collapse=' + ')))
     model <- train(model_formula, data=train_data, method="svmRadial",
-                   preProc=c('center', 'scale'), subset=train_data_1986$Training,
+                   preProc=c('center', 'scale'), subset=train_data$Training,
                    tuneGrid=train_grid, trControl=svm_train_control)
 
     message('Predicting classes...')
