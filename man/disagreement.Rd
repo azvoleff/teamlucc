@@ -2,29 +2,17 @@
 \alias{disagreement}
 \title{Calculate quantity and allocation disagreement for two maps}
 \usage{
-  disagreement(cont_t, ref_map = NULL, comp_map = NULL)
+  disagreement(ct, pop = NULL)
 }
 \arguments{
-  \item{cont_table}{an estimated population matrix
-  (contingency table), or, if \code{ref_map} is provided,
-  an observed sample matrix as calculated by
-  \code{accuracy}.}
+  \item{an}{observed sample matrix as calculated by
+  \code{accuracy}}
 
-  \item{ref_map}{(optional) a baseline reference map as a
-  \code{RasterLayer} to be used for converting the observed
-  sample matrix (\code{cont_table}) to an estimated
-  population matrix (using equation 1 in Pontius and
-  Millones 2011).}
-
-  \item{comp_map}{(optional) a comparison map as a
-  \code{RasterLayer}, to be used for converting the
-  observed sample matrix (\code{cont_table}) to an
-  estimated population matrix (using equation 1 in Pontius
-  and Millones 2011). If ref_map is provided to
-  \code{disagreement}, but comp_map is not provided, then
-  \code{disagreement} will assume that the class
-  proportions in ref_map and comp_map are equal.  Testing
-  the effects of this assumption is highly recommended.}
+  \item{pop}{(optional) either 1) a list of length equal to
+  the number of classes in ct giving the total number of
+  pixels in the entire population for each class, or 2) the
+  predicted cover map as a \code{RasterLayer}, from which
+  the population frequencies will be derived.}
 }
 \value{
   list with two entries: Q (quantity disagreement) and A

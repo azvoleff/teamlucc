@@ -22,4 +22,7 @@
   producer's, and overall accuracies for an image
   classification.
 }
+\examples{
+#TODO: add examples
+}
 

@@ -16,7 +16,6 @@
 #' quantity disagreement and allocation disagreement for accuracy assessment.  
 #' International Journal of Remote Sensing 32:4407-4429.
 disagreement <- function(ct, pop=NULL) {
-    stop('disagreement function is not yet finished')
     if (nrow(ct) != ncol(ct)) {
         stop('ct must be square')
     }
@@ -36,9 +35,19 @@ disagreement <- function(ct, pop=NULL) {
         stop('pop must be a numeric vector, integer vector, RasterLayer, or NULL')
     }
     # Below uses the notation of Pontius and Millones (2011)
-    nijsum <- matrix(colSums(ct), ncol=4, nrow=4, byrow=TRUE)
-    Ni <- matrix(pop, ncol=4, nrow=4)
-    pop_ct <- (ct / nijsum) * (Ni/sum(pop))
-    addmargins(pop_ct)
-    #TODO: finish coding this
+    nijsum <- matrix(rowSums(ct), nrow=nrow(ct), ncol=ncol(ct))
+    Ni <- matrix(pop, nrow=nrow(ct), ncol=ncol(ct))
+    pop_ct <- (ct / nijsum) * (Ni / sum(pop))
+
+    # Calculate quantity disagreement (Pontius and Millones, 2011, eqns 2-3)
+    qg_mat = abs(rowSums(pop_ct) - colSums(pop_ct))
+    Q = sum(qg_mat) / 2
+
+    # Calculate allocation disagreement (Pontius and Millones, 2011, eqns 4-5)
+    diag_indices <- which(diag(nrow(pop_ct)) == TRUE)
+    ag_mat = 2 * apply(cbind(rowSums(pop_ct) - pop_ct[diag_indices],
+                             colSums(pop_ct) - pop_ct[diag_indices]), 1, min)
+    A = sum(ag_mat) / 2
+
+    return(list(Q=Q, A=A))
 }
