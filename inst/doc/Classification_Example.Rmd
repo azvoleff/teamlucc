@@ -64,7 +64,7 @@ L5TSR_1986_tc <- topographic_corr(L5TSR_1986, slopeaspect, sunelev,
 plotRGB(L5TSR_1986_tc, stretch='lin', r=3, g=2, b=1)
 ```
 
-## Setup predictors for SVM classification
+## Setup predictors for image classification
 
 Calculate MSAVI2 from red and NIR bands:
 
@@ -99,7 +99,7 @@ Run classification with support vector machine (SVM) algorithm:
 train_data_1986 <- extract_training_data(L5TSR_1986_preds, 
                                          L5TSR_1986_2001_training, "t1_class", 
                                          testfrac=.3)
-classification_1986_LT5SR <- svm_classify(L5TSR_1986_preds, train_data_1986)
+classification_1986_L5TSR <- classify_image(L5TSR_1986_preds, train_data_1986)
 classification_1986_L5TSR$model
 plot(classification_1986_L5TSR$pred_classes)
 ```
@@ -107,5 +107,6 @@ plot(classification_1986_L5TSR$pred_classes)
 Perform accuracy assessment using an independent dataset from the training data:
 
 ```{r tm_1986_class_accuracy}
-accuracy(classification_1986_L5TSR$model)
+accuracy(classification_1986_L5TSR$model, 
+         pop=classification_1986_L5TSR$pred_classes)
 ```
