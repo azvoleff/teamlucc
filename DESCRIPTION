@@ -8,6 +8,7 @@ Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
     raster
 Imports:
+    R (>= 2.10),
     Rcpp (>= 0.10.1),
     RcppArmadillo,
     landsat,
