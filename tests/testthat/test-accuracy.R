@@ -27,16 +27,16 @@ pop_ct_olof_m <- matrix(c(.012, 0, 0.0004, .013, .97,
 dimnames(pop_ct_olof_m) <- list(predicted=c('', '', '', '', 'Producers'),
                                 observed=c('', '', '', '', 'Users'))
 test_that(".add_ct_margins works for Olofsson et al. (2013) example", {
-          expect_equal(.add_ct_margins(signif(pop_ct_olof, 2)),
-                       expected=pop_ct_olof_m, tolerance=.01)
+          expect_equal(.add_ct_margins(pop_ct_olof), expected=pop_ct_olof_m, 
+                       tolerance=.01)
 })
 
 # Below tests are based on "PontiusMatrix26.xlsx" Excel sheet provided by Gil 
 # Pontius.
 ct_pontius <- matrix(c(11, 12, 13, 14,
-               21, 22, 23, 24,
-               31, 32, 33, 34,
-               41, 42, 43, 44), nrow=4, byrow=TRUE)
+                       21, 22, 23, 24,
+                       31, 32, 33, 34,
+                       41, 42, 43, 44), nrow=4, byrow=TRUE)
 
 test_that(".calc_Q works for Potinus and Millones (2011) example", {
          expect_equal(.calc_Q(.calc_pop_ct(ct_pontius, pop=c(100, 200, 300, 400))), 
