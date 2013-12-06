@@ -105,7 +105,7 @@ accuracy <- function(model, test_data=NULL, pop=NULL) {
     ct <- table(predicted, observed)
 
     if ('RasterLayer' %in% class(pop)) {
-        pop <- freq(pop)[1]
+        pop <- freq(pop, useNA='no')[, 2]
         if (length(pop) != nrow(ct)) {
             stop('number of classes in pop must be equal to nrow(ct)')
         }
