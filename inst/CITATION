@@ -1,6 +1,6 @@
 citHeader("To cite teamr in publications use:")
 
-citEntry(entry = "Article",
+citEntry(entry = "Manual",
   title        = "Tropical Ecology Assessment and Monitoring Team {R} Analysis Toolkit: The {teamr} Package",
   author       = personList(as.person("Alex Zvoleff")),
   year         = "2013",
