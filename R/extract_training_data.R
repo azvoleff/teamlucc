@@ -26,6 +26,9 @@ extract_training_data <- function(x, polys, classcol, testfrac=0) {
     if (length(classcol) == 0) {
         stop(paste(classcol, 'not found in polys'))
     }
+    if (testfrac < 0 || testfrac > 1) {
+        stop('testfrac must be between 0 and 1')
+    }
     pixels <- extract(x, polys, small=TRUE, df=TRUE)
     # Add column with class labels
     polys$ID <- seq(1, nrow(polys))

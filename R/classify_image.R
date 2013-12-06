@@ -64,7 +64,6 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
         if (!('Training' %in%names(train_data))) {
             stop('when use_training_flag is TRUE, train_data must have a "Training" column')
         }
-        train_data <- train_data[train_data$Training, ]
     }
     svm_train_control <- trainControl(method="repeatedcv",
                                       repeats=5,
