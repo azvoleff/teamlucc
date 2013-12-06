@@ -68,7 +68,11 @@ glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
     #message('Calculating textures...')
     texture_img <- calc_texture_full_image(raster::as.matrix(layer), 
                                            n_grey, window, shift, statistics)
-    texture_img <- stack(apply(texture_img, 3, raster, template=layer))
+    if (dim(texture_img)[3] > 1) {
+        texture_img <- stack(apply(texture_img, 3, raster, template=layer))
+    } else {
+        texture_img <- raster(texture_img[, , 1], template=layer)
+    }
 
     names(texture_img) <- paste(layer_name, 'glcm', statistics, sep='_')
 
