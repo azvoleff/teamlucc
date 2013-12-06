@@ -1,4 +1,6 @@
-#' Runs a Support Vector Machine (SVM) classification
+#' Runs an image classification
+#'
+#' Currently only supports classification using a support vector machine (SVM).
 #'
 #' @export
 #' @import kernlab e1071 caret spatial.tools
@@ -15,7 +17,7 @@
 #' probabilities \code{RasterLayer} or \code{RasterBrick}. If 'NULL' (the 
 #' default) a temporary file will be used if necessary (if the size of the 
 #' output raster exceeds available memory).
-#' @param train_grid the training grid to be used for training the SVM. Must be 
+#' @param train_grid the training grid to be used for training the classifier. Must be 
 #' a \code{data.frame} with two columns: ".sigma" and ".C".
 #' @param classProbs whether to also calculate and return the probabilities of 
 #' membership for each class
@@ -40,21 +42,21 @@
 #' train_data_1986 <- extract_training_data(L5TSR_1986, 
 #'                                          polys=L5TSR_1986_2001_training,
 #'                                          classcol="t1_class", testfrac=.3)
-#' # Supply a small training grid for svm_classify to save processing time for 
+#' # Supply a small training grid for classify_image to save processing time for 
 #' # the purposes of this example - in normal use, train_grid can be left 
 #' # unspecified.
-#' svmout <- svm_classify(L5TSR_1986, train_data_1986, 
-#'                        train_grid=data.frame(.sigma=.0495, .C=0.5),
-#'                        classProbs=TRUE)
+#' svmout <- classify_image(L5TSR_1986, train_data_1986, 
+#'                          train_grid=data.frame(.sigma=.0495, .C=0.5),
+  #'                        classProbs=TRUE)
 #'
 #' # Examine output from svm_classify
 #' svmout$svm_train
 #' plot(svmout$pred_classes)
 #' plot(svmout$pred_probs)
 #' }
-svm_classify <- function(x, train_data, pred_classes_filename=NULL, 
-                         pred_probs_filename=NULL, train_grid=NULL,
-                         classProbs=FALSE, use_training_flag=TRUE) {
+classify_image <- function(x, train_data, pred_classes_filename=NULL, 
+                           pred_probs_filename=NULL, train_grid=NULL,
+                           classProbs=FALSE, use_training_flag=TRUE) {
     message('Training SVM...')
     if (is.null(train_grid)) {
         sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))

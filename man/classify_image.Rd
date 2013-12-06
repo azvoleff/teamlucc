@@ -1,8 +1,9 @@
-\name{svm_classify}
-\alias{svm_classify}
-\title{Runs a Support Vector Machine (SVM) classification}
+\name{classify_image}
+\alias{classify_image}
+\title{Runs an image classification}
 \usage{
-  svm_classify(x, train_data, pred_classes_filename = NULL,
+  classify_image(x, train_data,
+    pred_classes_filename = NULL,
     pred_probs_filename = NULL, train_grid = NULL,
     classProbs = FALSE, use_training_flag = TRUE)
 }
@@ -26,8 +27,8 @@
   raster exceeds available memory).}
 
   \item{train_grid}{the training grid to be used for
-  training the SVM. Must be a \code{data.frame} with two
-  columns: ".sigma" and ".C".}
+  training the classifier. Must be a \code{data.frame} with
+  two columns: ".sigma" and ".C".}
 
   \item{classProbs}{whether to also calculate and return
   the probabilities of membership for each class}
@@ -46,7 +47,8 @@
   probabilities \code{RasterBrick}
 }
 \description{
-  Runs a Support Vector Machine (SVM) classification
+  Currently only supports classification using a support
+  vector machine (SVM).
 }
 \details{
   processing can be done in parallel using all available
@@ -63,11 +65,11 @@ L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 train_data_1986 <- extract_training_data(L5TSR_1986,
                                          polys=L5TSR_1986_2001_training,
                                          classcol="t1_class", testfrac=.3)
-# Supply a small training grid for svm_classify to save processing time for
+# Supply a small training grid for classify_image to save processing time for
 # the purposes of this example - in normal use, train_grid can be left
 # unspecified.
-svmout <- svm_classify(L5TSR_1986, train_data_1986,
-                       train_grid=data.frame(.sigma=.0495, .C=0.5),
+svmout <- classify_image(L5TSR_1986, train_data_1986,
+                         train_grid=data.frame(.sigma=.0495, .C=0.5),
                        classProbs=TRUE)
 
 # Examine output from svm_classify
