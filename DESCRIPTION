@@ -64,5 +64,4 @@ Collate:
     'accuracy.R'
     'split_class.R'
     'compcont.R'
-    'disagreement.R'
     'classify_image.R'

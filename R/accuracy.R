@@ -6,18 +6,40 @@ setClass("accuracy",
                         )
          )
 
-.addUsersProducersMargins <- function(ct) {
+.calc_pop_ct <- function(ct, pop) {
+    # Below uses the notation of Pontius and Millones (2011)
+    nijsum <- matrix(rowSums(ct), nrow=nrow(ct), ncol=ncol(ct))
+    Ni <- matrix(pop, nrow=nrow(ct), ncol=ncol(ct))
+    # pop_ct is the population contigency table
+    return((ct / nijsum) * (Ni / sum(pop)))
+}
+
+.calc_Q <- function(pop_ct) {
+    # Calculate quantity disagreement (Pontius and Millones, 2011, eqns 2-3)
+    qg_mat = abs(rowSums(pop_ct) - colSums(pop_ct))
+    return(sum(qg_mat) / 2)
+}
+
+.calc_A <- function(pop_ct) {
+    # Calculate allocation disagreement (Pontius and Millones, 2011, eqns 4-5)
+    diag_indices <- which(diag(nrow(pop_ct)) == TRUE)
+    ag_mat = 2 * apply(cbind(rowSums(pop_ct) - pop_ct[diag_indices],
+                             colSums(pop_ct) - pop_ct[diag_indices]), 1, min)
+    return(sum(ag_mat) / 2)
+}
+
+.add_ct_margins <- function(ct) {
     # Get column-major indices of the diagonal of the ct
-    diag_indices <- which(diag(nlevels(observed)) == TRUE)
-    users_acc <- (ct[diag_indices] / colSums(ct))
-    prod_acc <- (ct[diag_indices] / rowSums(ct))
-    overall_acc <- (sum(ct[diag_indices]) / sum(ct))
+    diag_indices <- which(diag(nrow(ct)) == TRUE)
+    users_acc <- ct[diag_indices] / colSums(ct)
+    prod_acc <- ct[diag_indices] / rowSums(ct)
+    overall_acc <- sum(ct[diag_indices]) / sum(ct)
     ct <- addmargins(ct)
-    ct <- rbind(ct, Users=c(users_acc, NA))
-    ct <- cbind(ct, Producers=c(prod_acc, NA, overall_acc))
-    ct <- round(ct, digits=2)
-    dimnames(ct) <- list(observed=dimnames(ct)[[1]],
-                         predicted=dimnames(ct)[[2]])
+    ct <- rbind(ct, Producers=c(users_acc, NA))
+    ct <- cbind(ct, Users=c(prod_acc, NA, overall_acc))
+    ct <- round(ct, digits=4)
+    dimnames(ct) <- list(predicted=dimnames(ct)[[1]],
+                         observed=dimnames(ct)[[2]])
     return(ct)
 }
 
@@ -28,7 +50,8 @@ setClass("accuracy",
 #' includes user's, producer's, and overall accuracies for an image 
 #' classification, and quantity disagreement \code{Q} and allocation 
 #' disagreement \code{A}. Q and A are calculated based on Pontius and Millones 
-#' (2011).
+#' (2011). 95% confidence intervals for the user's, producer's, and overall 
+#' accuracies are calculated as in Olofsson et al. (2013).
 #'
 #' To avoid bias due to the use of a sample contingency table, the contingency 
 #' table can be converted to a population contingency table, if the variable 
@@ -79,7 +102,7 @@ accuracy <- function(model, test_data=NULL, pop=NULL) {
     observed <- test_data$y
     predicted <- predict(model, test_data)
     # ct is the sample contigency table
-    ct <- table(observed, predicted)
+    ct <- table(predicted, observed)
 
     if ('RasterLayer' %in% class(pop)) {
         pop <- freq(pop)[1]
@@ -97,24 +120,10 @@ accuracy <- function(model, test_data=NULL, pop=NULL) {
         stop('pop must be a numeric vector, integer vector, RasterLayer, or NULL')
     }
 
-    # Below uses the notation of Pontius and Millones (2011)
-    nijsum <- matrix(rowSums(ct), nrow=nrow(ct), ncol=ncol(ct))
-    Ni <- matrix(pop, nrow=nrow(ct), ncol=ncol(ct))
-    # pop_ct is the population contigency table
-    pop_ct <- (ct / nijsum) * (Ni / sum(pop))
+    pop_ct <- .calc_pop_ct(ct, pop)
+    Q <- .calc_Q(pop_ct)
+    A <- .calc_A(pop_ct)
 
-    # Calculate quantity disagreement (Pontius and Millones, 2011, eqns 2-3)
-    qg_mat = abs(rowSums(pop_ct) - colSums(pop_ct))
-    Q = sum(qg_mat) / 2
-
-    # Calculate allocation disagreement (Pontius and Millones, 2011, eqns 4-5)
-    diag_indices <- which(diag(nrow(pop_ct)) == TRUE)
-    ag_mat = 2 * apply(cbind(rowSums(pop_ct) - pop_ct[diag_indices],
-                             colSums(pop_ct) - pop_ct[diag_indices]), 1, min)
-    A = sum(ag_mat) / 2
-
-    ct <- .addUsersProducersMargins(ct)
-    pop_ct <- .addUsersProducersMargins(pop_ct)
-
-    return(list(ct=ct, pop_ct=pop_ct, Q=Q, A=A))
+    return(list(ct=.add_ct_margins(ct), pop_ct=.add_ct_margins(pop_ct),
+                Q=Q, A=A))
 }
