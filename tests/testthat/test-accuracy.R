@@ -1,4 +1,4 @@
-context("accuracy assessment calculations")
+context("accuracy assessment")
 
 # Below test case is from: Olofsson, P., G. M. Foody, S. V. Stehman, and C. E.  
 # Woodcock. 2013. Making better use of accuracy data in land change studies: 

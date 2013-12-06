@@ -1,1 +1,1 @@
-context("compcont composite contingency table calculations")
+context("composite contingency table")

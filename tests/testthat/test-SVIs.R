@@ -1,4 +1,4 @@
-context("SVI equation checks")
+context("SVIs")
 
 test_that("NDVI equation is correct", {
     expect_that(NDVI(red=10, nir=6), equals(c(NDVI=-.25)))

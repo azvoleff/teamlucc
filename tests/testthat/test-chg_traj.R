@@ -1,1 +1,1 @@
-context("chg_traj calculations")
+context("chg_traj")

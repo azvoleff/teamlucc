@@ -1,1 +1,1 @@
-context("chg_mag calculations")
+context("chg_mag")
