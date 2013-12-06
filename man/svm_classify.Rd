@@ -61,8 +61,8 @@
 # Load example datasets
 L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 train_data_1986 <- extract_training_data(L5TSR_1986,
-                                         L5TSR_1986_2001_training,
-                                         "t1_class")
+                                         polys=L5TSR_1986_2001_training,
+                                         classcol="t1_class", testfrac=.3)
 # Supply a small training grid for svm_classify to save processing time for
 # the purposes of this example - in normal use, train_grid can be left
 # unspecified.
