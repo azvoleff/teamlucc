@@ -15,5 +15,6 @@
 #' spectral mixture models and support vector machines for remote sensing.  
 #' Geoscience and Remote Sensing, IEEE Transactions on 38:2346-2360.
 mixing_model <- function(x, train_data, filename=NULL) {
-    #TODO: Code this function
+    stop('mixing_model is not yet finished')
+    #TODO: finish coding this function
 }

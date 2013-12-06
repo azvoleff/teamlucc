@@ -14,4 +14,6 @@
 #' quantity disagreement and allocation disagreement for accuracy assessment.  
 #' International Journal of Remote Sensing 32:4407-4429.
 compcont <- function(cont_t, ref_map=NULL, comp_map=NULL) {
+    stop('compcont is not yet finished')
+    #TODO: finish coding this function
 }
