@@ -38,12 +38,12 @@ ct_pontius <- matrix(c(11, 12, 13, 14,
                        31, 32, 33, 34,
                        41, 42, 43, 44), nrow=4, byrow=TRUE)
 
-test_that(".calc_Q works for Potinus and Millones (2011) example", {
+test_that(".calc_Q works for Pontius and Millones (2011) example", {
          expect_equal(.calc_Q(.calc_pop_ct(ct_pontius, pop=c(100, 200, 300, 400))), 
                       expected=.182234, tolerance=.00001)
 })
 
-test_that(".calc_A works for Potinus and Millones (2011) example", {
+test_that(".calc_A works for Pontius and Millones (2011) example", {
          expect_equal(.calc_A(.calc_pop_ct(ct_pontius, pop=c(100, 200, 300, 400))), 
                       expected=.567193, tolerance=.00001)
 })
