@@ -2,10 +2,10 @@
 \alias{glcm}
 \title{Image texture measures from grey-level co-occurrence matrices (GLCM)}
 \usage{
-  glcm(layer, n_grey = 32, window = c(3, 3),
-    shift = c(1, 1),
-    statistics = c("mean", "variance", "homogeneity", "contrast", "dissimilarity", "entropy", "second_moment", "correlation"),
-    ...)
+  glcm(layer, n_grey = 32, window = c(3, 3), shift = c(1,
+    1), statistics = c("mean", "variance", "homogeneity",
+    "contrast", "dissimilarity", "entropy",
+    "second_moment", "correlation"), ...)
 }
 \arguments{
   \item{layer}{a /code{RasterLayer}}

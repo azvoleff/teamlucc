@@ -2,6 +2,9 @@
 #'
 #' @export
 #' @import spatial.tools Rcpp RcppArmadillo
+#' @usage glcm(layer, n_grey = 32, window = c(3, 3), shift = c(1, 1), 
+#' statistics = c("mean", "variance", "homogeneity", "contrast", 
+#' "dissimilarity", "entropy", "second_moment", "correlation"), ...)
 #' @param layer a /code{RasterLayer}
 #' @param n_grey number of grey levels to use in texture calculation
 #' @param window the window size to consider for texture calculation as a two 
