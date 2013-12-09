@@ -13,6 +13,7 @@ before_install:
   - sudo apt-get install -qq libgdal-dev libproj-dev
 
 install:
+  - ./travis-tool.sh install_github azvoleff/spatial.tools
   - ./travis-tool.sh install_deps
 
 script: ./travis-tool.sh run_tests
