@@ -1,5 +1,7 @@
 # TEAM Data Processing Tools (R)
 
+[![Build Status]https://travis-ci.org/azvoleff/teamr.png)](https://travis-ci.org/azvoleff/teamr)
+
 ## Overview
 
 The `teamr` package is designed to facilitate the work of the Tropical Ecology 
