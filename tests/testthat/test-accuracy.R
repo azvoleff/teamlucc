@@ -26,6 +26,7 @@ pop_ct_olof_m <- matrix(c(.012, 0, 0.0004, .013, .97,
                           byrow=TRUE)
 dimnames(pop_ct_olof_m) <- list(predicted=c('', '', '', '', 'Producers'),
                                 observed=c('', '', '', '', 'Users'))
+class(pop_ct_olof_m) <- 'table'
 test_that(".add_ct_margins works for Olofsson et al. (2013) example", {
           expect_equal(.add_ct_margins(pop_ct_olof), expected=pop_ct_olof_m, 
                        tolerance=.01)

@@ -28,9 +28,7 @@
   population frequencies will be tabulated.}
 }
 \value{
-  list with four elements: ct (sample contingency table),
-  pop_ct (population contingency table), Q (quantity
-  disagreement), and A (allocation disagreement).
+  \code{\link{accuracy-class}} instance
 }
 \description{
   Calculates a contingency table and various statistics for
