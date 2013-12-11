@@ -10,7 +10,11 @@ before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
-  - sudo apt-get install -qq libgdal-dev libproj-dev r-cran-rcpp r-cran-mgcv r-cran-foreach r-cran-sp
+  - sudo apt-get install -qq libgdal-dev libproj-dev
+    # teamr R deps
+  - sudo apt-get install -qq r-cran-rcpp r-cran-mgcv r-cran-foreach r-cran-sp r-cran-abind 
+    # dependency R deps
+  - sudo apt-get install -qq r-cran-gtools r-cran-rgl
 
 install:
   - ./travis-tool.sh install_github azvoleff/spatial.tools

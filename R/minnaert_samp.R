@@ -98,9 +98,8 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     aspect <- (pi/180) * aspect
     slopeclass <- (pi/180) * slopeclass
 
-    IL <- cos(slope) * cos(sunzenith) + sin(slope) * sin(sunzenith) *
-    cos(sunazimuth - aspect)
-    IL[IL == 0] <- IL.epsilon
+    IL <- .calc_IL(slope, sunzenith, sunazimuth, aspect, IL.epsilon)
+    rm(aspect, sunazimuth)
 
     if(is.null(coverclass)) 
         coverclass <- matrix(rep(TRUE, length(x)), nrow=nrow(x))
