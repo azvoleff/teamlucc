@@ -26,18 +26,21 @@ code.
 
 ## Package Installation
 
-The easiest way to install the (beta version) of the `teamr` package is using 
-the [devtools](http://cran.r-project.org/web/packages/devtools/index.html) 
-package from Hadley Wickham. After installing `devtools` from CRAN, type:
+As `teamr` is still under development, it is not yet listed on 
+[CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
+version) of the `teamr` package is using the 
+[devtools](http://cran.r-project.org/web/packages/devtools/index.html) package 
+from Hadley Wickham. After installing `devtools` from CRAN, type:
 
 ```R
 install_github('teamr', username='azvoleff')
 ```
 
-at the R prompt to install `teamr`. As `teamr` contains C++ code, you will need 
-to have the the appropriate version of 
-[Rtools](http://cran.r-project.org/bin/windows/Rtools/) installed for your 
-version of R.
+at the R prompt to install `teamr`.
+
+If you are installing on Windows, you will first need to install the 
+appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
+for your version of R (as `teamr` contains C++ code).
 
 ## Author Contact Information
 
