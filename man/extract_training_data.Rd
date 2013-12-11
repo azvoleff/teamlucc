@@ -2,7 +2,7 @@
 \alias{extract_training_data}
 \title{Extract training data for use in a classification}
 \usage{
-  extract_training_data(x, polys, classcol, testfrac = 0)
+  extract_training_data(x, polys, classcol, training = 1)
 }
 \arguments{
   \item{x}{a \code{Raster*} object from which training data
@@ -17,8 +17,14 @@
   response variable (for example the land cover type of
   each pixel)}
 
-  \item{testfrac}{a number from 0-1 giving the fraction of
-  the data to be used for testing.}
+  \item{training}{indicator of which polygons to use in
+  training. Can be: 1) a string giving the name of a column
+  indicating whether each polygon is to be used in training
+  (column equal to TRUE) or in testing (column equal to
+  FALSE), or 2) a logical vector of length equal to
+  length(polys), or 3) a number between 0 and 1 indicating
+  the fraction of the polygons to be randomly selected for
+  use in training.}
 }
 \value{
   A data.frame with the training data. Each row will
