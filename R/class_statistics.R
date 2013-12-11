@@ -21,7 +21,7 @@ class_statistics <- function(x, y, classcol) {
         pixels <- extract_training_data(x, y, classcol)
     } else if (class(y) %in% c("RasterLayer", "RasterBrick", 
                                          "RasterStack")) {
-        stop('Error: class_statistics cannot yet handle Raster* objects')
+        stop('class_statistics cannot yet handle Raster* objects')
     }
     pixels <- melt(pixels, idvar='y')
     # Set y and variable to NULL to pass R CMD CHECK without notes

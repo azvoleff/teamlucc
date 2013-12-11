@@ -25,13 +25,13 @@
 #'
 chg_mag <- function(t1p, t2p, filename=NULL, ...) {
     if (proj4string(t1p) != proj4string(t2p)) {
-        stop('Error: t0 and t1 coordinate systems do not match')
+        stop('t0 and t1 coordinate systems do not match')
     }
     if (extent(t1p) != extent(t2p)) {
-        stop('Error: t0 and t1 extents do not match')
+        stop('t0 and t1 extents do not match')
     }
     if (nlayers(t1p) != nlayers(t2p)) {
-        stop('Error: t0 and t1 probability maps have differing number of classes')
+        stop('t0 and t1 probability maps have differing number of classes')
     }
 
     n_classes <- nlayers(t1p)

@@ -44,9 +44,9 @@ simplify_polygon <- function(poly_obj, max_vertices, maxit=100, multiplier=1.25,
                          initial_tolerance='dynamic') {
     n_parts <- sapply(poly_obj@polygons, function(x) length(x))
     if (length(n_parts) > 1)
-        stop('Error: ZOI shapefile contains more than one polygon')
+        stop('ZOI shapefile contains more than one polygon')
     else if (n_parts > 1)
-        stop('Error: ZOI polygon is a multipart polygon')
+        stop('ZOI polygon is a multipart polygon')
 
     if (initial_tolerance == 'dynamic') {
         # Set the initial tolerance as the extent / 100
@@ -55,7 +55,7 @@ simplify_polygon <- function(poly_obj, max_vertices, maxit=100, multiplier=1.25,
                                 (ext@ymax - ext@ymin)**2)
         tolerance <- diag_seg_length / 100
     } else if (!is.numeric(tolerance) | (length(tolerance) != 1)) {
-        stop('Error: tolerance must be "dynamic" or a numeric of length one')
+        stop('tolerance must be "dynamic" or a numeric of length one')
     } else {
         tolerance <- initial_tolerance
     }

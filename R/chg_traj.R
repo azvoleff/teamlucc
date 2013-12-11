@@ -26,25 +26,25 @@
 chg_traj <- function(initial, chg_mag, chg_dir, threshold, filename=NULL, 
                      classnames=NULL, ignorepersistence=TRUE) {
     if (proj4string(initial) != proj4string(chg_mag) ) {
-        stop('Error: initial and chg_mag coordinate systems do not match')
+        stop('initial and chg_mag coordinate systems do not match')
     } else if (proj4string(initial) != proj4string(chg_dir) ) {
-        stop('Error: initial and chg_dir coordinate systems do not match')
+        stop('initial and chg_dir coordinate systems do not match')
     }
     if (extent(initial) != extent(chg_mag)) {
-        stop('Error: extent of initial does not match extent of chg_mag')
+        stop('extent of initial does not match extent of chg_mag')
     } else if (extent(initial) != extent(chg_dir)) {
-        stop('Error: extent of initial does not match extent of chg_dir')
+        stop('extent of initial does not match extent of chg_dir')
     }
-    if (nlayers(initial) > 1) stop('Error: initial has more than 1 layer')
-    if (nlayers(chg_mag) > 1) stop('Error: chg_mag has more than 1 layer')
-    if (nlayers(chg_dir) > 1) stop('Error: chg_dir has more than 1 layer')
+    if (nlayers(initial) > 1) stop('initial has more than 1 layer')
+    if (nlayers(chg_mag) > 1) stop('chg_mag has more than 1 layer')
+    if (nlayers(chg_dir) > 1) stop('chg_dir has more than 1 layer')
 
     # Make a lookup table of codes for each type of transition
     classcodes <- sort(unique(getValues(initial)))
     traj_lut <- expand.grid(t0_code=classcodes, t1_code=classcodes)
     if (!is.null(classnames)) {
         if (length(classnames) != length(classcodes)) {
-            stop('Error: classnames must be NULL or a vector of length equal to number of classes in initial image')
+            stop('classnames must be NULL or a vector of length equal to number of classes in initial image')
         }
         traj_lut$t0_name <- classnames[match(traj_lut$t0_code, classcodes)]
         traj_lut$t1_name <- classnames[match(traj_lut$t1_code, classcodes)]
