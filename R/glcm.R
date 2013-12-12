@@ -32,7 +32,6 @@
 #' Pratt, W. K. 2007. Digital image processing: PIKS Scientific inside. 4th ed.
 #' Wiley-Interscience, Hoboken, N.J pages 540-541, 563-566.
 #' @examples
-#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' textures <- glcm(raster(L5TSR_1986, layer=1))
 #' plot(textures)
 glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),

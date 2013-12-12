@@ -11,7 +11,6 @@
 #' example the land cover type of each pixel)
 #' @return A data.frame of class statistics.
 #' @examples
-#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "t1_class")
 class_statistics <- function(x, y, classcol) {
     if (projection(x) != projection(y)) {

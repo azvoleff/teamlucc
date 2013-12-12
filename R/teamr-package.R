@@ -13,6 +13,30 @@
 #' @keywords package
 #' @useDynLib teamr
 NULL
+#' Landsat 5 Surface Reflectance Image from February 6, 1986 (path 15, row 53)
+#' 
+#' Portion of Landsat 5 Surface Reflectance image from the Landsat Climate Data 
+#' Record archive. This subset of the image includes only bands 1-4.
+#'
+#' @docType data
+#' @name L5TSR_1986
+#' @seealso L5TSR_2001
+NULL
+#' Landsat 5 Surface Reflectance Image from January 14, 2001 (path 15, row 53)
+#' 
+#' Portion of Landsat 5 Surface Reflectance image from the Landsat Climate Data 
+#' Record archive. This subset of the image includes only bands 1-4.
+#'
+#' @docType data
+#' @name L5TSR_2001
+#' @seealso L5TSR_1986
+NULL
+#' Subset of ASTER Digital Elevation Model V002
+#' 
+#' @docType data
+#' @name ASTER_V002_WEST
+#' @seealso ASTER_V002_EAST
+NULL
 #' Training polygons for 1986 and 2001 Landsat 5 Surface Reflectance images
 #' 
 #' Polygons digitized from 1986 and 2001 Landsat 5 Surface Reflectance image 

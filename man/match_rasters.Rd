@@ -39,7 +39,6 @@
 DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 
 # Crop and extend the DEM mosaic to match the Landsat image
-L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 }
 

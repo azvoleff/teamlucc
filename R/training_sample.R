@@ -28,9 +28,8 @@
 #' @examples
 #' \dontrun{
 #' set.seed(0)
-#' L5TSR_1986_b1 <- raster(system.file('extdata/L5TSR_1986.dat',
-#'                         package='teamr'))
-#' training_polys <- training_sample(L5TSR_1986_b1, 10,
+#' L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
+#' training_polys <- training_sample(L5TSR_1986_b1, 30,
 #'                                   side=6*xres(L5TSR_1986_b1))
 #' plot(L5TSR_1986_b1)
 #' plot(training_polys, add=TRUE)

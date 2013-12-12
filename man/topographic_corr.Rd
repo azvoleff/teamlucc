@@ -57,20 +57,14 @@
 DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 
 # Crop and extend the DEM mosaic to match the Landsat image
-L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
-
-# Read sun elevation and sun azimuth from .txt metadata file accompanying
-# the Landsat file (as output from teampy Python package).
-L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='teamr')
-metadatafile <- extension(L5TSR_1986_file, 'txt')
-sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
-sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
-
 slopeaspect <- slopeasp_seq(matched_DEM)
+
 # Apply the topographic correction
+sunelev <- 90 - 44.97 # From metadata file
+sunazimuth <- 124.37 # From metadata file
 L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, slopeaspect, sunelev,
-                                        sunazimuth, method='minslope')
+sunazimuth, method='minslope')
 
 plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)

@@ -37,7 +37,6 @@
   matrices (GLCM)
 }
 \examples{
-L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 textures <- glcm(raster(L5TSR_1986, layer=1))
 plot(textures)
 }

@@ -61,8 +61,6 @@
 \examples{
 \dontrun{
 # Don't run long example
-# Load example datasets
-L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 train_data_1986 <- extract_training_data(L5TSR_1986,
                                          polys=L5TSR_1986_2001_training,
                                          classcol="t1_class", training=.7)

@@ -18,7 +18,6 @@
 #' chosen by \code{classcol}) as the first column, with the remaining columns 
 #' containing the values at that location of each band in the raster stack.  
 #' @examples
-#' L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 #' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training, 
 #' "t1_class")
 extract_training_data <- function(x, polys, classcol, training=1) {

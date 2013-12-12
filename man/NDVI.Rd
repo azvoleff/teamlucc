@@ -14,7 +14,6 @@
   (NDVI)
 }
 \examples{
-L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 NDVI_img <- NDVI(red=raster(L5TSR_1986, layer=3), nir=raster(L5TSR_1986,
                 layer=4))
 plot(NDVI_img)

@@ -14,7 +14,6 @@
   the equation for MSAVI2 from Qi et al. (1994).
 }
 \examples{
-L5TSR_1986 <- stack(system.file('extdata/L5TSR_1986.dat', package='teamr'))
 MSAVI_img <- MSAVI2(red=raster(L5TSR_1986, layer=3),
                     nir=raster(L5TSR_1986, layer=4))
 plot(MSAVI_img)
