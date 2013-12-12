@@ -67,3 +67,4 @@ Collate:
     'split_class.R'
     'compcont.R'
     'classify_image.R'
+    'training_sample.R'
