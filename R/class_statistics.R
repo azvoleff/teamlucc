@@ -26,10 +26,10 @@ class_statistics <- function(x, y, classcol) {
     # Set y and variable to NULL to pass R CMD CHECK without notes
     value=variable=NULL
     class_stats <- ddply(pixels, .(y, variable), summarize,
-                         r_mean=mean(value),
-                         r_sd=sd(value),
-                         r_min=min(value),
-                         r_max=max(value),
+                         mean=mean(value),
+                         sd=sd(value),
+                         min=min(value),
+                         max=max(value),
                          n_pixels=length(value))
     return(class_stats)
 }
