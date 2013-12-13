@@ -70,5 +70,10 @@ extract_training_data <- function(x, polys, classcol, training=1) {
                     Poly_FID=polys@data[poly_pixel_match, ]$FID,
                     Training=polys@data[poly_pixel_match, ]$Training)
     pixels <- pixels[!(names(pixels) == 'ID')]
+
+    # Convert classes to valid R variable names - if they are not valid R 
+    # variable names, the classification algorithm may throw an error
+    pixels$y <- make.names(pixels$y)
+
     return(pixels)
 }
