@@ -31,5 +31,6 @@ class_statistics <- function(x, y, classcol) {
                          min=min(value),
                          max=max(value),
                          n_pixels=length(value))
+    class_stats <- class_stats[order(class_stats$variable, class_stats$y), ]
     return(class_stats)
 }
