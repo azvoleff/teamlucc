@@ -39,7 +39,7 @@
 #' # Don't run long example
 #' train_data_1986 <- extract_training_data(L5TSR_1986, 
 #'                                          polys=L5TSR_1986_2001_training,
-#'                                          classcol="t1_class", training=.7)
+#'                                          classcol="class_1986", training=.7)
 #' # Supply a small training grid for classify_image to save processing time for 
 #' # the purposes of this example - in normal use, train_grid can be left 
 #' # unspecified.
@@ -71,6 +71,7 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
     formula_vars <- names(train_data)
     formula_vars <- formula_vars[!(formula_vars %in% c('y', 'Training', 'Poly_FID'))]
     model_formula <- formula(paste('y ~', paste(formula_vars, collapse=' + ')))
+
     model <- train(model_formula, data=train_data, method="svmRadial",
                    preProc=c('center', 'scale'), subset=train_data$Training,
                    tuneGrid=train_grid, trControl=svm_train_control)

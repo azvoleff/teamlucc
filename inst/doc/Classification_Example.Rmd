@@ -19,17 +19,15 @@ sfQuickInit(2)
 ## Preprocess Landsat data
 Load the first four bands of a 1986 Landat 5 TM image subset:
 
-```{r tm_1986}
-L5TSR_1986_file <- system.file('extdata/L5TSR_1986.dat', package='teamr')
-L5TSR_1986 <- stack(L5TSR_1986_file)
+```{r tm_1986, fig.cap='1986 Landsat 5 TM surface reflectance'}
 names(L5TSR_1986) <- c('b1', 'b2', 'b3', 'b4')
-plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
+plot(L5TSR_1986)
 ```
 
 Mosaic the four ASTER DEM tiles needed to cover the Landsat image, then crop 
 the mosaic to cover only the image subset:
 
-```{r dem_mosaic_and_crop}
+```{r dem_mosaic_and_crop, fig.cap='ASTER DEM covering Landsat image area'}
 DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 plot(matched_DEM)
@@ -38,18 +36,15 @@ plot(matched_DEM)
 Calculate slope and aspect from ASTER DEM subset:
 
 ```{r tm_1986_slope_aspect}
-# Read sun elevation and sun azimuth from .txt metadata file accompanying
-# the Landsat file (as output from teampy Python package).
-metadatafile <- extension(L5TSR_1986_file, 'txt')
-sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
-sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
+sunelev <- 90 - 44.97 # From metadata file
+sunazimuth <- 124.37 # From metadata file
 # Apply the topographic correction
 slopeaspect <- slopeasp_seq(matched_DEM, smoothing=1.5)
 ```
 
 Perform topographic correction of Landsat subset:
 
-```{r tm_1986_tc}
+```{r tm_1986_tc, fig.cap='Topographically corrected Landsat image'}
 # First draw a sample for the Minnaert regression
 horizcells <- 10
 vertcells <- 10
@@ -68,7 +63,7 @@ plotRGB(L5TSR_1986_tc, stretch='lin', r=3, g=2, b=1)
 
 Calculate MSAVI2 from red and NIR bands:
 
-```{r tm_1986_MSAVI2}
+```{r tm_1986_MSAVI2, fig.cap='Modified Soil Adjusted Vegetation Index 2 (MSAVI2)'}
 L5TSR_1986_msavi <- MSAVI2(red=raster(L5TSR_1986_tc, layer=3),
                            nir=raster(L5TSR_1986_tc, layer=4))
 plot(L5TSR_1986_msavi)
@@ -76,14 +71,14 @@ plot(L5TSR_1986_msavi)
 
 Calculate textures from grey level co-occurrence matrices (GLCM) built from MSAVI2 image:
 
-```{r tm_1986_GLCM}
+```{r tm_1986_GLCM, fig.cap='GLCM textures from Landsat image'}
 L5TSR_1986_msavi_textures <- glcm(L5TSR_1986_msavi)
 plot(L5TSR_1986_msavi_textures)
 ```
 
 Build layer stack of predictor layers to use in classification:
 
-```{r tm_1986_layer_stack}
+```{r tm_1986_layer_stack, fig.cap='Predictor layers for image classification'}
 L5TSR_1986_preds <- stack(L5TSR_1986_tc,
                           L5TSR_1986_msavi,
                           L5TSR_1986_msavi_textures$MSAVI2_glcm_mean, 
@@ -95,10 +90,10 @@ plot(L5TSR_1986_preds)
 ## Perform classification on 1986 image
 
 Run classification with support vector machine (SVM) algorithm:
-```{r tm_1986_classification}
+```{r tm_1986_classification, fig.cap='Classified image'}
 train_data_1986 <- extract_training_data(L5TSR_1986_preds, 
                                          L5TSR_1986_2001_training, "t1_class", 
-                                         testfrac=.3)
+                                         training=.7)
 classification_1986_L5TSR <- classify_image(L5TSR_1986_preds, train_data_1986)
 classification_1986_L5TSR$model
 plot(classification_1986_L5TSR$pred_classes)
@@ -107,6 +102,7 @@ plot(classification_1986_L5TSR$pred_classes)
 Perform accuracy assessment using an independent dataset from the training data:
 
 ```{r tm_1986_class_accuracy}
-accuracy(classification_1986_L5TSR$model, 
-         pop=classification_1986_L5TSR$pred_classes)
+acc <- accuracy(classification_1986_L5TSR$model, 
+                pop=classification_1986_L5TSR$pred_classes)
+summary(acc)
 ```
