@@ -19,7 +19,7 @@
 #' containing the values at that location of each band in the raster stack.  
 #' @examples
 #' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training, 
-#' "t1_class")
+#' "class_1986")
 extract_training_data <- function(x, polys, classcol, training=1) {
     if (projection(x) != projection(polys)) {
         stop('Coordinate systems do not match')

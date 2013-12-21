@@ -11,7 +11,7 @@
 #' example the land cover type of each pixel)
 #' @return A data.frame of class statistics.
 #' @examples
-#' class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "t1_class")
+#' class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "class_1986")
 class_statistics <- function(x, y, classcol) {
     if (projection(x) != projection(y)) {
         stop('Coordinate systems do not match')

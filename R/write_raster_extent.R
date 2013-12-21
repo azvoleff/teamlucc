@@ -5,8 +5,8 @@
 #' @param x A \code{Raster*} object
 #' @param out_file Filename for the output shapefile
 #' @param fields list of fields to include in the output shapefile
-write_raster_extent <- function(x, out_file, fields=c('t1_class',
-                                                      't2_class')) {
+write_raster_extent <- function(x, out_file, fields=c('class_1986',
+                                                      'class_2001')) {
     if ((length(out_file) > 1) || (!grepl('.shp$', out_file, 
                                           ignore.case=TRUE))) {
         stop("out_file must be a file path ending in '.shp'")
