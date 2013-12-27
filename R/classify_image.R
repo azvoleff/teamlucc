@@ -69,7 +69,8 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
     # Build the formula, excluding the training flag column (if it exists) from 
     # the model formula
     formula_vars <- names(train_data)
-    formula_vars <- formula_vars[!(formula_vars %in% c('y', 'Training', 'Poly_FID'))]
+    formula_vars <- formula_vars[!(formula_vars %in% c('y', 'Training', 
+                                                       'Poly_FID'))]
     model_formula <- formula(paste('y ~', paste(formula_vars, collapse=' + ')))
 
     model <- train(model_formula, data=train_data, method="svmRadial",
