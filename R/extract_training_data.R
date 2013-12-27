@@ -73,7 +73,7 @@ extract_training_data <- function(x, polys, classcol, training=1) {
 
     # Convert classes to valid R variable names - if they are not valid R 
     # variable names, the classification algorithm may throw an error
-    pixels$y <- make.names(pixels$y)
+    pixels$y <- factor(make.names(pixels$y))
 
     return(pixels)
 }
