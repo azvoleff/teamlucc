@@ -50,6 +50,8 @@
 #' classified_LT5SR_1986$model
 #' plot(classified_LT5SR_1986$pred_classes)
 #' plot(classified_LT5SR_1986$pred_probs)
+#' summary(accuracy(classified_LT5SR_1986$model))
+#' 
 #' }
 classify_image <- function(x, train_data, pred_classes_filename=NULL, 
                            pred_probs_filename=NULL, train_grid=NULL,

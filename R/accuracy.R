@@ -36,10 +36,10 @@ print.summary.accuracy <- function(x, ...) {
     cat('Population contingency table:\n')
     print(.add_ct_margins(x[['pop_ct']]))
     cat('\n')
-    cat(paste("Overall accuracy:\t", x[['overall_acc']], "\n", sep = ""))
+    cat(paste("Overall accuracy:\t", round(x[['overall_acc']], digits=4), "\n", sep = ""))
     cat('\n')
-    cat(paste('Quantity disagreement:\t\t', x[['Q']], '\n', sep = ''))
-    cat(paste('Allocation disagreement:\t', x[['A']], '\n', sep = ''))
+    cat(paste('Quantity disagreement:\t\t', round(x[['Q']], digits=4), '\n', sep = ''))
+    cat(paste('Allocation disagreement:\t', round(x[['A']], digits=4), '\n', sep = ''))
     invisible(x)
 }
 
