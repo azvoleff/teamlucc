@@ -38,6 +38,6 @@
 }
 \examples{
 train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training,
-"t1_class")
+"class_1986")
 }
 

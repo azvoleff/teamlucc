@@ -23,6 +23,6 @@
   cover classes
 }
 \examples{
-class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "t1_class")
+class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "class_1986")
 }
 

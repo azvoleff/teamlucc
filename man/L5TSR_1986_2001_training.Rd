@@ -9,10 +9,10 @@
   classification algorithms.
 }
 \details{
-  There are three columns in the dataset. "t1_class" is the
-  cover class for the pixels in the polygon from the 1986
-  image. "t2_class" is the cover class for the pixels in
-  the polygon from the 2001 image.
+  There are three columns in the dataset. "class_1986" is
+  the cover class for the pixels in the polygon from the
+  1986 image. "class_2001" is the cover class for the
+  pixels in the polygon from the 2001 image.
 }
 \keyword{datasets}
 

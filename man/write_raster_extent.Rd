@@ -3,7 +3,7 @@
 \title{Makes a polygon shapefile of a \code{Raster*} extent.}
 \usage{
   write_raster_extent(x, out_file,
-    fields = c("t1_class", "t2_class"))
+    fields = c("class_1986", "class_2001"))
 }
 \arguments{
   \item{x}{A \code{Raster*} object}
