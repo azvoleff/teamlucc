@@ -17,10 +17,9 @@
   \item{nsamp}{how many samples to draw from each grid
   cell}
 
-  \item{rowmajor}{if returnindices=TRUE, whether to return
-  indices in row-major format (default is column-major).
-  Row-major format is useful in conjunction with
-  \code{Raster*} objects.}
+  \item{rowmajor}{whether to return indices in row-major
+  format (default is column-major). Row-major format is
+  useful in conjunction with \code{Raster*} objects.}
 
   \item{replace}{whether to sample with replacement (within
   each grid cell)}

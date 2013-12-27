@@ -38,7 +38,7 @@
 #' sunelev <- 90 - 44.97 # From metadata file
 #' sunazimuth <- 124.37 # From metadata file
 #' L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, slopeaspect, sunelev, 
-#' sunazimuth, method='minslope')
+#'                                         sunazimuth, method='minslope')
 #' 
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)

@@ -12,9 +12,9 @@
 #' @param vertcells how many cells to break the raster in vertically (over 
 #' the rows)
 #' @param nsamp how many samples to draw from each grid cell
-#' @param rowmajor if returnindices=TRUE, whether to return indices in 
-#' row-major format (default is column-major). Row-major format is useful in 
-#' conjunction with \code{Raster*} objects.
+#' @param rowmajor whether to return indices in row-major format (default is 
+#' column-major). Row-major format is useful in conjunction with \code{Raster*} 
+#' objects.
 #' @param replace whether to sample with replacement (within each grid cell)
 #' @return vector of sample indices
 #' @note TODO: Recode in C++ for speed.
