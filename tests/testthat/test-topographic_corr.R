@@ -6,12 +6,17 @@ library(landsat)
 L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
 L5TSR_1986_b2 <- raster(L5TSR_1986, layer=2)
 DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
-matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
+matched_DEM <- suppressMessages(match_rasters(L5TSR_1986, DEM_mosaic))
 slopeaspect <- slopeasp_seq(matched_DEM)
 slope <- as(raster(slopeaspect, layer=1), "SpatialGridDataFrame")
 aspect <- as(raster(slopeaspect, layer=2), "SpatialGridDataFrame")
 sunelev <- 90 - 44.97 # From metadata file
 sunazimuth <- 124.37 # From metadata file
+
+# Override teamr topographic_corr with a local version that suppresses messages
+topographic_corr <- function(...) {
+    suppressMessages(teamr::topographic_corr(...))
+}
 
 ###############################################################################
 # Test that minslope methods match between landsat package 'topocorr' and teamr 
@@ -78,7 +83,7 @@ teamr_minnaert_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev,
                                    sunazimuth, method='minnaert_full',
                                    sampleindices=sampleindices)
 
-test_that("teamr minnart sample and landsat minnaert match", {
+test_that("teamr minnaert sample and landsat minnaert match", {
           expect_equal(teamr_minnaert_sample, expected=landsat_minnaert, 
                        tolerance=.25)
 })
@@ -89,12 +94,12 @@ test_that("teamr minnart sample and landsat minnaert match", {
 library(spatial.tools)
 set.seed(0)
 sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
-sfQuickInit()
+sfQuickInit(2)
 teamr_minnaert_sample_par <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
                                    sunazimuth, method='minnaert_full',
                                    sampleindices=sampleindices, inparallel=TRUE)
-sfQuickStop()
+sfQuickStop(2)
 
-test_that("teamr minnart sample and landsat minnaert match", {
+test_that("teamr minnaert sample and landsat minnaert match", {
           expect_equal(teamr_minnaert_sample, expected=teamr_minnaert_sample_par)
 })
