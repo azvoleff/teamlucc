@@ -1,6 +1,6 @@
 context("GLCM textures")
 
-library('raster')
+suppressMessages(library(raster))
 
 # Make a function to get 2d matrix from 3d matrix returned by glcm
 get_teamr_glcm_texture <- function(statistic) {

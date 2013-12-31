@@ -1,6 +1,6 @@
 context("topographic_corr routines")
 
-library(landsat)
+suppressMessages(library(landsat))
 
 # Load sample data
 L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
@@ -91,7 +91,7 @@ test_that("teamr minnaert sample and landsat minnaert match", {
 ###############################################################################
 # Test that minnaert_full methods match when teamr minnaert_full runs 
 # sequentially or in parallel.
-library(spatial.tools)
+suppressMessages(library(spatial.tools))
 set.seed(0)
 sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
 sfQuickInit(2)
