@@ -37,7 +37,7 @@
         k_table$k[i] <- coefficients(lm(log10(K$x)[K.cut == i] ~ 
                                         log10(K$IL/cos(sunzenith))[K.cut == i]))[[2]]
     }
-    model <- gam(k_table$k ~ s(k_table$midpoint, k=length(k_table$midpoint) - 1))
+    model <- gam(k ~ s(midpoint, k=length(k_table$midpoint) - 1), data=k_table)
 
     return(list(model=model, k_table=k_table))
 }
