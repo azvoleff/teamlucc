@@ -23,7 +23,6 @@
     K <- K[K$IL > 0, ]
 
     k_table <- data.frame(matrix(0, nrow=length(slopeclass) - 1, ncol=3))
-    colnames(k_table) <- c("midpoint", "n", "k")
     k_table[, 1] <- diff(slopeclass)/2 + slopeclass[1:length(slopeclass) - 1]
 
     # don't use slopes outside slopeclass range
@@ -38,6 +37,7 @@
                                          log10(K$IL/cos(sunzenith))[K.cut == 
                                                                     i]))[[2]]
     }
+    colnames(k_table) <- c('midpoint', 'n', 'k')
     model <- with(k_table, gam(k ~ s(midpoint, k=length(midpoint) - 1)))
 
     return(list(model=model, k_table=k_table))
