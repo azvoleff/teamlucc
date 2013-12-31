@@ -2,10 +2,9 @@
 \alias{classify_image}
 \title{Runs an image classification}
 \usage{
-  classify_image(x, train_data,
-    pred_classes_filename = NULL,
-    pred_probs_filename = NULL, train_grid = NULL,
-    classProbs = FALSE, use_training_flag = TRUE)
+classify_image(x, train_data, pred_classes_filename = NULL,
+  pred_probs_filename = NULL, train_grid = NULL, classProbs = FALSE,
+  use_training_flag = TRUE)
 }
 \arguments{
   \item{x}{a \code{Raster*} image with the predictor
@@ -42,21 +41,20 @@
   FALSE).}
 }
 \value{
-  a list with 3 elements: the trained classifier, the
-  predicted classes \code{RasterLayer} and the class
-  probabilities \code{RasterBrick}
+a list with 3 elements: the trained classifier, the
+predicted classes \code{RasterLayer} and the class
+probabilities \code{RasterBrick}
 }
 \description{
-  Currently only supports classification using a support
-  vector machine (SVM).
+Currently only supports classification using a support
+vector machine (SVM).
 }
 \details{
-  processing can be done in parallel using all available
-  CPUs through the use of the cluster facilities in the
-  \code{spatial.tools} package. To enable clustering, call
-  \code{sfQuickInit} before running \code{classify_image}.
-  To stop the cluster when finished, call
-  \code{sfQuickStop}.
+processing can be done in parallel using all available CPUs
+through the use of the cluster facilities in the
+\code{spatial.tools} package. To enable clustering, call
+\code{sfQuickInit} before running \code{classify_image}. To
+stop the cluster when finished, call \code{sfQuickStop}.
 }
 \examples{
 \dontrun{

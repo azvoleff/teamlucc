@@ -2,8 +2,7 @@
 \alias{write_raster_extent}
 \title{Makes a polygon shapefile of a \code{Raster*} extent.}
 \usage{
-  write_raster_extent(x, out_file,
-    fields = c("class_1986", "class_2001"))
+write_raster_extent(x, out_file, fields = c("class_1986", "class_2001"))
 }
 \arguments{
   \item{x}{A \code{Raster*} object}
@@ -14,6 +13,6 @@
   shapefile}
 }
 \description{
-  Makes a polygon shapefile of a \code{Raster*} extent.
+Makes a polygon shapefile of a \code{Raster*} extent.
 }
 

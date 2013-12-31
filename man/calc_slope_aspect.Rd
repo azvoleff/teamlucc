@@ -3,8 +3,7 @@
 \title{Calculates slope and aspect using same formula as in the "landsat"
 package by Sarah Goslee.}
 \usage{
-  calc_slope_aspect(Rast, EWkernel, EWres, NSkernel, NSres,
-    smoothing)
+calc_slope_aspect(Rast, EWkernel, EWres, NSkernel, NSres, smoothing)
 }
 \arguments{
   \item{Rast}{a matrix of elevations. The slope and aspect
@@ -24,17 +23,16 @@ package by Sarah Goslee.}
   no smoothing.}
 }
 \value{
-  list with two elements. The first element is the
-  calculated slope, the second element is the calculated
-  aspect.
+list with two elements. The first element is the calculated
+slope, the second element is the calculated aspect.
 }
 \description{
-  This function is called by the \code{\link{slopeasp_par}}
-  function. It is not intended to be used directly.
+This function is called by the \code{\link{slopeasp_par}}
+function. It is not intended to be used directly.
 }
 \references{
-  Sarah Goslee. Analyzing Remote Sensing Data in {R}: The
-  {landsat} Package. Journal of Statistical Software, 2011,
-  43:4, pg 1--25. http://www.jstatsoft.org/v43/i04/
+Sarah Goslee. Analyzing Remote Sensing Data in {R}: The
+{landsat} Package. Journal of Statistical Software, 2011,
+43:4, pg 1--25. http://www.jstatsoft.org/v43/i04/
 }
 

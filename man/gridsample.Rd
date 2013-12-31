@@ -2,8 +2,8 @@
 \alias{gridsample}
 \title{Draw a random sample from a grid laid out on a RasterLayer or matrix}
 \usage{
-  gridsample(x, horizcells = 10, vertcells = 10,
-    nsamp = 10, rowmajor = FALSE, replace = FALSE)
+gridsample(x, horizcells = 10, vertcells = 10, nsamp = 10,
+  rowmajor = FALSE, replace = FALSE)
 }
 \arguments{
   \item{x}{a matrix or RasterLayer to draw sample from}
@@ -25,16 +25,16 @@
   each grid cell)}
 }
 \value{
-  vector of sample indices
+vector of sample indices
 }
 \description{
-  This function is used to subsample a \code{RasterLayer}
-  or \code{matrix} by dividing the dataset into a grid of
-  \code{horizcells} x \code{vertcells}, and by then drawing
-  a sample of size \code{nsamp} from within each grid cell.
+This function is used to subsample a \code{RasterLayer} or
+\code{matrix} by dividing the dataset into a grid of
+\code{horizcells} x \code{vertcells}, and by then drawing a
+sample of size \code{nsamp} from within each grid cell.
 }
 \note{
-  TODO: Recode in C++ for speed.
+TODO: Recode in C++ for speed.
 }
 \examples{
 # Make a 100x100 matrix

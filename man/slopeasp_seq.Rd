@@ -2,8 +2,8 @@
 \alias{slopeasp_seq}
 \title{Slope and aspect calculation for DEM \code{RasterLayer}}
 \usage{
-  slopeasp_seq(DEM, EWkernel, NSkernel, smoothing = 1,
-    filename = "", overwrite = FALSE)
+slopeasp_seq(DEM, EWkernel, NSkernel, smoothing = 1, filename = "",
+  overwrite = FALSE)
 }
 \arguments{
   \item{DEM}{DEM as \code{RasterLayer}}
@@ -24,27 +24,27 @@
   exists}
 }
 \value{
-  RasterBrick with two layers: 'slope' and 'aspect'
+RasterBrick with two layers: 'slope' and 'aspect'
 }
 \description{
-  This code calculate the slope and aspect for a DEM
-  provided as a \code{RasterLayer}.
+This code calculate the slope and aspect for a DEM provided
+as a \code{RasterLayer}.
 }
 \details{
-  The code for calculating the slope and aspect is taken
-  directly from the \code{landsat} package by Sarah Goslee.
-  See the help page for \code{slopeasp} in the
-  \code{landsat} package for details on the parameters.
+The code for calculating the slope and aspect is taken
+directly from the \code{landsat} package by Sarah Goslee.
+See the help page for \code{slopeasp} in the \code{landsat}
+package for details on the parameters.
 }
 \examples{
 #TODO: Write examples
 }
 \author{
-  Sarah Goslee and Alex Zvoleff
+Sarah Goslee and Alex Zvoleff
 }
 \references{
-  Sarah Goslee. Analyzing Remote Sensing Data in {R}: The
-  {landsat} Package. Journal of Statistical Software, 2011,
-  43:4, pg 1--25. http://www.jstatsoft.org/v43/i04/
+Sarah Goslee. Analyzing Remote Sensing Data in {R}: The
+{landsat} Package. Journal of Statistical Software, 2011,
+43:4, pg 1--25. http://www.jstatsoft.org/v43/i04/
 }
 

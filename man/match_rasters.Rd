@@ -2,8 +2,7 @@
 \alias{match_rasters}
 \title{Match the coordinate system and extent of two rasters}
 \usage{
-  match_rasters(baseimg, matchimg, filename = NULL,
-    overwrite = FALSE)
+match_rasters(baseimg, matchimg, filename = NULL, overwrite = FALSE)
 }
 \arguments{
   \item{baseimg}{A /code{Raster*} to use as the base image.
@@ -22,17 +21,17 @@
   it already exists}
 }
 \value{
-  The /code{matchimg} reprojected (if necessary), cropped,
-  and extended to match the /code{baseimg}.
+The /code{matchimg} reprojected (if necessary), cropped,
+and extended to match the /code{baseimg}.
 }
 \description{
-  Match the coordinate system and extent of two rasters
+Match the coordinate system and extent of two rasters
 }
 \details{
-  Note that if the \code{matchimg} needs to be reprojected,
-  \code{match_rasters} can run in parallel if
-  \code{beginCluster()} is run prior to running
-  \code{match_rasters}.
+Note that if the \code{matchimg} needs to be reprojected,
+\code{match_rasters} can run in parallel if
+\code{beginCluster()} is run prior to running
+\code{match_rasters}.
 }
 \examples{
 # Mosaic the two ASTER DEM tiles needed to a Landsat image

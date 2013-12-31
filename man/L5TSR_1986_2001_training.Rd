@@ -3,16 +3,15 @@
 \alias{L5TSR_1986_2001_training}
 \title{Training polygons for 1986 and 2001 Landsat 5 Surface Reflectance images}
 \description{
-  Polygons digitized from 1986 and 2001 Landsat 5 Surface
-  Reflectance image from the Landsat Climate Data Record
-  archive. The training polygons can be used for testing
-  classification algorithms.
+Polygons digitized from 1986 and 2001 Landsat 5 Surface
+Reflectance image from the Landsat Climate Data Record
+archive. The training polygons can be used for testing
+classification algorithms.
 }
 \details{
-  There are three columns in the dataset. "class_1986" is
-  the cover class for the pixels in the polygon from the
-  1986 image. "class_2001" is the cover class for the
-  pixels in the polygon from the 2001 image.
+There are three columns in the dataset. "class_1986" is the
+cover class for the pixels in the polygon from the 1986
+image. "class_2001" is the cover class for the pixels in
+the polygon from the 2001 image.
 }
-\keyword{datasets}
 

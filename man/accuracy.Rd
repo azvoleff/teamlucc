@@ -2,7 +2,7 @@
 \alias{accuracy}
 \title{Calculate statistics summarizing classification accuracy}
 \usage{
-  accuracy(model, test_data = NULL, pop = NULL)
+accuracy(model, test_data = NULL, pop = NULL)
 }
 \arguments{
   \item{model}{a classification model with a \code{predict}
@@ -28,38 +28,37 @@
   population frequencies will be tabulated.}
 }
 \value{
-  \code{\link{accuracy-class}} instance
+\code{\link{accuracy-class}} instance
 }
 \description{
-  Calculates a contingency table and various statistics for
-  use in image classification accuracy assessment and map
-  comparison. Contingency table includes user's,
-  producer's, and overall accuracies for an image
-  classification, and quantity disagreement \code{Q} and
-  allocation disagreement \code{A}. Q and A are calculated
-  based on Pontius and Millones (2011). 95% confidence
-  intervals for the user's, producer's, and overall
-  accuracies are calculated as in Olofsson et al. (2013).
+Calculates a contingency table and various statistics for
+use in image classification accuracy assessment and map
+comparison. Contingency table includes user's, producer's,
+and overall accuracies for an image classification, and
+quantity disagreement \code{Q} and allocation disagreement
+\code{A}. Q and A are calculated based on Pontius and
+Millones (2011). 95% confidence intervals for the user's,
+producer's, and overall accuracies are calculated as in
+Olofsson et al. (2013).
 }
 \details{
-  To avoid bias due to the use of a sample contingency
-  table, the contingency table can be converted to a
-  population contingency table, if the variable 'pop' is
-  provided. For an accuracy assessment based on a random
-  sample, 'pop' does not need to be provided.
+To avoid bias due to the use of a sample contingency table,
+the contingency table can be converted to a population
+contingency table, if the variable 'pop' is provided. For
+an accuracy assessment based on a random sample, 'pop' does
+not need to be provided.
 }
 \examples{
 accuracy(classified_LT5SR_1986$model)
 }
 \references{
-  Pontius, R. G., and M. Millones. 2011. Death to Kappa:
-  birth of quantity disagreement and allocation
-  disagreement for accuracy assessment. International
-  Journal of Remote Sensing 32:4407-4429. Olofsson, P., G.
-  M. Foody, S. V. Stehman, and C. E. Woodcock.  2013.
-  Making better use of accuracy data in land change
-  studies: Estimating accuracy and area and quantifying
-  uncertainty using stratified estimation.  Remote Sensing
-  of Environment 129:122-131.
+Pontius, R. G., and M. Millones. 2011. Death to Kappa:
+birth of quantity disagreement and allocation disagreement
+for accuracy assessment. International Journal of Remote
+Sensing 32:4407-4429. Olofsson, P., G. M. Foody, S. V.
+Stehman, and C. E. Woodcock.  2013. Making better use of
+accuracy data in land change studies: Estimating accuracy
+and area and quantifying uncertainty using stratified
+estimation.  Remote Sensing of Environment 129:122-131.
 }
 

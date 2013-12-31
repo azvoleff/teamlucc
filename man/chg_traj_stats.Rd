@@ -2,7 +2,7 @@
 \alias{chg_traj_stats}
 \title{Calculate change-trajectory statistics}
 \usage{
-  chg_traj_stats(traj)
+chg_traj_stats(traj)
 }
 \arguments{
   \item{traj}{a list (as output by \code{chg_traj} with two
@@ -11,11 +11,11 @@
   trajectory codes.}
 }
 \value{
-  a \code{data.frame} object with change trajectory
-  statistics
+a \code{data.frame} object with change trajectory
+statistics
 }
 \description{
-  Calculate change-trajectory statistics
+Calculate change-trajectory statistics
 }
 \examples{
 #TODO: Add examples

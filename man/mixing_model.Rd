@@ -2,7 +2,7 @@
 \alias{mixing_model}
 \title{Fractional mixing model implemented with support vector machine (SVM)}
 \usage{
-  mixing_model(x, train_data, filename = NULL)
+mixing_model(x, train_data, filename = NULL)
 }
 \arguments{
   \item{x}{a \code{Raster*} image with the predictor
@@ -15,16 +15,16 @@
   \item{filename}{(optional) filename for output image}
 }
 \value{
-  a \code{RasterBrick} with the proportion of each pixel
-  within each of the classes listed in the training data
+a \code{RasterBrick} with the proportion of each pixel
+within each of the classes listed in the training data
 }
 \description{
-  TODO: Write docs.
+TODO: Write docs.
 }
 \references{
-  Brown, M., H. G.  Lewis, and S.  R.  Gunn.  2000.  Linear
-  spectral mixture models and support vector machines for
-  remote sensing. Geoscience and Remote Sensing, IEEE
-  Transactions on 38:2346-2360.
+Brown, M., H. G.  Lewis, and S.  R.  Gunn.  2000.  Linear
+spectral mixture models and support vector machines for
+remote sensing. Geoscience and Remote Sensing, IEEE
+Transactions on 38:2346-2360.
 }
 

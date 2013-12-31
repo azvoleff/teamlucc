@@ -2,7 +2,7 @@
 \alias{class_statistics}
 \title{Exports statistics on pixels within each of a set of land cover classes}
 \usage{
-  class_statistics(x, y, classcol)
+class_statistics(x, y, classcol)
 }
 \arguments{
   \item{x}{A \code{RasterLayer} from which class statistics
@@ -16,11 +16,11 @@
   each pixel)}
 }
 \value{
-  A data.frame of class statistics.
+A data.frame of class statistics.
 }
 \description{
-  Exports statistics on pixels within each of a set of land
-  cover classes
+Exports statistics on pixels within each of a set of land
+cover classes
 }
 \examples{
 class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "class_1986")

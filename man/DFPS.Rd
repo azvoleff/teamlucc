@@ -2,8 +2,8 @@
 \alias{DFPS}
 \title{Double-Window Flexible Pace Search (DFPS) threshold determination}
 \usage{
-  DFPS(chg_polys, chg_mag, radius = 100, delta = 0.01,
-    m = 10, maxiter = 20)
+DFPS(chg_polys, chg_mag, radius = 100, delta = 0.01, m = 10,
+  maxiter = 20)
 }
 \arguments{
   \item{chg_polys}{\code{SpatialPolygonsDataFrame} with
@@ -27,18 +27,18 @@
   search process}
 }
 \description{
-  Double-Window Flexible Pace Search (DFPS) threshold
-  determination
+Double-Window Flexible Pace Search (DFPS) threshold
+determination
 }
 \references{
-  Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
-  Land-use/land-cover change detection using improved
-  change-vector analysis. Photogrammetric Engineering and
-  Remote Sensing 69:369-380.
+Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
+Land-use/land-cover change detection using improved
+change-vector analysis. Photogrammetric Engineering and
+Remote Sensing 69:369-380.
 
-  Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change
-  vector analysis in posterior probability space: a new
-  method for land cover change detection. IEEE Geoscience
-  and Remote Sensing Letters 8:317-321.
+Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector
+analysis in posterior probability space: a new method for
+land cover change detection. IEEE Geoscience and Remote
+Sensing Letters 8:317-321.
 }
 

@@ -2,7 +2,7 @@
 \alias{NDVI}
 \title{Calculates the Normalized Difference Vegetation Index (NDVI)}
 \usage{
-  NDVI(red, nir)
+NDVI(red, nir)
 }
 \arguments{
   \item{red}{red \code{RasterLayer}}
@@ -10,8 +10,8 @@
   \item{nir}{near-infrared \code{RasterLayer}}
 }
 \description{
-  Calculates the Normalized Difference Vegetation Index
-  (NDVI)
+Calculates the Normalized Difference Vegetation Index
+(NDVI)
 }
 \examples{
 NDVI_img <- NDVI(red=raster(L5TSR_1986, layer=3), nir=raster(L5TSR_1986,

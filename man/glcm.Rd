@@ -2,10 +2,9 @@
 \alias{glcm}
 \title{Image texture measures from grey-level co-occurrence matrices (GLCM)}
 \usage{
-  glcm(layer, n_grey = 32, window = c(3, 3), shift = c(1,
-    1), statistics = c("mean", "variance", "homogeneity",
-    "contrast", "dissimilarity", "entropy",
-    "second_moment", "correlation"), ...)
+glcm(layer, n_grey = 32, window = c(3, 3), shift = c(1, 1),
+statistics = c("mean", "variance", "homogeneity", "contrast",
+"dissimilarity", "entropy", "second_moment", "correlation"), ...)
 }
 \arguments{
   \item{layer}{a /code{RasterLayer}}
@@ -29,33 +28,31 @@
   \item{...}{additional parameters to pass to rasterEngine}
 }
 \value{
-  A /code{RasterLayer} with the calculated requested GLCM
-  texture measures.
+A /code{RasterLayer} with the calculated requested GLCM
+texture measures.
 }
 \description{
-  Image texture measures from grey-level co-occurrence
-  matrices (GLCM)
+Image texture measures from grey-level co-occurrence
+matrices (GLCM)
 }
 \examples{
 textures <- glcm(raster(L5TSR_1986, layer=1))
 plot(textures)
 }
 \references{
-  Lu, D., and M. Batistella. 2005. Exploring TM image
-  texture and its relationships with biomass estimation in
-  Rond\^{o}nia, Brazilian Amazon. Acta Amazonica
-  35:249-257.
+Lu, D., and M. Batistella. 2005. Exploring TM image texture
+and its relationships with biomass estimation in
+Rond\^{o}nia, Brazilian Amazon. Acta Amazonica 35:249-257.
 
-  Gonzalez, R. C. 2008. Digital image processing. 3rd ed.
-  Prentice Hall, Upper Saddle River, N.J, pages 830-836.
+Gonzalez, R. C. 2008. Digital image processing. 3rd ed.
+Prentice Hall, Upper Saddle River, N.J, pages 830-836.
 
-  Haralick, R. M., K. Shanmugam, and I. Dinstein. 1973.
-  Textural features for image classification. IEEE
-  Transactions on Systems, Man and Cybernetics
-  SMC-3:610-621.
+Haralick, R. M., K. Shanmugam, and I. Dinstein. 1973.
+Textural features for image classification. IEEE
+Transactions on Systems, Man and Cybernetics SMC-3:610-621.
 
-  Pratt, W. K. 2007. Digital image processing: PIKS
-  Scientific inside. 4th ed. Wiley-Interscience, Hoboken,
-  N.J pages 540-541, 563-566.
+Pratt, W. K. 2007. Digital image processing: PIKS
+Scientific inside. 4th ed. Wiley-Interscience, Hoboken, N.J
+pages 540-541, 563-566.
 }
 

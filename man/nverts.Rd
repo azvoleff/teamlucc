@@ -2,16 +2,16 @@
 \alias{nverts}
 \title{Count number of vertices in an sp polygon object}
 \usage{
-  nverts(poly_obj)
+nverts(poly_obj)
 }
 \arguments{
   \item{poly_obj}{an sp polygon object}
 }
 \value{
-  the number of vertices in the polygon
+the number of vertices in the polygon
 }
 \description{
-  Count number of vertices in an sp polygon object
+Count number of vertices in an sp polygon object
 }
 \examples{
 # TODO: Write an example.

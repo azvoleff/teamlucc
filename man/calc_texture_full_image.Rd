@@ -2,8 +2,7 @@
 \alias{calc_texture_full_image}
 \title{Calculates a glcm texture for use in the glcm.R script}
 \usage{
-  calc_texture_full_image(rast, n_grey, window_dims, shift,
-    statistics)
+calc_texture_full_image(rast, n_grey, window_dims, shift, statistics)
 }
 \arguments{
   \item{rast}{a matrix containing the pixels to be used in
@@ -22,12 +21,12 @@
   statistics to calculate}
 }
 \value{
-  a list of length equal to the length of the
-  \code{statistics} input parameter, containing the
-  selected textures measures
+a list of length equal to the length of the
+\code{statistics} input parameter, containing the selected
+textures measures
 }
 \description{
-  This function is called by the \code{\link{glcm}}
-  function. It is not intended to be used directly.
+This function is called by the \code{\link{glcm}} function.
+It is not intended to be used directly.
 }
 

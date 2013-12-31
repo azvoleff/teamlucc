@@ -2,9 +2,8 @@
 \alias{topographic_corr}
 \title{Topographically correct a raster}
 \usage{
-  topographic_corr(x, slopeaspect, sunelev, sunazimuth,
-    method, filename = NULL, overwrite = FALSE,
-    inparallel = FALSE, sampleindices = NULL)
+topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = NULL,
+  overwrite = FALSE, inparallel = FALSE, sampleindices = NULL)
 }
 \arguments{
   \item{x}{an image to correct}
@@ -41,16 +40,16 @@
   these indices.}
 }
 \value{
-  The topographically corrected image.
+The topographically corrected image.
 }
 \description{
-  Performs topographic correction using code based on
-  \code{\link{topocorr}} from the \code{Landsat} package.
-  The code in this package has been modifed from
-  \code{\link{topocorr}} to allow using a subsample of the
-  image for Minnaert k calculations, and to provide the
-  option of running the topographic correction in parallel
-  using \code{\link{foreach}}.
+Performs topographic correction using code based on
+\code{\link{topocorr}} from the \code{Landsat} package. The
+code in this package has been modifed from
+\code{\link{topocorr}} to allow using a subsample of the
+image for Minnaert k calculations, and to provide the
+option of running the topographic correction in parallel
+using \code{\link{foreach}}.
 }
 \examples{
 # Mosaic the two ASTER DEM tiles needed to a Landsat image

@@ -2,7 +2,7 @@
 \alias{extract_training_data}
 \title{Extract training data for use in a classification}
 \usage{
-  extract_training_data(x, polys, classcol, training = 1)
+extract_training_data(x, polys, classcol, training = 1)
 }
 \arguments{
   \item{x}{a \code{Raster*} object from which training data
@@ -27,14 +27,13 @@
   use in training.}
 }
 \value{
-  A data.frame with the training data. Each row will
-  contain the response (the column chosen by
-  \code{classcol}) as the first column, with the remaining
-  columns containing the values at that location of each
-  band in the raster stack.
+A data.frame with the training data. Each row will contain
+the response (the column chosen by \code{classcol}) as the
+first column, with the remaining columns containing the
+values at that location of each band in the raster stack.
 }
 \description{
-  Extract training data for use in a classification
+Extract training data for use in a classification
 }
 \examples{
 train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training,

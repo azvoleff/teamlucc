@@ -2,7 +2,7 @@
 \alias{color_image}
 \title{Assign class labels to classification file}
 \usage{
-  color_image(x, cls, outfile)
+color_image(x, cls, outfile)
 }
 \arguments{
   \item{x}{classified image as \code{RasterLayer}}
@@ -14,7 +14,7 @@
   \item{outfile}{the filename to use for the output}
 }
 \description{
-  Assign class labels to classification file
+Assign class labels to classification file
 }
 \examples{
 #TODO: Add examples

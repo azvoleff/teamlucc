@@ -3,10 +3,9 @@
 \alias{ASTER_V002_EAST}
 \title{Subset of ASTER Digital Elevation Model V002}
 \description{
-  Subset of ASTER Digital Elevation Model V002
+Subset of ASTER Digital Elevation Model V002
 }
 \seealso{
-  ASTER_V002_WEST
+ASTER_V002_WEST
 }
-\keyword{datasets}
 

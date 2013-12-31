@@ -2,9 +2,8 @@
 \alias{training_sample}
 \title{Generate random sample polygons from a raster layer}
 \usage{
-  training_sample(x, size, side = 2 * xres(x),
-    fields = c(), out_file = NULL, validate = TRUE,
-    validate.layer = 1, exp = 2)
+training_sample(x, size, side = 2 * xres(x), fields = c(),
+  out_file = NULL, validate = TRUE, validate.layer = 1, exp = 2)
 }
 \arguments{
   \item{x}{a \code{Raster*}}
@@ -33,21 +32,20 @@
   fewer sample polygons than desired \code{size}}
 }
 \value{
-  a \code{SpatialPolygonsDataFrame} with \code{n} polygons
+a \code{SpatialPolygonsDataFrame} with \code{n} polygons
 }
 \description{
-  Useful for gathering training data for an image
-  classification. With the default settings, the output
-  polygons will be perfectly aligned with the pixels in the
-  input raster.
+Useful for gathering training data for an image
+classification. With the default settings, the output
+polygons will be perfectly aligned with the pixels in the
+input raster.
 }
 \details{
-  The \code{validate} parameter allows excluding no data
-  areas from the output polygons (though the simple method
-  this function uses to enforce this means that pixels
-  within the border areas of the image will have a slightly
-  lower probability of selection than those in the
-  interior).
+The \code{validate} parameter allows excluding no data
+areas from the output polygons (though the simple method
+this function uses to enforce this means that pixels within
+the border areas of the image will have a slightly lower
+probability of selection than those in the interior).
 }
 \examples{
 \dontrun{

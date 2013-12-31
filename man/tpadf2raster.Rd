@@ -2,7 +2,7 @@
 \alias{tpadf2raster}
 \title{Function to convert TIMESAT .tpa data.frame to an R raster.}
 \usage{
-  tpadf2raster(x, base_image, variable)
+tpadf2raster(x, base_image, variable)
 }
 \arguments{
   \item{x}{A TPA data.frame as output by tpa2df}
@@ -18,11 +18,10 @@
   right_deriv, large_integ, and small_integ.}
 }
 \value{
-  A raster object
+A raster object
 }
 \description{
-  Function to convert TIMESAT .tpa data.frame to an R
-  raster.
+Function to convert TIMESAT .tpa data.frame to an R raster.
 }
 \examples{
 # TODO: Need to add examples here, and need to include a sample TIMESAT tpa

@@ -2,7 +2,7 @@
 \alias{split_class}
 \title{Calculate change-trajectory image}
 \usage{
-  split_class(train_data)
+split_class(train_data)
 }
 \arguments{
   \item{train_data}{a data table with a column labeled 'y'
@@ -10,6 +10,6 @@
   the values of predictor(s) at each location.}
 }
 \description{
-  Calculate change-trajectory image
+Calculate change-trajectory image
 }
 

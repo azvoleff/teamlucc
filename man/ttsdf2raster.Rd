@@ -2,7 +2,7 @@
 \alias{ttsdf2raster}
 \title{Function to convert TIMESAT tts data.frame an R raster.}
 \usage{
-  ttsdf2raster(x, base_image)
+ttsdf2raster(x, base_image)
 }
 \arguments{
   \item{x}{A TTS data.frame as output by tts2df}
@@ -13,10 +13,10 @@
   TIMESAT.}
 }
 \value{
-  A raster object
+A raster object
 }
 \description{
-  Function to convert TIMESAT tts data.frame an R raster.
+Function to convert TIMESAT tts data.frame an R raster.
 }
 \examples{
 # TODO: Need to add examples here, and need to include a sample TIMESAT tpa
