@@ -23,22 +23,21 @@
     K <- K[K$IL > 0, ]
 
     k_table <- data.frame(matrix(0, nrow=length(slopeclass) - 1, ncol=3))
-    k_table[, 1] <- diff(slopeclass)/2 + slopeclass[1:length(slopeclass) - 1]
+    names(k_table) <- c('midpoint', 'n', 'k')
+    k_table$midpoint <- diff(slopeclass)/2 + slopeclass[1:length(slopeclass) - 1]
 
     # don't use slopes outside slopeclass range
     K.cut <- as.numeric(cut(K$slope, slopeclass))
     if(nrow(k_table) != length(table(K.cut))) {
         stop("slopeclass is inappropriate for these data (empty classes)\n")
     }
-    k_table[, 2] <- table(K.cut)
+    k_table$n <- table(K.cut)
 
     for(i in sort(unique(K.cut[!is.na(K.cut)]))) {
-        k_table[i, 3] <- coefficients(lm(log10(K$x)[K.cut == i] ~ 
-                                         log10(K$IL/cos(sunzenith))[K.cut == 
-                                                                    i]))[[2]]
+        k_table$k[i] <- coefficients(lm(log10(K$x)[K.cut == i] ~ 
+                                        log10(K$IL/cos(sunzenith))[K.cut == i]))[[2]]
     }
-    colnames(k_table) <- c('midpoint', 'n', 'k')
-    model <- with(k_table, gam(k ~ s(midpoint, k=length(midpoint) - 1)))
+    model <- gam(k_table$k ~ s(k_table$midpoint, k=length(k_table$midpoint) - 1))
 
     return(list(model=model, k_table=k_table))
 }
