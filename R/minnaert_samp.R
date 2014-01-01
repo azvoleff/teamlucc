@@ -1,5 +1,5 @@
 #' @import mgcv
-.calc_k_model <- function(x, IL, slope, sampleindices, slopeclass,
+.calc_k_table <- function(x, IL, slope, sampleindices, slopeclass,
                           coverclass, sunzenith) {
     if (!is.null(sampleindices)) {
         K <- data.frame(x=x[sampleindices],
@@ -37,9 +37,8 @@
         k_table$k[i] <- coefficients(lm(log10(K$x)[K.cut == i] ~ 
                                         log10(K$IL/cos(sunzenith))[K.cut == i]))[[2]]
     }
-    model <- gam(k ~ s(midpoint, k=length(k_table$midpoint) - 1), data=k_table)
 
-    return(list(model=model, k_table=k_table))
+    return(k_table)
 }
 
 #' Topographic correction for satellite imagery using Minnaert method
@@ -103,15 +102,18 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     if(is.null(coverclass)) 
         coverclass <- matrix(rep(TRUE, length(x)), nrow=nrow(x))
 
-    k_model <- .calc_k_model(x, IL, slope, sampleindices, slopeclass, 
+    k_table <- .calc_k_table(x, IL, slope, sampleindices, slopeclass, 
                              coverclass, sunzenith)
+
+    k_model <- gam(k ~ s(midpoint, k=length(k_table$midpoint) - 1), data=k_table)
 
     names(slope) <- 'midpoint'
     # if slope is greater than modeled range, use maximum of modeled range
     slope[slope > max(slopeclass)] <- max(slopeclass)
     # if slope is less than modeled range, treat it as flat
     slope[slope < min(slopeclass)] <- 0
-    K.all <- predict(slope, k_model$model)
+    print("Made it to prediction line in minnaert_samp")
+    K.all <- predict(slope, k_model)
     K.all[K.all > 1] <- 1
     K.all[K.all < 0] <- 0
 
@@ -120,5 +122,5 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     # Don't correct flat areas
     xout[K.all == 0 & !is.na(K.all)] <- x[K.all == 0 & !is.na(K.all)]
 
-    list(classcoef=k_model$k_table, model=k_model$model, minnaert=xout, sampleindices=sampleindices)
+    list(classcoef=k_table, model=k_model, minnaert=xout, sampleindices=sampleindices)
 }
