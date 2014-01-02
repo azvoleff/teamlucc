@@ -70,8 +70,9 @@ landsat_minnaert <- minnaert(as(L5TSR_1986_b1, "SpatialGridDataFrame"), slope,
 landsat_minnaert <- raster(landsat_minnaert$minnaert)
 names(landsat_minnaert) <- 'b1tc'
 
+# Need a tolerance since teamr uses 'bam' instead of 'gam'
 test_that("teamr minnaert and landsat minnaert match", {
-          expect_equal(teamr_minnaert, expected=landsat_minnaert)
+          expect_equal(teamr_minnaert, expected=landsat_minnaert, tolerance=.1)
 })
 
 ###############################################################################

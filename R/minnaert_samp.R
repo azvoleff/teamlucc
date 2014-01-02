@@ -59,7 +59,6 @@
 #' @param aspect the aspect as a \code{RasterLayer}
 #' @param sunelev sun elevation in degrees
 #' @param sunazimuth sun azimuth in degrees
-#' @param na.value the value used to code no data values
 #' @param GRASS.aspect is aspect defined according to GRASS convetion
 #' @param IL.epsilon a small amount to add to calculated illumination values 
 #' that are equal to zero to avoid division by zero resulting in Inf values
@@ -75,7 +74,7 @@
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
 minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
-                          na.value=NA, GRASS.aspect=FALSE, IL.epsilon=0.000001,
+                          GRASS.aspect=FALSE, IL.epsilon=0.000001,
                           slopeclass=c(1, 5, 10, 15, 20, 25, 30, 45), 
                           coverclass=NULL, sampleindices=NULL) {
     ## aspect may be GRASS output: counterclockwise from east
@@ -86,8 +85,6 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
         aspect <- -1 * aspect + 90
         aspect <- (aspect + 360) %% 360
     }
-
-    x[x == na.value] <- NA
 
     # all inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
@@ -104,15 +101,14 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
 
     k_table <- .calc_k_table(x, IL, slope, sampleindices, slopeclass, 
                              coverclass, sunzenith)
+    
+    k_model <- bam(k ~ s(midpoint, k=length(midpoint) - 1), data=k_table)
 
-    k_model <- gam(k ~ s(midpoint, k=length(k_table$midpoint) - 1), data=k_table)
-
-    names(slope) <- 'midpoint'
     # if slope is greater than modeled range, use maximum of modeled range
     slope[slope > max(slopeclass)] <- max(slopeclass)
     # if slope is less than modeled range, treat it as flat
     slope[slope < min(slopeclass)] <- 0
-    print("Made it to prediction line in minnaert_samp")
+    names(slope) <- 'midpoint'
     K.all <- predict(slope, k_model)
     K.all[K.all > 1] <- 1
     K.all[K.all < 0] <- 0
