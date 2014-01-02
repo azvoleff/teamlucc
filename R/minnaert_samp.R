@@ -52,7 +52,6 @@
 #' See the help page for \code{minnaert} in the \code{landsat} package for 
 #' additional details on the parameters.
 #'
-#' @export
 #' @import spatial.tools
 #' @param x image as a \code{RasterLayer}
 #' @param slope the slope as a \code{RasterLayer}
@@ -102,7 +101,7 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     k_table <- .calc_k_table(x, IL, slope, sampleindices, slopeclass, 
                              coverclass, sunzenith)
     
-    k_model <- bam(k ~ s(midpoint, k=length(midpoint) - 1), data=k_table)
+    k_model <- with(k_table, bam(k ~ s(midpoint, k=length(midpoint) - 1), data=k_table))
 
     # if slope is greater than modeled range, use maximum of modeled range
     slope[slope > max(slopeclass)] <- max(slopeclass)
