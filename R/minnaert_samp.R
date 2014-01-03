@@ -52,6 +52,7 @@
 #' See the help page for \code{minnaert} in the \code{landsat} package for 
 #' additional details on the parameters.
 #'
+#' @export
 #' @import spatial.tools
 #' @param x image as a \code{RasterLayer}
 #' @param slope the slope as a \code{RasterLayer}
