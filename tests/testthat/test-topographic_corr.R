@@ -1,4 +1,4 @@
-context("topographic_corr routines")
+context("topographic_corr")
 
 suppressMessages(library(landsat))
 
