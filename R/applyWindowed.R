@@ -1,13 +1,18 @@
 #' Apply a raster function with edge effects over a series of blocks
 #'
-#' This function can be useful when applying windows functions over a raster, 
-#' as 
+#' This function can be useful when applying windowed functions over a raster, 
+#' as with \code{glcm}. This function allows windows functions that have edge 
+#' effects to be applied over a raster in block-by-block fashion.  
+#' \code{applyWindowed} avoids the striping that would result if the edge 
+#' effects were ignored.
 #'
 #' @export
 #' @param x a \code{Raster*}
 #' @param fun the function to apply
-#' @param edge number of rows on top and bottom with edge effects, defined as 
-#' c(top, bottom)
+#' @param out_file path to save output raster to
+#' @param edge length 2 numberic with number of rows on top and bottom with 
+#' edge effects, defined as c(top, bottom)
+#' @param ... additional arguments to pass to \code{fun}
 #' @examples
 #' \dontrun{
 #' applyWindowed(L5TSR_1986, glcm, 'out.envi', edge=c(1, 3))
