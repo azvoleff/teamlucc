@@ -92,7 +92,6 @@ applyWindowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, ...) {
         }
         # To write to a RasterBrick the out_block needs to be structured as 
         # a 2-d matrix with bands in columns and columns as row-major vectors
-        print(paste('initial: ', paste(dim(out_block), collapse=', ')))
         if (dim(out_block)[3] == 1) {
             out_block <- aperm(out_block, c(3, 2, 1))
             out_block <- matrix(out_block, ncol=nrow(out_block))
@@ -100,7 +99,6 @@ applyWindowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, ...) {
             out_block <- aperm(out_block, c(3, 2, 1))
             out_block <- matrix(out_block, ncol=nrow(out_block), byrow=TRUE)
         }
-        print(paste('final: ', paste(dim(out_block), collapse=', ')))
         out <- writeValues(out, out_block, bs$row[block_num])
     }
     out <- writeStop(out)
