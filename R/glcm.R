@@ -2,10 +2,10 @@
 #'
 #' @export
 #' @import spatial.tools Rcpp RcppArmadillo
-#' @usage glcm(layer, n_grey = 32, window = c(3, 3), shift = c(1, 1), 
+#' @usage glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1), 
 #' statistics = c("mean", "variance", "homogeneity", "contrast", 
 #' "dissimilarity", "entropy", "second_moment", "correlation"), ...)
-#' @param layer a /code{RasterLayer}
+#' @param x a /code{RasterLayer} or matrix
 #' @param n_grey number of grey levels to use in texture calculation
 #' @param window the window size to consider for texture calculation as a two 
 #' element integer vector
@@ -32,9 +32,9 @@
 #' Pratt, W. K. 2007. Digital image processing: PIKS Scientific inside. 4th ed.
 #' Wiley-Interscience, Hoboken, N.J pages 540-541, 563-566.
 #' @examples
-#' textures <- glcm(raster(L5TSR_1986, layer=1))
+#' textures <- glcm(raster(L5TSR_1986, x=1))
 #' plot(textures)
-glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
+glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
                  statistics=c('mean', 'variance', 'homogeneity', 'contrast', 
                               'dissimilarity', 'entropy', 'second_moment', 
                               'correlation'), ...) {
@@ -53,7 +53,7 @@ glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
     avail_stats <- c('mean', 'mean_ENVI', 'variance', 'variance_ENVI', 
                      'homogeneity', 'contrast', 'dissimilarity', 'entropy', 
                      'second_moment', 'correlation')
-    stat_check <- unlist(lapply(statistics, function(x) x %in% avail_stats))
+    stat_check <- unlist(lapply(statistics, function(stat) stat %in% avail_stats))
     if (sum(stat_check) != length(stat_check)) {
         stop(paste('invalid texture(s):',
                    paste(statistics[!stat_check], collapse=', ')))
@@ -61,19 +61,19 @@ glcm <- function(layer, n_grey=32, window=c(3, 3), shift=c(1, 1),
 
     # Resample the image to the required number of grey levels
     #message(paste('Resampling to', n_grey, 'grey levels...'))
-    layer_name <- names(layer)
-    layer <- raster::cut(layer, breaks=seq(cellStats(layer, 'min'), 
-                                           cellStats(layer, 'max'), 
+    layer_name <- names(x)
+    x <- raster::cut(x, breaks=seq(cellStats(x, 'min'), 
+                                           cellStats(x, 'max'), 
                                            length.out=n_grey + 1), 
                          include.lowest=TRUE)
 
     #message('Calculating textures...')
-    texture_img <- calc_texture_full_image(raster::as.matrix(layer), 
+    texture_img <- calc_texture_full_image(raster::as.matrix(x), 
                                            n_grey, window, shift, statistics)
     if (dim(texture_img)[3] > 1) {
-        texture_img <- stack(apply(texture_img, 3, raster, template=layer))
+        texture_img <- stack(apply(texture_img, 3, raster, template=x))
     } else {
-        texture_img <- raster(texture_img[, , 1], template=layer)
+        texture_img <- raster(texture_img[, , 1], template=x)
     }
 
     names(texture_img) <- paste(layer_name, 'glcm', statistics, sep='_')
