@@ -60,3 +60,7 @@ test_that("GLCM correlation is correct", {
                  expected=getValues(glcm_test_raster_ENVI_textures$correlation),
                  tolerance=.000001)
 })
+
+#TODO:
+# Test that glcm run on a raster matches the output from running 
+# glcm directly on a matrix

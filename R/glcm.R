@@ -66,8 +66,9 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
     if (class(x) == 'RasterLayer') {
         if (is.null(min_x)) min_x <- cellStats(x, 'min')
         if (is.null(max_x)) max_x <- cellStats(x, 'max')
-        x_cut <- as.matrix(raster::cut(x, breaks=seq(min_x, max_x, length.out=(n_grey + 1)),
-                                         include.lowest=TRUE, right=FALSE))
+        x_cut <- raster::cut(x, breaks=seq(min_x, max_x, length.out=(n_grey + 1)),
+                             include.lowest=TRUE, right=FALSE)
+        x_cut <- raster::as.matrix(x_cut)
     } else if ('matrix' %in% class(x) && (length(dim(x)) == 2)) {
         if (is.null(min_x)) min_x <- min(x)
         if (is.null(max_x)) max_x <- max(x)
@@ -77,16 +78,15 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
         stop('x must be a RasterLayer or two-dimensional matrix')
     }
 
-    #message('Calculating textures...')
     textures <- calc_texture_full_image(x_cut, n_grey, window, shift, statistics)
 
     if (class(x) == 'RasterLayer') {
-        names(textures) <- paste('glcm', statistics, sep='_')
         if (dim(textures)[3] > 1) {
             textures <- stack(apply(textures, 3, raster, template=x))
         } else {
             textures <- raster(textures[, , 1], template=x)
         }
+        names(textures) <- paste('glcm', statistics, sep='_')
     } else if ('matrix' %in% class(x)) {
         dimnames(textures) <- list(NULL, NULL, paste('glcm', statistics, sep='_'))
     } else {
