@@ -30,8 +30,7 @@ if the edge effects were ignored.
 L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
 min_x <- cellStats(L5TSR_1986_b1, 'min')
 max_x <- cellStats(L5TSR_1986_b1, 'max')
-applyWindowed(L5TSR_1986_b1, glcm, tempfile(fileext='.grd'), edge=c(1, 3),
-              min_x=min_x, max_x=max_x)
+applyWindowed(L5TSR_1986_b1, glcm, edge=c(1, 3), min_x=min_x, max_x=max_x)
 }
 }
 
