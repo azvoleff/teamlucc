@@ -37,7 +37,7 @@
 glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
                  statistics=c('mean', 'variance', 'homogeneity', 'contrast', 
                               'dissimilarity', 'entropy', 'second_moment', 
-                              'correlation'), ...) {
+                              'correlation'), min_x=NULL, max_x=NULL, ...) {
     if (length(window) != 2) {
         stop('window must be integer vector of length 2')
     }
@@ -50,33 +50,48 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
     if ((window[1] %% 2 == 0) || (window[2] %% 2 == 0)) {
         stop('both elements of window must be odd')
     }
+    if (class(statistics) != 'character') {
+        stop('statistics must be a character vector')
+    }
     avail_stats <- c('mean', 'mean_ENVI', 'variance', 'variance_ENVI', 
                      'homogeneity', 'contrast', 'dissimilarity', 'entropy', 
                      'second_moment', 'correlation')
     stat_check <- unlist(lapply(statistics, function(stat) stat %in% avail_stats))
     if (sum(stat_check) != length(stat_check)) {
-        stop(paste('invalid texture(s):',
+        stop(paste('invalid statistic(s):',
                    paste(statistics[!stat_check], collapse=', ')))
     }
 
     # Resample the image to the required number of grey levels
-    #message(paste('Resampling to', n_grey, 'grey levels...'))
-    layer_name <- names(x)
-    x <- raster::cut(x, breaks=seq(cellStats(x, 'min'), 
-                                           cellStats(x, 'max'), 
-                                           length.out=n_grey + 1), 
-                         include.lowest=TRUE)
-
-    #message('Calculating textures...')
-    texture_img <- calc_texture_full_image(raster::as.matrix(x), 
-                                           n_grey, window, shift, statistics)
-    if (dim(texture_img)[3] > 1) {
-        texture_img <- stack(apply(texture_img, 3, raster, template=x))
+    if (class(x) == 'RasterLayer') {
+        if (is.null(min_x)) min_x <- cellStats(x, 'min')
+        if (is.null(max_x)) max_x <- cellStats(x, 'max')
+        x_cut <- as.matrix(raster::cut(x, breaks=seq(min_x, max_x, length.out=(n_grey + 1)),
+                                         include.lowest=TRUE, right=FALSE))
+    } else if ('matrix' %in% class(x) && (length(dim(x)) == 2)) {
+        if (is.null(min_x)) min_x <- min(x)
+        if (is.null(max_x)) max_x <- max(x)
+        x_cut <- matrix(findInterval(x, seq(min_x, max_x, length.out=(n_grey + 1)), all.inside=TRUE),
+                          nrow=nrow(x))
     } else {
-        texture_img <- raster(texture_img[, , 1], template=x)
+        stop('x must be a RasterLayer or two-dimensional matrix')
     }
 
-    names(texture_img) <- paste(layer_name, 'glcm', statistics, sep='_')
+    #message('Calculating textures...')
+    textures <- calc_texture_full_image(x_cut, n_grey, window, shift, statistics)
 
-    return(texture_img)
+    if (class(x) == 'RasterLayer') {
+        names(textures) <- paste('glcm', statistics, sep='_')
+        if (dim(textures)[3] > 1) {
+            textures <- stack(apply(textures, 3, raster, template=x))
+        } else {
+            textures <- raster(textures[, , 1], template=x)
+        }
+    } else if ('matrix' %in% class(x)) {
+        dimnames(textures) <- list(NULL, NULL, paste('glcm', statistics, sep='_'))
+    } else {
+        stop('unknown object returned from calc_texture_full_image')
+    }
+
+    return(textures)
 }
