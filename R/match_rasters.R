@@ -22,16 +22,12 @@
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
 match_rasters <- function(baseimg, matchimg, filename=NULL, overwrite=FALSE) {
     if (projection(baseimg) != projection(matchimg)) {
-        message('Coordinate systems do not match - reprojecting matchimg...')
         matchimg <- projectRaster(matchimg, baseimg)
     }
     # First crop out any overlapping area
-    message('Cropping matchimg to base...')
     outimg <- crop(matchimg, baseimg)
     # Now extend borders of cropped raster to match base raster
-    message('Extending matchimg to base...')
     outimg <- extend(matchimg, outimg)
-    #message('Resampling matchimg to base...')
     #resample(outimg, baseimg)
     if (!is.null(filename)) {
         writeRaster(outimg, filename, overwrite=overwrite)
