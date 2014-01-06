@@ -1,7 +1,7 @@
 #' Double-Window Flexible Pace Search (DFPS) threshold determination
 #'
 #' @export
-#' @import rgeos
+#' @importFrom rgeos gDifference
 #' @param chg_polys \code{SpatialPolygonsDataFrame} with polygons of change 
 #' areas surrounded by windows of no-change
 #' @param chg_mag change magnitude \code{RasterLayer} from \code{CVAPS}
