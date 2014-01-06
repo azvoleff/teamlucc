@@ -1,7 +1,7 @@
 #' Preprocess surface reflectance imagery from the Landsat CDR archive
 #'
 #' @export
-#' @importFrom rgeos gContains
+#' @importFrom rgeos gContains gUnion
 #' @param image_list a list of paths to Landsat CDR images that have been 
 #' converted to bsq files with teampy.
 #' @param dem a list of digital elevation models (DEMs) that (when mosaiced) 
@@ -18,7 +18,8 @@
 #'                  'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif')
 #' team_preprocess(image_list, dem_list)
 #' }
-team_preprocess <- function(image_list, dem_list, n_cpus=2, cleartmp=FALSE) {
+team_preprocess <- function(image_list, DEM, output_dir, n_cpus=2, 
+                            cleartmp=FALSE) {
     ################################################################################
     # Verify extents and projections of images and DEMs match (DEM projection 
     # doesn't have to match image projection, but all DEMs must have the same 
@@ -26,41 +27,53 @@ team_preprocess <- function(image_list, dem_list, n_cpus=2, cleartmp=FALSE) {
     image_stacks <- lapply(image_list, stack)
     dem_rasts <- lapply(dem_list, raster)
 
-    image_prj <- projection(image_stacks[1])
+    image_prj <- projection(image_stacks[[1]])
     if (any(lapply(image_stacks, projection) != image_prj)) {
         stop("each image in image_list must have the same projection")
     }
-    dem_prj <- projection(dem_rasts[1])
+    dem_prj <- projection(dem_rasts[[1]])
     if (any(lapply(dem_rasts, projection) != dem_prj)) {
         stop("each DEM in dem_list must have the same projection")
     }
 
+    #TODO: download ASTER that aligns with CDR SR imagery
+    # plot(dem_mosaic_extent)
+    # plot(image_extent_polys[[1]], add=TRUE)
+    # plot(image_extent_polys[[2]], add=TRUE)
+    # plot(image_extent_polys[[3]], add=TRUE)
     # Verify the combined extent of the DEMs in dem_list covers the full area 
     # of the images in image_list
-    image_extents <- lapply(image_stacks, extent)
-    dem_extents <- lapply(dem_rasts, extent)
-    image_mosaiced_extent <- mosaic(image_extents)
-    dem_mosaiced_extent <- mosaic(dem_extents)
-
-    if (!gContains(dem_mosaiced_extent, image_mosaiced_extent)) {
-        stop("mosaiced DEMs do not fully cover extent of images in image_list")
+    image_extent_polys <- lapply(image_stacks, get_extent_poly)
+    # Make sure the DEM extents and image extent polys are in same projection 
+    dem_extent_polys <- lapply(dem_rasts, function(rast) get_extent_poly(projectExtent(rast, CRS(image_prj))))
+    dem_mosaic_extent <- dem_extent_polys[[1]]
+    for (dem_extent_poly in dem_extent_polys[-1]) {
+        dem_mosaic_extent <- gUnion(dem_mosaic_extent, dem_extent_poly)
+    }
+    extents_contained <- unlist(lapply(image_extent_polys, function(ext) gContains(dem_mosaic_extent, ext)))
+    if (!any(extents_contained)) {
+        warning("DEM does not fully cover extent of images in image_list")
     }
 
     ################################################################################
     # Mosaic DEMs
     print('Mosaicing DEMs...')
     trackTime(action='start')
-    dem_mosaic <- mosaic(dem_rasts, fun='mean')
+    # See http://bit.ly/1dJPIeF re issue in raster that necessitates below workaround
+    # TODO: Contact Hijmans re possible fix
+    mosaicargs <- dem_rasts
+    mosaicargs$fun <- mean
+    dem_mosaic <- do.call(mosaic, mosaicargs)
+    dem_mosaic_filename <- file.path(data_dir, 'Rasters/DEM/ASTER/ASTER_DEM_L5TSR_1986_mosaic.envi')
+    dem_mosaic <- projectRaster(dem_mosaic, crs=CRS(image_prj), dem_mosaic_filename)
+    #dem_mosaic <- mosaic(dem_rasts, fun='mean')
     trackTime()
 
-    sfQuickInit(2)
     print('Running slopeasp_seq...')
     trackTime(action='start')
-    slopeaspect_filename <- file.path(data_dir, 'Rasters/DEM/ASTER/ASTER_DEM_L5TSR_1986_slopeaspect.grd')
-    slopeaspect <- slopeasp_seq(raster(matched_DEM_file), 
-                                filename=slopeaspect_filename, overwrite=TRUE)
+    slopeaspect_filename <- file.path(data_dir, 'Rasters/DEM/ASTER/ASTER_DEM_L5TSR_1986_slopeaspect.envi')
+    slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, overwrite=TRUE)
     trackTime()
-    sfQuickStop()
 
     for (image_path in image_list) {
         ################################################################################
