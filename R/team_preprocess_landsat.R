@@ -81,13 +81,12 @@ team_preprocess <- function(image_list, DEM, slopeaspect, output_dir, n_cpus=2,
         # The combined cloud mask includes the cloud_QA, cloud_shadow_QA, and 
         # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, while 
         # good pixels are coded as 1.
-        image_rast_mask <- masks$combined_cloud_mask * masks$missing_mask
         image_rast_mask_path <- file.path(output_path, paste(sitecode, image_basename, 'mask.envi', sep='_'))
-        writeRaster(image_rast_mask, image_rast_mask_path)
+        image_rast_mask <- overlay(masks, fun=function(cloud_mask, missing_mask) cloud_mask * missing_mask, filename=image_rast_mask_path)
 
-        image_rast <- mask(image_rast, image_rast_mask, maskvalue=0)
         image_rast_masked_path <- file.path(output_path, paste(sitecode, image_basename, 'masked.envi', sep='_'))
-        writeRaster(image_rast, image_rast_masked_path)
+        image_rast <- mask(image_rast, image_rast_mask, maskvalue=0, 
+                           filename=image_rast_masked_path)
 
         # image_rast_mask is no longer needed, so unload it to save memory
         rm(image_rast_mask)
@@ -100,19 +99,15 @@ team_preprocess <- function(image_list, DEM, slopeaspect, output_dir, n_cpus=2,
         trackTime(action='start')
         cropped_dem_file <- file.path(output_path, paste(sitecode, image_basename, 'dem.envi', sep='_'))
         cropped_slopeaspect_file <- file.path(output_path, paste(sitecode, image_basename, 'dem_slopeaspect.envi', sep='_'))
-        cropped_dem <- match_rasters(image_rast, dem, filename=cropped_dem_file)
-        cropped_slopeapect <- match_rasters(image_rast, slopeaspect, filename=cropped_dem_file)
+        cropped_dem <- match_rasters(image_rast, raster(dem), filename=cropped_dem_file)
+        cropped_slopeapect <- match_rasters(image_rast, stack(slopeaspect), filename=cropped_slopeaspect_file)
         trackTime()
 
         print('Running topocorr...')
         library(spatial.tools)
         trackTime(action='start')
-        slopeaspect <- brick(slopeaspect)
-        metadatafile <- extension(image_path, 'txt')
-        sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
-        sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
-        topocorr_filename <- file.path(output_path, paste(sitecode, image_basename, 'masked_tc.envi', sep='_'))
-        # First draw a sample for the Minnaert k regression
+
+        # Draw a sample for the Minnaert k regression
         horizcells <- 10
         vertcells <- 10
         nsamp <- 200000 / (horizcells * vertcells)
@@ -121,7 +116,13 @@ team_preprocess <- function(image_list, DEM, slopeaspect, output_dir, n_cpus=2,
         # major order
         sampleindices <- gridsample(image_rast, horizcells=10, vertcells=10, 
                                     nsamp=nsamp, rowmajor=TRUE)
-        image_rast <- topographic_corr(image_rast, slopeaspect, sunelev, 
+
+        metadatafile <- extension(image_path, 'txt')
+        sunelev <- 90 - as.numeric(get_metadata_item(metadatafile, 'SolarZenith'))
+        sunazimuth <- as.numeric(get_metadata_item(metadatafile, 'SolarAzimuth'))
+
+        topocorr_filename <- file.path(output_path, paste(sitecode, image_basename, 'masked_tc.envi', sep='_'))
+        image_rast <- topographic_corr(image_rast, cropped_slopeaspect, sunelev, 
                                        sunazimuth, method='minnaert_full', 
                                        filename=topocorr_filename, 
                                        inparallel=TRUE, overwrite=TRUE,

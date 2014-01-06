@@ -2,15 +2,20 @@
 \alias{team_preprocess}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-team_preprocess(image_list, dem_list, n_cpus = 2, cleartmp = FALSE)
+team_preprocess(image_list, DEM, slopeaspect, output_dir, n_cpus = 2,
+  cleartmp = FALSE)
 }
 \arguments{
   \item{image_list}{a list of paths to Landsat CDR images
   that have been converted to bsq files with teampy.}
 
-  \item{dem}{a list of digital elevation models (DEMs) that
-  (when mosaiced) covers the full extent of all the images
-  in the image_list.}
+  \item{dem}{path to a digital elevation model (DEM)
+  covering the full extent of all the images in
+  \code{image_list}. See \code{team_setup_dem} for a
+  function simplifying this.}
+
+  \item{slopeaspect}{path to a two layer raster stack with
+  slope and aspect calculated from the above DEM}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
@@ -24,12 +29,12 @@ archive
 }
 \examples{
 \dontrun{
-image_list <- list('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18')
-dem_list <- list('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W084_dem.tif',
-                 'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif',
-                 'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N10W084_dem.tif',
-                 'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif')
-team_preprocess(image_list, dem_list)
+image_list <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.bsq',
+                'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc/lndsr.LT50150532001014AAA01.bsq',
+                'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc/lndsr.LE70150532012021EDC00.bsq')
+dem <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic.envi'
+slopeaspect <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic_slopeaspect.envi'
+team_preprocess(image_list, dem, 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 }
 }
 
