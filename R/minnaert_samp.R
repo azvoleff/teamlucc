@@ -8,16 +8,19 @@
         # Remember that the sample indices are row-major (as they were drawn 
         # for a RasterLayer), so the coverclass matrix needs to be transposed 
         # as it is stored in column-major order
-        coverclass <- t(coverclass)[sampleindices]
+        if(!is.null(coverclass)) coverclass <- t(coverclass)[sampleindices]
     } else {
         K <- data.frame(x=getValues(x), IL=getValues(IL), 
                         slope=getValues(slope))
     }
 
+    if(!is.null(coverclass)) {
+        K <- K[coverclass, ]
+    }
+
     ## K is between 0 and 1
     # IL can be <=0 under certain conditions
     # but that makes it impossible to take log10 so remove those elements
-    K <- K[coverclass, ]
     K <- K[!apply(K, 1, function(rowvals) any(is.na(rowvals))),]
     K <- K[K$x > 0, ]
     K <- K[K$IL > 0, ]
@@ -95,9 +98,6 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
 
     IL <- .calc_IL(slope, sunzenith, sunazimuth, aspect, IL.epsilon)
     rm(aspect, sunazimuth)
-
-    if(is.null(coverclass)) 
-        coverclass <- matrix(rep(TRUE, length(x)), nrow=nrow(x))
 
     k_table <- .calc_k_table(x, IL, slope, sampleindices, slopeclass, 
                              coverclass, sunzenith)
