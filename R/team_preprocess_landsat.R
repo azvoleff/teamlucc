@@ -21,7 +21,7 @@
 #' slopeaspect <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic_slopeaspect.envi'
 #' team_preprocess(image_list, dem, 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
-team_preprocess <- function(image_list, DEM, slopeaspect, output_dir, n_cpus=2, 
+team_preprocess_landsat <- function(image_list, DEM, slopeaspect, output_dir, n_cpus=2, 
                             cleartmp=FALSE) {
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################

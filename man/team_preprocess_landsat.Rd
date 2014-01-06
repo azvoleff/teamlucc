@@ -1,8 +1,8 @@
-\name{team_preprocess}
-\alias{team_preprocess}
+\name{team_preprocess_landsat}
+\alias{team_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-team_preprocess(image_list, DEM, slopeaspect, output_dir, n_cpus = 2,
+team_preprocess_landsat(image_list, DEM, slopeaspect, output_dir, n_cpus = 2,
   cleartmp = FALSE)
 }
 \arguments{
