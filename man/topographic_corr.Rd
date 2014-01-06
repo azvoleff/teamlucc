@@ -52,6 +52,7 @@ option of running the topographic correction in parallel
 using \code{\link{foreach}}.
 }
 \examples{
+\dontrun{
 # Mosaic the two ASTER DEM tiles needed to a Landsat image
 DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 
@@ -67,5 +68,6 @@ L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, slopeaspect, sunelev,
 
 plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
+}
 }
 

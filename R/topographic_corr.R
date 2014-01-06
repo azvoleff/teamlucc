@@ -27,6 +27,7 @@
 #' \code{\link{gridsample}} for one method of calculating these indices.
 #' @return The topographically corrected image.
 #' @examples
+#' \dontrun{
 #' # Mosaic the two ASTER DEM tiles needed to a Landsat image
 #' DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 #' 
@@ -42,6 +43,7 @@
 #' 
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
+#' }
 topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
                              filename=NULL, overwrite=FALSE, inparallel=FALSE, 
                              sampleindices=NULL) {
