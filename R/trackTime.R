@@ -27,8 +27,7 @@ trackTime <- function(label='', action='print', email=FALSE) {
                 print(paste('trackTime:', round(as.duration(now() - startTimeVar[[1]]), 2)))
             }
         } else {
-            stop(paste0('No timer with label "', label, '" found. Must call 
-                        trackTime("start") before calling trackTime()'))
+            stop(paste0('No timer with label "', label, '" found. Must call trackTime(action="start") before calling trackTime()'))
         }
     } else {
         stop(paste('Unrecognized action "', action, '"', sep=''))
