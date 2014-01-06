@@ -4,7 +4,7 @@
 #' @import rgdal
 #' @param x A \code{Raster*} object
 #' @param fields list of fields to include in the output shapefile
-get_extent_poly <- function(x, fields=c('class_1986', 'class_2001')) {
+get_extent_poly <- function(x, fields=c()) {
     img_ext <- extent(x)
     # Need to create the shapefile with a polygon in it as R doesn't have an 
     # easy way to create and setup an empty shapefile. So make a polygon with 
