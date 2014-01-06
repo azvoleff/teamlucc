@@ -1,7 +1,7 @@
 #' Print status messages tracking run time for an R script
 #'
 #' @export
-#' @import lubridate
+#' @importFrom lubridate as.duration now
 #' @param an optional label used to maintain multiple tracking timers
 #' @param action a string indicating whether to \code{start} the timer or 
 #' \code{print} (default) the time that has passed since the timer was last 
