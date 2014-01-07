@@ -2,7 +2,7 @@
 \alias{team_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-team_preprocess_landsat(image_list, DEM, slopeaspect, sitecode, output_path,
+team_preprocess_landsat(image_list, dem, slopeaspect, sitecode, output_path,
   n_cpus = 2, cleartmp = FALSE)
 }
 \arguments{

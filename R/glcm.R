@@ -4,7 +4,8 @@
 #' @import spatial.tools Rcpp RcppArmadillo
 #' @usage glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1), 
 #' statistics = c("mean", "variance", "homogeneity", "contrast", 
-#' "dissimilarity", "entropy", "second_moment", "correlation"), ...)
+#' "dissimilarity", "entropy", "second_moment", "correlation"),
+#' min_x=NULL, max_x=NULL, ...)
 #' @param x a /code{RasterLayer} or matrix
 #' @param n_grey number of grey levels to use in texture calculation
 #' @param window the window size to consider for texture calculation as a two 
@@ -15,6 +16,12 @@
 #' any (one or more) of the following: 'mean', 'mean_ENVI', 'variance', 
 #' 'variance_ENVI', 'homogeneity', 'contrast', 'dissimilarity', 'entropy', 
 #' 'second_moment', and/or 'correlation'.
+#' @param min_x minimum value of input \code{RasterLayer} (optional, 
+#' \code{glcm} will calculate if not supplied). Useful when running \code{glcm} 
+#' over blocks of a raster.
+#' @param max_x maximum value of input \code{RasterLayer} (optional, 
+#' \code{glcm} will calculate if not supplied). Useful when running \code{glcm} 
+#' over blocks of a raster.
 #' @param ... additional parameters to pass to rasterEngine
 #' @return A /code{RasterLayer} with the calculated requested GLCM texture 
 #' measures.

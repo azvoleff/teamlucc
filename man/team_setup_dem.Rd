@@ -6,9 +6,9 @@ team_setup_dem(dem_list, sitecode, output_path, sample_image = NULL,
   n_cpus = 1)
 }
 \arguments{
-  \item{dem}{a list of digital elevation models (DEMs) that
-  (when mosaiced) covers the full extent of all the images
-  in the image_list.}
+  \item{dem_list}{a list of digital elevation models (DEMs)
+  that (when mosaiced) covers the full extent of all the
+  images in the image_list.}
 
   \item{sitecode}{code to use as a prefix for all
   filenames}

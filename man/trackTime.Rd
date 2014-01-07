@@ -2,10 +2,10 @@
 \alias{trackTime}
 \title{Print status messages tracking run time for an R script}
 \usage{
-trackTime(label = "", action = "print", email = FALSE)
+trackTime(label = "", action = "print")
 }
 \arguments{
-  \item{an}{optional label used to maintain multiple
+  \item{label}{an optional label used to maintain multiple
   tracking timers}
 
   \item{action}{a string indicating whether to \code{start}

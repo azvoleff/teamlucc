@@ -4,7 +4,8 @@
 \usage{
 glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1),
 statistics = c("mean", "variance", "homogeneity", "contrast",
-"dissimilarity", "entropy", "second_moment", "correlation"), ...)
+"dissimilarity", "entropy", "second_moment", "correlation"),
+min_x=NULL, max_x=NULL, ...)
 }
 \arguments{
   \item{x}{a /code{RasterLayer} or matrix}
@@ -24,6 +25,14 @@ statistics = c("mean", "variance", "homogeneity", "contrast",
   'variance_ENVI', 'homogeneity', 'contrast',
   'dissimilarity', 'entropy', 'second_moment', and/or
   'correlation'.}
+
+  \item{min_x}{minimum value of input \code{RasterLayer}
+  (optional, \code{glcm} will calculate if not supplied).
+  Useful when running \code{glcm} over blocks of a raster.}
+
+  \item{max_x}{maximum value of input \code{RasterLayer}
+  (optional, \code{glcm} will calculate if not supplied).
+  Useful when running \code{glcm} over blocks of a raster.}
 
   \item{...}{additional parameters to pass to rasterEngine}
 }

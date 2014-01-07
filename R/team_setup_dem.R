@@ -2,8 +2,8 @@
 #'
 #' @export
 #' @import spatial.tools
-#' @param dem a list of digital elevation models (DEMs) that (when mosaiced) 
-#' covers the full extent of all the images in the image_list.
+#' @param dem_list a list of digital elevation models (DEMs) that (when 
+#' mosaiced) covers the full extent of all the images in the image_list.
 #' @param sitecode code to use as a prefix for all filenames
 #' @param output_path the path to use for the output 
 #' @param sample_image a \code{Raster*} or the path to an image in a format 

@@ -2,13 +2,13 @@
 #'
 #' @export
 #' @importFrom lubridate as.duration now
-#' @param an optional label used to maintain multiple tracking timers
+#' @param label an optional label used to maintain multiple tracking timers
 #' @param action a string indicating whether to \code{start} the timer or 
 #' \code{print} (default) the time that has passed since the timer was last 
 #' started.
 #' @examples
 #' #TODO: Add examples
-trackTime <- function(label='', action='print', email=FALSE) {
+trackTime <- function(label='', action='print') {
     if (action == 'start') {
         assign(paste('trackTime_starttime', label, sep='_'), now(), 
                inherits=TRUE)

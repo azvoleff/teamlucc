@@ -24,7 +24,8 @@ Imports:
     caret,
     foreach,
     sp,
-    mclust
+    mclust,
+    lubridate
 Suggests:
     testthat
 LinkingTo: Rcpp, RcppArmadillo

@@ -24,7 +24,7 @@
 #' team_preprocess(image_list, dem, slopeaspect, "VB", 
 #' 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
-team_preprocess_landsat <- function(image_list, DEM, slopeaspect, sitecode, output_path, n_cpus=2, 
+team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, output_path, n_cpus=2, 
                             cleartmp=FALSE) {
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################
@@ -103,11 +103,10 @@ team_preprocess_landsat <- function(image_list, DEM, slopeaspect, sitecode, outp
         cropped_dem_file <- file.path(output_path, paste(sitecode, image_basename, 'dem.envi', sep='_'))
         cropped_slopeaspect_file <- file.path(output_path, paste(sitecode, image_basename, 'dem_slopeaspect.envi', sep='_'))
         cropped_dem <- match_rasters(image_rast, raster(dem), filename=cropped_dem_file)
-        cropped_slopeapect <- match_rasters(image_rast, stack(slopeaspect), filename=cropped_slopeaspect_file)
+        cropped_slopeaspect <- match_rasters(image_rast, stack(slopeaspect), filename=cropped_slopeaspect_file)
         trackTime()
 
         print('Running topocorr...')
-        library(spatial.tools)
         trackTime(action='start')
 
         # Draw a sample for the Minnaert k regression
@@ -147,7 +146,7 @@ team_preprocess_landsat <- function(image_list, DEM, slopeaspect, sitecode, outp
         trackTime(action='start')
         MSAVI2_glcm_filename <- file.path(output_path, paste(sitecode, image_basename, 'masked_tc_MSAVI2_glcm.envi', sep='_'))
         MSAVI2_layer <- raster(MSAVI2_filename)
-        MSAVI2_glcm <- glcm(MSAVI2_layer, filename=glcm_filename, overwrite=TRUE)
+        MSAVI2_glcm <- glcm(MSAVI2_layer, filename=MSAVI2_glcm_filename, overwrite=TRUE)
         trackTime()
 
         ################################################################################
