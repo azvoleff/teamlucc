@@ -36,7 +36,7 @@ team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL,
     ################################################################################
     # Mosaic DEMs
     print('Mosaicing DEMs...')
-    trackTime(action='start')
+    track_time(action='start')
     # See http://bit.ly/1dJPIeF re issue in raster that necessitates below workaround
     # TODO: Contact Hijmans re possible fix
     mosaicargs <- dem_rasts
@@ -49,12 +49,12 @@ team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL,
     } else {
         dem_mosaic <- projectRaster(dem_mosaic, sample_image, filename=dem_mosaic_filename, overwrite=overwrite)
     }
-    trackTime()
+    track_time()
 
     print('Running slopeasp_seq...')
-    trackTime(action='start')
+    track_time(action='start')
     slopeaspect_filename <- file.path(output_path, paste0(sitecode, '_dem_mosaic_slopeaspect.envi'))
     slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, overwrite=overwrite)
-    trackTime()
+    track_time()
     if (n_cpus > 1) sfQuickStop()
 }

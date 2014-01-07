@@ -7,27 +7,41 @@
 #' \code{print} (default) the time that has passed since the timer was last 
 #' started.
 #' @examples
-#' #TODO: Add examples
+#' track_time(action="start")
+#' track_time()
+#'
+#' track_time(label='process1', action="start")
+#' track_time(label='process1')
+#'
+#' track_time()
 track_time <- function(label='', action='print') {
     if (action == 'start') {
-        assign(paste('trackTime_starttime', label, sep='_'), now(), 
+        assign(paste('track_time_starttime', label, sep='_'), now(), 
                inherits=TRUE)
         if (label != '') {
-            return(paste0('trackTime: Tracking timer "', label,'" started at ', now(), '.'))
+            return(paste0('track_time: Tracking timer "',
+                          label,'" started at ', now(), '.'))
         } else {
-            return(paste0('trackTime: Tracking timer started at ', now(), '.'))
+            return(paste0('track_time: Tracking timer started at ',
+                          now(), '.'))
         }
     } else if (action == 'print') {
-        startTimeVar <- mget(paste('trackTime_starttime', label, sep='_'), 
+        startTimeVar <- mget(paste('track_time_starttime', label, sep='_'), 
                              ifnotfound=list(NULL), inherits=TRUE)
         if (!is.null(startTimeVar[[1]])) {
             if (label != '') {
-                return(paste0('trackTime (', label, '): ', round(as.duration(now() - startTimeVar[[1]]), 2)))
+                return(paste0('track_time (', label, '): ',
+                              round(as.duration(now() - startTimeVar[[1]]), 2)))
             } else {
-                return(paste('trackTime:', round(as.duration(now() - startTimeVar[[1]]), 2)))
+                return(paste('track_time:',
+                             round(as.duration(now() - startTimeVar[[1]]), 2)))
             }
         } else {
-            stop(paste0('No timer with label "', label, '" found. Must call trackTime(action="start") before calling trackTime()'))
+            if (label == '') {
+                stop(paste0('No unlabeled timer found. Must call track_time(action="start") before calling track_time()'))
+            } else {
+                stop(paste0('No timer with label "', label, '" found. Must call track_time(action="start") before calling track_time()'))
+            }
         }
     } else {
         stop(paste('Unrecognized action "', action, '"', sep=''))

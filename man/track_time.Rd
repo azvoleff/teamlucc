@@ -1,8 +1,8 @@
-\name{trackTime}
-\alias{trackTime}
+\name{track_time}
+\alias{track_time}
 \title{Print status messages tracking run time for an R script}
 \usage{
-trackTime(label = "", action = "print")
+track_time(label = "", action = "print")
 }
 \arguments{
   \item{label}{an optional label used to maintain multiple
@@ -16,6 +16,12 @@ trackTime(label = "", action = "print")
 Print status messages tracking run time for an R script
 }
 \examples{
-#TODO: Add examples
+track_time(action="start")
+track_time()
+
+track_time(label='process1', action="start")
+track_time(label='process1')
+
+track_time()
 }
 
