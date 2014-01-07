@@ -3,7 +3,7 @@
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
 team_preprocess_landsat(image_list, dem, slopeaspect, sitecode, output_path,
-  n_cpus = 2, cleartmp = FALSE, overwrite = FALSE)
+  n_cpus = 1, cleartmp = FALSE, overwrite = FALSE)
 }
 \arguments{
   \item{image_list}{a list of paths to Landsat CDR images

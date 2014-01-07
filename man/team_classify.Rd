@@ -2,7 +2,7 @@
 \alias{team_classify}
 \title{Classify a preprocessed surface reflectance image}
 \usage{
-team_classify(predictors, train_data)
+team_classify(predictors, train_data, overwrite = FALSE)
 }
 \arguments{
   \item{predictors}{a \code{Raster*} of predictor layers
@@ -12,6 +12,9 @@ team_classify(predictors, train_data)
 
   \item{train_data}{a training dataset as output by
   \code{extract_training_data}}
+
+  \item{overwrite}{whether to overwrite existing files
+  (otherwise an error will be raised)}
 }
 \description{
 First the image should be preprocesed using the
