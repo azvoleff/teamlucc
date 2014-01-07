@@ -1,6 +1,7 @@
 #' Preprocess surface reflectance imagery from the Landsat CDR archive
 #'
 #' @export
+#' @import spatial.tools
 #' @importFrom rgeos gContains gUnion
 #' @param image_list a list of paths to Landsat CDR images that have been 
 #' converted to bsq files with teampy.
@@ -9,8 +10,9 @@
 #' function simplifying this.
 #' @param slopeaspect path to a two layer raster stack with slope and aspect 
 #' calculated from the above DEM
-#' @param n_cpus the number of CPUs to use for processes that can run in 
-#' parallel
+#' @param sitecode code to use as a prefix for all filenames
+#' @param output_path the path to use for the output @param n_cpus the number 
+#' of CPUs to use for processes that can run in parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
 #' @examples
 #' \dontrun{
@@ -19,9 +21,10 @@
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc/lndsr.LE70150532012021EDC00.bsq')
 #' dem <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic.envi'
 #' slopeaspect <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic_slopeaspect.envi'
-#' team_preprocess(image_list, dem, 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
+#' team_preprocess(image_list, dem, slopeaspect, "VB", 
+#' 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
-team_preprocess_landsat <- function(image_list, DEM, slopeaspect, output_dir, n_cpus=2, 
+team_preprocess_landsat <- function(image_list, DEM, slopeaspect, sitecode, output_path, n_cpus=2, 
                             cleartmp=FALSE) {
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################

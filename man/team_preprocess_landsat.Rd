@@ -2,8 +2,8 @@
 \alias{team_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-team_preprocess_landsat(image_list, DEM, slopeaspect, output_dir, n_cpus = 2,
-  cleartmp = FALSE)
+team_preprocess_landsat(image_list, DEM, slopeaspect, sitecode, output_path,
+  n_cpus = 2, cleartmp = FALSE)
 }
 \arguments{
   \item{image_list}{a list of paths to Landsat CDR images
@@ -16,6 +16,11 @@ team_preprocess_landsat(image_list, DEM, slopeaspect, output_dir, n_cpus = 2,
 
   \item{slopeaspect}{path to a two layer raster stack with
   slope and aspect calculated from the above DEM}
+
+  \item{sitecode}{code to use as a prefix for all
+  filenames}
+
+  \item{output_path}{the path to use for the output}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
@@ -34,7 +39,8 @@ image_list <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150
                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc/lndsr.LE70150532012021EDC00.bsq')
 dem <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic.envi'
 slopeaspect <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic_slopeaspect.envi'
-team_preprocess(image_list, dem, 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
+team_preprocess(image_list, dem, slopeaspect, "VB",
+'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 }
 }
 
