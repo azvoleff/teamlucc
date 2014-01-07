@@ -49,8 +49,8 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
     # Verify the combined extent of the DEMs in dem_list covers the full area 
     # of the images in image_list
     image_extent_polys <- lapply(image_stacks, get_extent_poly)
+    if ('RasterLayer' != class(dem)) dem <- raster(dem)
     # Make sure the DEM extents and image extent polys are in same projection 
-    dem <- raster(dem)
     dem_extent_poly <- get_extent_poly(dem)
     extents_contained <- unlist(lapply(image_extent_polys, function(ext) gContains(dem_extent_poly, ext)))
     for (n in 1:length(extents_contained)) {
@@ -93,7 +93,6 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         image_rast_masked_path <- file.path(output_path, paste(sitecode, image_basename, 'masked.envi', sep='_'))
         image_rast <- mask(image_rast, image_rast_mask, maskvalue=0, 
                            filename=image_rast_masked_path, overwrite=overwrite)
-
         # image_rast_mask is no longer needed, so unload it to save memory
         rm(image_rast_mask)
 
@@ -104,9 +103,16 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         print('Cropping slope/aspect raster to extent of Landsat image...')
         trackTime(action='start')
         cropped_dem_file <- file.path(output_path, paste(sitecode, image_basename, 'dem.envi', sep='_'))
+        cropped_dem <- match_rasters(image_rast, dem, 
+                                     filename=cropped_dem_file, 
+                                     overwrite=overwrite)
+        if (!(class(slopeaspect) %in% c('RasterStack', 'RasterBrick'))) {
+            slopeaspect <- stack(slopeaspect)
+        }
         cropped_slopeaspect_file <- file.path(output_path, paste(sitecode, image_basename, 'dem_slopeaspect.envi', sep='_'))
-        cropped_dem <- match_rasters(image_rast, raster(dem), filename=cropped_dem_file, overwrite=overwrite)
-        cropped_slopeaspect <- match_rasters(image_rast, stack(slopeaspect), filename=cropped_slopeaspect_file, overwrite=overwrite)
+        cropped_slopeaspect <- match_rasters(image_rast, slopeaspect, 
+                                             filename=cropped_slopeaspect_file, 
+                                             overwrite=overwrite)
         trackTime()
 
         print('Running topocorr...')
