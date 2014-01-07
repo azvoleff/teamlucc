@@ -42,10 +42,6 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
     }
 
     #TODO: download ASTER that aligns with CDR SR imagery
-    # plot(dem_mosaic_extent)
-    # plot(image_extent_polys[[1]], add=TRUE)
-    # plot(image_extent_polys[[2]], add=TRUE)
-    # plot(image_extent_polys[[3]], add=TRUE)
     # Verify the combined extent of the DEMs in dem_list covers the full area 
     # of the images in image_list
     image_extent_polys <- lapply(image_stacks, get_extent_poly)
@@ -102,14 +98,20 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         # Perform topographic correction
         print('Cropping slope/aspect raster to extent of Landsat image...')
         trackTime(action='start')
-        cropped_dem_file <- file.path(output_path, paste(sitecode, image_basename, 'dem.envi', sep='_'))
+        cropped_dem_file <- file.path(output_path,
+                                      paste(sitecode, image_basename, 
+                                            'dem.envi', sep='_'))
         cropped_dem <- match_rasters(image_rast, dem, 
                                      filename=cropped_dem_file, 
                                      overwrite=overwrite)
         if (!(class(slopeaspect) %in% c('RasterStack', 'RasterBrick'))) {
             slopeaspect <- stack(slopeaspect)
         }
-        cropped_slopeaspect_file <- file.path(output_path, paste(sitecode, image_basename, 'dem_slopeaspect.envi', sep='_'))
+        cropped_slopeaspect_file <- file.path(output_path,
+                                              paste(sitecode, image_basename, 
+                                                    'dem_slopeaspect.envi', 
+                                                    sep='_'))
+        #TODO: Check why extend in this match_rasters call is raising warning
         cropped_slopeaspect <- match_rasters(image_rast, slopeaspect, 
                                              filename=cropped_slopeaspect_file, 
                                              overwrite=overwrite)
@@ -172,9 +174,9 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                   MSAVI2_glcm$glcm_mean,
                                   MSAVI2_glcm$glcm_variance,
                                   MSAVI2_glcm$glcm_dissimilarity,
-                                  dem,
-                                  slopeaspect$slope,
-                                  slopeaspect$aspect)
+                                  cropped_dem,
+                                  cropped_slopeaspect$slope,
+                                  cropped_slopeaspect$aspect)
         image_rast_preds_filename <- file.path(output_path, paste(sitecode, image_basename, 'predictors.envi', sep='_'))
         image_rast_preds <- writeRaster(image_rast_preds, image_rast_preds_filename, overwrite=overwrite)
         if (cleartmp) removeTmpFiles(h=1)
