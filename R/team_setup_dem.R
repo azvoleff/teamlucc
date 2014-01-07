@@ -11,6 +11,8 @@
 #' projection system for the output DEM mosaic.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
+#' @param overwrite whether to overwrite existing files (otherwise an error 
+#' will be raised)
 #' @examples
 #' \dontrun{
 #' dem_list <- list('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W084_dem.tif',
@@ -20,7 +22,7 @@
 #' team_setup_dem(dem_list, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
 #' }
 team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL, 
-                            n_cpus=1) {
+                            n_cpus=1, overwrite=FALSE) {
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################
     # Verify projections of DEMs match
@@ -43,16 +45,16 @@ team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL,
     dem_mosaic_filename <- file.path(output_path, paste0(sitecode, '_dem_mosaic.envi'))
     sample_image <- raster(sample_image)
     if (is.null(sample_image) | (projection(sample_image) == projection(dem_mosaic))) {
-        writeRaster(dem_mosaic, dem_mosaic_filename)
+        dem_mosaic <- writeRaster(dem_mosaic, dem_mosaic_filename, overwrite=overwriteoverwrite)
     } else {
-        dem_mosaic <- projectRaster(dem_mosaic, sample_image, filename=dem_mosaic_filename)
+        dem_mosaic <- projectRaster(dem_mosaic, sample_image, filename=dem_mosaic_filename, overwrite=overwrite)
     }
     trackTime()
 
     print('Running slopeasp_seq...')
     trackTime(action='start')
     slopeaspect_filename <- file.path(output_path, paste0(sitecode, '_dem_mosaic_slopeaspect.envi'))
-    slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, overwrite=TRUE)
+    slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, overwrite=overwrite)
     trackTime()
     if (n_cpus > 1) sfQuickStop()
 }

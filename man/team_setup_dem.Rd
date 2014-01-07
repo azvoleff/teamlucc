@@ -3,7 +3,7 @@
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
 team_setup_dem(dem_list, sitecode, output_path, sample_image = NULL,
-  n_cpus = 1)
+  n_cpus = 1, overwrite = FALSE)
 }
 \arguments{
   \item{dem_list}{a list of digital elevation models (DEMs)
@@ -22,6 +22,9 @@ team_setup_dem(dem_list, sitecode, output_path, sample_image = NULL,
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
+
+  \item{overwrite}{whether to overwrite existing files
+  (otherwise an error will be raised)}
 }
 \description{
 Setup the DEM mosaic for a particular TEAM site

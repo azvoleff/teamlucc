@@ -14,6 +14,8 @@
 #' @param output_path the path to use for the output @param n_cpus the number 
 #' of CPUs to use for processes that can run in parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
+#' @param overwrite whether to overwrite existing files (otherwise an error 
+#' will be raised)
 #' @examples
 #' \dontrun{
 #' image_list <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.bsq',
@@ -24,8 +26,9 @@
 #' team_preprocess(image_list, dem, slopeaspect, "VB", 
 #' 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
-team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, output_path, n_cpus=2, 
-                            cleartmp=FALSE) {
+team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, 
+                                    output_path, n_cpus=2, cleartmp=FALSE, 
+                                    overwrite=FALSE) {
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################
     # Verify extents and projections of images and DEMs match (DEM projection 
@@ -85,11 +88,11 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, outp
         # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, while 
         # good pixels are coded as 1.
         image_rast_mask_path <- file.path(output_path, paste(sitecode, image_basename, 'mask.envi', sep='_'))
-        image_rast_mask <- overlay(masks, fun=function(cloud_mask, missing_mask) cloud_mask * missing_mask, filename=image_rast_mask_path)
+        image_rast_mask <- overlay(masks, fun=function(cloud_mask, missing_mask) cloud_mask * missing_mask, filename=image_rast_mask_path, overwrite=overwrite)
 
         image_rast_masked_path <- file.path(output_path, paste(sitecode, image_basename, 'masked.envi', sep='_'))
         image_rast <- mask(image_rast, image_rast_mask, maskvalue=0, 
-                           filename=image_rast_masked_path)
+                           filename=image_rast_masked_path, overwrite=overwrite)
 
         # image_rast_mask is no longer needed, so unload it to save memory
         rm(image_rast_mask)
@@ -102,8 +105,8 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, outp
         trackTime(action='start')
         cropped_dem_file <- file.path(output_path, paste(sitecode, image_basename, 'dem.envi', sep='_'))
         cropped_slopeaspect_file <- file.path(output_path, paste(sitecode, image_basename, 'dem_slopeaspect.envi', sep='_'))
-        cropped_dem <- match_rasters(image_rast, raster(dem), filename=cropped_dem_file)
-        cropped_slopeaspect <- match_rasters(image_rast, stack(slopeaspect), filename=cropped_slopeaspect_file)
+        cropped_dem <- match_rasters(image_rast, raster(dem), filename=cropped_dem_file, overwrite=overwrite)
+        cropped_slopeaspect <- match_rasters(image_rast, stack(slopeaspect), filename=cropped_slopeaspect_file, overwrite=overwrite)
         trackTime()
 
         print('Running topocorr...')
@@ -127,7 +130,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, outp
         image_rast <- topographic_corr(image_rast, cropped_slopeaspect, sunelev, 
                                        sunazimuth, method='minnaert_full', 
                                        filename=topocorr_filename, 
-                                       inparallel=TRUE, overwrite=TRUE,
+                                       inparallel=TRUE, overwrite=overwrite,
                                        sampleindices=sampleindices)
         trackTime()
 
@@ -139,14 +142,16 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, outp
         MSAVI2_filename <- file.path(output_path, paste(sitecode, image_basename, 'masked_tc_MSAVI2.envi', sep='_'))
         MSAVI2_layer <- MSAVI2(red=raster(image_rast, layer=3),
                                nir=raster(image_rast, layer=4))
-        writeRaster(MSAVI2_layer, MSAVI2_filename)
+        MSAVI2_layer <- writeRaster(MSAVI2_layer, MSAVI2_filename, overwrite=overwrite)
         trackTime()
 
         print('Calculating GLCM textures from MSAVI image...')
         trackTime(action='start')
         MSAVI2_glcm_filename <- file.path(output_path, paste(sitecode, image_basename, 'masked_tc_MSAVI2_glcm.envi', sep='_'))
         MSAVI2_layer <- raster(MSAVI2_filename)
-        MSAVI2_glcm <- glcm(MSAVI2_layer, filename=MSAVI2_glcm_filename, overwrite=TRUE)
+        MSAVI2_glcm <- glcm(MSAVI2_layer)
+        MSAVI2_layer <- writeRaster(MSAVI2_layer, filename=MSAVI2_glcm_filename, 
+                    overwrite=overwrite)
         trackTime()
 
         ################################################################################
@@ -165,7 +170,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, outp
                                   slopeaspect$slope,
                                   slopeaspect$aspect)
         image_rast_preds_filename <- file.path(output_path, paste(sitecode, image_basename, 'predictors.envi', sep='_'))
-        writeRaster(image_rast_preds, image_rast_preds_filename)
+        image_rast_preds <- writeRaster(image_rast_preds, image_rast_preds_filename, overwrite=overwrite)
         if (cleartmp) removeTmpFiles(h=1)
     }
     if (n_cpus > 1) sfQuickStop()
