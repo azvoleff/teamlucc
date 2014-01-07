@@ -45,7 +45,7 @@ team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL,
     dem_mosaic_filename <- file.path(output_path, paste0(sitecode, '_dem_mosaic.envi'))
     sample_image <- raster(sample_image)
     if (is.null(sample_image) | (projection(sample_image) == projection(dem_mosaic))) {
-        dem_mosaic <- writeRaster(dem_mosaic, dem_mosaic_filename, overwrite=overwriteoverwrite)
+        dem_mosaic <- writeRaster(dem_mosaic, dem_mosaic_filename, overwrite=overwrite)
     } else {
         dem_mosaic <- projectRaster(dem_mosaic, sample_image, filename=dem_mosaic_filename, overwrite=overwrite)
     }
