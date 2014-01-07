@@ -2,7 +2,7 @@
 \alias{match_rasters}
 \title{Match the coordinate system and extent of two rasters}
 \usage{
-match_rasters(baseimg, matchimg, filename = NULL, overwrite = FALSE)
+match_rasters(baseimg, matchimg, filename = "", overwrite = FALSE)
 }
 \arguments{
   \item{baseimg}{A /code{Raster*} to use as the base image.
