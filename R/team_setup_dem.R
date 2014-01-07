@@ -13,6 +13,9 @@
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
+#' @param notify notifier to use (defaults to \code{print} function). See the 
+#' \code{notifyR} package for one way of sending notifications from R. The 
+#' \code{notify} function should accept a string as the only argument.
 #' @examples
 #' \dontrun{
 #' dem_list <- list('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W084_dem.tif',
@@ -22,7 +25,7 @@
 #' team_setup_dem(dem_list, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
 #' }
 team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL, 
-                            n_cpus=1, overwrite=FALSE) {
+                            n_cpus=1, overwrite=FALSE, notify=print) {
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################
     # Verify projections of DEMs match
@@ -35,8 +38,8 @@ team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL,
 
     ################################################################################
     # Mosaic DEMs
-    print('Mosaicing DEMs...')
-    track_time(action='start')
+    notify('Mosaicing DEMs...')
+    notify(track_time(action='start'))
     # See http://bit.ly/1dJPIeF re issue in raster that necessitates below workaround
     # TODO: Contact Hijmans re possible fix
     mosaicargs <- dem_rasts
@@ -49,12 +52,12 @@ team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL,
     } else {
         dem_mosaic <- projectRaster(dem_mosaic, sample_image, filename=dem_mosaic_filename, overwrite=overwrite)
     }
-    track_time()
+    notify(track_time())
 
-    print('Running slopeasp_seq...')
-    track_time(action='start')
+    notify('Running slopeasp_seq...')
+    notify(track_time(action='start'))
     slopeaspect_filename <- file.path(output_path, paste0(sitecode, '_dem_mosaic_slopeaspect.envi'))
     slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, overwrite=overwrite)
-    track_time()
+    notify(track_time())
     if (n_cpus > 1) sfQuickStop()
 }

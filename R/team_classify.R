@@ -11,9 +11,13 @@
 #' \code{extract_training_data}
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
+#' @param notify notifier to use (defaults to \code{print} function). See the 
+#' \code{notifyR} package for one way of sending notifications from R. The 
+#' \code{notify} function should accept a string as the only argument.
 #' @examples
 #' #TODO: Add example
-team_classify <- function(predictors, train_data, overwrite=FALSE) {
+team_classify <- function(predictors, train_data, overwrite=FALSE, 
+                          notify=print) {
     classification <- classify_image(predictors, train_data)
     classification$model
     plot(classification$pred_classes)

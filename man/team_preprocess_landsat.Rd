@@ -3,7 +3,7 @@
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
 team_preprocess_landsat(image_list, dem, slopeaspect, sitecode, output_path,
-  n_cpus = 1, cleartmp = FALSE, overwrite = FALSE)
+  n_cpus = 1, cleartmp = FALSE, overwrite = FALSE, notify = print)
 }
 \arguments{
   \item{image_list}{a list of paths to Landsat CDR images
@@ -30,6 +30,11 @@ team_preprocess_landsat(image_list, dem, slopeaspect, sitecode, output_path,
 
   \item{overwrite}{whether to overwrite existing files
   (otherwise an error will be raised)}
+
+  \item{notify}{notifier to use (defaults to \code{print}
+  function). See the \code{notifyR} package for one way of
+  sending notifications from R. The \code{notify} function
+  should accept a string as the only argument.}
 }
 \description{
 Preprocess surface reflectance imagery from the Landsat CDR

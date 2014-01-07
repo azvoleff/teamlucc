@@ -16,6 +16,9 @@
 #' @param cleartmp whether to clear temp files on each run through the loop
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
+#' @param notify notifier to use (defaults to \code{print} function). See the 
+#' \code{notifyR} package for one way of sending notifications from R. The 
+#' \code{notify} function should accept a string as the only argument.
 #' @examples
 #' \dontrun{
 #' image_list <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.bsq',
@@ -28,7 +31,7 @@
 #' }
 team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, 
                                     output_path, n_cpus=1, cleartmp=FALSE, 
-                                    overwrite=FALSE) {
+                                    overwrite=FALSE, notify=print) {
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################
     # Verify extents and projections of images and DEMs match (DEM projection 
@@ -55,7 +58,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
     }
 
     for (image_path in image_list) {
-        print(paste("Processing", image_path))
+        notify(paste("Processing", image_path))
 
         ################################################################################
         # Extract image basename for use in naming subsequent files
@@ -66,8 +69,8 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         
         ################################################################################
         # Load data and mask out clouds and missing values
-        print('Loading data and masking clouds and missing data...')
-        track_time(action='start')
+        notify('Loading data and masking clouds and missing data...')
+        notify(track_time(action='start'))
         data_bands <- grep('band_[123457]_reflectance',  
                            get_band_names_from_hdr(extension(image_path, '.hdr')))
         image_rast <- stack(image_path, bands=data_bands)
@@ -98,12 +101,12 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         # image_rast_mask is no longer needed, so unload it to save memory
         rm(image_rast_mask)
 
-        track_time()
+        notify(track_time())
 
         ################################################################################
         # Perform topographic correction
-        print('Cropping slope/aspect raster to extent of Landsat image...')
-        track_time(action='start')
+        notify('Cropping slope/aspect raster to extent of Landsat image...')
+        notify(track_time(action='start'))
         cropped_dem_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
                                             'dem.envi', sep='_'))
@@ -121,10 +124,10 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         cropped_slopeaspect <- match_rasters(image_rast, slopeaspect, 
                                              filename=cropped_slopeaspect_file, 
                                              overwrite=overwrite)
-        track_time()
+        notify(track_time())
 
-        print('Running topocorr...')
-        track_time(action='start')
+        notify('Running topocorr...')
+        notify(track_time(action='start'))
 
         # Draw a sample for the Minnaert k regression
         horizcells <- 10
@@ -154,12 +157,12 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                        inparallel=inparallel, 
                                        overwrite=overwrite,
                                        sampleindices=sampleindices)
-        track_time()
+        notify(track_time())
 
         ################################################################################
         # Calculate additional predictor layers (MSAVI and textures)
-        print('Calculating MSAVI2...')
-        track_time(action='start')
+        notify('Calculating MSAVI2...')
+        notify(track_time(action='start'))
         MSAVI2_filename <- file.path(output_path,
                                      paste(sitecode, image_basename, 
                                            'masked_tc_MSAVI2.envi', sep='_'))
@@ -167,10 +170,10 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                nir=raster(image_rast, layer=4))
         MSAVI2_layer <- writeRaster(MSAVI2_layer, MSAVI2_filename, 
                                     overwrite=overwrite)
-        track_time()
+        notify(track_time())
 
-        print('Calculating GLCM textures from MSAVI image...')
-        track_time(action='start')
+        notify('Calculating GLCM textures from MSAVI image...')
+        notify(track_time(action='start'))
         MSAVI2_glcm_filename <- file.path(output_path,
                                           paste(sitecode, image_basename, 
                                                 'masked_tc_MSAVI2_glcm.envi', 
@@ -179,7 +182,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         MSAVI2_glcm <- glcm(MSAVI2_layer)
         MSAVI2_layer <- writeRaster(MSAVI2_layer, filename=MSAVI2_glcm_filename, 
                     overwrite=overwrite)
-        track_time()
+        notify(track_time())
 
         ################################################################################
         # Layer stack predictor layers:

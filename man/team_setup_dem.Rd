@@ -3,7 +3,7 @@
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
 team_setup_dem(dem_list, sitecode, output_path, sample_image = NULL,
-  n_cpus = 1, overwrite = FALSE)
+  n_cpus = 1, overwrite = FALSE, notify = print)
 }
 \arguments{
   \item{dem_list}{a list of digital elevation models (DEMs)
@@ -25,6 +25,11 @@ team_setup_dem(dem_list, sitecode, output_path, sample_image = NULL,
 
   \item{overwrite}{whether to overwrite existing files
   (otherwise an error will be raised)}
+
+  \item{notify}{notifier to use (defaults to \code{print}
+  function). See the \code{notifyR} package for one way of
+  sending notifications from R. The \code{notify} function
+  should accept a string as the only argument.}
 }
 \description{
 Setup the DEM mosaic for a particular TEAM site
