@@ -9,9 +9,11 @@
 #' readable by the \code{raster} package.
 #' @param train_data a training dataset as output by 
 #' \code{extract_training_data}
+#' @param overwrite whether to overwrite existing files (otherwise an error 
+#' will be raised)
 #' @examples
 #' #TODO: Add example
-team_classify <- function(predictors, train_data) {
+team_classify <- function(predictors, train_data, overwrite=FALSE) {
     classification <- classify_image(predictors, train_data)
     classification$model
     plot(classification$pred_classes)

@@ -93,12 +93,10 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
         return(preds)
     }
     n_classes <- length(caret:::getClassLevels(model))
-    preds <- rasterEngine(in_rast=x, fun=calc_preds, 
-                               args=list(model=model, 
-                                         n_classes=n_classes,
-                                         classProbs=classProbs), 
-                               filename=pred_probs_filename, 
-                               chunk_format="raster")
+    preds <- rasterEngine(in_rast=x, fun=calc_preds,
+                          args=list(model=model, n_classes=n_classes, 
+                                    classProbs=classProbs), 
+                          filename=pred_probs_filename, chunk_format="raster")
     pred_classes <- raster(preds, layer=1)
     names(pred_classes) <- 'cover'
     if (classProbs) {

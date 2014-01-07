@@ -27,7 +27,7 @@
 #' 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
 team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode, 
-                                    output_path, n_cpus=2, cleartmp=FALSE, 
+                                    output_path, n_cpus=1, cleartmp=FALSE, 
                                     overwrite=FALSE) {
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################
