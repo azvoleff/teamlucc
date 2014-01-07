@@ -20,17 +20,13 @@
 #' 
 #' # Crop and extend the DEM mosaic to match the Landsat image
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
-match_rasters <- function(baseimg, matchimg, filename=NULL, overwrite=FALSE) {
+match_rasters <- function(baseimg, matchimg, filename='', overwrite=FALSE) {
     if (projection(baseimg) != projection(matchimg)) {
         matchimg <- projectRaster(matchimg, baseimg)
     }
     # First crop out any overlapping area
     outimg <- crop(matchimg, baseimg)
     # Now extend borders of cropped raster to match base raster
-    outimg <- extend(matchimg, outimg)
-    #resample(outimg, baseimg)
-    if (!is.null(filename)) {
-        writeRaster(outimg, filename, overwrite=overwrite)
-    }
+    outimg <- extend(matchimg, outimg, filename=filename, overwrite=overwrite)
     return(outimg)
 }
