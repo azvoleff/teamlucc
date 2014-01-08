@@ -105,7 +105,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
 
         ################################################################################
         # Perform topographic correction
-        notify('Cropping slope/aspect raster to extent of Landsat image...')
+        notify('Cropping dem and slope/aspect rasters to extent of Landsat image...')
         notify(track_time(action='start'))
         cropped_dem_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
@@ -125,6 +125,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                              filename=cropped_slopeaspect_file, 
                                              overwrite=overwrite)
         notify(track_time())
+        if (cleartmp) removeTmpFiles(h=1)
 
         notify('Running topocorr...')
         notify(track_time(action='start'))
@@ -158,6 +159,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                        overwrite=overwrite,
                                        sampleindices=sampleindices)
         notify(track_time())
+        if (cleartmp) removeTmpFiles(h=1)
 
         ################################################################################
         # Calculate additional predictor layers (MSAVI and textures)
