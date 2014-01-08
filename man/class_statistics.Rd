@@ -23,6 +23,10 @@ Exports statistics on pixels within each of a set of land
 cover classes
 }
 \examples{
+\dontrun{
+# Don't run due to raster bug that will be fixed in next version of raster
+#package (as of 1/8/2014). See: http://bit.ly/1fe5x0m
 class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "class_1986")
+}
 }
 
