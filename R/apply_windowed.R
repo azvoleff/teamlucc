@@ -3,7 +3,7 @@
 #' This function can be useful when applying windowed functions over a raster, 
 #' as with \code{glcm}. This function allows windows functions that have edge 
 #' effects to be applied over a raster in block-by-block fashion.  
-#' \code{applyWindowed} avoids the striping that would result if the edge 
+#' \code{apply_windowed} avoids the striping that would result if the edge 
 #' effects were ignored.
 #'
 #' @export
@@ -22,9 +22,9 @@
 #' L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
 #' min_x <- cellStats(L5TSR_1986_b1, 'min')
 #' max_x <- cellStats(L5TSR_1986_b1, 'max')
-#' applyWindowed(L5TSR_1986_b1, glcm, edge=c(1, 3), min_x=min_x, max_x=max_x)
+#' apply_windowed(L5TSR_1986_b1, glcm, edge=c(1, 3), min_x=min_x, max_x=max_x)
 #' }
-applyWindowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, filename='', 
+apply_windowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, filename='', 
                           overwrite=FALSE, ...) {
     if ((length(edge) != 2) || (class(edge) != 'numeric') || any(edge < 0)) {
         stop('edge must be a length 2 positive numeric')

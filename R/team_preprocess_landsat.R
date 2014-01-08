@@ -189,7 +189,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                                 sep='_'))
         min_MSAVI2 <- cellStats(MSAVI2_layer, 'min')
         max_MSAVI2 <- cellStats(MSAVI2_layer, 'max')
-        MSAVI2_glcm <- applyWindowed(MSAVI2_layer, glcm, edge=c(1, 3), 
+        MSAVI2_glcm <- apply_windowed(MSAVI2_layer, glcm, edge=c(1, 3), 
                                      min_x=min_MSAVI2, max_x=max_MSAVI2, 
                                      filename=MSAVI2_glcm_filename, 
                                      overwrite=overwrite)
