@@ -187,10 +187,12 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                           paste(sitecode, image_basename, 
                                                 'masked_tc_MSAVI2_glcm.envi', 
                                                 sep='_'))
-        MSAVI2_layer <- raster(MSAVI2_filename)
-        MSAVI2_glcm <- glcm(MSAVI2_layer)
-        MSAVI2_glcm <- writeRaster(MSAVI2_glcm, filename=MSAVI2_glcm_filename, 
-                    overwrite=overwrite, datatype=dataType(MSAVI2_glcm))
+        min_MSAVI2 <- cellStats(MSAVI2_layer, 'min')
+        max_MSAVI2 <- cellStats(MSAVI2_layer, 'max')
+        MSAVI2_glcm <- applyWindowed(MSAVI2_layer, glcm, edge=c(1, 3), 
+                                     min_x=min_MSAVI2, max_x=max_MSAVI2, 
+                                     filename=MSAVI2_glcm_filename, 
+                                     overwrite=overwrite)
         notify(track_time())
 
         ######################################################################
