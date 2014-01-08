@@ -91,14 +91,20 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         image_rast_mask_path <- file.path(output_path,
                                           paste(sitecode, image_basename, 
                                                 'mask.envi', sep='_'))
-        image_rast_mask <- overlay(masks, fun=function(cloud_mask, missing_mask) cloud_mask * missing_mask,
-                                   filename=image_rast_mask_path, overwrite=overwrite, datatype=dataType(masks))
+        image_rast_mask <- overlay(masks,
+                                   fun=function(cloud_mask, missing_mask) {
+                                       cloud_mask * missing_mask
+                                   },
+                                   filename=image_rast_mask_path, 
+                                   overwrite=overwrite, 
+                                   datatype=dataType(masks))
 
         image_rast_masked_path <- file.path(output_path,
                                             paste(sitecode, image_basename, 
                                                   'masked.envi', sep='_'))
         image_rast <- mask(image_rast, image_rast_mask, maskvalue=0, 
-                           filename=image_rast_masked_path, overwrite=overwrite, datatype=dataType(image_rast))
+                           filename=image_rast_masked_path, 
+                           overwrite=overwrite, datatype=dataType(image_rast))
         # image_rast_mask is no longer needed, so unload it to save memory
         rm(image_rast_mask)
 
@@ -157,7 +163,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                        sunazimuth, method='minnaert_full', 
                                        filename=topocorr_filename, 
                                        inparallel=inparallel, 
-                                       overwrite=overwrite, datatype=dataType(image_rast),
+                                       overwrite=overwrite, 
                                        sampleindices=sampleindices)
         notify(track_time())
         if (cleartmp) removeTmpFiles(h=1)

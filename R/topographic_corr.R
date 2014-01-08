@@ -107,7 +107,8 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
     }
     names(corr_img) <- paste0(names(x), 'tc')
     if (!is.null(filename)) {
-        writeRaster(corr_img, filename=filename, overwrite=overwrite, datatype=dataType(corr_img))
+        writeRaster(corr_img, filename=filename, overwrite=overwrite, 
+                    datatype=dataType(x))
     }
     return(corr_img)
 }
