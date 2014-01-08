@@ -47,19 +47,28 @@ team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL,
     mosaicargs <- dem_rasts
     mosaicargs$fun <- mean
     dem_mosaic <- do.call(mosaic, mosaicargs)
-    dem_mosaic_filename <- file.path(output_path, paste0(sitecode, '_dem_mosaic.envi'))
+    dem_mosaic_filename <- file.path(output_path,
+                                     paste0(sitecode, '_dem_mosaic.envi'))
     sample_image <- raster(sample_image)
-    if (is.null(sample_image) | (projection(sample_image) == projection(dem_mosaic))) {
-        dem_mosaic <- writeRaster(dem_mosaic, dem_mosaic_filename, overwrite=overwrite)
+    if (is.null(sample_image) | (projection(sample_image) == 
+                                 projection(dem_mosaic))) {
+        dem_mosaic <- writeRaster(dem_mosaic, dem_mosaic_filename, 
+                                  overwrite=overwrite)
     } else {
-        dem_mosaic <- projectRaster(dem_mosaic, sample_image, filename=dem_mosaic_filename, overwrite=overwrite)
+        dem_mosaic <- projectRaster(dem_mosaic, 
+                                    crs=CRS(projection(sample_image)), 
+                                    filename=dem_mosaic_filename, 
+                                    overwrite=overwrite)
     }
     notify(track_time())
 
     notify('Running slopeasp_seq...')
     notify(track_time(action='start'))
-    slopeaspect_filename <- file.path(output_path, paste0(sitecode, '_dem_mosaic_slopeaspect.envi'))
-    slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, overwrite=overwrite)
+    slopeaspect_filename <- file.path(output_path,
+                                      paste0(sitecode, 
+                                             '_dem_mosaic_slopeaspect.envi'))
+    slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, 
+                                overwrite=overwrite)
     notify(track_time())
     if (n_cpus > 1) sfQuickStop()
 }
