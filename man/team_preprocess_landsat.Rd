@@ -6,8 +6,9 @@ team_preprocess_landsat(image_list, dem, slopeaspect, sitecode, output_path,
   n_cpus = 1, cleartmp = FALSE, overwrite = FALSE, notify = print)
 }
 \arguments{
-  \item{image_list}{a list of paths to Landsat CDR images
-  that have been converted to bsq files with teampy.}
+  \item{image_list}{a list of paths to a set of Landsat CDR
+  images (for a single TEAM site) that have been converted
+  to bsq files with teampy.}
 
   \item{dem}{path to a digital elevation model (DEM)
   covering the full extent of all the images in

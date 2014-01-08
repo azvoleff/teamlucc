@@ -2,7 +2,8 @@
 \alias{team_classify}
 \title{Classify a preprocessed surface reflectance image}
 \usage{
-team_classify(predictors, train_data, overwrite = FALSE, notify = print)
+team_classify(predictors, train_data, output_path, n_cpus, overwrite = FALSE,
+  notify = print)
 }
 \arguments{
   \item{predictors}{a \code{Raster*} of predictor layers
@@ -12,6 +13,11 @@ team_classify(predictors, train_data, overwrite = FALSE, notify = print)
 
   \item{train_data}{a training dataset as output by
   \code{extract_training_data}}
+
+  \item{output_path}{the path to use for the output}
+
+  \item{n_cpus}{the number of CPUs to use for processes
+  that can run in parallel}
 
   \item{overwrite}{whether to overwrite existing files
   (otherwise an error will be raised)}
