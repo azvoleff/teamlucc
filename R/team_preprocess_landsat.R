@@ -213,7 +213,8 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                                      sep='_'))
         image_rast_preds <- writeRaster(image_rast_preds, 
                                         image_rast_preds_filename, 
-                                        overwrite=overwrite, datatype=dataType(image_rast_preds))
+                                        overwrite=overwrite, 
+                                        datatype=dataType(image_rast_preds))
         if (cleartmp) removeTmpFiles(h=1)
     }
     if (n_cpus > 1) sfQuickStop()
