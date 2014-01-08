@@ -26,6 +26,8 @@
 #' }
 team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL, 
                             n_cpus=1, overwrite=FALSE, notify=print) {
+    notify("Starting DEM setup...")
+
     if (n_cpus > 1) sfQuickInit(n_cpus)
     ################################################################################
     # Verify projections of DEMs match

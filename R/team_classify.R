@@ -18,6 +18,8 @@
 #' #TODO: Add example
 team_classify <- function(predictors, train_data, overwrite=FALSE, 
                           notify=print) {
+    notify("Starting classification...")
+
     classification <- classify_image(predictors, train_data)
     classification$model
     plot(classification$pred_classes)
