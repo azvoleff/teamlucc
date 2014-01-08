@@ -60,14 +60,13 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
 
     for (image_path in image_list) {
         notify(paste("Processing", image_path))
-
         ################################################################################
-        # Extract image basename for use in naming subsequent files
-        base_regex <- '((19[89])|(20[01]))[0-9]_[0-9]{3}_((LT[45])|(LE[78]))'
-        base_regexpr <- regexpr(base_regex, image_path)
-        image_basename <- substr(image_path, base_regexpr,
-                                 base_regexpr+attr(base_regexpr, "match.length")-1)
-        
+        # Determine image basename for use in naming subsequent files
+        aq_date <- get_metadata_item(extension(image_path, '.txt'), 'AcquisitionDate')
+        aq_date <- strptime(aq_date, format="%Y-%m-%dT%H:%M:%OSZ")
+        short_name  <- get_metadata_item(extension(image_path, '.txt'), 'ShortName')
+        image_basename <- paste(format(aq_date, '%Y_%j'), short_name, sep='_')
+
         ################################################################################
         # Load data and mask out clouds and missing values
         notify('Loading data and masking clouds and missing data...')
