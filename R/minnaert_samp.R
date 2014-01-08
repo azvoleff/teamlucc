@@ -92,11 +92,11 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     # all inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
-    slope <- (pi/180) * slope
-    aspect <- (pi/180) * aspect
+    slope <- calc(slope, fun=function(vals) {(pi/180) * vals})
+    aspect <- calc(aspect, fun=function(vals) {(pi/180) * vals})
     slopeclass <- (pi/180) * slopeclass
 
-    IL <- .calc_IL(slope, sunzenith, sunazimuth, aspect, IL.epsilon)
+    IL <- .calc_IL(slope, aspect, sunzenith, sunazimuth, IL.epsilon)
     rm(aspect, sunazimuth)
 
     k_table <- .calc_k_table(x, IL, slope, sampleindices, slopeclass, 
@@ -104,17 +104,31 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     
     k_model <- with(k_table, bam(k ~ s(midpoint, k=length(midpoint) - 1), data=k_table))
 
-    # if slope is greater than modeled range, use maximum of modeled range
-    slope[slope > max(slopeclass)] <- max(slopeclass)
-    # if slope is less than modeled range, treat it as flat
-    slope[slope < min(slopeclass)] <- 0
+    # If slope is greater than modeled range, use maximum of modeled range. If 
+    # slope is less than modeled range, treat it as flat.
+    slopeclass_max <- max(slopeclass)
+    slopeclass_min <- min(slopeclass)
+    slope <- calc(slope,
+                  fun=function(vals) {
+                      vals[vals > slopeclass_max] <- slopeclass_max
+                      vals[vals < slopeclass_min] <- 0
+                      return(vals)
+                  })
+
     names(slope) <- 'midpoint'
     K.all <- predict(slope, k_model)
-    K.all[K.all > 1] <- 1
-    K.all[K.all < 0] <- 0
+    K.all <- calc(K.all,
+                  fun=function(vals) {
+                      vals[vals > 1] <- 1
+                      vals[vals < 0] <- 0
+                      return(vals)
+                  })
 
     # Perform correction
-    xout <- x * (cos(sunzenith)/IL) ^ K.all
+    xout <- overlay(x, IL, K.all,
+                    fun=function(x_vals, IL_vals, K.all_vals) {
+                        x_vals * (cos(sunzenith)/IL_vals) ^ K.all_vals
+                    })
     # Don't correct flat areas
     xout[K.all == 0 & !is.na(K.all)] <- x[K.all == 0 & !is.na(K.all)]
 

@@ -1,8 +1,16 @@
-.calc_IL <- function(slope, sunzenith, sunazimuth, aspect, IL.epsilon) {
+.calc_IL_vector <- function(slope, aspect, sunzenith, sunazimuth, IL.epsilon) {
     IL <- cos(slope) * cos(sunzenith) + sin(slope) * sin(sunzenith) * 
         cos(sunazimuth - aspect)
     IL[IL == 0] <- IL.epsilon
     return(IL)
+}
+
+.calc_IL <- function(slope, aspect, sunzenith, sunazimuth, IL.epsilon) {
+    overlay(slope, aspect,
+            fun=function(slope_vals, aspect_vals) {
+                .calc_IL_vector(slope_vals, aspect_vals, sunzenith, sunazimuth, 
+                               IL.epsilon)
+            })
 }
 
 #' Topographic correction for satellite imagery
@@ -63,7 +71,7 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
 
     x[x == na.value] <- NA
 
-    IL <- .calc_IL(slope, sunzenith, sunazimuth, aspect, IL.epsilon)
+    IL <- .calc_IL(slope, aspect, sunzenith, sunazimuth, IL.epsilon)
     rm(aspect, sunazimuth)
 
     if (!is.null(sampleindices) && !(method %in% c('minnaert', 'minslope', 
