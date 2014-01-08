@@ -2,7 +2,8 @@
 \alias{applyWindowed}
 \title{Apply a raster function with edge effects over a series of blocks}
 \usage{
-applyWindowed(x, fun, edge = c(0, 0), chunksize = NULL, ...)
+applyWindowed(x, fun, edge = c(0, 0), chunksize = NULL, filename = "",
+  overwrite = FALSE, ...)
 }
 \arguments{
   \item{x}{a \code{Raster*}}
@@ -14,6 +15,12 @@ applyWindowed(x, fun, edge = c(0, 0), chunksize = NULL, ...)
 
   \item{chunksize}{the number of rows to read per block
   (passed to \code{raster} \code{blockSize} function.}
+
+  \item{filename}{file on disk to save \code{Raster*} to
+  (optional)}
+
+  \item{overwrite}{whether to overwrite any existing files
+  (otherwise an error will be raised)}
 
   \item{...}{additional arguments to pass to \code{fun}}
 }

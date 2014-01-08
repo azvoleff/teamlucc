@@ -13,6 +13,9 @@
 #' edge effects, defined as c(top, bottom)
 #' @param chunksize the number of rows to read per block (passed to 
 #' \code{raster} \code{blockSize} function.
+#' @param filename file on disk to save \code{Raster*} to (optional)
+#' @param overwrite whether to overwrite any existing files (otherwise an error 
+#' will be raised)
 #' @param ... additional arguments to pass to \code{fun}
 #' @examples
 #' \dontrun{
@@ -21,7 +24,8 @@
 #' max_x <- cellStats(L5TSR_1986_b1, 'max')
 #' applyWindowed(L5TSR_1986_b1, glcm, edge=c(1, 3), min_x=min_x, max_x=max_x)
 #' }
-applyWindowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, ...) {
+applyWindowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, filename='', 
+                          overwrite=FALSE, ...) {
     if ((length(edge) != 2) || (class(edge) != 'numeric') || any(edge < 0)) {
         stop('edge must be a length 2 positive numeric')
     }
@@ -52,7 +56,8 @@ applyWindowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, ...) {
     
     started_writes <- FALSE
     for (block_num in 1:bs$n) {
-        this_block <- getValues(x, row=bs_mod$row[block_num], nrows=bs_mod$nrows[block_num],
+        this_block <- getValues(x, row=bs_mod$row[block_num], 
+                                nrows=bs_mod$nrows[block_num],
                                 format='matrix')
         out_block <- fun(this_block, ...)
         layer_names <- dimnames(out_block)[[3]]
@@ -85,7 +90,9 @@ applyWindowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, ...) {
             } else {
                 out <- brick(stack(rep(c(x), dim(out_block)[3])), values=FALSE)
             }
-            out <- writeStart(out, filename=rasterTmpFile())
+            if (filename == '') filename <- rasterTmpFile()
+            out <- writeStart(out, filename=filename, overwrite=overwrite, 
+                              datatype=dataType(x))
             names(out) <- layer_names
             started_writes <- TRUE
         }
@@ -101,5 +108,6 @@ applyWindowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, ...) {
         out <- writeValues(out, out_block, bs$row[block_num])
     }
     out <- writeStop(out)
+
     return(out)
 }
