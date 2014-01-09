@@ -9,6 +9,9 @@
 #' match the extent of the /code{baseimg}.
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param overwrite whether to overwrite \code{filename} if it already exists
+#' @param method the method to use if resampling is needed to align image 
+#' origins. Can be "ngb" for nearest-neighbor, or "binlinear" for bilinear 
+#' interpolation
 #' @return The /code{matchimg} reprojected (if necessary), cropped, and 
 #' extended to match the /code{baseimg}.
 #' @details Note that if the \code{matchimg} needs to be reprojected,
@@ -20,19 +23,19 @@
 #' 
 #' # Crop and extend the DEM mosaic to match the Landsat image
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
-match_rasters <- function(baseimg, matchimg, filename='', overwrite=FALSE) {
+match_rasters <- function(baseimg, matchimg, filename='', datatype=NULL, 
+                          overwrite=FALSE, method='bilinear') {
     if (projection(baseimg) != projection(matchimg)) {
-        matchimg <- projectRaster(matchimg, baseimg)
+        matchimg <- projectRaster(from=matchimg, to=baseimg)
     }
     # First crop out any overlapping area
-    outimg <- crop(matchimg, baseimg)
+    matchimg <- crop(matchimg, baseimg)
+    matchimg <- extend(matchimg, baseimg)
     # Now extend borders of cropped raster to match base raster
-    if (extent(outimg) != extent(baseimg)) {
-        outimg <- extend(outimg, baseimg, filename=filename, 
-                         overwrite=overwrite, datatype=dataType(outimg))
-    } else if (filename != '') {
-        outimg <- writeRaster(outimg, filename=filename, overwrite=overwrite, 
-                              datatype=dataType(outimg))
+    if (extent(matchimg) != extent(baseimg)) {
+        matchimg <- resample(matchimg, baseimg, method=method)
     }
-    return(outimg)
+    matchimg <- writeRaster(matchimg, filename=filename, overwrite=overwrite, 
+                            datatype=datatype)
+    return(matchimg)
 }
