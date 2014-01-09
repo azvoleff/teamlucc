@@ -15,8 +15,6 @@ Imports:
     landsat,
     rgeos,
     rgdal,
-    e1071,
-    kernlab,
     mgcv,
     plyr,
     reshape2,

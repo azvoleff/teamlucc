@@ -3,7 +3,7 @@
 #' Currently only supports classification using a support vector machine (SVM).
 #'
 #' @export
-#' @import kernlab e1071 caret spatial.tools
+#' @import caret spatial.tools
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
 #' @param train_data a data table with a column labeled 'y' with the observed 
