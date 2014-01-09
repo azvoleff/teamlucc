@@ -15,7 +15,7 @@ before_install:
     # teamr R imports deps
   - ./travis-tool.sh install_r_binary Rcpp RcppArmadillo landsat rgeos rgdal mgcv plyr reshape2 spatial.tools caret foreach sp mclust
     # teamr R suggested
-  - ./travis-tool.sh install_r_binary testthat kernlab e1071 notifyR
+  - ./travis-tool.sh install_r_binary testthat kernlab e1071
 
 install:
   - ./travis-tool.sh install_github azvoleff/spatial.tools
