@@ -27,8 +27,8 @@ match_rasters <- function(baseimg, matchimg, filename='', overwrite=FALSE) {
     # First crop out any overlapping area
     outimg <- crop(matchimg, baseimg)
     # Now extend borders of cropped raster to match base raster
-    if (extent(matchimg) != extent(baseimg)) {
-        outimg <- extend(matchimg, outimg, filename=filename, 
+    if (extent(outimg) != extent(baseimg)) {
+        outimg <- extend(outimg, baseimg, filename=filename, 
                          overwrite=overwrite, datatype=dataType(outimg))
     } else if (filename != '') {
         outimg <- writeRaster(outimg, filename=filename, overwrite=overwrite, 
