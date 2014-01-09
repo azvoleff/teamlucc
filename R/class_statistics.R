@@ -11,11 +11,7 @@
 #' example the land cover type of each pixel)
 #' @return A data.frame of class statistics.
 #' @examples
-#' \dontrun{
-#' # Don't run due to raster bug that will be fixed in next version of raster 
-#' #package (as of 1/8/2014). See: http://bit.ly/1fe5x0m
 #' class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "class_1986")
-#' }
 class_statistics <- function(x, y, classcol) {
     if (projection(x) != projection(y)) {
         stop('Coordinate systems do not match')
