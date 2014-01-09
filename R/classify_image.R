@@ -92,7 +92,7 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
                                                nlayers(preds)))
         return(preds)
     }
-    n_classes <- length(caret:::getClassLevels(model))
+    n_classes <- length(levels(model))
     preds <- rasterEngine(in_rast=x, fun=calc_preds,
                           args=list(model=model, n_classes=n_classes, 
                                     classProbs=classProbs), 
@@ -101,7 +101,7 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
     names(pred_classes) <- 'cover'
     if (classProbs) {
         pred_probs <- dropLayer(preds, 1)
-        names(pred_probs) <- caret:::getClassLevels(model)
+        names(pred_probs) <- levels(model)
         return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs))
     } else {
         return(list(model=model, pred_classes=pred_classes))
