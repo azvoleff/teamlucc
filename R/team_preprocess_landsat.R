@@ -97,14 +97,14 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                    },
                                    filename=image_rast_mask_path, 
                                    overwrite=overwrite, 
-                                   datatype=dataType(masks))
+                                   datatype='INT2S')
 
         image_rast_masked_path <- file.path(output_path,
                                             paste(sitecode, image_basename, 
                                                   'masked.envi', sep='_'))
         image_rast <- mask(image_rast, image_rast_mask, maskvalue=0, 
                            filename=image_rast_masked_path, 
-                           overwrite=overwrite, datatype=dataType(image_rast))
+                           overwrite=overwrite, datatype=dataType(image_rast)[1])
         # image_rast_mask is no longer needed, so unload it to save memory
         rm(image_rast_mask)
 
@@ -119,7 +119,8 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                             'dem.envi', sep='_'))
         cropped_dem <- match_rasters(image_rast, dem, 
                                      filename=cropped_dem_file, 
-                                     overwrite=overwrite)
+                                     overwrite=overwrite,
+                                     datatype=dataType(dem))
         if (!(class(slopeaspect) %in% c('RasterStack', 'RasterBrick'))) {
             slopeaspect <- stack(slopeaspect)
         }
@@ -130,7 +131,8 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         #TODO: Check why extend in this match_rasters call is raising warning
         cropped_slopeaspect <- match_rasters(image_rast, slopeaspect, 
                                              filename=cropped_slopeaspect_file, 
-                                             overwrite=overwrite)
+                                             overwrite=overwrite, 
+                                             datatype=dataType(slopeaspect)[1])
         notify(track_time())
         if (cleartmp) removeTmpFiles(h=1)
 
@@ -216,8 +218,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                                      sep='_'))
         image_rast_preds <- writeRaster(image_rast_preds, 
                                         image_rast_preds_filename, 
-                                        overwrite=overwrite, 
-                                        datatype=dataType(image_rast_preds))
+                                        overwrite=overwrite)
         if (cleartmp) removeTmpFiles(h=1)
     }
     if (n_cpus > 1) sfQuickStop()
