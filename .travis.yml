@@ -10,11 +10,12 @@ before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
-  - sudo apt-get install -qq libgdal-dev libproj-dev
-    # teamr R deps
-  - sudo apt-get install -qq r-cran-rcpp r-cran-mgcv r-cran-foreach r-cran-sp r-cran-abind 
-    # dependency R deps
-  - sudo apt-get install -qq r-cran-gtools r-cran-rgl
+    # teamr R depends
+  - ./travis-tool.sh install_r_binary raster
+    # teamr R imports deps
+  - ./travis-tool.sh install_r_binary Rcpp RcppArmadillo landsat rgeos rgdal mgcv plyr reshape2 spatial.tools caret foreach sp mclust
+    # teamr R suggested
+  - ./travis-tool.sh install_r_binary testthat kernlab e1071 notifyR
 
 install:
   - ./travis-tool.sh install_github azvoleff/spatial.tools
@@ -22,7 +23,6 @@ install:
   - ./travis-tool.sh install_github hadley/devtools
   - ./travis-tool.sh install_github hadley/testthat
   - ./travis-tool.sh install_github hadley/httr
-  - ./travis-tool.sh install_r kernlab e1071
   - Rscript -e 'library(devtools);install_url("http://cran.r-project.org/src/contrib/Archive/raster/raster_2.1-66.tar.gz")'
 
 script: ./travis-tool.sh run_tests
