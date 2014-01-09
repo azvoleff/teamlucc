@@ -5,7 +5,7 @@
 glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1),
 statistics = c("mean", "variance", "homogeneity", "contrast",
 "dissimilarity", "entropy", "second_moment", "correlation"),
-min_x=NULL, max_x=NULL, ...)
+min_x=NULL, max_x=NULL)
 }
 \arguments{
   \item{x}{a /code{RasterLayer} or matrix}
@@ -33,8 +33,6 @@ min_x=NULL, max_x=NULL, ...)
   \item{max_x}{maximum value of input \code{RasterLayer}
   (optional, \code{glcm} will calculate if not supplied).
   Useful when running \code{glcm} over blocks of a raster.}
-
-  \item{...}{additional parameters to pass to rasterEngine}
 }
 \value{
 A /code{RasterLayer} with the calculated requested GLCM
