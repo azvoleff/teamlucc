@@ -15,13 +15,13 @@ before_install:
   - sudo apt-get install -qq r-cran-rcpp r-cran-mgcv r-cran-foreach r-cran-sp r-cran-abind 
     # dependency R deps
   - sudo apt-get install -qq r-cran-gtools r-cran-rgl
-  - Rscript -e 'install_url("http://cran.r-project.org/src/contrib/Archive/raster/raster_2.1-66.tar.gz")'
 
 install:
   - ./travis-tool.sh install_github azvoleff/spatial.tools
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github hadley/devtools
   - ./travis-tool.sh install_github hadley/testthat
+  - Rscript -e 'library(devtools);install_url("http://cran.r-project.org/src/contrib/Archive/raster/raster_2.1-66.tar.gz")'
 
 script: ./travis-tool.sh run_tests
 
