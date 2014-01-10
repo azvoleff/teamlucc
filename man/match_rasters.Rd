@@ -2,8 +2,8 @@
 \alias{match_rasters}
 \title{Match the coordinate system and extent of two rasters}
 \usage{
-match_rasters(baseimg, matchimg, filename = "", datatype = NULL,
-  overwrite = FALSE, method = "bilinear")
+match_rasters(baseimg, matchimg, filename, datatype, overwrite = FALSE,
+  method = "bilinear")
 }
 \arguments{
   \item{baseimg}{A /code{Raster*} to use as the base image.
@@ -18,11 +18,15 @@ match_rasters(baseimg, matchimg, filename = "", datatype = NULL,
   \item{filename}{file on disk to save \code{Raster*} to
   (optional)}
 
+  \item{datatype}{the datatype to use when saving to
+  \code{filename} (optional)}
+
   \item{overwrite}{whether to overwrite \code{filename} if
   it already exists}
 
-  \item{method}{the method to use if resampling is needed
-  to align image origins. Can be "ngb" for
+  \item{method}{the method to use if projection is needed
+  to match image coordinate systems, or if resampling is
+  needed to align image origins. Can be "ngb" for
   nearest-neighbor, or "binlinear" for bilinear
   interpolation}
 }
