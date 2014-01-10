@@ -27,9 +27,6 @@ expected_nad83 <- raster(matrix(c(21, 25, 29, 33, 22, 26, 30, 34, 23, 27, 31,
                          crs=wgs84_string)
 names(expected_nad83) <- "layer"
 
-
-get_nad83 <- match_rasters(baseimg, matchimg_nad83, method='ngb')
-
 test_that("match raster works correctly with reprojection", {
     expect_equal(match_rasters(baseimg, matchimg_nad83, method='ngb'), 
                  expected=expected_nad83)
