@@ -1,19 +1,20 @@
 \name{get_metadata_item}
 \alias{get_metadata_item}
-\title{Extract a metadata item from a metadata file in team format}
+\title{Extract a metadata item from a metadata file in GDAL PAM format}
 \usage{
-get_metadata_item(x, item)
+get_metadata_item(x, key)
 }
 \arguments{
-  \item{x}{a metadata file in team format (ending in .txt)}
+  \item{x}{an image file that has an accompanying GDAL PAM
+  format metadata file (ending in .aux.xml)}
 
-  \item{item}{a string giving the name of the metadata item
+  \item{key}{a string giving the name of the metadata item
   to extract}
 }
 \value{
 The metadata item (as a string)
 }
 \description{
-Extract a metadata item from a metadata file in team format
+GDAL PAM format metadata files end in ".aux.xml".
 }
 

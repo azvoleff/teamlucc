@@ -1,14 +1,28 @@
-#' Extract a metadata item from a metadata file in team format 
+#' Extract a metadata item from a metadata file in GDAL PAM format
+#'
+#' GDAL PAM format metadata files end in ".aux.xml".
 #'
 #' @export
-#' @param x a metadata file in team format (ending in .txt)
-#' @param item a string giving the name of the metadata item to extract
+#' @importFrom raster extension
+#' @importFrom XML xpathApply xmlValue
+#' @param x an image file that has an accompanying GDAL PAM format metadata 
+#' file (ending in .aux.xml)
+#' @param key a string giving the name of the metadata item to extract
 #' @return The metadata item (as a string)
-get_metadata_item <- function(x, item) {
-    if (!file.exists(x)) {
-        stop(paste('Could not find metadata file', x))
+#'
+get_metadata_item <- function(x, key) {
+    metadata_file <- paste0(x, '.aux.xml')
+    if (!file.exists(metadata_file)) {
+        stop(paste('Could not find metadata file', metadata_file))
     }
-    metadata <- read.csv(x, stringsAsFactors=FALSE)
-    rownum <- which(grepl(item, metadata$item))
-    return(metadata$value[rownum])
+    doc <- xmlInternalTreeParse(metadata_file)
+    xpath_exp <- paste0("//MDI[@key='", key, "']")
+    value <- unlist(xpathApply(doc, xpath_exp, xmlValue))
+    if (length(value) > 1) {
+        stop('multiple elements found')
+    }
+    if (length(value) == 0) {
+        stop('no elements found')
+    }
+    return(value)
 }

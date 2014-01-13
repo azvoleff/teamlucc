@@ -24,7 +24,8 @@ Imports:
     foreach,
     sp,
     mclust,
-    lubridate
+    lubridate,
+    XML
 Suggests:
     testthat,
     kernlab,

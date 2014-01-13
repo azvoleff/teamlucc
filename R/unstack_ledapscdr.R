@@ -21,23 +21,6 @@ unstack_ledapscdr <- function(x, out, overwrite=FALSE) {
     }
     out_basename <- file_path_sans_ext(basename(x))
 
-    # Dump the main HDF metadata to a text file
-    metadata <- gdalinfo(x)
-    start_row <- grep('Metadata:', metadata) + 1
-    items <- c()
-    item_values <- c()
-    for (n in start_row:length(metadata)) {
-        this_row <- metadata[n]
-        if (!grepl('^ ', this_row)) break
-        this_row <- strsplit(gsub('^[ ]*', '', this_row), split='=')
-        items <- c(items, this_row[[1]][1])
-        item_values <- c(item_values, this_row[[1]][2])
-    }
-    metadata_df <- data.frame(item=items, value=item_values)
-    write.table(metadata_df,
-                file=paste0(file.path(out, out_basename), '_metadata.txt'), sep=',', 
-                row.names=FALSE)
-
     sds <- get_subdatasets(x)
     loc <- regexpr('[a-zA-Z0-9_-]*$', sds)
     out_rasts <- c()
