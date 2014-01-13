@@ -43,9 +43,9 @@ archive
 }
 \examples{
 \dontrun{
-image_list <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18.bsq',
-                'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc/lndsr.LT50150532001014AAA01.bsq',
-                'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc/lndsr.LE70150532012021EDC00.bsq')
+image_list <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc/lndsr.LT50150531986037XXX18_metadata.txt',
+                'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc/lndsr.LT50150532001014AAA01_metadata.txt',
+                'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc/lndsr.LE70150532012021EDC00_metadata.txt')
 dem <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic.envi'
 slopeaspect <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic_slopeaspect.envi'
 team_preprocess(image_list, dem, slopeaspect, "VB",

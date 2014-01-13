@@ -19,6 +19,7 @@ Imports:
     plyr,
     reshape2,
     spatial.tools (>= 1.2.2),
+    gdalUtils,
     caret,
     foreach,
     sp,
