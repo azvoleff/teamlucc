@@ -10,7 +10,7 @@
 #' your operating system.
 #'
 #' @export
-#' @importFrom gdalUtils gdal_translate
+#' @importFrom gdalUtils gdal_translate get_subdatasets
 #' @importFrom tools file_path_sans_ext
 #' @param x input HDF4 file
 #' @param out output file
