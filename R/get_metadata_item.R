@@ -4,12 +4,11 @@
 #'
 #' @export
 #' @importFrom raster extension
-#' @importFrom XML xpathApply xmlValue
+#' @importFrom XML xmlInternalTreeParse xpathApply xmlValue
 #' @param x an image file that has an accompanying GDAL PAM format metadata 
 #' file (ending in .aux.xml)
 #' @param key a string giving the name of the metadata item to extract
 #' @return The metadata item (as a string)
-#'
 get_metadata_item <- function(x, key) {
     metadata_file <- paste0(x, '.aux.xml')
     if (!file.exists(metadata_file)) {
