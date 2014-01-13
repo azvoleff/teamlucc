@@ -102,7 +102,7 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         image_rast_masked_path <- file.path(output_path,
                                             paste(sitecode, image_basename, 
                                                   'masked.envi', sep='_'))
-        image_rast <- mask(image_rast, image_rast_mask, maskvalue=0, 
+        image_rast <- mask(image_rast, image_rast_mask,
                            filename=image_rast_masked_path, 
                            overwrite=overwrite, datatype=dataType(image_rast)[1])
         # image_rast_mask is no longer needed, so unload it to save memory
@@ -134,7 +134,6 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                              overwrite=overwrite, 
                                              datatype=dataType(slopeaspect)[1])
         notify(track_time())
-        if (cleartmp) removeTmpFiles(h=1)
 
         notify('Running topocorr...')
         notify(track_time(action='start'))
@@ -168,7 +167,6 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
                                        overwrite=overwrite, 
                                        sampleindices=sampleindices)
         notify(track_time())
-        if (cleartmp) removeTmpFiles(h=1)
 
         ######################################################################
         # Calculate additional predictor layers (MSAVI and textures)
@@ -192,9 +190,9 @@ team_preprocess_landsat <- function(image_list, dem, slopeaspect, sitecode,
         min_MSAVI2 <- cellStats(MSAVI2_layer, 'min')
         max_MSAVI2 <- cellStats(MSAVI2_layer, 'max')
         MSAVI2_glcm <- apply_windowed(MSAVI2_layer, glcm, edge=c(1, 3), 
-                                     min_x=min_MSAVI2, max_x=max_MSAVI2, 
-                                     filename=MSAVI2_glcm_filename, 
-                                     overwrite=overwrite)
+                                      min_x=min_MSAVI2, max_x=max_MSAVI2, 
+                                      filename=MSAVI2_glcm_filename, 
+                                      overwrite=overwrite)
         notify(track_time())
 
         ######################################################################
