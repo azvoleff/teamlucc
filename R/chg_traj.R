@@ -1,7 +1,7 @@
 #' Calculate change-trajectory image
 #'
 #' @export
-#' @import spatial.tools
+#' @importFrom spatial.tools rasterEngine
 #' @param initial initial cover class as \code{RasterLayer}
 #' @param chg_mag change magnitude \code{RasterLayer} from \code{CVAPS}
 #' @param chg_dir change direction \code{RasterLayer} from \code{CVAPS}

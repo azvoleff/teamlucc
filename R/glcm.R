@@ -1,10 +1,11 @@
 #' Image texture measures from grey-level co-occurrence matrices (GLCM)
 #'
 #' @export
-#' @import spatial.tools Rcpp RcppArmadillo
-#' @usage glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1), 
-#' statistics = c("mean", "variance", "homogeneity", "contrast", 
-#' "dissimilarity", "entropy", "second_moment", "correlation"),
+#' @importFrom spatial.tools rasterEngine
+#' @import Rcpp RcppArmadillo
+#' @usage glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1), statistics = 
+#' c("mean", "variance", "homogeneity", "contrast", "dissimilarity", "entropy", 
+#' "second_moment", "correlation"),
 #' min_x=NULL, max_x=NULL)
 #' @param x a /code{RasterLayer} or matrix
 #' @param n_grey number of grey levels to use in texture calculation

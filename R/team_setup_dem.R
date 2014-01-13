@@ -1,7 +1,7 @@
 #' Setup the DEM mosaic for a particular TEAM site
 #'
 #' @export
-#' @import spatial.tools
+#' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @param dem_list a list of digital elevation models (DEMs) that (when 
 #' mosaiced) covers the full extent of all the images in the image_list.
 #' @param sitecode code to use as a prefix for all filenames
