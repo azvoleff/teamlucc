@@ -36,7 +36,7 @@ unstack_ledapscdr <- function(x, out, overwrite=FALSE) {
     metadata_df <- data.frame(item=items, value=item_values)
     write.table(metadata_df,
                 file=paste0(file.path(out, out_basename), '_metadata.txt'), sep=',', 
-                row.names=FALSE, col.names=FALSE)
+                row.names=FALSE)
 
     sds <- get_subdatasets(x)
     loc <- regexpr('[a-zA-Z0-9_-]*$', sds)
