@@ -43,8 +43,10 @@ Image texture measures from grey-level co-occurrence
 matrices (GLCM)
 }
 \examples{
+\dontrun{
 textures <- glcm(raster(L5TSR_1986, layer=1))
 plot(textures)
+}
 }
 \references{
 Lu, D., and M. Batistella. 2005. Exploring TM image texture

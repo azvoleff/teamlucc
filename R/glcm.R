@@ -39,8 +39,10 @@
 #' Pratt, W. K. 2007. Digital image processing: PIKS Scientific inside. 4th ed.
 #' Wiley-Interscience, Hoboken, N.J pages 540-541, 563-566.
 #' @examples
+#' \dontrun{
 #' textures <- glcm(raster(L5TSR_1986, layer=1))
 #' plot(textures)
+#' }
 glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
                  statistics=c('mean', 'variance', 'homogeneity', 'contrast', 
                               'dissimilarity', 'entropy', 'second_moment', 
