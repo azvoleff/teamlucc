@@ -6,7 +6,8 @@
 #' @export
 #' @import ggplot2
 #' @importFrom rgeos gBuffer
-#' @importFrom plyr unit
+#' @importFrom grid unit
+#' @importFrom plyr join
 #' @param x image as a \code{Raster*} object
 #' @param out filename for output image. The extension of this file will 
 #' determine the output file format (png, pdf, etc.).
