@@ -15,6 +15,8 @@ overlay_poly(x, y, out, title = "", width = 6.5, height = 6.5,
   this file will determine the output file format (png,
   pdf, etc.).}
 
+  \item{title}{title of plot}
+
   \item{width}{width (in inches) of output image}
 
   \item{height}{height (in inches) of output image}

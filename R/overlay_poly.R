@@ -12,6 +12,7 @@
 #' @param y polygon to overlay, as \code{SpatialPolygonDataFrame}
 #' @param out filename for output image. The extension of this file will 
 #' determine the output file format (png, pdf, etc.).
+#' @param title title of plot
 #' @param width width (in inches) of output image
 #' @param height height (in inches) of output image
 #' @param dpi DPI for output image
@@ -22,15 +23,19 @@ overlay_poly <- function(x, y, out, title='', width=6.5, height=6.5, dpi=300, ..
         stop('x must be a one or three band image')
     }
 
-    # Resample the image based on the browse output DPI and image size. No need 
-    # to stretch the entire Landsat image just to output a small browse image.
-    agg_fact <- floor(max(nrow(x), ncol(x)) / (dpi * max(plot_width, 
-                                                         plot_height)))
-    #TODO: use resample instead of aggregate to make this process faster
-    x <- aggregate(x, fact=agg_fact)
     y <- spTransform(y, CRS(proj4string(x)))
     x <- crop(x, y)
     x <- mask(x, y)
+
+    # Resample the image based on the browse output DPI and image size. No need 
+    # to stretch the entire Landsat image just to output a small browse image.
+    agg_fact <- floor(max(nrow(x), ncol(x)) / (dpi * max(width, height)))
+    if (agg_fact > 1) {
+        new_params <- raster(x)
+        extent(new_params) <- extent(x)
+        res(new_params) <- res(x) * agg_fact
+        x <- resample(x, new_params, method='ngb')
+    }
 
     # Setup the zoi dataframe for ggplot2
     y@data$id <- rownames(y@data)
@@ -38,8 +43,7 @@ overlay_poly <- function(x, y, out, title='', width=6.5, height=6.5, dpi=300, ..
     y.df <- join(y.points, y@data, by="id")
 
     # Setup color matrix for ggplot2, applying a linear 2 percent stretch
-    x_vals <- getValues(x)
-    x_vals <- linear_stretch(x_vals)
+    x_vals <- linear_stretch(getValues(x))
     x_vals[is.na(x_vals)] <- 1
     if (nlayers(x) == 3) {
         fc_df <- data.frame(x=coordinates(x)[, 1],
@@ -69,4 +73,5 @@ overlay_poly <- function(x, y, out, title='', width=6.5, height=6.5, dpi=300, ..
               plot.margin=unit(c(.1, .1, .1, .1), 'cm')) +
         geom_path(data=y.df, aes(long, lat), color='blue', size=1)
     ggsave(out, width=width, height=height, dpi=dpi)
+
 }
