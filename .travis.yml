@@ -13,7 +13,7 @@ before_install:
     # teamr R depends
   - ./travis-tool.sh install_r_binary raster
     # teamr R imports deps
-  - ./travis-tool.sh install_r_binary Rcpp RcppArmadillo landsat rgeos rgdal mgcv plyr reshape2 spatial.tools caret foreach sp mclust lubridate
+  - ./travis-tool.sh install_r_binary Rcpp RcppArmadillo landsat rgeos rgdal mgcv plyr reshape2 spatial.tools caret foreach sp mclust lubridate ggplot2
     # teamr R suggested
   - ./travis-tool.sh install_r_binary testthat kernlab e1071
     # others
