@@ -170,6 +170,7 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                      filename=cropped_dem_file, 
                                      overwrite=overwrite,
                                      datatype=dataType(dem))
+        names(cropped_dem) <- "dem"
         if (!(class(slopeaspect) %in% c('RasterStack', 'RasterBrick'))) {
             slopeaspect <- stack(slopeaspect)
         }
@@ -182,6 +183,7 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                              filename=cropped_slopeaspect_file, 
                                              overwrite=overwrite, 
                                              datatype=dataType(slopeaspect)[1])
+        names(cropped_slopeaspect) <- c('slope', 'aspect')
         notify(track_time())
 
         notify('Running topocorr...')
@@ -237,11 +239,16 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                                 sep='_'))
         min_MSAVI2 <- cellStats(MSAVI2_layer, 'min')
         max_MSAVI2 <- cellStats(MSAVI2_layer, 'max')
+        glcm_statistics <- c('mean', 'variance', 'homogeneity', 'contrast', 
+                             'dissimilarity', 'entropy', 'second_moment', 
+                             'correlation')
         MSAVI2_glcm <- apply_windowed(MSAVI2_layer, glcm, edge=c(1, 3), 
                                       min_x=min_MSAVI2, max_x=max_MSAVI2, 
                                       filename=MSAVI2_glcm_filename, 
-                                      overwrite=overwrite)
+                                      overwrite=overwrite, 
+                                      statistics=glcm_statistics)
         notify(track_time())
+        names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
 
         ######################################################################
         # Layer stack predictor layers:
@@ -263,7 +270,9 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                                'predictors.envi', sep='_'))
         predictors <- writeRaster(predictors, predictors_filename, 
                                   overwrite=overwrite)
+
         if (cleartmp) removeTmpFiles(h=1)
+
     }
     if (n_cpus > 1) sfQuickStop()
 }
