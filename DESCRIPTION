@@ -18,6 +18,7 @@ Imports:
     mgcv,
     plyr,
     reshape2,
+    ggplot2,
     spatial.tools (>= 1.2.2),
     gdalUtils,
     caret,
