@@ -6,7 +6,7 @@ expected_numeric <- c(0.0000000, 0.1093750, 0.2395833, 0.3697917, 0.5000000,
                       0.6302083, 0.7604167, 0.8906250, 1.0000000)
 expected_matrix <- matrix(expected_numeric, nrow=3)
 expected_RasterLayer <- raster(matrix(expected_numeric, nrow=3))
-expected_RasterStack <- stack(expected_raster, expected_raster)
+expected_RasterStack <- stack(expected_RasterLayer, expected_RasterLayer)
 
 test_RasterLayer <- raster(matrix(test_vals, nrow=3))
 test_RasterStack <- stack(test_RasterLayer, test_RasterLayer + 10)

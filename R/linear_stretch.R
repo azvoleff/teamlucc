@@ -19,7 +19,7 @@
 #' @param max_val maximum value of final output (image will be rescaled to 
 #' range from 0 - \code{max_val})
 #' @return image with stretch applied
-linear_stretch <- function(x, pct=2, max_val=1, ...) {
+linear_stretch <- function(x, pct=2, max_val=1) {
     # Applies linear stretch (2 percent by default). Assumes image is arranged 
     # with bands in columns. Returns the image with stretch applied and bands 
     # rescaled to range from 0 - max_val.

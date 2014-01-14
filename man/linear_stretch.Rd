@@ -2,7 +2,7 @@
 \alias{linear_stretch}
 \title{Apply a linear stretch to an image}
 \usage{
-linear_stretch(x, pct = 2, max_val = 1, ...)
+linear_stretch(x, pct = 2, max_val = 1)
 }
 \arguments{
   \item{x}{image to stretch}

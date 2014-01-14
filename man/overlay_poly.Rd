@@ -2,10 +2,14 @@
 \alias{overlay_poly}
 \title{Make plot of image with overlaid polygon}
 \usage{
-overlay_poly(x, y, out, width = 6.5, height = 6.5, dpi = 300, ...)
+overlay_poly(x, y, out, title = "", width = 6.5, height = 6.5,
+  dpi = 300, ...)
 }
 \arguments{
   \item{x}{image as a \code{Raster*} object}
+
+  \item{y}{polygon to overlay, as
+  \code{SpatialPolygonDataFrame}}
 
   \item{out}{filename for output image. The extension of
   this file will determine the output file format (png,
