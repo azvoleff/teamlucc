@@ -2,8 +2,8 @@
 \alias{overlay_poly}
 \title{Make plot of image with overlaid polygon}
 \usage{
-overlay_poly(x, y, out, title = "", width = 6.5, height = 6.5,
-  dpi = 300, ...)
+overlay_poly(x, y, out, title = "", width = 4, height = 4, dpi = 150,
+  ...)
 }
 \arguments{
   \item{x}{image as a \code{Raster*} object}
