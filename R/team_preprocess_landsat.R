@@ -235,8 +235,9 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                        sunazimuth, method='minnaert_full', 
                                        filename=topocorr_filename, 
                                        inparallel=inparallel, 
-                                       overwrite=overwrite, 
-                                       sampleindices=sampleindices)
+                                       overwrite=overwrite, datatype='INT2S',
+                                       sampleindices=sampleindices,
+                                       scale_factor=10000, asinteger=TRUE)
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'topocorr'))
 
         ######################################################################
@@ -265,7 +266,9 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                       min_x=min_MSAVI2, max_x=max_MSAVI2, 
                                       filename=MSAVI2_glcm_filename, 
                                       overwrite=overwrite, 
-                                      statistics=glcm_statistics)
+                                      statistics=glcm_statistics,
+                                      datatype='INT2S',
+                                      asinteger=TRUE, scale_factor=1000)
         names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'glcm'))
 
@@ -283,13 +286,13 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                             MSAVI2_glcm$glcm_variance,
                             MSAVI2_glcm$glcm_dissimilarity,
                             cropped_dem,
-                            cropped_slopeaspect$slope,
-                            cropped_slopeaspect$aspect)
+                            round(cropped_slopeaspect$slope * 100),
+                            round(cropped_slopeaspect$aspect * 1000))
         predictors_filename <- file.path(output_path,
                                          paste(sitecode, image_basename, 
                                                'predictors.envi', sep='_'))
         predictors <- writeRaster(predictors, predictors_filename, 
-                                  overwrite=overwrite)
+                                  overwrite=overwrite, datatype='INT2S')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'write predictors'))
 
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))

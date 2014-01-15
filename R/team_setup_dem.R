@@ -75,6 +75,7 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, 
                                 overwrite=overwrite)
     timer <- stop_timer(timer, label='Calculating slope & aspect')
+
     if (n_cpus > 1) sfQuickStop()
 
     timer <- stop_timer(timer, label='Setting up DEMs')
