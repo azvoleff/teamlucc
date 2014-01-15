@@ -2,7 +2,7 @@
 \alias{team_setup_dem}
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
-team_setup_dem(dem_list, sitecode, output_path, sample_image = NULL,
+team_setup_dem(dem_path, sitecode, output_path, sample_image = NULL,
   n_cpus = 1, overwrite = FALSE, notify = print)
 }
 \arguments{
@@ -36,11 +36,8 @@ Setup the DEM mosaic for a particular TEAM site
 }
 \examples{
 \dontrun{
-dem_list <- list('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W084_dem.tif',
-                 'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif',
-                 'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N10W084_dem.tif',
-                 'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif')
-team_setup_dem(dem_list, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
+dem_path <- 'H:/Data/TEAM/VB/Rasters/DEM/ASTER'
+team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
 }
 }
 

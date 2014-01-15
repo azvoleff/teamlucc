@@ -18,17 +18,19 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @examples
 #' \dontrun{
-#' dem_list <- list('H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W084_dem.tif',
-#'                  'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif',
-#'                  'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N10W084_dem.tif',
-#'                  'H:/Data/TEAM/VB/Rasters/DEM/ASTER/ASTGTM2_N09W085_dem.tif')
-#' team_setup_dem(dem_list, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
+#' dem_path <- 'H:/Data/TEAM/VB/Rasters/DEM/ASTER'
+#' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
 #' }
-team_setup_dem <- function(dem_list, sitecode, output_path, sample_image=NULL, 
+team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL, 
                             n_cpus=1, overwrite=FALSE, notify=print) {
     notify("Starting DEM setup...")
 
     if (n_cpus > 1) sfQuickInit(n_cpus)
+
+    # Below should recognize ASTER GDEMV2 or SRTM tiles from Earth Explorer
+    dem_list <- dir(dem_path, pattern='(\\.bil)|(_dem\\.tif)$')
+    dem_list <- file.path(dem_path, dem_list)
+
     ################################################################################
     # Verify projections of DEMs match
     dem_rasts <- lapply(dem_list, raster)
