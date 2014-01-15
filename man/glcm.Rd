@@ -33,6 +33,14 @@ min_x=NULL, max_x=NULL)
   \item{max_x}{maximum value of input \code{RasterLayer}
   (optional, \code{glcm} will calculate if not supplied).
   Useful when running \code{glcm} over blocks of a raster.}
+
+  \item{scale_factor}{factor by which to multiply results.
+  Useful if rounding results to integers (see
+  \code{asinteger} argument).}
+
+  \item{asinteger}{whether to round results to nearest
+  integer. Can be used to save space by saving results as,
+  for example, an 'INT2S' \code{raster}.}
 }
 \value{
 A /code{RasterLayer} with the calculated requested GLCM

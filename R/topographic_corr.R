@@ -20,11 +20,16 @@
 #' \code{\link{topocorr}}.
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param overwrite whether to overwrite \code{filename} if it already exists
+#' @param datatype the \code{raster} datatype to use
 #' @param inparallel whether to run correction in parallel using \code{foreach}
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
 #' regression models used for some topographic correction methods (like 
 #' Minnaert). Useful when handling very large images. See
 #' \code{\link{gridsample}} for one method of calculating these indices.
+#' @param scale_factor factor by which to multiply results. Useful if rounding 
+#' results to integers (see \code{asinteger} argument).
+#' @param asinteger whether to round results to nearest integer. Can be used to 
+#' save space by saving results as, for example, an 'INT2S' \code{raster}.
 #' @return The topographically corrected image.
 #' @examples
 #' \dontrun{
@@ -45,8 +50,9 @@
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 #' }
 topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
-                             filename=NULL, overwrite=FALSE, inparallel=FALSE, 
-                             sampleindices=NULL) {
+                             filename=NULL, overwrite=FALSE, datatype='FLT4S',
+                             inparallel=FALSE, sampleindices=NULL, 
+                             scale_factor=1, asinteger=FALSE) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')
     }
@@ -108,7 +114,13 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
     names(corr_img) <- paste0(names(x), 'tc')
     if (!is.null(filename)) {
         writeRaster(corr_img, filename=filename, overwrite=overwrite, 
-                    datatype=dataType(x))
+                    datatype=datatype)
+    }
+    if (scale_factor != 1) {
+        corr_img <- corr_img * scale_factor
+    }
+    if (asinteger) {
+        corr_img <- round(corr_img)
     }
     return(corr_img)
 }

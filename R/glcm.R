@@ -23,6 +23,10 @@
 #' @param max_x maximum value of input \code{RasterLayer} (optional, 
 #' \code{glcm} will calculate if not supplied). Useful when running \code{glcm} 
 #' over blocks of a raster.
+#' @param scale_factor factor by which to multiply results. Useful if rounding 
+#' results to integers (see \code{asinteger} argument).
+#' @param asinteger whether to round results to nearest integer. Can be used to 
+#' save space by saving results as, for example, an 'INT2S' \code{raster}.
 #' @return A /code{RasterLayer} with the calculated requested GLCM texture 
 #' measures.
 #' @references Lu, D., and M. Batistella. 2005. Exploring TM image texture and 
@@ -46,7 +50,8 @@
 glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
                  statistics=c('mean', 'variance', 'homogeneity', 'contrast', 
                               'dissimilarity', 'entropy', 'second_moment', 
-                              'correlation'), min_x=NULL, max_x=NULL) {
+                              'correlation'), min_x=NULL, max_x=NULL, 
+                 scale_factor=1, asinteger=FALSE) {
     if (length(window) != 2) {
         stop('window must be integer vector of length 2')
     }
@@ -101,6 +106,11 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
     } else {
         stop('unknown object returned from calc_texture_full_image')
     }
-
+    if (scale_factor != 1) {
+        textures <- textures * scale_factor
+    }
+    if (asinteger) {
+        textures <- round(textures)
+    }
     return(textures)
 }

@@ -3,7 +3,7 @@
 \title{Apply a raster function with edge effects over a series of blocks}
 \usage{
 apply_windowed(x, fun, edge = c(0, 0), chunksize = NULL, filename = "",
-  overwrite = FALSE, ...)
+  overwrite = FALSE, datatype = "FLT4S", ...)
 }
 \arguments{
   \item{x}{a \code{Raster*}}
@@ -21,6 +21,8 @@ apply_windowed(x, fun, edge = c(0, 0), chunksize = NULL, filename = "",
 
   \item{overwrite}{whether to overwrite any existing files
   (otherwise an error will be raised)}
+
+  \item{datatype}{the \code{raster} datatype to use}
 
   \item{...}{additional arguments to pass to \code{fun}}
 }

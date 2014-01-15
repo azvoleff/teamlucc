@@ -16,6 +16,7 @@
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param overwrite whether to overwrite any existing files (otherwise an error 
 #' will be raised)
+#' @param datatype the \code{raster} datatype to use
 #' @param ... additional arguments to pass to \code{fun}
 #' @examples
 #' \dontrun{
@@ -25,7 +26,7 @@
 #' apply_windowed(L5TSR_1986_b1, glcm, edge=c(1, 3), min_x=min_x, max_x=max_x)
 #' }
 apply_windowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, filename='', 
-                          overwrite=FALSE, ...) {
+                          overwrite=FALSE, datatype='FLT4S', ...) {
     if ((length(edge) != 2) || (class(edge) != 'numeric') || any(edge < 0)) {
         stop('edge must be a length 2 positive numeric')
     }
@@ -92,7 +93,7 @@ apply_windowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, filename='',
             }
             if (filename == '') filename <- rasterTmpFile()
             out <- writeStart(out, filename=filename, overwrite=overwrite, 
-                              datatype=dataType(x))
+                              datatype=datatype)
             names(out) <- layer_names
             started_writes <- TRUE
         }

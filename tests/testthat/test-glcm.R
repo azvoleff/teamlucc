@@ -61,6 +61,19 @@ test_that("GLCM correlation is correct", {
                  tolerance=.000001)
 })
 
-#TODO:
-# Test that glcm run on a raster matches the output from running 
-# glcm directly on a matrix
+# Test that glcm run on a raster matches the output from running glcm directly 
+# on a matrix
+glcm_corr_matrix <- glcm(raster::as.matrix(glcm_test_raster), 32, c(3, 3), c(1, 1), 'correlation')
+glcm_corr_matrix <- matrix(glcm_corr_matrix, nrow=nrow(glcm_corr_matrix))
+test_that("GLCM run on a matrix works correctly", {
+    expect_equal(glcm_corr_matrix,
+                 expected=raster::as.matrix(glcm_test_raster_ENVI_textures$correlation),
+                 tolerance=.000001)
+})
+
+glcm_corr_int <- round(glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), 'correlation') * 1000)
+test_that("GLCM scaling works correctly when run with scaling and rounding", {
+    expect_equal(glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), 'correlation', asinteger=TRUE, scale_factor=1000),
+                 expected=glcm_corr_int,
+                 tolerance=.000001)
+})

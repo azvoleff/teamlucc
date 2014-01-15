@@ -3,7 +3,8 @@
 \title{Topographically correct a raster}
 \usage{
 topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = NULL,
-  overwrite = FALSE, inparallel = FALSE, sampleindices = NULL)
+  overwrite = FALSE, datatype = "FLT4S", inparallel = FALSE,
+  sampleindices = NULL, scale_factor = 1, asinteger = FALSE)
 }
 \arguments{
   \item{x}{an image to correct}
@@ -29,6 +30,8 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = NULL,
   \item{overwrite}{whether to overwrite \code{filename} if
   it already exists}
 
+  \item{datatype}{the \code{raster} datatype to use}
+
   \item{inparallel}{whether to run correction in parallel
   using \code{foreach}}
 
@@ -38,6 +41,14 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = NULL,
   when handling very large images. See
   \code{\link{gridsample}} for one method of calculating
   these indices.}
+
+  \item{scale_factor}{factor by which to multiply results.
+  Useful if rounding results to integers (see
+  \code{asinteger} argument).}
+
+  \item{asinteger}{whether to round results to nearest
+  integer. Can be used to save space by saving results as,
+  for example, an 'INT2S' \code{raster}.}
 }
 \value{
 The topographically corrected image.
