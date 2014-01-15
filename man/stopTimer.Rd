@@ -16,11 +16,13 @@ timer, labelled 'Default' will be used.
 timer <- Track_time()
 print(timer)
 
-timer <- startTimer('test')
-
-print(timer)
+timer <- startTimer(timer, 'test')
 
 print(timer, 'test')
+
+timer <- stopTimer(timer, 'test')
+
+print(timer)
 }
 \seealso{
 \code{\link{startTimer}}

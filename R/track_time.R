@@ -78,13 +78,13 @@ setMethod("show", signature(object="Track_time"), function(object) print(object)
 #' timer <- Track_time()
 #' print(timer)
 #'
-#' timer <- startTimer('test')
-#'
-#' print(timer)
+#' timer <- startTimer(timer, 'test')
 #'
 #' print(timer, 'test')
 #'
-#' timer <- stopTimer('test')
+#' timer <- stopTimer(timer, 'test')
+#'
+#' print(timer)
 setGeneric("startTimer", function(x, label) {
     standardGeneric("startTimer")
 })
@@ -125,12 +125,13 @@ setMethod("startTimer", signature(x="Track_time"),
 #' timer <- Track_time()
 #' print(timer)
 #'
-#' timer <- startTimer('test')
-#'
-#' print(timer)
+#' timer <- startTimer(timer, 'test')
 #'
 #' print(timer, 'test')
 #'
+#' timer <- stopTimer(timer, 'test')
+#'
+#' print(timer)
 setGeneric("stopTimer", function(x, label='Default') {
     standardGeneric("stopTimer")
 })
