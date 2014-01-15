@@ -25,7 +25,7 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
                            n_cpus=1, overwrite=FALSE, notify=print) {
     timer <- Track_time(notify)
 
-    timer <- start_timer(timer, label=paste('Setting up DEMs', image_basename))
+    timer <- start_timer(timer, label='Setting up DEMs')
 
     if (n_cpus > 1) sfQuickInit(n_cpus)
 
@@ -77,5 +77,5 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     timer <- stop_timer(timer, label='Calculating slope & aspect')
     if (n_cpus > 1) sfQuickStop()
 
-    timer <- stop_timer(timer, label=paste('Setting up DEMs', image_basename))
+    timer <- stop_timer(timer, label='Setting up DEMs')
 }

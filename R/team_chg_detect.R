@@ -14,7 +14,7 @@
 team_chg_detect <- function(t1_predictions, t2_predictions, notify) {
     timer <- Track_time(notify)
 
-    timer <- start_timer(timer, label=paste('Change detection', image_basename))
+    timer <- start_timer(timer, label='Change detection')
 
     ################################################################################
     # Calculate change magnitude and direction
@@ -34,5 +34,5 @@ team_chg_detect <- function(t1_predictions, t2_predictions, notify) {
 
     sfQuickStop()
 
-    timer <- stop_timer(timer, label=paste('Change detection', image_basename))
+    timer <- stop_timer(timer, label='Change detection')
 }
