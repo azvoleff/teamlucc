@@ -58,12 +58,10 @@ setMethod("show", signature(object="Track_time"), function(object) print(object)
             stop(paste0('"', label, '"', ' timer already defined'))
         }
         x@timers <- rbind(x@timers, data.frame(label=label, starttime=now()))
-        x@notify(paste0('"', label, '" timer started at: ', 
-                        x@timers$starttime[x@timers$label == label]))
+        x@notify(paste0(x@timers$starttime[x@timers$label == label], ': started "', label, '"'))
     } else {
         x@timers$starttime[x@timers$label == 'Default'] <- now()
-        x@notify(paste('"Default" timer started at:', 
-                       x@timers$starttime[x@timers$label == 'Default']))
+        x@notify(paste0(x@timers$starttime[x@timers$label == "Default"], ': started'))
     }
     return(x)
 }
@@ -112,7 +110,7 @@ setMethod("start_timer", signature(x="Track_time"),
     } else {
         x@timers <- x@timers[x@timers$label != label, ] 
     }
-    x@notify(paste0('"', label, '" timer finished at: ', now(), ' (', round(elapsed, 3),' elapsed)'))
+    x@notify(paste0(now(), ': finished "', label, '" (', round(elapsed, 3),' elapsed)'))
     return(x)
 }
 
