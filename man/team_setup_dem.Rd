@@ -6,7 +6,7 @@ team_setup_dem(dem_path, sitecode, output_path, sample_image = NULL,
   n_cpus = 1, overwrite = FALSE, notify = print)
 }
 \arguments{
-  \item{dem_list}{a list of digital elevation models (DEMs)
+  \item{dem_path}{a list of digital elevation models (DEMs)
   that (when mosaiced) covers the full extent of all the
   images in the image_list.}
 

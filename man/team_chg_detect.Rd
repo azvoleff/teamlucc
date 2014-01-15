@@ -2,7 +2,7 @@
 \alias{team_chg_detect}
 \title{Perform change detection for two Landsat CDR surface reflectance images}
 \usage{
-team_chg_detect(t1_predictions, t2_predictions)
+team_chg_detect(t1_predictions, t2_predictions, notify)
 }
 \arguments{
   \item{t1_predictions}{output from
@@ -10,6 +10,11 @@ team_chg_detect(t1_predictions, t2_predictions)
 
   \item{t2_predictions}{output from
   \code{team_classify_image} for time 2 image}
+
+  \item{notify}{notifier to use (defaults to \code{print}
+  function). See the \code{notifyR} package for one way of
+  sending notifications from R. The \code{notify} function
+  should accept a string as the only argument.}
 }
 \description{
 First the images should be classified using the

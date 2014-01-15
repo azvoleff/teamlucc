@@ -17,8 +17,10 @@ setClass('Track_time', slots=c(timers='data.frame', notify="function"),
 #' @export
 #' @import methods
 #' @importFrom lubridate now
-#' @param label an optional label used to maintain multiple tracking timers
-#' @seealso \code{\link{startTimer}}, \code{\link{stopTimer}}
+#' @param notify a function to handle the string output from Track_time.  This 
+#' function should accepts a string as an argument. Default is the
+#' \code{\link{print}} function.
+#' @seealso \code{\link{start_timer}}, \code{\link{stop_timer}}
 #' @examples
 #' timer <- Track_time()
 #' print(timer)
@@ -50,7 +52,7 @@ print.Track_time <- function(x, label, ...) {
 setMethod("show", signature(object="Track_time"), function(object) print(object))
 
 #' @importFrom lubridate now as.duration
-.startTimer <- function(x, label) {
+.start_timer <- function(x, label) {
     if (!missing(label)) {
         if (label %in% x@timers$label) {
             stop(paste0('"', label, '"', ' timer already defined'))
@@ -72,33 +74,34 @@ setMethod("show", signature(object="Track_time"), function(object) print(object)
 #' 'Default' will be used.
 #'
 #' @export
+#' @param x a \code{Track_time} object
 #' @param label an optional label used to maintain multiple tracking timers
-#' @seealso \code{\link{stopTimer}}
+#' @seealso \code{\link{stop_timer}}
 #' @examples
 #' timer <- Track_time()
 #' print(timer)
 #'
-#' timer <- startTimer(timer, 'test')
+#' timer <- start_timer(timer, 'test')
 #'
 #' print(timer, 'test')
 #'
-#' timer <- stopTimer(timer, 'test')
+#' timer <- stop_timer(timer, 'test')
 #'
 #' print(timer)
-setGeneric("startTimer", function(x, label) {
-    standardGeneric("startTimer")
+setGeneric("start_timer", function(x, label) {
+    standardGeneric("start_timer")
 })
 
-setMethod("startTimer", signature(x="Track_time"),
-    function(x) .startTimer(x)
+setMethod("start_timer", signature(x="Track_time"),
+    function(x) .start_timer(x)
 )
 
-setMethod("startTimer", signature(x="Track_time"),
-    function(x, label) .startTimer(x, label)
+setMethod("start_timer", signature(x="Track_time"),
+    function(x, label) .start_timer(x, label)
 )
 
 #' @importFrom lubridate now as.duration
-.stopTimer <- function(x, label='Default') {
+.stop_timer <- function(x, label='Default') {
     if (!(label %in% x@timers$label)) {
         stop(paste0('"', label, '"', ' timer not defined'))
     }
@@ -119,27 +122,28 @@ setMethod("startTimer", signature(x="Track_time"),
 #' 'Default' will be used.
 #'
 #' @export
+#' @param x a \code{Track_time} object
 #' @param label an optional label used to maintain multiple tracking timers
-#' @seealso \code{\link{startTimer}}
+#' @seealso \code{\link{start_timer}}
 #' @examples
 #' timer <- Track_time()
 #' print(timer)
 #'
-#' timer <- startTimer(timer, 'test')
+#' timer <- start_timer(timer, 'test')
 #'
 #' print(timer, 'test')
 #'
-#' timer <- stopTimer(timer, 'test')
+#' timer <- stop_timer(timer, 'test')
 #'
 #' print(timer)
-setGeneric("stopTimer", function(x, label='Default') {
-    standardGeneric("stopTimer")
+setGeneric("stop_timer", function(x, label='Default') {
+    standardGeneric("stop_timer")
 })
 
-setMethod("stopTimer", signature(x="Track_time"),
-    function(x) .stopTimer(x)
+setMethod("stop_timer", signature(x="Track_time"),
+    function(x) .stop_timer(x)
 )
 
-setMethod("stopTimer", signature(x="Track_time"),
-    function(x, label) .stopTimer(x, label)
+setMethod("stop_timer", signature(x="Track_time"),
+    function(x, label) .stop_timer(x, label)
 )

@@ -34,7 +34,9 @@
 team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode, 
                                     output_path, aoi=NULL, n_cpus=1, cleartmp=FALSE, 
                                     overwrite=FALSE, notify=print) {
-    notify("Starting preprocessing...")
+    timer <- Track_time(notify)
+
+    timer <- start_timer(label='Preprocessing images')
     if (n_cpus > 1) sfQuickInit(n_cpus)
 
     # Setup a regex to identify Landsat CDR images
@@ -128,13 +130,12 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         image_basename <- paste(paste0(WRS_Path, WRS_Row),
                                 format(aq_date, '%Y%j'), short_name, sep='_')
 
-        notify(paste0("Processing ", image_basename, '...'))
+        timer <- start_timer(label=paste('Preprocessing', image_basename))
 
         ######################################################################
         # Crop image to AOI if desired
         if (!is.null(aoi)) {
-            notify('Cropping image to AOI...')
-            notify(track_time(action='start'))
+            timer <- start_timer(label=paste(image_basename, '-', 'crop'))
             if (class(aoi) != 'SpatialPolygonsDataFrame') {
                 stop('aoi must be a SpatialPolygonsDataFrame')
             } else if (projection(aoi) != projection(image_stack)) {
@@ -143,13 +144,12 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
             image_stack <- crop(image_stack, aoi)
             mask_stack <- crop(mask_stack, aoi)
             image_basename <- paste(image_basename, 'crop', sep='_')
-            notify(track_time())
+            timer <- stop_timer(label=paste(image_basename, '-', 'crop'))
         }
 
         ######################################################################
         # Load data and mask out clouds and missing values
-        notify('Loading data and masking clouds and missing data...')
-        notify(track_time(action='start'))
+        timer <- start_timer(label=paste(image_basename, '-', 'masking'))
 
         # The combined cloud mask includes the cloud_QA, cloud_shadow_QA, and 
         # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, while 
@@ -178,12 +178,11 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         image_stack <- mask(image_stack, image_stack_mask, maskvalue=0,
                             filename=image_stack_masked_path, 
                             overwrite=overwrite, datatype=dataType(image_stack)[1])
-        notify(track_time())
+        timer <- stop_timer(label=paste(image_basename, '-', 'masking'))
 
         ######################################################################
         # Perform topographic correction
-        notify('Cropping dem and slope/aspect rasters to extent of Landsat image...')
-        notify(track_time(action='start'))
+        timer <- start_timer(label=paste(image_basename, '-', 'crop DEMs'))
         cropped_dem_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
                                             'dem.envi', sep='_'))
@@ -205,10 +204,9 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                              overwrite=overwrite, 
                                              datatype=dataType(slopeaspect)[1])
         names(cropped_slopeaspect) <- c('slope', 'aspect')
-        notify(track_time())
+        timer <- stop_timer(label=paste(image_basename, '-', 'crop DEMs'))
 
-        notify('Running topocorr...')
-        notify(track_time(action='start'))
+        timer <- start_timer(label=paste(image_basename, '-', 'topocorr'))
 
         # Draw a sample for the Minnaert k regression
         horizcells <- 10
@@ -237,12 +235,11 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                        inparallel=inparallel, 
                                        overwrite=overwrite, 
                                        sampleindices=sampleindices)
-        notify(track_time())
+        timer <- stop_timer(label=paste(image_basename, '-', 'topocorr'))
 
         ######################################################################
         # Calculate additional predictor layers (MSAVI and textures)
-        notify('Calculating MSAVI2...')
-        notify(track_time(action='start'))
+        timer <- start_timer(label=paste(image_basename, '-', 'MSAVI2'))
         MSAVI2_filename <- file.path(output_path,
                                      paste(sitecode, image_basename, 
                                            'masked_tc_MSAVI2.envi', sep='_'))
@@ -250,10 +247,9 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                nir=raster(image_stack, layer=4))
         MSAVI2_layer <- writeRaster(MSAVI2_layer, MSAVI2_filename, 
                                     overwrite=overwrite, datatype=dataType(MSAVI2_layer))
-        notify(track_time())
+        timer <- stop_timer(label=paste(image_basename, '-', 'MSAVI2'))
 
-        notify('Calculating GLCM textures from MSAVI image...')
-        notify(track_time(action='start'))
+        timer <- start_timer(label=paste(image_basename, '-', 'glcm'))
         MSAVI2_glcm_filename <- file.path(output_path,
                                           paste(sitecode, image_basename, 
                                                 'masked_tc_MSAVI2_glcm.envi', 
@@ -268,11 +264,12 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                       filename=MSAVI2_glcm_filename, 
                                       overwrite=overwrite, 
                                       statistics=glcm_statistics)
-        notify(track_time())
         names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
+        timer <- stop_timer(label=paste(image_basename, '-', 'glcm'))
 
         ######################################################################
         # Layer stack predictor layers:
+        timer <- start_timer(label=paste(image_basename, '-', 'write predictors'))
         predictors <- stack(raster(image_stack, layer=1),
                             raster(image_stack, layer=2),
                             raster(image_stack, layer=3),
@@ -291,9 +288,13 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                                'predictors.envi', sep='_'))
         predictors <- writeRaster(predictors, predictors_filename, 
                                   overwrite=overwrite)
+        timer <- stop_timer(label=paste(image_basename, '-', 'write predictors'))
+
+        timer <- stop_timer(label=paste('Preprocessing', image_basename))
 
         if (cleartmp) removeTmpFiles(h=1)
-
     }
     if (n_cpus > 1) sfQuickStop()
+
+    timer <- stop_timer(label='Preprocessing images')
 }

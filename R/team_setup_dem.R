@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @importFrom spatial.tools sfQuickInit sfQuickStop
-#' @param dem_list a list of digital elevation models (DEMs) that (when 
+#' @param dem_path a list of digital elevation models (DEMs) that (when 
 #' mosaiced) covers the full extent of all the images in the image_list.
 #' @param sitecode code to use as a prefix for all filenames
 #' @param output_path the path to use for the output 
@@ -22,8 +22,10 @@
 #' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
 #' }
 team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL, 
-                            n_cpus=1, overwrite=FALSE, notify=print) {
-    notify("Starting DEM setup...")
+                           n_cpus=1, overwrite=FALSE, notify=print) {
+    timer <- Track_time(notify)
+
+    timer <- start_timer(timer, label=paste('Setting up DEMs', image_basename))
 
     if (n_cpus > 1) sfQuickInit(n_cpus)
 
@@ -42,9 +44,9 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
 
     ################################################################################
     # Mosaic DEMs
-    notify('Mosaicing DEMs...')
-    notify(track_time(action='start'))
-    # See http://bit.ly/1dJPIeF re issue in raster that necessitates below workaround
+    timer <- start_timer(timer, label='Mosaicing DEMs')
+    # See http://bit.ly/1dJPIeF re issue in raster that necessitates below 
+    # workaround
     # TODO: Contact Hijmans re possible fix
     mosaicargs <- dem_rasts
     mosaicargs$fun <- mean
@@ -55,22 +57,25 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     if (is.null(sample_image) | (projection(sample_image) == 
                                  projection(dem_mosaic))) {
         dem_mosaic <- writeRaster(dem_mosaic, dem_mosaic_filename, 
-                                  overwrite=overwrite)
+                                  overwrite=overwrite, 
+                                  datatype=dataType(dem_mosaic))
     } else {
         dem_mosaic <- projectRaster(dem_mosaic, 
                                     crs=CRS(projection(sample_image)), 
                                     filename=dem_mosaic_filename, 
-                                    overwrite=overwrite)
+                                    overwrite=overwrite, 
+                                    datatype=dataType(dem_mosaic))
     }
-    notify(track_time())
+    timer <- stop_timer(timer, label='Mosaicing DEMs')
 
-    notify('Running slopeasp_seq...')
-    notify(track_time(action='start'))
+    timer <- start_timer(timer, label='Calculating slope & aspect')
     slopeaspect_filename <- file.path(output_path,
                                       paste0(sitecode, 
                                              '_dem_mosaic_slopeaspect.envi'))
     slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, 
                                 overwrite=overwrite)
-    notify(track_time())
+    timer <- stop_timer(timer, label='Calculating slope & aspect')
     if (n_cpus > 1) sfQuickStop()
+
+    timer <- stop_timer(timer, label=paste('Setting up DEMs', image_basename))
 }

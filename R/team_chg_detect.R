@@ -8,22 +8,31 @@
 #' image
 #' @param t2_predictions output from \code{team_classify_image} for time 2 
 #' image
-team_chg_detect <- function(t1_predictions, t2_predictions) {
+#' @param notify notifier to use (defaults to \code{print} function). See the 
+#' \code{notifyR} package for one way of sending notifications from R. The 
+#' \code{notify} function should accept a string as the only argument.
+team_chg_detect <- function(t1_predictions, t2_predictions, notify) {
+    timer <- Track_time(notify)
+
+    timer <- start_timer(timer, label=paste('Change detection', image_basename))
+
     ################################################################################
     # Calculate change magnitude and direction
     ################################################################################
-    print('Calculating change magnitude/direction...')
-    track_time(action='start')
+    timer <- start_timer(timer, label=paste('Change magnitude and direction', image_basename))
     t0_probs <- brick('L5TSR_1986_probs.grd')
     t1_probs <- brick('L5TSR_2001_probs.grd')
     chg_dir_image <- chg_dir(t0_probs, t1_probs, filename='L5TSR_1986_to_2001_chgdir')
     chg_mag_image <- chg_mag(t0_probs, t1_probs, filename='L5TSR_1986_to_2001_chgmag')
-    track_time()
+    timer <- stop_timer(timer, label=paste('Change magnitude and direction', image_basename))
 
     ################################################################################
     # Calculate change trajectories
     ################################################################################
+    timer <- start_timer(timer, label=paste('Change trajectories', image_basename))
+    timer <- stop_timer(timer, label=paste('Change trajectories', image_basename))
 
     sfQuickStop()
-    track_time('total_time')
+
+    timer <- stop_timer(timer, label=paste('Change detection', image_basename))
 }

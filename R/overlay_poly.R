@@ -43,7 +43,7 @@ overlay_poly <- function(x, y, out, title='', width=4, height=4, dpi=150,
     }
     dat <- data.frame(coords, color=dat)
 
-    color_val=long=lat=NULL  # fix for R CMD CHECK
+    color=long=lat=NULL  # fix for R CMD CHECK
     theme_set(theme_bw(base_size=8))
     p <- ggplot(dat) +
         geom_raster(aes(x, y, fill=color)) + coord_fixed() +

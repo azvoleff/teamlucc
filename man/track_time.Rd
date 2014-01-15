@@ -5,8 +5,9 @@
 Track_time(notify = print)
 }
 \arguments{
-  \item{label}{an optional label used to maintain multiple
-  tracking timers}
+  \item{notify}{a function to handle the string output from
+  Track_time.  This function should accepts a string as an
+  argument. Default is the \code{\link{print}} function.}
 }
 \description{
 Creates a new Track_time object for use in tracking and
@@ -18,6 +19,6 @@ timer <- Track_time()
 print(timer)
 }
 \seealso{
-\code{\link{startTimer}}, \code{\link{stopTimer}}
+\code{\link{start_timer}}, \code{\link{stop_timer}}
 }
 
