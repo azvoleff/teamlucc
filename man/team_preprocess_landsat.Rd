@@ -3,7 +3,8 @@
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
 team_preprocess_landsat(image_dirs, dem, slopeaspect, sitecode, output_path,
-  n_cpus = 1, cleartmp = FALSE, overwrite = FALSE, notify = print)
+  aoi = NULL, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
+  notify = print)
 }
 \arguments{
   \item{image_dirs}{list of paths to a set of Landsat CDR
@@ -22,6 +23,9 @@ team_preprocess_landsat(image_dirs, dem, slopeaspect, sitecode, output_path,
   filenames}
 
   \item{output_path}{the path to use for the output}
+
+  \item{aoi}{an area of interest (AOI) to crop from each
+  image}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
