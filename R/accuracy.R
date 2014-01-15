@@ -48,6 +48,8 @@ print.accuracy <- function(x, ...) {
     summary(x, ...)
 }
 
+setMethod("show", signature(object="accuracy"), function(object) summary(object))
+
 .calc_pop_ct <- function(ct, pop) {
     # Below uses the notation of Pontius and Millones (2011)
     nijsum <- matrix(rowSums(ct), nrow=nrow(ct), ncol=ncol(ct))
