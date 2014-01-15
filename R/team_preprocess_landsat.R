@@ -11,8 +11,10 @@
 #' @param slopeaspect path to a two layer raster stack with slope and aspect 
 #' calculated from the above DEM
 #' @param sitecode code to use as a prefix for all filenames
-#' @param output_path the path to use for the output @param n_cpus the number 
-#' of CPUs to use for processes that can run in parallel
+#' @param output_path the path to use for the output
+#' @param aoi an area of interest (AOI) to crop from each image
+#' @param n_cpus the number of CPUs to use for processes that can run in 
+#' parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
@@ -30,7 +32,7 @@
 #' 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
 team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode, 
-                                    output_path, n_cpus=1, cleartmp=FALSE, 
+                                    output_path, aoi=NULL, n_cpus=1, cleartmp=FALSE, 
                                     overwrite=FALSE, notify=print) {
     notify("Starting preprocessing...")
     if (n_cpus > 1) sfQuickInit(n_cpus)
@@ -127,6 +129,22 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                 format(aq_date, '%Y%j'), short_name, sep='_')
 
         notify(paste0("Processing ", image_basename, '...'))
+
+        ######################################################################
+        # Crop image to AOI if desired
+        if (!is.null(aoi)) {
+            notify('Cropping image to AOI...')
+            notify(track_time(action='start'))
+            if (class(aoi) != 'SpatialPolygonsDataFrame') {
+                stop('aoi must be a SpatialPolygonsDataFrame')
+            } else if (projection(aoi) != projection(image_stack)) {
+                stop(paste('projections of aoi and', image_basename, 'do not match'))
+            }
+            image_stack <- crop(image_stack, aoi)
+            mask_stack <- crop(mask_stack, aoi)
+            image_basename <- paste(image_basename, 'crop', sep='_')
+            notify(track_time())
+        }
 
         ######################################################################
         # Load data and mask out clouds and missing values
