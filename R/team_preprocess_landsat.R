@@ -121,7 +121,10 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         aq_date <- get_metadata_item(band1_imagefile, 'AcquisitionDate')
         aq_date <- strptime(aq_date, format="%Y-%m-%dT%H:%M:%OSZ")
         short_name  <- get_metadata_item(band1_imagefile, 'ShortName')
-        image_basename <- paste(format(aq_date, '%Y_%j'), short_name, sep='_')
+        WRS_Path <- sprintf('%03i', as.numeric(get_metadata_item(band1_imagefile, 'WRS_Path')))
+        WRS_Row <- sprintf('%03i', as.numeric(get_metadata_item(band1_imagefile, 'WRS_Row')))
+        image_basename <- paste(paste0(WRS_Path, WRS_Row),
+                                format(aq_date, '%Y%j'), short_name, sep='_')
 
         notify(paste0("Processing ", image_basename, '...'))
 
