@@ -26,24 +26,7 @@ code.
 
 ## Package Installation
 
-### Step One - Install the `teamr` package in R
-As `teamr` is still under development, it is not yet listed on 
-[CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
-version) of the `teamr` package is using the 
-[devtools](http://cran.r-project.org/web/packages/devtools/index.html) package 
-from Hadley Wickham. After installing `devtools` from CRAN, type:
-
-```R
-install_github('teamr', username='azvoleff')
-```
-
-at the R prompt to install `teamr`.
-
-If you are installing on Windows, you will first need to install the 
-appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
-for your version of R (as `teamr` contains C++ code).
-
-### Step One - Get GDAL installed and working
+### Step one - install GDAL
 
 *NOTE*: this step is only required if you want to use the `unstack_ledapscdr` 
 function in `teamr`. All the other functions in `teamr` will work without 
@@ -74,7 +57,24 @@ At a shell prompt, type:
 sudo apt-get install gdal-bin libgdal-dev
 ```
 
-### Step Three - Ensure you have an appropriate version of `raster`
+### Step two - install the `teamr` package in R
+As `teamr` is still under development, it is not yet listed on 
+[CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
+version) of the `teamr` package is using the 
+[devtools](http://cran.r-project.org/web/packages/devtools/index.html) package 
+from Hadley Wickham. After installing `devtools` from CRAN, type:
+
+```R
+install_github('teamr', username='azvoleff')
+```
+
+at the R prompt to install `teamr`.
+
+If you are installing on Windows, you will first need to install the 
+appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
+for your version of R (as `teamr` contains C++ code).
+
+### Step three - check version of `raster` in R
 *NOTE*: A bug in version 2.2-5 of the `raster` package will cause errors in
 `teamr` (see 
 [stackoverflow](http://stackoverflow.com/questions/20915114/extract-in-r-fails-for-small-polygons-and-raster)
@@ -84,6 +84,16 @@ to the previous version using `devtools`:
 ```R
 install_url('http://cran.r-project.org/src/contrib/Archive/raster/raster_2.1-66.tar.gz')
 ```
+
+To check the version of the `raster` package, open R and type:
+
+```R
+library(raster)
+sessionInfo()
+
+```
+
+and check the output.
 
 ## Author Contact Information
 
