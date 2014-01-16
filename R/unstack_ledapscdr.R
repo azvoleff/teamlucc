@@ -10,12 +10,15 @@
 #' your operating system.
 #'
 #' @export
-#' @importFrom gdalUtils gdal_translate get_subdatasets
 #' @importFrom tools file_path_sans_ext
 #' @param x input HDF4 file
 #' @param out output file
 #' @param overwrite whether to overwrite existing files
 unstack_ledapscdr <- function(x, out, overwrite=FALSE) {
+    if (!require(gdalUtils)) {
+        stop('unstack_ledapscdr requires the "gdalUtils" package')
+    }
+
     if (!file_test('-d', out)) {
         stop('out must be a directory')
     }

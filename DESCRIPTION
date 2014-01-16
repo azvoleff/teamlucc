@@ -21,7 +21,6 @@ Imports:
     ggplot2,
     grid,
     spatial.tools (>= 1.2.2),
-    gdalUtils,
     caret,
     foreach,
     sp,
@@ -29,6 +28,7 @@ Imports:
     lubridate,
     XML
 Suggests:
+    gdalUtils,
     testthat,
     kernlab,
     e1071,
