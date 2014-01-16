@@ -1,6 +1,7 @@
 #' Calculates the Normalized Difference Vegetation Index (NDVI)
 #'
 #' @export
+#' @importFrom raster overlay
 #' @param red red \code{RasterLayer}
 #' @param nir near-infrared \code{RasterLayer}
 #' @param asinteger whether to round results to nearest integer
@@ -24,6 +25,7 @@ NDVI <- function(red, nir, asinteger=FALSE, ...) {
 #' Calculates the Enhanced Vegetation Index (EVI)
 #'
 #' @export
+#' @importFrom raster overlay
 #' @param blue blue \code{RasterLayer}
 #' @param red red \code{RasterLayer}
 #' @param nir near-infrared \code{RasterLayer}
@@ -56,6 +58,7 @@ EVI <- function(blue, red, nir, asinteger=FALSE, ...) {
 #' MSAVI2 from Qi et al. (1994).
 #'
 #' @export
+#' @importFrom raster overlay
 #' @param red red \code{RasterLayer}
 #' @param nir near-infrared \code{RasterLayer}
 #' @param asinteger whether to round results to nearest integer
@@ -69,7 +72,7 @@ EVI <- function(blue, red, nir, asinteger=FALSE, ...) {
 #' plot(MSAVI_img)
 MSAVI2 <- function(red, nir, asinteger=FALSE, ...) {
     ret <- overlay(red, nir, function(red, nir) {
-        res <- 2*nir + 1 - sqrt((2*nir + 1)^2 - 8*(nir - red)))/2
+        res <- (2*nir + 1 - sqrt((2*nir + 1)^2 - 8*(nir - red)))/2
         if(asinteger) {
             res <- round(res)
         }
@@ -82,6 +85,7 @@ MSAVI2 <- function(red, nir, asinteger=FALSE, ...) {
 #' Calculates the Atmospherically Resistant Vegetation Index (ARVI)
 #'
 #' @export
+#' @importFrom raster overlay
 #' @param blue blue \code{RasterLayer}
 #' @param red red \code{RasterLayer}
 #' @param nir near-infrared \code{RasterLayer}
