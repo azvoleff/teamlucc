@@ -185,11 +185,11 @@ team_preprocess_landsat <- function(image_dirs, dem, sitecode, output_path,
                                       paste(sitecode, image_basename, 
                                             'dem.envi', sep='_'))
         cropped_dem <- match_rasters(image_stack, dem)
-        names(cropped_dem) <- "dem"
         cropped_dem <- calc(cropped_dem, fun=function(vals) {
                 round(vals)
             }, filename=cropped_dem_file, overwrite=overwrite, 
             datatype='INT2S')
+        names(cropped_dem) <- "dem"
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
 
         timer <- start_timer(timer, label=paste(image_basename, '-', 'calculate slope/aspect'))
@@ -197,7 +197,6 @@ team_preprocess_landsat <- function(image_dirs, dem, sitecode, output_path,
                                       paste(sitecode, image_basename, 
                                             'dem_slopeaspect.envi', sep='_'))
         slopeaspect <- slopeasp_seq(cropped_dem)
-        names(slopeaspect) <- c('slope', 'aspect')
         slopeaspect$slope <- calc(slopeaspect$slope, fun=function(vals) {
             vals[vals > 89.5] <- 0
             round(vals)
@@ -208,6 +207,7 @@ team_preprocess_landsat <- function(image_dirs, dem, sitecode, output_path,
             })
         slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_file, 
                                    overwrite=overwrite, datatype='INT2S')
+        names(slopeaspect) <- c('slope', 'aspect')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'calculate slope/aspect'))
 
         ######################################################################
@@ -291,14 +291,18 @@ team_preprocess_landsat <- function(image_dirs, dem, sitecode, output_path,
                             MSAVI2_glcm$glcm_mean,
                             MSAVI2_glcm$glcm_variance,
                             MSAVI2_glcm$glcm_dissimilarity,
-                            cropped_dem,
+                            cropped_dem$dem,
                             slopeaspect$slope,
                             slopeaspect$aspect)
         predictors_filename <- file.path(output_path,
                                          paste(sitecode, image_basename, 
                                                'predictors.envi', sep='_'))
-        predictors <- writeRaster(predictors, predictors_filename, 
+        predictors <- writeRaster(predictors, filename=predictors_filename, 
                                   overwrite=overwrite)
+        names(predictors) <- c('b1', 'b2', 'b3', 'b4', 'b5', 'b7', 'msavi', 
+                              'msavi_glcm_mean', 'msavi_glcm_variance', 
+                              'msavi_glcm_dissimilarity', 'elev', 'slope', 
+                              'aspect')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'write predictors'))
 
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))

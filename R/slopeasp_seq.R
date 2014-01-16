@@ -50,7 +50,7 @@ slopeasp_seq <- function(DEM, EWkernel, NSkernel, smoothing=1, filename='',
     names(slopeasp_img) <- c('slope', 'aspect')
 
     if (filename != '') {
-        writeRaster(slopeasp_img, filename=filename, ...)
+        slopeasp_img <- writeRaster(slopeasp_img, filename=filename, ...)
     }
 
     return(slopeasp_img)
