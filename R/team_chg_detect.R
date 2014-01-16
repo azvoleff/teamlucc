@@ -19,18 +19,18 @@ team_chg_detect <- function(t1_predictions, t2_predictions, notify) {
     ################################################################################
     # Calculate change magnitude and direction
     ################################################################################
-    timer <- start_timer(timer, label=paste('Change magnitude and direction', image_basename))
+    timer <- start_timer(timer, label='Change magnitude and direction')
     t0_probs <- brick('L5TSR_1986_probs.grd')
     t1_probs <- brick('L5TSR_2001_probs.grd')
     chg_dir_image <- chg_dir(t0_probs, t1_probs, filename='L5TSR_1986_to_2001_chgdir')
     chg_mag_image <- chg_mag(t0_probs, t1_probs, filename='L5TSR_1986_to_2001_chgmag')
-    timer <- stop_timer(timer, label=paste('Change magnitude and direction', image_basename))
+    timer <- stop_timer(timer, label='Change magnitude and direction')
 
     ################################################################################
     # Calculate change trajectories
     ################################################################################
-    timer <- start_timer(timer, label=paste('Change trajectories', image_basename))
-    timer <- stop_timer(timer, label=paste('Change trajectories', image_basename))
+    timer <- start_timer(timer, label='Change trajectories')
+    timer <- stop_timer(timer, label='Change trajectories')
 
     sfQuickStop()
 
