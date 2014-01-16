@@ -2,8 +2,7 @@
 \alias{slopeasp_seq}
 \title{Slope and aspect calculation for DEM \code{RasterLayer}}
 \usage{
-slopeasp_seq(DEM, EWkernel, NSkernel, smoothing = 1, filename = "",
-  overwrite = FALSE)
+slopeasp_seq(DEM, EWkernel, NSkernel, smoothing = 1, filename = "", ...)
 }
 \arguments{
   \item{DEM}{DEM as \code{RasterLayer}}
@@ -17,11 +16,11 @@ slopeasp_seq(DEM, EWkernel, NSkernel, smoothing = 1, filename = "",
   \item{smoothing}{positive integer for smoothing. 1 means
   no smoothing.}
 
-  \item{filename}{output file for 2-band slope and aspect
-  layer stack (optional)}
+  \item{filename}{(optional) output file to save layer
+  stack}
 
-  \item{overwrite}{whether to overwrite output file if it
-  exists}
+  \item{...}{additional arguments as for
+  \code{writeRaster}}
 }
 \value{
 RasterBrick with two layers: 'slope' and 'aspect'

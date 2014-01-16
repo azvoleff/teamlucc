@@ -13,9 +13,8 @@
 #' @param EWkernel kernel to use for East-West gradient calculation
 #' @param NSkernel kernel to use for North-South gradient calculation
 #' @param smoothing positive integer for smoothing. 1 means no smoothing.
-#' @param filename output file for 2-band slope and aspect layer stack 
-#' (optional)
-#' @param overwrite whether to overwrite output file if it exists
+#' @param filename (optional) output file to save layer stack
+#' @param ... additional arguments as for \code{writeRaster}
 #' @return RasterBrick with two layers: 'slope' and 'aspect'
 #' @author Sarah Goslee and Alex Zvoleff
 #' @references
@@ -25,7 +24,7 @@
 #' @examples
 #' #TODO: Write examples
 slopeasp_seq <- function(DEM, EWkernel, NSkernel, smoothing=1, filename='', 
-                          overwrite=FALSE) {
+                         ...) {
     if (class(DEM) == 'SpatialGridDataFrame') {
         stop('DEM must be a Raster* object')
     }
@@ -46,8 +45,13 @@ slopeasp_seq <- function(DEM, EWkernel, NSkernel, smoothing=1, filename='',
                               smoothing=smoothing)
     slope <- as(slopeasp_spdf$slope, 'RasterLayer')
     aspect <- as(slopeasp_spdf$aspect, 'RasterLayer')
-    slopeasp_img <- brick(stack(slope, aspect), filename=filename, 
-                          overwrite=overwrite)
+
+    slopeasp_img <- stack(slope, aspect)
     names(slopeasp_img) <- c('slope', 'aspect')
+
+    if (filename != '') {
+        writeRaster(slopeasp_img, filename=filename, ...)
+    }
+
     return(slopeasp_img)
 }
