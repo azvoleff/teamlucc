@@ -8,8 +8,6 @@
 #' @param dem path to a digital elevation model (DEM) covering the full extent 
 #' of all the images in \code{image_dirs}. See \code{team_setup_dem} for a 
 #' function simplifying this.
-#' @param slopeaspect path to a two layer raster stack with slope and aspect 
-#' calculated from the above DEM
 #' @param sitecode code to use as a prefix for all filenames
 #' @param output_path the path to use for the output
 #' @param aoi an area of interest (AOI) to crop from each image
@@ -27,12 +25,11 @@
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
 #' dem <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic.envi'
-#' slopeaspect <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic_slopeaspect.envi'
-#' team_preprocess(image_dirs, dem, slopeaspect, "VB", 
-#' 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
+#' team_preprocess(image_dirs, dem, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, 
+#'                 TRUE)
 #' }
-team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode, 
-                                    output_path, aoi=NULL, n_cpus=1, cleartmp=FALSE, 
+team_preprocess_landsat <- function(image_dirs, dem, sitecode, output_path, 
+                                    aoi=NULL, n_cpus=1, cleartmp=FALSE, 
                                     overwrite=FALSE, notify=print) {
     timer <- Track_time(notify)
 
@@ -102,7 +99,6 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         stop("each input image must have the same projection")
     }
 
-    #TODO: download ASTER that aligns with CDR SR imagery
     # Verify the combined extent of the DEMs in dem_list covers the full area 
     # of the images in image_stacks
     image_extent_polys <- lapply(image_stacks, get_extent_poly)
@@ -170,9 +166,9 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         # 	0 = not fill
         # 	255 = fill
         image_stack_mask <- overlay(mask_stack$fmask_band, mask_stack$fill_QA,
-                                    fun=function(fmask, fill) {
-                                     ((fmask == 0) | (fmask == 1)) & (fill == 0)
-                                    })
+            fun=function(fmask, fill) {
+                ((fmask == 0) | (fmask == 1)) & (fill == 0)
+                })
 
         image_stack_masked_path <- file.path(output_path,
                                             paste(sitecode, image_basename, 
@@ -183,33 +179,40 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'masking'))
 
         ######################################################################
-        # Perform topographic correction
-        timer <- start_timer(timer, label=paste(image_basename, '-', 'crop DEMs'))
+        # Crop dem, slope, and aspect
+        timer <- start_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
         cropped_dem_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
                                             'dem.envi', sep='_'))
-        cropped_dem <- match_rasters(image_stack, dem, 
-                                     filename=cropped_dem_file, 
-                                     overwrite=overwrite,
-                                     datatype=dataType(dem))
+        cropped_dem <- match_rasters(image_stack, dem)
         names(cropped_dem) <- "dem"
-        if (!(class(slopeaspect) %in% c('RasterStack', 'RasterBrick'))) {
-            slopeaspect <- stack(slopeaspect)
-        }
-        cropped_slopeaspect_file <- file.path(output_path,
-                                              paste(sitecode, image_basename, 
-                                                    'dem_slopeaspect.envi', 
-                                                    sep='_'))
-        #TODO: Check why extend in this match_rasters call is raising warning
-        cropped_slopeaspect <- match_rasters(image_stack, slopeaspect, 
-                                             filename=cropped_slopeaspect_file, 
-                                             overwrite=overwrite, 
-                                             datatype=dataType(slopeaspect)[1])
-        names(cropped_slopeaspect) <- c('slope', 'aspect')
-        timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop DEMs'))
+        cropped_dem <- calc(cropped_dem, fun=function(vals) {
+                round(vals)
+            }, filename=cropped_dem_file, overwrite=overwrite, 
+            datatype='INT2S')
+        timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
 
+        timer <- start_timer(timer, label=paste(image_basename, '-', 'calculate slope/aspect'))
+        slopeaspect_file <- file.path(output_path,
+                                      paste(sitecode, image_basename, 
+                                            'dem_slopeaspect.envi', sep='_'))
+        slopeaspect <- slopeasp_seq(cropped_dem)
+        names(slopeaspect) <- c('slope', 'aspect')
+        slopeaspect$slope <- calc(slopeaspect$slope, fun=function(vals) {
+            vals[vals > 89.5] <- 0
+            round(vals)
+            })
+        slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {
+            vals[vals > 359.5] <- 0
+            round(vals)
+            })
+        slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_file, 
+                                   overwrite=overwrite, datatype='INT2S')
+        timer <- stop_timer(timer, label=paste(image_basename, '-', 'calculate slope/aspect'))
+
+        ######################################################################
+        # Perform topographic correction
         timer <- start_timer(timer, label=paste(image_basename, '-', 'topocorr'))
-
         # Draw a sample for the Minnaert k regression
         horizcells <- 10
         vertcells <- 10
@@ -231,7 +234,7 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         } else {
             inparallel <- FALSE
         }
-        image_stack <- topographic_corr(image_stack, cropped_slopeaspect, sunelev, 
+        image_stack <- topographic_corr(image_stack, slopeaspect, sunelev, 
                                        sunazimuth, method='minnaert_full', 
                                        filename=topocorr_filename, 
                                        inparallel=inparallel, 
@@ -248,8 +251,13 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                            'masked_tc_MSAVI2.envi', sep='_'))
         MSAVI2_layer <- MSAVI2(red=raster(image_stack, layer=3),
                                nir=raster(image_stack, layer=4))
-        MSAVI2_layer <- writeRaster(MSAVI2_layer, MSAVI2_filename, 
-                                    overwrite=overwrite, datatype=dataType(MSAVI2_layer))
+        # Truncate MSAVI2 to range between 0 and 1, and scale by 10,000 so it 
+        # can be saved as a INT2S
+        MSAVI2_layer <- calc(MSAVI2_layer, fun=function(vals) {
+                vals[vals > 1] <- 1
+                vals[vals < 0] <- 0
+                vals <- round(vals * 10000)
+            }, filename=MSAVI2_filename, overwrite=overwrite, datatype="INT2S")
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'MSAVI2'))
 
         timer <- start_timer(timer, label=paste(image_basename, '-', 'glcm'))
@@ -257,18 +265,16 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                           paste(sitecode, image_basename, 
                                                 'masked_tc_MSAVI2_glcm.envi', 
                                                 sep='_'))
-        min_MSAVI2 <- cellStats(MSAVI2_layer, 'min')
-        max_MSAVI2 <- cellStats(MSAVI2_layer, 'max')
         glcm_statistics <- c('mean', 'variance', 'homogeneity', 'contrast', 
                              'dissimilarity', 'entropy', 'second_moment', 
                              'correlation')
+        # Note the min_x and max_x are given for MSAVI2 that has been scaled by 
+        # 10,000
         MSAVI2_glcm <- apply_windowed(MSAVI2_layer, glcm, edge=c(1, 3), 
-                                      min_x=min_MSAVI2, max_x=max_MSAVI2, 
+                                      min_x=0, max_x=10000, 
                                       filename=MSAVI2_glcm_filename, 
                                       overwrite=overwrite, 
-                                      statistics=glcm_statistics,
-                                      datatype='INT2S',
-                                      asinteger=TRUE, scale_factor=1000)
+                                      statistics=glcm_statistics)
         names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'glcm'))
 
@@ -286,13 +292,13 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                             MSAVI2_glcm$glcm_variance,
                             MSAVI2_glcm$glcm_dissimilarity,
                             cropped_dem,
-                            round(cropped_slopeaspect$slope * 100),
-                            round(cropped_slopeaspect$aspect * 1000))
+                            slopeaspect$slope,
+                            slopeaspect$aspect)
         predictors_filename <- file.path(output_path,
                                          paste(sitecode, image_basename, 
                                                'predictors.envi', sep='_'))
         predictors <- writeRaster(predictors, predictors_filename, 
-                                  overwrite=overwrite, datatype='INT2S')
+                                  overwrite=overwrite)
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'write predictors'))
 
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))

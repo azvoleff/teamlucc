@@ -68,22 +68,6 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     }
     timer <- stop_timer(timer, label='Mosaicing DEMs')
 
-    #TODO: FIX THIS
-    # ################################################################################
-    # # Resample DEMs
-    # timer <- start_timer(timer, label='Resampling DEMs')
-    # if (res(dem_mosaic) != res(sample_image)) {
-    #     dem_mosaic <- resample(dem_mosaic, sample_image, method=method)
-    # }
-
-    timer <- start_timer(timer, label='Calculating slope & aspect')
-    slopeaspect_filename <- file.path(output_path,
-                                      paste0(sitecode, 
-                                             '_dem_mosaic_slopeaspect.envi'))
-    slopeaspect <- slopeasp_seq(dem_mosaic, filename=slopeaspect_filename, 
-                                overwrite=overwrite)
-    timer <- stop_timer(timer, label='Calculating slope & aspect')
-
     if (n_cpus > 1) sfQuickStop()
 
     timer <- stop_timer(timer, label='Setting up DEMs')
