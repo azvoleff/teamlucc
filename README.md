@@ -26,6 +26,7 @@ code.
 
 ## Package Installation
 
+### Step One - Install the `teamr` package in R
 As `teamr` is still under development, it is not yet listed on 
 [CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
 version) of the `teamr` package is using the 
@@ -42,8 +43,40 @@ If you are installing on Windows, you will first need to install the
 appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
 for your version of R (as `teamr` contains C++ code).
 
+### Step One - Get GDAL installed and working
+
+*NOTE*: this step is only required if you want to use the `unstack_ledapscdr` 
+function in `teamr`. All the other functions in `teamr` will work without 
+installing GDAL.
+
+#### Windows:
+
+Download the [32bit](http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86.exe) 
+or [64bit](http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe) [OSGeo4W](http://trac.osgeo.org/osgeo4w/) installer.
+
+Run the installer. Choose the "Express Desktop Install".  On the "Select 
+Packages" screen, ensure the GDAL screen package is checked. You can uncheck 
+the boxes for QGIS and GRASS GIS if you don't want them installed (though I 
+highly recommend QGIS).
+
+[Edit your environment variables](http://support.microsoft.com/kb/310519):
+
+1. Add "C:\OSGeo4W\bin" (or "C:\OSGeo4W64\bin" if you installed the 64bit 
+version) to the "PATH" environment variable.
+2. Add a new "GDAL_DATA" environment variable equal to "C:\OSGeo4W\share\gdal" 
+(or "C:\OSGeo4W64\share\gdal" for the 64bit version).
+
+#### Linux (ubuntu):
+
+At a shell prompt, type:
+
+``` sh
+sudo apt-get install gdal-bin libgdal-dev
+```
+
+### Step Three - Ensure you have an appropriate version of `raster`
 *NOTE*: A bug in version 2.2-5 of the `raster` package will cause errors in
-`teamr` (see
+`teamr` (see 
 [stackoverflow](http://stackoverflow.com/questions/20915114/extract-in-r-fails-for-small-polygons-and-raster)
 for more information. If you have upgraded to `raster` version 2.2-5, downgrade
 to the previous version using `devtools`:
