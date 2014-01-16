@@ -1,15 +1,28 @@
+\docType{methods}
 \name{EVI}
 \alias{EVI}
+\alias{EVI,RasterLayer,RasterLayer,RasterLayer-method}
+\alias{EVI,matrix,matrix,matrix-method}
+\alias{EVI,numeric,numeric,numeric-method}
 \title{Calculates the Enhanced Vegetation Index (EVI)}
 \usage{
-EVI(blue, red, nir)
+EVI(blue, red, nir, ...)
+
+\S4method{EVI}{numeric,numeric,numeric}(blue, red, nir)
+
+\S4method{EVI}{matrix,matrix,matrix}(blue, red, nir)
+
+\S4method{EVI}{RasterLayer,RasterLayer,RasterLayer}(blue, red, nir, ...)
 }
 \arguments{
-  \item{blue}{blue \code{RasterLayer}}
+  \item{blue}{blue}
 
-  \item{red}{red \code{RasterLayer}}
+  \item{red}{red}
 
-  \item{nir}{near-infrared \code{RasterLayer}}
+  \item{nir}{near-infrared}
+
+  \item{...}{additional arguments as for
+  \code{\link{writeRaster}}}
 }
 \description{
 Calculates the Enhanced Vegetation Index (EVI)
