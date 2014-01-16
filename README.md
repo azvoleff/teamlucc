@@ -77,23 +77,22 @@ for your version of R (as `teamr` contains C++ code).
 ### Step three - check version of `raster` in R
 *NOTE*: A bug in version 2.2-5 of the `raster` package will cause errors in
 `teamr` (see 
-[stackoverflow](http://stackoverflow.com/questions/20915114/extract-in-r-fails-for-small-polygons-and-raster)
-for more information. If you have upgraded to `raster` version 2.2-5, downgrade
-to the previous version using `devtools`:
-
-```R
-install_url('http://cran.r-project.org/src/contrib/Archive/raster/raster_2.1-66.tar.gz')
-```
+[stackoverflow](http://stackoverflow.com/questions/20915114/extract-in-r-fails-for-small-polygons-and-raster) 
+for more information.
 
 To check the version of the `raster` package, open R and type:
 
 ```R
 library(raster)
 sessionInfo()
-
 ```
 
-and check the output.
+and check the output. If you have `raster` version 2.2-5, downgrade
+to the previous version using `devtools`:
+
+```R
+install_url('http://cran.r-project.org/src/contrib/Archive/raster/raster_2.1-66.tar.gz')
+```
 
 ## Author Contact Information
 
