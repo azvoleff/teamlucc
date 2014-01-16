@@ -3,7 +3,7 @@
 #' @import methods
 #' @importFrom lubridate now
 #' @export
-#' @name track_time-class
+#' @name Track_time-class
 setClass('Track_time', slots=c(timers='data.frame', notify="function"),
     prototype=list(timers=data.frame(label='Default', starttime=now()), 
                    notify=print)
@@ -18,8 +18,9 @@ setClass('Track_time', slots=c(timers='data.frame', notify="function"),
 #' @import methods
 #' @importFrom lubridate now
 #' @param notify a function to handle the string output from Track_time.  This 
-#' function should accepts a string as an argument. Default is the
+#' function should accept a string as an argument. Default is the
 #' \code{\link{print}} function.
+#' @return Track_time object
 #' @seealso \code{\link{start_timer}}, \code{\link{stop_timer}}
 #' @examples
 #' timer <- Track_time()
@@ -30,9 +31,15 @@ Track_time <- function(notify=print) {
                notify=notify))
 }
 
+#' Print a Track_time object
+#'
+#' @export
+#' @method print Track_time
 #' @import methods
+#' @param x a Track_time object
+#' @param label (optional) selects a specific tracking timer to print
+#' @param ... ignored
 #' @importFrom lubridate now as.duration
-#' @S3method print Track_time
 print.Track_time <- function(x, label, ...) {
     timers <- x@timers
     if (!missing(label)) {
@@ -49,6 +56,10 @@ print.Track_time <- function(x, label, ...) {
     }
 }
 
+#' Show a Track_time object
+#'
+#' @export
+#' @param object a Track_time object
 setMethod("show", signature(object="Track_time"), function(object) print(object))
 
 #' @importFrom lubridate now as.duration
@@ -68,12 +79,15 @@ setMethod("show", signature(object="Track_time"), function(object) print(object)
 
 #' Start a tracking timer
 #'
-#' The \code{label} is optional. If not supplied, the default timer, labelled 
-#' 'Default' will be used.
+#' The \code{label} is optional. If not supplied the default timer (labelled 
+#' "Default") will be used.
 #'
 #' @export
+#' @docType methods
+#' @rdname start_timer-methods
 #' @param x a \code{Track_time} object
 #' @param label an optional label used to maintain multiple tracking timers
+#' @return Track_time object
 #' @seealso \code{\link{stop_timer}}
 #' @examples
 #' timer <- Track_time()
@@ -90,11 +104,15 @@ setGeneric("start_timer", function(x, label) {
     standardGeneric("start_timer")
 })
 
+#' @rdname start_timer-methods
+#' @aliases start_timer,Track_time-method
 setMethod("start_timer", signature(x="Track_time"),
     function(x) .start_timer(x)
 )
 
-setMethod("start_timer", signature(x="Track_time"),
+#' @rdname start_timer-methods
+#' @aliases start_timer,Track_time,character-method
+setMethod("start_timer", signature(x="Track_time", label="character"),
     function(x, label) .start_timer(x, label)
 )
 
@@ -120,9 +138,12 @@ setMethod("start_timer", signature(x="Track_time"),
 #' 'Default' will be used.
 #'
 #' @export
+#' @docType methods
+#' @rdname stop_timer-methods
 #' @param x a \code{Track_time} object
 #' @param label an optional label used to maintain multiple tracking timers
 #' @seealso \code{\link{start_timer}}
+#' @return Track_time object
 #' @examples
 #' timer <- Track_time()
 #' print(timer)
@@ -138,10 +159,14 @@ setGeneric("stop_timer", function(x, label='Default') {
     standardGeneric("stop_timer")
 })
 
+#' @rdname stop_timer-methods
+#' @aliases stop_timer,Track_time-method
 setMethod("stop_timer", signature(x="Track_time"),
     function(x) .stop_timer(x)
 )
 
-setMethod("stop_timer", signature(x="Track_time"),
+#' @rdname stop_timer-methods
+#' @aliases stop_timer,Track_time,character-method
+setMethod("stop_timer", signature(x="Track_time", label="character"),
     function(x, label) .stop_timer(x, label)
 )

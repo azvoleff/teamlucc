@@ -48,6 +48,9 @@ print.accuracy <- function(x, ...) {
     summary(x, ...)
 }
 
+#' Show an accuracy object
+#'
+#' @export
 setMethod("show", signature(object="accuracy"), function(object) summary(object))
 
 .calc_pop_ct <- function(ct, pop) {

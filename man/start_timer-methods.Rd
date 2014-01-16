@@ -1,8 +1,16 @@
+\docType{methods}
 \name{start_timer}
 \alias{start_timer}
+\alias{start_timer,Track_time,ANY-method}
+\alias{start_timer,Track_time,character-method}
+\alias{start_timer,Track_time-method}
 \title{Start a tracking timer}
 \usage{
 start_timer(x, label)
+
+\S4method{start_timer}{Track_time,ANY}(x)
+
+\S4method{start_timer}{Track_time,character}(x, label)
 }
 \arguments{
   \item{x}{a \code{Track_time} object}
@@ -10,9 +18,12 @@ start_timer(x, label)
   \item{label}{an optional label used to maintain multiple
   tracking timers}
 }
+\value{
+Track_time object
+}
 \description{
-The \code{label} is optional. If not supplied, the default
-timer, labelled 'Default' will be used.
+The \code{label} is optional. If not supplied the default
+timer (labelled "Default") will be used.
 }
 \examples{
 timer <- Track_time()

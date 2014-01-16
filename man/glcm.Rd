@@ -5,7 +5,7 @@
 glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1), statistics =
 c("mean", "variance", "homogeneity", "contrast", "dissimilarity", "entropy",
 "second_moment", "correlation"),
-min_x=NULL, max_x=NULL)
+min_x=NULL, max_x=NULL, scale_factor=1, asinteger=FALSE)
 }
 \arguments{
   \item{x}{a /code{RasterLayer} or matrix}

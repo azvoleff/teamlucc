@@ -1,14 +1,25 @@
+\docType{methods}
 \name{stop_timer}
 \alias{stop_timer}
+\alias{stop_timer,Track_time,ANY-method}
+\alias{stop_timer,Track_time,character-method}
+\alias{stop_timer,Track_time-method}
 \title{Stop a tracking timer}
 \usage{
 stop_timer(x, label = "Default")
+
+\S4method{stop_timer}{Track_time,ANY}(x)
+
+\S4method{stop_timer}{Track_time,character}(x, label)
 }
 \arguments{
   \item{x}{a \code{Track_time} object}
 
   \item{label}{an optional label used to maintain multiple
   tracking timers}
+}
+\value{
+Track_time object
 }
 \description{
 The \code{label} is optional. If not supplied, the default

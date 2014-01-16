@@ -1,0 +1,18 @@
+\name{print.Track_time}
+\alias{print.Track_time}
+\title{Print a Track_time object}
+\usage{
+\method{print}{Track_time}(x, label, ...)
+}
+\arguments{
+  \item{x}{a Track_time object}
+
+  \item{label}{(optional) selects a specific tracking timer
+  to print}
+
+  \item{...}{ignored}
+}
+\description{
+Print a Track_time object
+}
+
