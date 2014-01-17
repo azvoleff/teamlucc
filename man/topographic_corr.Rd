@@ -2,35 +2,29 @@
 \alias{topographic_corr}
 \title{Topographically correct a raster}
 \usage{
-topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = NULL,
+topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = "",
   overwrite = FALSE, datatype = "FLT4S", inparallel = FALSE,
-  sampleindices = NULL, scale_factor = 1, asinteger = FALSE)
+  sampleindices = NULL, scale_factor = 1, asinteger = FALSE, ...)
 }
 \arguments{
   \item{x}{an image to correct}
 
   \item{slopeaspect}{a \code{RasterBrick} or
-  \code{RasterStack} with two layers.  First layer should
-  be the slope, second layer should be aspect. The slope
-  and aspect are defined as in \code{slopeasp} in the
-  \code{landsat} package.  \code{\link{slopeasp_par}} will
-  output the slope and aspect using the proper definition
-  and as a \code{RasterBrick}.}
+  \code{RasterStack} with two layers.  The first layer
+  should be the slope, the second layer should be the
+  aspect. The slope and aspect are defined as in
+  \code{terrain} in the \code{raster} package.}
 
   \item{sunelev}{sun elevation in degrees}
 
   \item{sunazimuth}{sun azimuth in degrees}
 
   \item{method}{the topographic correction method to use.
-  See the help for \code{\link{topocorr}}.}
+  See the help for \code{\link{topocorr}} for more guidance
+  on this.}
 
   \item{filename}{file on disk to save \code{Raster*} to
   (optional)}
-
-  \item{overwrite}{whether to overwrite \code{filename} if
-  it already exists}
-
-  \item{datatype}{the \code{raster} datatype to use}
 
   \item{inparallel}{whether to run correction in parallel
   using \code{foreach}}
@@ -49,9 +43,13 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = NULL,
   \item{asinteger}{whether to round results to nearest
   integer. Can be used to save space by saving results as,
   for example, an 'INT2S' \code{raster}.}
+
+  \item{...}{additional arguments to pass to
+  \code{writeRaster} (such as datatype and filename)}
 }
 \value{
-The topographically corrected image.
+The topographically corrected image as a \code{RasterLayer}
+or \code{RasterStack}
 }
 \description{
 Performs topographic correction using code based on
@@ -69,7 +67,7 @@ DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
 
 # Crop and extend the DEM mosaic to match the Landsat image
 matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
-slopeaspect <- slopeasp_seq(matched_DEM)
+slopeaspect <- terrain(matched_DEM, opt=c('slope', 'aspect')
 
 # Apply the topographic correction
 sunelev <- 90 - 44.97 # From metadata file

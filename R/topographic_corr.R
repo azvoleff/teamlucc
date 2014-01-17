@@ -38,7 +38,7 @@
 #' 
 #' # Crop and extend the DEM mosaic to match the Landsat image
 #' matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
-#' slopeaspect <- slopeasp_seq(matched_DEM)
+#' slopeaspect <- terrain(matched_DEM, opt=c('slope', 'aspect')
 #' 
 #' # Apply the topographic correction
 #' sunelev <- 90 - 44.97 # From metadata file

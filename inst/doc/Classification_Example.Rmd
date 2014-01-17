@@ -39,7 +39,7 @@ Calculate slope and aspect from ASTER DEM subset:
 sunelev <- 90 - 44.97 # From metadata file
 sunazimuth <- 124.37 # From metadata file
 # Apply the topographic correction
-slopeaspect <- slopeasp_seq(matched_DEM, smoothing=1.5)
+slopeaspect <- terrain(matched_DEM, opt=c('slope', 'aspect')
 ```
 
 Perform topographic correction of Landsat subset:

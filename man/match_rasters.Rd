@@ -34,8 +34,7 @@ and extended to match the /code{baseimg}.
 Match the coordinate system and extent of two rasters
 }
 \details{
-Note that if the \code{matchimg} needs to be reprojected,
-\code{match_rasters} can run in parallel if
+Note that \code{match_rasters} can run in parallel if
 \code{beginCluster()} is run prior to running
 \code{match_rasters}.
 }
