@@ -199,6 +199,9 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         slopeaspect_cropped_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
                                             'dem_slopeaspect.envi', sep='_'))
+        if (!(class(slopeaspect) %in% c('RasterStack', 'RasterBrick'))) {
+            slopeaspect <- brick(slopeaspect)
+        }
         slopeaspect <- match_rasters(image_stack, slopeaspect, 
                                      filename=slopeaspect_cropped_file, 
                                      overwrite=overwrite)
