@@ -12,7 +12,6 @@ Depends:
 Imports:
     Rcpp (>= 0.10.1),
     RcppArmadillo,
-    landsat,
     rgeos,
     rgdal,
     mgcv,
@@ -32,6 +31,7 @@ Suggests:
     testthat,
     kernlab,
     e1071,
+    landsat,
     notifyR
 LinkingTo: Rcpp, RcppArmadillo
 Description: Routines for processing imagery and other spatial data for the
