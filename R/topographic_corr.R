@@ -50,8 +50,7 @@
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 #' }
 topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
-                             filename='', overwrite=FALSE, datatype='FLT4S',
-                             inparallel=FALSE, sampleindices=NULL, 
+                             filename='', inparallel=FALSE, sampleindices=NULL, 
                              scale_factor=1, asinteger=FALSE, ...) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')

@@ -3,8 +3,8 @@
 \title{Topographically correct a raster}
 \usage{
 topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = "",
-  overwrite = FALSE, datatype = "FLT4S", inparallel = FALSE,
-  sampleindices = NULL, scale_factor = 1, asinteger = FALSE, ...)
+  inparallel = FALSE, sampleindices = NULL, scale_factor = 1,
+  asinteger = FALSE, ...)
 }
 \arguments{
   \item{x}{an image to correct}
