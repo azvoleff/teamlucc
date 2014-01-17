@@ -32,41 +32,62 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     # Below should recognize ASTER GDEMV2 or SRTM tiles from Earth Explorer
     dem_list <- dir(dem_path, pattern='(\\.bil)|(_dem\\.tif)$')
     dem_list <- file.path(dem_path, dem_list)
-
-    ################################################################################
-    # Verify projections of DEMs match
     dem_rasts <- lapply(dem_list, raster)
 
-    dem_prj <- projection(dem_rasts[[1]])
-    if (any(lapply(dem_rasts, projection) != dem_prj)) {
-        stop("each DEM in dem_list must have the same projection")
-    }
+    if (length(dem_list) > 1) {
+        ######################################################################
+        # Verify projections of DEMs match
 
-    ################################################################################
-    # Mosaic DEMs
-    timer <- start_timer(timer, label='Mosaicing DEMs')
-    # See http://bit.ly/1dJPIeF re issue in raster that necessitates below 
-    # workaround
-    # TODO: Contact Hijmans re possible fix
-    mosaicargs <- dem_rasts
-    mosaicargs$fun <- mean
-    dem_mosaic <- do.call(mosaic, mosaicargs)
+        dem_prj <- projection(dem_rasts[[1]])
+        if (any(lapply(dem_rasts, projection) != dem_prj)) {
+            stop("each DEM in dem_list must have the same projection")
+        }
+
+        ######################################################################
+        # Mosaic DEMs
+        timer <- start_timer(timer, label='Mosaicing DEMs')
+        # See http://bit.ly/1dJPIeF re issue in raster that necessitates below 
+        # workaround
+        # TODO: Contact Hijmans re possible fix
+        mosaicargs <- dem_rasts
+        mosaicargs$fun <- mean
+        dem_mosaic <- do.call(mosaic, mosaicargs)
+        timer <- stop_timer(timer, label='Mosaicing DEMs')
+    } else {
+        dem_mosaic <- dem_rasts[[1]]
+    }
+    dem_mosaic <- round(dem_mosaic)
+    dataType(dem_mosaic) <- 'INT2S'
+
     dem_mosaic_filename <- file.path(output_path,
                                      paste0(sitecode, '_dem_mosaic.envi'))
-    sample_image <- raster(sample_image)
-    if (is.null(sample_image) | (projection(sample_image) == 
-                                 projection(dem_mosaic))) {
+    if (is.null(sample_image) | compareRaster(sample_image, dem_mosaic,
+                                              extent=FALSE, rowcol=FALSE, 
+                                              crs=TRUE, res=TRUE, orig=TRUE, 
+                                              stopiffalse=FALSE)) {
         dem_mosaic <- writeRaster(dem_mosaic, dem_mosaic_filename, 
                                   overwrite=overwrite, 
                                   datatype=dataType(dem_mosaic))
     } else {
-        dem_mosaic <- projectRaster(dem_mosaic, 
-                                    crs=CRS(projection(sample_image)), 
+        timer <- start_timer(timer, label='Reprojecting DEM mosaic')
+        dem_mosaic <- projectRaster(dem_mosaic, sample_image,
                                     filename=dem_mosaic_filename, 
                                     overwrite=overwrite, 
                                     datatype=dataType(dem_mosaic))
+        timer <- stop_timer(timer, label='Reprojecting DEM mosaic')
     }
-    timer <- stop_timer(timer, label='Mosaicing DEMs')
+
+    timer <- start_timer(timer, label='Calculating slope and aspect')
+    slopeaspect_filename <- file.path(output_path,
+                                     paste0(sitecode, '_dem_mosaic_slopeaspect.envi'))
+    slopeaspect <- terrain(dem_mosaic, opt=c('slope', 'aspect'))
+    slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {
+        vals[vals >= 2*pi] <- 0
+        round(vals)
+        })
+    slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_filename, 
+                               overwrite=overwrite)
+    timer <- stop_timer(timer, label='Calculating slope and aspect')
 
     if (n_cpus > 1) sfQuickStop()
 

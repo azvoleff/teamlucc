@@ -8,6 +8,8 @@
 #' @param dem path to a digital elevation model (DEM) covering the full extent 
 #' of all the images in \code{image_dirs}. See \code{team_setup_dem} for a 
 #' function simplifying this.
+#' @param slopeaspect path to a two band raster of slope (band 1) and aspect 
+#' (band 2) in a format readable by \code{raster}
 #' @param sitecode code to use as a prefix for all filenames
 #' @param output_path the path to use for the output
 #' @param aoi an area of interest (AOI) to crop from each image
@@ -25,12 +27,13 @@
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
 #' dem <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic.envi'
-#' team_preprocess(image_dirs, dem, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, 
-#'                 TRUE)
+#' slopeaspect <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic_slopeaspect.envi'
+#' team_preprocess(image_dirs, dem, slopeaspect, "VB", 
+#'                 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
-team_preprocess_landsat <- function(image_dirs, dem, sitecode, output_path, 
-                                    aoi=NULL, n_cpus=1, cleartmp=FALSE, 
-                                    overwrite=FALSE, notify=print) {
+team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode, 
+                                    output_path, aoi=NULL, n_cpus=1, 
+                                    cleartmp=FALSE,  overwrite=FALSE, notify=print) {
     timer <- Track_time(notify)
 
     timer <- start_timer(timer, label='Preprocessing images')
@@ -193,20 +196,12 @@ team_preprocess_landsat <- function(image_dirs, dem, sitecode, output_path,
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
 
         timer <- start_timer(timer, label=paste(image_basename, '-', 'calculate slope/aspect'))
-        slopeaspect_file <- file.path(output_path,
+        slopeaspect_cropped_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
                                             'dem_slopeaspect.envi', sep='_'))
-        slopeaspect <- slopeasp_seq(cropped_dem)
-        slopeaspect$slope <- calc(slopeaspect$slope, fun=function(vals) {
-            vals[vals > 89.5] <- 0
-            round(vals)
-            })
-        slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {
-            vals[vals > 359.5] <- 0
-            round(vals)
-            })
-        slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_file, 
-                                   overwrite=overwrite, datatype='INT2S')
+        slopeaspect <- match_rasters(image_stack, slopeaspect, 
+                                     filename=slopeaspect_cropped_file, 
+                                     overwrite=overwrite)
         names(slopeaspect) <- c('slope', 'aspect')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'calculate slope/aspect'))
 
