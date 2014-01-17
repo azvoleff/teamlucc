@@ -82,6 +82,7 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     slopeaspect <- terrain(dem_mosaic, opt=c('slope', 'aspect'))
     slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {
         vals[vals >= 2*pi] <- 0
+        vals
         })
     slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_filename, 
                                overwrite=overwrite)
