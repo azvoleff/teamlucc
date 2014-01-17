@@ -10,17 +10,14 @@
 #' @import foreach
 #' @param x an image to correct
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
-#' layers.  First layer should be the slope, second layer should be aspect. The 
-#' slope and aspect are defined as in \code{slopeasp} in the \code{landsat} 
-#' package.  \code{\link{slopeasp_par}} will output the slope and aspect using 
-#' the proper definition and as a \code{RasterBrick}.
+#' layers.  The first layer should be the slope, the second layer should be 
+#' the aspect. The slope and aspect are defined as in \code{terrain} in the 
+#' \code{raster} package.
 #' @param sunelev sun elevation in degrees
 #' @param sunazimuth sun azimuth in degrees
 #' @param method the topographic correction method to use. See the help for 
-#' \code{\link{topocorr}}.
+#' \code{\link{topocorr}} for more guidance on this.
 #' @param filename file on disk to save \code{Raster*} to (optional)
-#' @param overwrite whether to overwrite \code{filename} if it already exists
-#' @param datatype the \code{raster} datatype to use
 #' @param inparallel whether to run correction in parallel using \code{foreach}
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
 #' regression models used for some topographic correction methods (like 
@@ -30,7 +27,10 @@
 #' results to integers (see \code{asinteger} argument).
 #' @param asinteger whether to round results to nearest integer. Can be used to 
 #' save space by saving results as, for example, an 'INT2S' \code{raster}.
-#' @return The topographically corrected image.
+#' @param ... additional arguments to pass to \code{writeRaster} (such as 
+#' datatype and filename)
+#' @return The topographically corrected image as a \code{RasterLayer} or 
+#' \code{RasterStack}
 #' @examples
 #' \dontrun{
 #' # Mosaic the two ASTER DEM tiles needed to a Landsat image
@@ -50,9 +50,9 @@
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 #' }
 topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
-                             filename=NULL, overwrite=FALSE, datatype='FLT4S',
+                             filename='', overwrite=FALSE, datatype='FLT4S',
                              inparallel=FALSE, sampleindices=NULL, 
-                             scale_factor=1, asinteger=FALSE) {
+                             scale_factor=1, asinteger=FALSE, ...) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')
     }
@@ -84,7 +84,6 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
     } else {
         corr_layers <- c()
         for (layer_num in 1:nlayers(x)) {
-            message(paste0('Running topocorr on layer ', layer_num, ' of ', nlayers(x), '...'))
             if (nlayers(x) > 1) {
                 uncorr_layer <- raster(x, layer=layer_num)
             } else {
@@ -112,15 +111,14 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
         }
     }
     names(corr_img) <- paste0(names(x), 'tc')
-    if (!is.null(filename)) {
-        writeRaster(corr_img, filename=filename, overwrite=overwrite, 
-                    datatype=datatype)
-    }
     if (scale_factor != 1) {
         corr_img <- corr_img * scale_factor
     }
     if (asinteger) {
         corr_img <- round(corr_img)
+    }
+    if (filename != '') {
+        writeRaster(corr_img, filename=filename, ...)
     }
     return(corr_img)
 }

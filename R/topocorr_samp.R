@@ -27,15 +27,14 @@
 #' @export
 #' @importFrom landsat slopeasp
 #' @param x image as a \code{RasterLayer}
-#' @param slope the slope as a \code{RasterLayer}
-#' @param aspect the aspect as a \code{RasterLayer}
+#' @param slope the slope in radians as a \code{RasterLayer}
+#' @param aspect the aspect in radians as a \code{RasterLayer}
 #' @param sunelev sun elevation in degrees
 #' @param sunazimuth sun azimuth in degrees
 #' @param method the method to use for the topographic correction:
 #' cosine, improvedcosine, minnaert, minslope, ccorrection, gamma, SCS, or 
 #' illumination
 #' @param na.value the value used to code no data values
-#' @param GRASS.aspect is aspect defined according to GRASS convetion
 #' @param IL.epsilon a small amount to add to calculated illumination values 
 #' that are equal to zero to avoid division by zero resulting in Inf values
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
@@ -51,20 +50,9 @@
 #' @examples
 #' #TODO: add examples
 topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine", 
-                          na.value=NA, GRASS.aspect=FALSE, IL.epsilon=0.000001,
+                          na.value=NA, IL.epsilon=0.000001,
                           sampleindices=NULL) {
-    ## aspect may be GRASS output: counterclockwise from east
-    ## or nonGRASS output: clockwise from north
-    ## require the latter for further calculations
-    ## because sunazimuth is always measured clockwise from north
-    if(GRASS.aspect) {
-        aspect <- -1 * aspect + 90
-        aspect <- (aspect + 360) %% 360
-    }
-
-    # all inputs are in degrees, but we need radians
-    slope <- (pi/180) * slope
-    aspect <- (pi/180) * aspect
+    # some inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
 

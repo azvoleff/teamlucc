@@ -6,47 +6,42 @@ suppressMessages(library(landsat))
 L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
 L5TSR_1986_b2 <- raster(L5TSR_1986, layer=2)
 DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
-matched_DEM <- suppressMessages(match_rasters(L5TSR_1986, DEM_mosaic))
-slopeaspect <- slopeasp_seq(matched_DEM)
-slope <- as(raster(slopeaspect, layer=1), "SpatialGridDataFrame")
-aspect <- as(raster(slopeaspect, layer=2), "SpatialGridDataFrame")
+matched_DEM <- match_rasters(L5TSR_1986, DEM_mosaic)
+slopeaspect <- terrain(matched_DEM, opt=c('slope', 'aspect'))
+slope_deg <- as(slopeaspect$slope * (180/pi), "SpatialGridDataFrame")
+aspect_deg  <- as(slopeaspect$aspect * (180/pi), "SpatialGridDataFrame")
 sunelev <- 90 - 44.97 # From metadata file
 sunazimuth <- 124.37 # From metadata file
-
-# Override teamr topographic_corr with a local version that suppresses messages
-topographic_corr <- function(...) {
-    suppressMessages(teamr::topographic_corr(...))
-}
 
 ###############################################################################
 # Test that minslope methods match between landsat package 'topocorr' and teamr 
 # 'topographic_corr':
-teamr_tc <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, sunazimuth, 
+teamr_tc_b1 <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, sunazimuth, 
                              method='minslope')
 
-landsat_tc_b1 <- topocorr(as(L5TSR_1986_b1, "SpatialGridDataFrame"), slope, 
-                          aspect, sunelev, sunazimuth, method='minslope')
+landsat_tc_b1 <- topocorr(as(L5TSR_1986_b1, "SpatialGridDataFrame"), slope_deg,
+                          aspect_deg, sunelev, sunazimuth, method='minslope')
 landsat_tc_b1 <- raster(landsat_tc_b1)
 names(landsat_tc_b1) <- 'b1tc'
 
 test_that("teamr and landsat minslope match", {
-          expect_equal(teamr_tc, expected=landsat_tc_b1)
+          expect_equal(teamr_tc_b1, expected=landsat_tc_b1)
 })
 
 ###############################################################################
 set.seed(1)
 sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
-teamr_tc_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
+teamr_tc_b1_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
                                     sunazimuth, method='minslope', 
                                     sampleindices=sampleindices)
 
 test_that("teamr and landsat minslope match when sampling is used in teamr", {
-          expect_equal(teamr_tc_sample, expected=landsat_tc_b1, tolerance=.25)
+          expect_equal(teamr_tc_b1_sample, expected=landsat_tc_b1, tolerance=.25)
 })
 
 ###############################################################################
-landsat_tc_b2 <- topocorr(as(L5TSR_1986_b2, "SpatialGridDataFrame"), slope, 
-                          aspect, sunelev, sunazimuth, method='minslope')
+landsat_tc_b2 <- topocorr(as(L5TSR_1986_b2, "SpatialGridDataFrame"), slope_deg, 
+                          aspect_deg, sunelev, sunazimuth, method='minslope')
 landsat_tc_b2 <- raster(landsat_tc_b2)
 names(landsat_tc_b2) <- 'b2tc'
 landsat_tc_b1_b2 <- stack(landsat_tc_b1, landsat_tc_b2)
@@ -65,8 +60,8 @@ test_that("teamr and landsat minslope match when multiple layers are processed i
 teamr_minnaert <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
                                    sunazimuth, method='minnaert_full')
 
-landsat_minnaert <- minnaert(as(L5TSR_1986_b1, "SpatialGridDataFrame"), slope, 
-                             aspect, sunelev, sunazimuth)
+landsat_minnaert <- minnaert(as(L5TSR_1986_b1, "SpatialGridDataFrame"), slope_deg, 
+                             aspect_deg, sunelev, sunazimuth)
 landsat_minnaert <- raster(landsat_minnaert$minnaert)
 names(landsat_minnaert) <- 'b1tc'
 

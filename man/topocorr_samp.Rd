@@ -3,15 +3,16 @@
 \title{Topographic correction for satellite imagery}
 \usage{
 topocorr_samp(x, slope, aspect, sunelev, sunazimuth, method = "cosine",
-  na.value = NA, GRASS.aspect = FALSE, IL.epsilon = 1e-06,
-  sampleindices = NULL)
+  na.value = NA, IL.epsilon = 1e-06, sampleindices = NULL)
 }
 \arguments{
   \item{x}{image as a \code{RasterLayer}}
 
-  \item{slope}{the slope as a \code{RasterLayer}}
+  \item{slope}{the slope in radians as a
+  \code{RasterLayer}}
 
-  \item{aspect}{the aspect as a \code{RasterLayer}}
+  \item{aspect}{the aspect in radians as a
+  \code{RasterLayer}}
 
   \item{sunelev}{sun elevation in degrees}
 
@@ -22,9 +23,6 @@ topocorr_samp(x, slope, aspect, sunelev, sunazimuth, method = "cosine",
   ccorrection, gamma, SCS, or illumination}
 
   \item{na.value}{the value used to code no data values}
-
-  \item{GRASS.aspect}{is aspect defined according to GRASS
-  convetion}
 
   \item{IL.epsilon}{a small amount to add to calculated
   illumination values that are equal to zero to avoid

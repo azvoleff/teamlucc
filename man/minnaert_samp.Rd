@@ -2,23 +2,22 @@
 \alias{minnaert_samp}
 \title{Topographic correction for satellite imagery using Minnaert method}
 \usage{
-minnaert_samp(x, slope, aspect, sunelev, sunazimuth, GRASS.aspect = FALSE,
-  IL.epsilon = 1e-06, slopeclass = c(1, 5, 10, 15, 20, 25, 30, 45),
-  coverclass = NULL, sampleindices = NULL)
+minnaert_samp(x, slope, aspect, sunelev, sunazimuth, IL.epsilon = 1e-06,
+  slopeclass = c(1, 5, 10, 15, 20, 25, 30, 45), coverclass = NULL,
+  sampleindices = NULL)
 }
 \arguments{
   \item{x}{image as a \code{RasterLayer}}
 
-  \item{slope}{the slope as a \code{RasterLayer}}
+  \item{slope}{the slope in radians as a
+  \code{RasterLayer}}
 
-  \item{aspect}{the aspect as a \code{RasterLayer}}
+  \item{aspect}{the aspect in radians as a
+  \code{RasterLayer}}
 
   \item{sunelev}{sun elevation in degrees}
 
   \item{sunazimuth}{sun azimuth in degrees}
-
-  \item{GRASS.aspect}{is aspect defined according to GRASS
-  convetion}
 
   \item{IL.epsilon}{a small amount to add to calculated
   illumination values that are equal to zero to avoid

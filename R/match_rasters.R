@@ -15,9 +15,8 @@
 #' datatype and filename)
 #' @return The /code{matchimg} reprojected (if necessary), cropped, and 
 #' extended to match the /code{baseimg}.
-#' @details Note that if the \code{matchimg} needs to be reprojected,
-#' \code{match_rasters} can run in parallel if \code{beginCluster()} is run 
-#' prior to running \code{match_rasters}.
+#' @details Note that \code{match_rasters} can run in parallel if 
+#' \code{beginCluster()} is run prior to running \code{match_rasters}.
 #' @examples
 #' # Mosaic the two ASTER DEM tiles needed to a Landsat image
 #' DEM_mosaic <- mosaic(ASTER_V002_EAST, ASTER_V002_WEST, fun='mean')
