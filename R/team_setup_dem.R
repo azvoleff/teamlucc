@@ -1,7 +1,6 @@
 #' Setup the DEM mosaic for a particular TEAM site
 #'
 #' @export
-#' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @param dem_path a list of digital elevation models (DEMs) that (when 
 #' mosaiced) covers the full extent of all the images in the image_list.
 #' @param sitecode code to use as a prefix for all filenames
@@ -27,7 +26,7 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
 
     timer <- start_timer(timer, label='Setting up DEMs')
 
-    if (n_cpus > 1) sfQuickInit(n_cpus)
+    if (n_cpus > 1) beginCluster(n_cpus)
 
     # Below should recognize ASTER GDEMV2 or SRTM tiles from Earth Explorer
     dem_list <- dir(dem_path, pattern='(\\.bil)|(_dem\\.tif)$')
@@ -89,7 +88,7 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
                                overwrite=overwrite)
     timer <- stop_timer(timer, label='Calculating slope and aspect')
 
-    if (n_cpus > 1) sfQuickStop()
+    if (n_cpus > 1) endCluster()
 
     timer <- stop_timer(timer, label='Setting up DEMs')
 }

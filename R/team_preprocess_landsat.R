@@ -1,7 +1,6 @@
 #' Preprocess surface reflectance imagery from the Landsat CDR archive
 #'
 #' @export
-#' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @importFrom rgeos gContains gUnion
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
@@ -37,7 +36,7 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
     timer <- Track_time(notify)
 
     timer <- start_timer(timer, label='Preprocessing images')
-    if (n_cpus > 1) sfQuickInit(n_cpus)
+    if (n_cpus > 1) beginCluster(n_cpus)
 
     # Setup a regex to identify Landsat CDR images
     lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
@@ -307,7 +306,7 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
 
         if (cleartmp) removeTmpFiles(h=1)
     }
-    if (n_cpus > 1) sfQuickStop()
+    if (n_cpus > 1) endCluster()
 
     timer <- stop_timer(timer, label='Preprocessing images')
 }
