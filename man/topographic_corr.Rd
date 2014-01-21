@@ -20,8 +20,8 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = "",
   \item{sunazimuth}{sun azimuth in degrees}
 
   \item{method}{the topographic correction method to use.
-  See the help for \code{\link{topocorr}} for more guidance
-  on this.}
+  See the help for \code{topocorr} for more guidance on
+  this.}
 
   \item{filename}{file on disk to save \code{Raster*} to
   (optional)}

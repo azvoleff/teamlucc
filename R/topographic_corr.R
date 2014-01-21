@@ -16,7 +16,7 @@
 #' @param sunelev sun elevation in degrees
 #' @param sunazimuth sun azimuth in degrees
 #' @param method the topographic correction method to use. See the help for 
-#' \code{\link{topocorr}} for more guidance on this.
+#' \code{topocorr} for more guidance on this.
 #' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param inparallel whether to run correction in parallel using \code{foreach}
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
