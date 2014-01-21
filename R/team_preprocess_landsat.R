@@ -219,10 +219,8 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         # major order
         sampleindices <- gridsample(image_stack, horizcells=10, vertcells=10, 
                                     nsamp=nsamp, rowmajor=TRUE)
-
         sunelev <- 90 - as.numeric(get_metadata_item(band1_imagefile, 'SolarZenith'))
         sunazimuth <- as.numeric(get_metadata_item(band1_imagefile, 'SolarAzimuth'))
-
         topocorr_filename <- file.path(output_path,
                                        paste(sitecode, image_basename, 
                                              'masked_tc.envi', sep='_'))
@@ -237,7 +235,7 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                        inparallel=inparallel, 
                                        overwrite=overwrite, datatype='INT2S',
                                        sampleindices=sampleindices,
-                                       scale_factor=10000, asinteger=TRUE)
+                                       asinteger=TRUE)
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'topocorr'))
 
         ######################################################################
