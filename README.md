@@ -74,26 +74,6 @@ If you are installing on Windows, you will first need to install the
 appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
 for your version of R (as `teamr` contains C++ code).
 
-### Step three - check version of `raster` in R
-*NOTE*: A bug in version 2.2-5 of the `raster` package will cause errors in
-`teamr` (see 
-[stackoverflow](http://stackoverflow.com/questions/20915114/extract-in-r-fails-for-small-polygons-and-raster) 
-for more information.
-
-To check the version of the `raster` package, open R and type:
-
-```R
-library(raster)
-sessionInfo()
-```
-
-and check the output. If you have `raster` version 2.2-5, downgrade
-to the previous version using `devtools`:
-
-```R
-install_url('http://cran.r-project.org/src/contrib/Archive/raster/raster_2.1-66.tar.gz')
-```
-
 ## Author Contact Information
 
 [Alex Zvoleff](mailto:azvoleff@conservation.org)  

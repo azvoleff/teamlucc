@@ -8,7 +8,7 @@ Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
     R (>= 2.10.0),
     methods,
-    raster
+    raster (>= 2.2-6)
 Imports:
     Rcpp (>= 0.10.1),
     RcppArmadillo,
