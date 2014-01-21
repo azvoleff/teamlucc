@@ -32,7 +32,5 @@ team_chg_detect <- function(t1_predictions, t2_predictions, notify) {
     timer <- start_timer(timer, label='Change trajectories')
     timer <- stop_timer(timer, label='Change trajectories')
 
-    sfQuickStop()
-
     timer <- stop_timer(timer, label='Change detection')
 }

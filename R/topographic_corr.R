@@ -1,10 +1,10 @@
 #' Topographically correct a raster
 #'
-#' Performs topographic correction using code based on \code{\link{topocorr}} 
-#' from the \code{Landsat} package. The code in this package has been modifed 
-#' from \code{\link{topocorr}} to allow using a subsample of the image for 
-#' Minnaert k calculations, and to provide the option of running the 
-#' topographic correction in parallel using \code{\link{foreach}}.
+#' Performs topographic correction using code based on \code{topocorr} from the 
+#' \code{Landsat} package. The code in this package has been modifed from 
+#' \code{topocorr} to allow using a subsample of the image for Minnaert k 
+#' calculations, and to provide the option of running the topographic 
+#' correction in parallel using \code{\link{foreach}}.
 #'
 #' @export
 #' @import foreach
