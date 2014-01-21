@@ -155,15 +155,18 @@ arma::cube calc_texture_full_image(arma::mat rast,
             if (na_opt == "any") {
                 // Return NA for all textures within this window if there are 
                 // any NA values within the base_window or the offset_window
+                bool na_flag=false;
                 for(unsigned i=0; i < base_window.n_elem; i++) {
-                    if (!arma::is_finite(base_window(i)) | !arma::is_finite(offset_window(i))) {
+                    if ((!arma::is_finite(base_window(i))) || (!arma::is_finite(offset_window(i)))) {
                         for(signed s=0; s < statistics.size(); s++) {
                             textures(row + center_coord(0),
                                      col + center_coord(1), s) = na_val;
                         }
-                        continue;
+                        na_flag = true;
+                        break;
                     }
                 }
+                if (na_flag) continue;
             } else if (na_opt == "center") {
                 // Return NA for all textures within this window if the center 
                 // value is an NA
@@ -177,7 +180,7 @@ arma::cube calc_texture_full_image(arma::mat rast,
             }
 
             for(unsigned i=0; i < base_window.n_elem; i++) {
-                if (!(arma::is_finite(base_window(i)) | arma::is_finite(offset_window(i)))) {
+                if (!(arma::is_finite(base_window(i)) || arma::is_finite(offset_window(i)))) {
                     // This will execute only if there is an NA in the window 
                     // AND na_opt is set to "ignore" or "center"
                     continue;

@@ -230,12 +230,12 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
             inparallel <- FALSE
         }
         image_stack <- topographic_corr(image_stack, slopeaspect, sunelev, 
-                                       sunazimuth, method='minnaert_full', 
-                                       filename=topocorr_filename, 
-                                       inparallel=inparallel, 
-                                       overwrite=overwrite, datatype='INT2S',
-                                       sampleindices=sampleindices,
-                                       asinteger=TRUE)
+                                        sunazimuth, method='minnaert_full', 
+                                        filename=topocorr_filename, 
+                                        inparallel=inparallel, 
+                                        overwrite=overwrite, datatype='INT2S',
+                                        sampleindices=sampleindices,
+                                        asinteger=TRUE)
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'topocorr'))
 
         ######################################################################
@@ -269,7 +269,7 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                       min_x=0, max_x=10000, 
                                       filename=MSAVI2_glcm_filename, 
                                       overwrite=overwrite, 
-                                      statistics=glcm_statistics)
+                                      statistics=glcm_statistics, na_opt='center')
         names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'glcm'))
 
@@ -292,8 +292,8 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         predictors_filename <- file.path(output_path,
                                          paste(sitecode, image_basename, 
                                                'predictors.envi', sep='_'))
-        predictors <- writeRaster(predictors, filename=predictors_filename, 
-                                  overwrite=overwrite)
+        predictors <- mask(predictors, image_stack_mask, maskvalue=0, 
+                           filename=predictors_filename, overwrite=overwrite)
         names(predictors) <- c('b1', 'b2', 'b3', 'b4', 'b5', 'b7', 'msavi', 
                               'msavi_glcm_mean', 'msavi_glcm_variance', 
                               'msavi_glcm_dissimilarity', 'elev', 'slope', 
