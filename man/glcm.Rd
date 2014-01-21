@@ -5,7 +5,8 @@
 glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1), statistics =
 c("mean", "variance", "homogeneity", "contrast", "dissimilarity", "entropy",
 "second_moment", "correlation"),
-min_x=NULL, max_x=NULL, scale_factor=1, asinteger=FALSE)
+min_x=NULL, max_x=NULL, na_opt="any", na_val=NA, scale_factor=1,
+asinteger=FALSE)
 }
 \arguments{
   \item{x}{a /code{RasterLayer} or matrix}
@@ -33,6 +34,19 @@ min_x=NULL, max_x=NULL, scale_factor=1, asinteger=FALSE)
   \item{max_x}{maximum value of input \code{RasterLayer}
   (optional, \code{glcm} will calculate if not supplied).
   Useful when running \code{glcm} over blocks of a raster.}
+
+  \item{na_opt}{How to handle NA values in \code{x}. Can be
+  set to "ignore", "any" or "center". If set to "any", all
+  textures statistics for a given pixel will be set to NA
+  if there are any NA values in the \code{window} around
+  that pixel. If set to "center" this will only occur if
+  the center value is an NA. If set to "ignore", NA values
+  in \code{window} will be ignored.}
+
+  \item{na_val}{the value to use to fill NA values on edges
+  of \code{x} where textures cannot be calculated due to
+  the window falling outside of the image, and as necessary
+  depending on the chosen \code{na_opt}.}
 
   \item{scale_factor}{factor by which to multiply results.
   Useful if rounding results to integers (see

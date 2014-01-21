@@ -5,7 +5,8 @@
 #' @usage glcm(x, n_grey = 32, window = c(3, 3), shift = c(1, 1), statistics = 
 #' c("mean", "variance", "homogeneity", "contrast", "dissimilarity", "entropy", 
 #' "second_moment", "correlation"),
-#' min_x=NULL, max_x=NULL, scale_factor=1, asinteger=FALSE)
+#' min_x=NULL, max_x=NULL, na_opt="any", na_val=NA, scale_factor=1, 
+#' asinteger=FALSE)
 #' @param x a /code{RasterLayer} or matrix
 #' @param n_grey number of grey levels to use in texture calculation
 #' @param window the window size to consider for texture calculation as a two 
@@ -22,7 +23,16 @@
 #' @param max_x maximum value of input \code{RasterLayer} (optional, 
 #' \code{glcm} will calculate if not supplied). Useful when running \code{glcm} 
 #' over blocks of a raster.
-#' @param scale_factor factor by which to multiply results. Useful if rounding 
+#' @param na_opt How to handle NA values in \code{x}. Can be set to "ignore", 
+#' "any" or "center". If set to "any", all textures statistics for a given 
+#' pixel will be set to NA if there are any NA values in the \code{window} 
+#' around that pixel. If set to "center" this will only occur if the center 
+#' value is an NA. If set to "ignore", NA values in \code{window} will be 
+#' ignored.
+#' @param na_val the value to use to fill NA values on edges of \code{x} where 
+#' textures cannot be calculated due to the window falling outside of the 
+#' image, and as necessary depending on the chosen \code{na_opt}.
+#' @param scale_factor factor by which to multiply results.  Useful if rounding 
 #' results to integers (see \code{asinteger} argument).
 #' @param asinteger whether to round results to nearest integer. Can be used to 
 #' save space by saving results as, for example, an 'INT2S' \code{raster}.
@@ -50,7 +60,7 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
                  statistics=c('mean', 'variance', 'homogeneity', 'contrast', 
                               'dissimilarity', 'entropy', 'second_moment', 
                               'correlation'), min_x=NULL, max_x=NULL, 
-                 scale_factor=1, asinteger=FALSE) {
+                 na_opt='any', na_val=NA, scale_factor=1, asinteger=FALSE) {
     if (length(window) != 2) {
         stop('window must be integer vector of length 2')
     }
@@ -74,6 +84,9 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
         stop(paste('invalid statistic(s):',
                    paste(statistics[!stat_check], collapse=', ')))
     }
+    if (!(na_opt %in% c('any', 'center', 'ignore'))) {
+        stop('na_opt must be one of "any", "center", or "ignore"')
+    }
 
     # Resample the image to the required number of grey levels
     if (class(x) == 'RasterLayer') {
@@ -91,7 +104,8 @@ glcm <- function(x, n_grey=32, window=c(3, 3), shift=c(1, 1),
         stop('x must be a RasterLayer or two-dimensional matrix')
     }
 
-    textures <- calc_texture_full_image(x_cut, n_grey, window, shift, statistics)
+    textures <- calc_texture_full_image(x_cut, n_grey, window, shift, 
+                                        statistics, na_opt, na_val)
 
     if (class(x) == 'RasterLayer') {
         if (dim(textures)[3] > 1) {

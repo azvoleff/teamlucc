@@ -2,7 +2,8 @@
 \alias{calc_texture_full_image}
 \title{Calculates a glcm texture for use in the glcm.R script}
 \usage{
-calc_texture_full_image(rast, n_grey, window_dims, shift, statistics)
+calc_texture_full_image(rast, n_grey, window_dims, shift, statistics, na_opt,
+  na_val)
 }
 \arguments{
   \item{rast}{a matrix containing the pixels to be used in
@@ -19,6 +20,11 @@ calc_texture_full_image(rast, n_grey, window_dims, shift, statistics)
 
   \item{statistics}{a list of strings naming the texture
   statistics to calculate}
+
+  \item{na_opt}{one of "ignore", "center", or "any"}
+
+  \item{na_val}{what value to use to fill missing values on
+  edges or where necessary due to chosen na_opt value}
 }
 \value{
 a list of length equal to the length of the

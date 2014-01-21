@@ -80,12 +80,15 @@ double text_correlation(mat pij, mat imat, mat jmat, double mean_haralick, doubl
 //' computing co-ocurrency matrices
 //' @param statistics a list of strings naming the texture statistics to 
 //' calculate
+//' @param na_opt one of "ignore", "center", or "any"
+//' @param na_val what value to use to fill missing values on edges or where
+//' necessary due to chosen na_opt value
 //' @return a list of length equal to the length of the \code{statistics} input 
 //' parameter, containing the selected textures measures
 // [[Rcpp::export]]
 arma::cube calc_texture_full_image(arma::mat rast,
         int n_grey, arma::vec window_dims, arma::vec shift,
-        Rcpp::CharacterVector statistics) {
+        Rcpp::CharacterVector statistics, std::string na_opt, double na_val) {
     mat imat(n_grey, n_grey);
     mat jmat(n_grey, n_grey);
     mat base_window(window_dims(0), window_dims(1));
@@ -95,7 +98,7 @@ arma::cube calc_texture_full_image(arma::mat rast,
     double mean_haralick, ENVI_mean;
 
     // textures cube will hold the calculated texture statistics
-    cube textures(rast.n_rows, rast.n_cols, statistics.size(), fill::zeros);
+    cube textures(rast.n_rows, rast.n_cols, statistics.size());
 
     std::map<std::string, double (*)(mat, mat, mat, double, double)> stat_func_map;
     stat_func_map["mean"] = text_mean;
@@ -148,9 +151,39 @@ arma::cube calc_texture_full_image(arma::mat rast,
                                         row + offset_ul(0) + window_dims(0) - 1,
                                         col + offset_ul(1) + window_dims(1) - 1);
             pij.fill(0);
+
+            if (na_opt == "any") {
+                // Return NA for all textures within this window if there are 
+                // any NA values within the base_window or the offset_window
+                for(unsigned i=0; i < base_window.n_elem; i++) {
+                    if (!arma::is_finite(base_window(i)) | !arma::is_finite(offset_window(i))) {
+                        for(signed s=0; s < statistics.size(); s++) {
+                            textures(row + center_coord(0),
+                                     col + center_coord(1), s) = na_val;
+                        }
+                        continue;
+                    }
+                }
+            } else if (na_opt == "center") {
+                // Return NA for all textures within this window if the center 
+                // value is an NA
+                if (!arma::is_finite(base_window(center_coord(0), center_coord(1)))) {
+                    for(signed s=0; s < statistics.size(); s++) {
+                        textures(row + center_coord(0),
+                                 col + center_coord(1), s) = na_val;
+                    }
+                    continue;
+                }
+            }
+
             for(unsigned i=0; i < base_window.n_elem; i++) {
-                // Subtract one from the below indices to correct for row and col 
-                // indices starting at 0 in C++ versus 1 in R.
+                if (!(arma::is_finite(base_window(i)) | arma::is_finite(offset_window(i)))) {
+                    // This will execute only if there is an NA in the window 
+                    // AND na_opt is set to "ignore" or "center"
+                    continue;
+                }
+                // Subtract one from the below indices to correct for row and 
+                // col indices starting at 0 in C++ versus 1 in R.
                 pij(base_window(i) - 1, offset_window(i) - 1)++;
             }
             pij = pij / base_window.n_elem;
@@ -172,5 +205,45 @@ arma::cube calc_texture_full_image(arma::mat rast,
 
         }
     }
+
+    // The below loops fill in border areas with nan values in areas where 
+    // textures cannot be calculated due to edge effects.
+    
+    // Fill nan values on left border
+    for(unsigned row=0; row < rast.n_rows; row++) {
+        for(unsigned col=0; col < center_coord(1); col++) {
+            for(signed i=0; i < statistics.size(); i++) {
+                textures(row, col, i) = na_val;
+            }
+        }
+    }
+
+    // Fill nan values on top border
+    for(unsigned row=0; row < center_coord(0); row++) {
+        for(unsigned col=0; col < rast.n_cols; col++) {
+            for(signed i=0; i < statistics.size(); i++) {
+                textures(row, col, i) = na_val;
+            }
+        }
+    }
+
+    // Fill nan values on right border
+    for(unsigned row=0; row < rast.n_rows; row++) {
+        for(unsigned col=(rast.n_cols - abs(shift(1)) - ceil(window_dims(1)/2)) + 1; col < rast.n_cols; col++) {
+            for(signed i=0; i < statistics.size(); i++) {
+                textures(row, col, i) = na_val;
+            }
+        }
+    }
+
+    // Fill nan values on bottom border
+    for(unsigned row=(rast.n_rows - abs(shift(0)) - ceil(window_dims(0)/2)) + 1; row < rast.n_rows; row++) {
+        for(unsigned col=0; col < rast.n_cols; col++) {
+            for(signed i=0; i < statistics.size(); i++) {
+                textures(row, col, i) = na_val;
+            }
+        }
+    }
+
     return(textures);
 }

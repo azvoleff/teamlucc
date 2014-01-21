@@ -15,9 +15,12 @@
 #' computing co-ocurrency matrices
 #' @param statistics a list of strings naming the texture statistics to 
 #' calculate
+#' @param na_opt one of "ignore", "center", or "any"
+#' @param na_val what value to use to fill missing values on edges or where
+#' necessary due to chosen na_opt value
 #' @return a list of length equal to the length of the \code{statistics} input 
 #' parameter, containing the selected textures measures
-calc_texture_full_image <- function(rast, n_grey, window_dims, shift, statistics) {
-    .Call('teamr_calc_texture_full_image', PACKAGE = 'teamr', rast, n_grey, window_dims, shift, statistics)
+calc_texture_full_image <- function(rast, n_grey, window_dims, shift, statistics, na_opt, na_val) {
+    .Call('teamr_calc_texture_full_image', PACKAGE = 'teamr', rast, n_grey, window_dims, shift, statistics, na_opt, na_val)
 }
 

@@ -7,7 +7,8 @@ get_teamr_glcm_texture <- function(statistic) {
     if (length(statistic) != 1) {
         stop('length of statistic must be equal to 1')
     }
-    texture <- glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), statistic)
+    # Note the na_val=0 is needed to match ENVI output
+    texture <- glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), statistic, na_val=0)
     return(getValues(texture))
 }
 
@@ -63,7 +64,7 @@ test_that("GLCM correlation is correct", {
 
 # Test that glcm run on a raster matches the output from running glcm directly 
 # on a matrix
-glcm_corr_matrix <- glcm(raster::as.matrix(glcm_test_raster), 32, c(3, 3), c(1, 1), 'correlation')
+glcm_corr_matrix <- glcm(raster::as.matrix(glcm_test_raster), 32, c(3, 3), c(1, 1), 'correlation', na_val=0)
 glcm_corr_matrix <- matrix(glcm_corr_matrix, nrow=nrow(glcm_corr_matrix))
 test_that("GLCM run on a matrix works correctly", {
     expect_equal(glcm_corr_matrix,
@@ -71,9 +72,9 @@ test_that("GLCM run on a matrix works correctly", {
                  tolerance=.000001)
 })
 
-glcm_corr_int <- round(glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), 'correlation') * 1000)
+glcm_corr_int <- round(glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), 'correlation', na_val=0) * 1000)
 test_that("GLCM scaling works correctly when run with scaling and rounding", {
-    expect_equal(glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), 'correlation', asinteger=TRUE, scale_factor=1000),
+    expect_equal(glcm(glcm_test_raster, 32, c(3, 3), c(1, 1), 'correlation', asinteger=TRUE, scale_factor=1000, na_val=0),
                  expected=glcm_corr_int,
                  tolerance=.000001)
 })
