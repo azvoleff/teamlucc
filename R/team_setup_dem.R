@@ -36,7 +36,6 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     if (length(dem_list) > 1) {
         ######################################################################
         # Verify projections of DEMs match
-
         dem_prj <- projection(dem_rasts[[1]])
         if (any(lapply(dem_rasts, projection) != dem_prj)) {
             stop("each DEM in dem_list must have the same projection")

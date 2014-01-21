@@ -25,7 +25,6 @@ install:
   - ./travis-tool.sh install_github hadley/devtools
   - ./travis-tool.sh install_github hadley/testthat
   - ./travis-tool.sh install_github hadley/httr
-  - Rscript -e 'library(devtools);install_url("http://cran.r-project.org/src/contrib/Archive/raster/raster_2.1-66.tar.gz")'
 
 script: ./travis-tool.sh run_tests
 
