@@ -94,8 +94,12 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
         vals[vals >= 2*pi] <- 0
         vals
         })
+    # Note that slopeaspect is scaled - slope by 10000, and aspect by 1000 so 
+    # that the layers can be saved as INT2S
+    slopeaspect <- stack(round(raster(slopeaspect, layer=1) * 10000),
+                         round(raster(slopeaspect, layer=2) * 1000))
     slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_filename, 
-                               overwrite=overwrite)
+                               overwrite=overwrite, dataType='INT2S')
     timer <- stop_timer(timer, label='Calculating slope and aspect')
 
     if (n_cpus > 1) endCluster()

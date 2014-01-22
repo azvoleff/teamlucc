@@ -214,6 +214,11 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         horizcells <- 10
         vertcells <- 10
         nsamp <- 200000 / (horizcells * vertcells)
+        # Remember that slopeaspect layers are scaled to INT2S, but 
+        # topographic_corr expects them as floats, so apply the scale factors 
+        # used in team_setup_dem
+        slopeaspect <- stack(raster(slopeaspect, layer=1) / 10000,
+                             raster(slopeaspect, layer=2) / 1000)
         # Note that rowmajor indices are needed as raster layers are stored in 
         # rowmajor order, unlike most R objects that are addressed in column 
         # major order
