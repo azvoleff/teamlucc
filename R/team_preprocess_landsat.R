@@ -217,8 +217,8 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         # Remember that slopeaspect layers are scaled to INT2S, but 
         # topographic_corr expects them as floats, so apply the scale factors 
         # used in team_setup_dem
-        slopeaspect <- stack(raster(slopeaspect, layer=1) / 10000,
-                             raster(slopeaspect, layer=2) / 1000)
+        slopeaspect_flt <- stack(raster(slopeaspect, layer=1) / 10000,
+                                 raster(slopeaspect, layer=2) / 1000)
         # Note that rowmajor indices are needed as raster layers are stored in 
         # rowmajor order, unlike most R objects that are addressed in column 
         # major order
@@ -229,7 +229,7 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         topocorr_filename <- file.path(output_path,
                                        paste(sitecode, image_basename, 
                                              'masked_tc.envi', sep='_'))
-        image_stack <- topographic_corr(image_stack, slopeaspect, sunelev, 
+        image_stack <- topographic_corr(image_stack, slopeaspect_flt, sunelev, 
                                        sunazimuth, method='minnaert_full', 
                                        filename=topocorr_filename, 
                                        overwrite=overwrite, datatype='INT2S',
@@ -282,9 +282,9 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                             raster(image_stack, layer=5),
                             raster(image_stack, layer=6),
                             MSAVI2_layer,
-                            MSAVI2_glcm$glcm_mean,
-                            MSAVI2_glcm$glcm_variance,
-                            MSAVI2_glcm$glcm_dissimilarity,
+                            scale_raster(MSAVI2_glcm$glcm_mean),
+                            scale_raster(MSAVI2_glcm$glcm_variance),
+                            scale_raster(MSAVI2_glcm$glcm_dissimilarity),
                             cropped_dem$dem,
                             slopeaspect$slope,
                             slopeaspect$aspect)
@@ -292,7 +292,8 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
                                          paste(sitecode, image_basename, 
                                                'predictors.envi', sep='_'))
         predictors <- mask(predictors, image_stack_mask, maskvalue=0, 
-                           filename=predictors_filename, overwrite=overwrite)
+                           filename=predictors_filename, overwrite=overwrite,
+                           datatype='INT2S')
         names(predictors) <- c('b1', 'b2', 'b3', 'b4', 'b5', 'b7', 'msavi', 
                               'msavi_glcm_mean', 'msavi_glcm_variance', 
                               'msavi_glcm_dissimilarity', 'elev', 'slope', 
