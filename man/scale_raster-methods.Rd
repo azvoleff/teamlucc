@@ -27,16 +27,21 @@ scale_raster(x, power_of = 10, max_out = 32767, round_output = TRUE,
   \item{power_of}{raster will be scaled using the highest
   possible power of this number}
 
-  \item{max_out}{scale_factor will be chosen to ensure that
-  the maximum and minimum values of the raster do not
-  exceed this number}
+  \item{max_out}{the scaling factors will be chosen for
+  each layer to ensure that the maximum and minimum (if
+  minimum is negative) values of each layer do not exceed
+  \code{max_out}}
 
-  \item{do_scaling}{perform the scaling (if
-  \code{do_scaling} is TRUE) or just return the scale
-  factors (if \code{do_scaling} is FALSE)}
+  \item{do_scaling}{perform the scaling and return a
+  \code{Raster*} (if \code{do_scaling} is TRUE) or return a
+  list of scale factors (if \code{do_scaling} is FALSE)}
 
   \item{round_output}{whether to round the output to the
   nearest integer}
+}
+\value{
+a \code{Raster*} if \code{do_scaling} is TRUE, or a list of
+scaling factors if \code{do_scaling} is false.
 }
 \description{
 Useful for scaling a layer and rounding to integer so that
