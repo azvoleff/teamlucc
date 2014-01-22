@@ -68,7 +68,17 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
                                   datatype=dataType(dem_mosaic))
     } else {
         timer <- start_timer(timer, label='Reprojecting DEM mosaic')
-        dem_mosaic <- projectRaster(dem_mosaic, sample_image,
+        # The below lines construct to_ext as the extent the image will be 
+        # projected to. This extent must cover the same area as the dem_mosaic, 
+        # but must have the same resolution, CRS and origin as the sample_image
+        to_ext <- projectExtent(dem_mosaic, crs(sample_image))
+        to_res <- res(sample_image)
+        xmin(to_ext) <- floor(xmin(to_ext) / to_res[1]) * to_res[1]
+        xmax(to_ext) <- ceiling(xmax(to_ext) / to_res[1]) * to_res[1]
+        ymin(to_ext) <- floor(ymin(to_ext) / to_res[2]) * to_res[2]
+        ymax(to_ext) <- ceiling(ymax(to_ext) / to_res[2]) * to_res[2]
+        res(to_ext) <- to_res
+        dem_mosaic <- projectRaster(from=dem_mosaic, to=to_ext,
                                     filename=dem_mosaic_filename, 
                                     overwrite=overwrite, 
                                     datatype=dataType(dem_mosaic))
