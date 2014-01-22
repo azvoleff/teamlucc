@@ -53,8 +53,7 @@ Performs topographic correction using code based on
 in this package has been modifed from \code{topocorr} to
 allow using a subsample of the image for Minnaert k
 calculations, and to provide the option of running the
-topographic correction in parallel using
-\code{\link{foreach}}.
+topographic correction in parallel using \code{foreach}.
 }
 \examples{
 \dontrun{

@@ -4,7 +4,7 @@
 #' \code{Landsat} package. The code in this package has been modifed from 
 #' \code{topocorr} to allow using a subsample of the image for Minnaert k 
 #' calculations, and to provide the option of running the topographic 
-#' correction in parallel using \code{\link{foreach}}.
+#' correction in parallel using \code{foreach}.
 #'
 #' @export
 #' @param x an image to correct
