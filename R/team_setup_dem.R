@@ -88,6 +88,7 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     timer <- start_timer(timer, label='Calculating slope and aspect')
     slopeaspect_filename <- file.path(output_path,
                                      paste0(sitecode, '_dem_mosaic_slopeaspect.envi'))
+    # Note that the default output of 'terrain' is in radians
     slopeaspect <- terrain(dem_mosaic, opt=c('slope', 'aspect'))
     slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {
         vals[vals >= 2*pi] <- 0
