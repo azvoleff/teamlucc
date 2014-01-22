@@ -3,8 +3,7 @@
 \title{Topographically correct a raster}
 \usage{
 topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = "",
-  inparallel = FALSE, sampleindices = NULL, scale_factor = 1,
-  asinteger = FALSE, ...)
+  sampleindices = NULL, scale_factor = 1, asinteger = FALSE, ...)
 }
 \arguments{
   \item{x}{an image to correct}
@@ -25,9 +24,6 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = "",
 
   \item{filename}{file on disk to save \code{Raster*} to
   (optional)}
-
-  \item{inparallel}{whether to run correction in parallel
-  using \code{foreach}}
 
   \item{sampleindices}{(optional) row-major indices of
   sample pixels to use in regression models used for some

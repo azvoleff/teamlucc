@@ -224,18 +224,12 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         topocorr_filename <- file.path(output_path,
                                        paste(sitecode, image_basename, 
                                              'masked_tc.envi', sep='_'))
-        if (n_cpus > 1) {
-            inparallel <- TRUE
-        } else {
-            inparallel <- FALSE
-        }
         image_stack <- topographic_corr(image_stack, slopeaspect, sunelev, 
-                                        sunazimuth, method='minnaert_full', 
-                                        filename=topocorr_filename, 
-                                        inparallel=inparallel, 
-                                        overwrite=overwrite, datatype='INT2S',
-                                        sampleindices=sampleindices,
-                                        asinteger=TRUE)
+                                       sunazimuth, method='minnaert_full', 
+                                       filename=topocorr_filename, 
+                                       overwrite=overwrite, datatype='INT2S',
+                                       sampleindices=sampleindices,
+                                       asinteger=TRUE)
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'topocorr'))
 
         ######################################################################

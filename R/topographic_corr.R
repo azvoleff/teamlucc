@@ -7,7 +7,6 @@
 #' correction in parallel using \code{\link{foreach}}.
 #'
 #' @export
-#' @import foreach
 #' @param x an image to correct
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
 #' layers.  The first layer should be the slope, the second layer should be 
@@ -18,7 +17,6 @@
 #' @param method the topographic correction method to use. See the help for 
 #' \code{topocorr} for more guidance on this.
 #' @param filename file on disk to save \code{Raster*} to (optional)
-#' @param inparallel whether to run correction in parallel using \code{foreach}
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
 #' regression models used for some topographic correction methods (like 
 #' Minnaert). Useful when handling very large images. See
@@ -50,8 +48,8 @@
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 #' }
 topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
-                             filename='', inparallel=FALSE, sampleindices=NULL, 
-                             scale_factor=1, asinteger=FALSE, ...) {
+                             filename='', sampleindices=NULL, scale_factor=1, 
+                             asinteger=FALSE, ...) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')
     }
@@ -62,7 +60,22 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
     # topocorr. TODO: rewrite topocorr to handle RasterLayers
     slope <- raster(slopeaspect, layer=1)
     aspect <- raster(slopeaspect, layer=2)
-    if (inparallel == TRUE && (nlayers(x) > 1)) {
+
+    cl <- options('rasterClusterObject')[[1]]
+    if (is.null(cl) || (nlayers(x) == 1)) {
+        inparallel <- FALSE
+    } else if (!require(foreach)) {
+        warning('Cluster object found, but "foreach" is required to run topographic correction in parallel. Running sequentially.')
+        inparallel <- FALSE
+    } else if (!require(doSNOW)) {
+        warning('Cluster object found, but "doSNOW" is required to run topographic correction in parallel. Running sequentially.')
+        inparallel <- FALSE
+    } else {
+        inparallel <- TRUE
+    }
+
+    if (inparallel) {
+        registerDoSNOW(cl)
         # Set uncorr_layer to NULL to pass R CMD CHECK without notes
         uncorr_layer=NULL
         corr_img <- foreach(uncorr_layer=unstack(x), .combine='addLayer', 

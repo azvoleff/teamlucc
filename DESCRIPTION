@@ -21,7 +21,6 @@ Imports:
     grid,
     spatial.tools (>= 1.2.2),
     caret,
-    foreach,
     sp,
     mclust,
     lubridate,
@@ -32,6 +31,8 @@ Suggests:
     kernlab,
     e1071,
     landsat,
+    foreach,
+    doSNOW,
     notifyR
 LinkingTo: Rcpp, RcppArmadillo
 Description: Routines for processing imagery and other spatial data for the
