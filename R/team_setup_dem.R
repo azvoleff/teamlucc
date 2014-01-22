@@ -99,7 +99,7 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     slopeaspect <- stack(round(raster(slopeaspect, layer=1) * 10000),
                          round(raster(slopeaspect, layer=2) * 1000))
     slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_filename, 
-                               overwrite=overwrite, dataType='INT2S')
+                               overwrite=overwrite, datatype='INT2S')
     timer <- stop_timer(timer, label='Calculating slope and aspect')
 
     if (n_cpus > 1) endCluster()
