@@ -4,11 +4,6 @@
 #' @importFrom rgeos gContains gUnion
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
-#' @param dem path to a digital elevation model (DEM) covering the full extent 
-#' of all the images in \code{image_dirs}. See \code{team_setup_dem} for a 
-#' function simplifying this.
-#' @param slopeaspect path to a two band raster of slope (band 1) and aspect 
-#' (band 2) in a format readable by \code{raster}
 #' @param sitecode code to use as a prefix for all filenames
 #' @param output_path the path to use for the output
 #' @param aoi an area of interest (AOI) to crop from each image
@@ -25,14 +20,11 @@
 #' image_dirs <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc',
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
-#' dem <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic.envi'
-#' slopeaspect <- 'H:/Data/TEAM/VB/LCLUC_Analysis/VB_dem_mosaic_slopeaspect.envi'
-#' team_preprocess(image_dirs, dem, slopeaspect, "VB", 
-#'                 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
+#' team_preprocess(image_dirs, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
-team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode, 
-                                    output_path, aoi=NULL, n_cpus=1, 
-                                    cleartmp=FALSE,  overwrite=FALSE, notify=print) {
+team_preprocess_landsat <- function(image_dirs, sitecode, output_path, 
+                                    aoi=NULL, n_cpus=1, cleartmp=FALSE,  
+                                    overwrite=FALSE, notify=print) {
     timer <- Track_time(notify)
 
     timer <- start_timer(timer, label='Preprocessing images')
@@ -90,27 +82,6 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
             image_stacks <- c(image_stacks, image_stack)
             mask_stacks <- c(mask_stacks, mask_stack)
         }
-    }
-
-    ##########################################################################
-    # Verify extents and projections of images and DEMs match (DEM projection 
-    # doesn't have to match image projection, but all DEMs must have the same 
-    # projections, and all images must have the same projections).
-    image_prj <- projection(image_stacks[[1]])
-    if (any(lapply(image_stacks, projection) != image_prj)) {
-        stop("each input image must have the same projection")
-    }
-
-    # Verify the combined extent of the DEMs in dem_list covers the full area 
-    # of the images in image_stacks
-    image_extent_polys <- lapply(image_stacks, get_extent_poly)
-    if ('RasterLayer' != class(dem)) dem <- raster(dem)
-    # Make sure the DEM extents and image extent polys are in same projection 
-    dem_extent_poly <- get_extent_poly(dem)
-    extents_contained <- unlist(lapply(image_extent_polys,
-                                       function(ext) gContains(dem_extent_poly, ext)))
-    for (n in 1:length(extents_contained)) {
-        warning(paste("DEM does not fully cover extent of", image_files[n]))
     }
 
     for (n in 1:length(image_stacks)) {
@@ -182,6 +153,19 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
 
         ######################################################################
         # Crop dem, slope, and aspect
+        dem_filename <- file.path(output_path, paste0(sitecode, '_dem_', 
+                                                      WRS_Path, WRS_Row, 
+                                                      '.envi'))
+        dem <- raster(dem_filename)
+        if (!(projection(dem) == projection(image_stack))) {
+            stop(paste("DEM does not fully cover extent of", image_basename))
+        }
+        image_extent_poly <- get_extent_poly(image_stack)
+        dem_extent_poly <- get_extent_poly(dem)
+        if (!gContains(dem_extent_poly, ext)) {
+            warning(paste("DEM does not fully cover extent of", image_basename))
+        }
+
         timer <- start_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
         cropped_dem_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
@@ -195,12 +179,13 @@ team_preprocess_landsat <- function(image_dirs, dem, slopeaspect, sitecode,
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
 
         timer <- start_timer(timer, label=paste(image_basename, '-', 'calculate slope/aspect'))
+        slopeaspect_filename <- file.path(output_path,
+                                          paste0(sitecode, '_dem_slopeaspect_',
+                                                 WRS_Path, WRS_Row, '.envi'))
+        slopeaspect <- brick(slopeaspect_filename)
         slopeaspect_cropped_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
                                             'dem_slopeaspect.envi', sep='_'))
-        if (!(class(slopeaspect) %in% c('RasterStack', 'RasterBrick'))) {
-            slopeaspect <- brick(slopeaspect)
-        }
         slopeaspect <- match_rasters(image_stack, slopeaspect, 
                                      filename=slopeaspect_cropped_file, 
                                      overwrite=overwrite)
