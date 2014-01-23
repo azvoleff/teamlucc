@@ -2,6 +2,7 @@
 #'
 #' @export
 #' @importFrom sp spTransform
+#' @importFrom rgeos gBuffer
 #' @param dem_path a list of digital elevation models (DEMs) that (when 
 #' mosaiced) covers the full extent of all the images in the image_list.
 #' @param sitecode code to use as a prefix for all filenames
@@ -24,8 +25,8 @@
 #' }
 team_setup_dem <- function(dem_path, sitecode, output_path, pathrows, n_cpus=1, 
                            overwrite=FALSE, notify=print) {
-    if (!require(lspathrow)) {
-        stop('lspathrow not found - to install, type: install_github("azvoleff/lspathrow")')
+    if (!require(wrspathrow)) {
+        stop('wrspathrow not found - to install, type: install_github("azvoleff/wrspathrow")')
     }
     timer <- Track_time(notify)
 
@@ -60,13 +61,11 @@ team_setup_dem <- function(dem_path, sitecode, output_path, pathrows, n_cpus=1,
     } else {
         dem_mosaic <- dem_rasts[[1]]
     }
-    dem_mosaic <- round(dem_mosaic)
-    dataType(dem_mosaic) <- 'INT2S'
 
     for (pathrow in pathrows) {
         pathrow_label <- paste0(sprintf('%03i', pathrow[1]), sprintf('%03i', pathrow[2]))
         aoi_wgs <- pathrow_poly(pathrow[1], pathrow[2]) 
-        aoi_utm <- spTransform(aoi, CRS(utm_zone(aoi, proj4string=TRUE)))
+        aoi_utm <- spTransform(aoi_wgs, CRS(utm_zone(aoi_wgs, proj4string=TRUE)))
         # Add a 10km buffer in UTM coordinate system (as LEDAPS SR is in UTM) 
         # then transform back to WGS84 to use for cropping the dem mosaic
         aoi_utm <- gBuffer(aoi_utm, width=10000, byid=TRUE)
@@ -74,7 +73,9 @@ team_setup_dem <- function(dem_path, sitecode, output_path, pathrows, n_cpus=1,
 
         timer <- start_timer(timer, label=paste('Cropping DEM mosaic for', pathrow_label))
         dem_mosaic_crop <- crop(dem_mosaic, aoi_wgs)
-        timer <- start_timer(timer, label=paste('Cropping DEM mosaic for', pathrow_label))
+        dem_mosaic_crop <- round(dem_mosaic_crop)
+        dataType(dem_mosaic_crop) <- 'INT2S'
+        timer <- stop_timer(timer, label=paste('Cropping DEM mosaic for', pathrow_label))
 
         timer <- start_timer(timer, label=paste('Reprojecting DEM mosaic for', pathrow_label))
         dem_mosaic_filename <- file.path(output_path,
@@ -89,11 +90,16 @@ team_setup_dem <- function(dem_path, sitecode, output_path, pathrows, n_cpus=1,
         xmax(to_ext) <- ceiling(xmax(to_ext) / to_res[1]) * to_res[1]
         ymin(to_ext) <- floor(ymin(to_ext) / to_res[2]) * to_res[2]
         ymax(to_ext) <- ceiling(ymax(to_ext) / to_res[2]) * to_res[2]
+        # The below two lines shift the origin to 15, 15 for consistency with 
+        # the LEDAPS CDR images.
+        xmin(to_ext) <- xmin(to_ext) + to_res[1]/2
+        ymax(to_ext) <- ymax(to_ext) + to_res[2]/2
         res(to_ext) <- to_res
         dem_mosaic_crop <- projectRaster(from=dem_mosaic_crop, to=to_ext,
-                                    filename=dem_mosaic_filename, 
-                                    overwrite=overwrite, 
-                                    datatype=dataType(dem_mosaic_crop))
+                                         filename=dem_mosaic_filename, 
+                                         overwrite=overwrite, 
+                                         method='bilinear',
+                                         datatype=dataType(dem_mosaic_crop))
         timer <- stop_timer(timer, label=paste('Reprojecting DEM mosaic for', pathrow_label))
 
         timer <- start_timer(timer, label=paste('Calculating slope and aspect for', pathrow_label))
