@@ -33,7 +33,8 @@ Suggests:
     landsat,
     foreach,
     doSNOW,
-    notifyR
+    notifyR,
+    wrspathrow
 LinkingTo: Rcpp, RcppArmadillo
 Description: Routines for processing imagery and other spatial data for the
     Tropical Ecology Assessment and Monitoring (TEAM) Network.
