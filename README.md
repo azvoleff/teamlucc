@@ -1,4 +1,4 @@
-# TEAM Data Processing Tools (R)
+# TEAM Data Processing Tools
 
 [![Build Status](https://travis-ci.org/azvoleff/teamr.png)](https://travis-ci.org/azvoleff/teamr)
 
