@@ -157,12 +157,31 @@ team_preprocess_landsat <- function(image_dirs, sitecode, output_path,
                                                       WRS_Path, WRS_Row, 
                                                       '.envi'))
         dem <- raster(dem_filename)
-        if (!(projection(dem) == projection(image_stack))) {
-            stop(paste("DEM does not fully cover extent of", image_basename))
+
+        slopeaspect_filename <- file.path(output_path,
+                                          paste0(sitecode, '_dem_slopeaspect_',
+                                                 WRS_Path, WRS_Row, '.envi'))
+        slopeaspect <- brick(slopeaspect_filename)
+
+        if (!compareRaster(dem, image_stack, extent=FALSE, rowcol=FALSE, 
+                           crs=TRUE, stopiffalse=FALSE)) {
+            warning(paste("DEM projection does not match image projection - reprojecting", 
+                          image_basename))
+            timer <- start_timer(timer, label=paste(image_basename, '-', 'reprojecting DEM'))
+            dem <- projectRaster(dem, image_stack)
+            timer <- stop_timer(timer, label=paste(image_basename, '-', 'reprojecting DEM'))
+            timer <- start_timer(timer, label=paste(image_basename, '-', 'reprojecting slopeaspect'))
+            slopeaspect <- projectRaster(slopeaspect, image_stack)
+            timer <- stop_timer(timer, label=paste(image_basename, '-', 'reprojecting slopeaspect'))
         }
+        # Since the projections match, make sure the proj4strings are identical 
+        # so rgeos doesn't throw an error
+        proj4string(dem) <- proj4string(image_stack)
+        proj4string(slopeaspect) <- proj4string(image_stack)
+
         image_extent_poly <- get_extent_poly(image_stack)
         dem_extent_poly <- get_extent_poly(dem)
-        if (!gContains(dem_extent_poly, ext)) {
+        if (!gContains(dem_extent_poly, image_extent_poly)) {
             warning(paste("DEM does not fully cover extent of", image_basename))
         }
 
@@ -179,10 +198,6 @@ team_preprocess_landsat <- function(image_dirs, sitecode, output_path,
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
 
         timer <- start_timer(timer, label=paste(image_basename, '-', 'calculate slope/aspect'))
-        slopeaspect_filename <- file.path(output_path,
-                                          paste0(sitecode, '_dem_slopeaspect_',
-                                                 WRS_Path, WRS_Row, '.envi'))
-        slopeaspect <- brick(slopeaspect_filename)
         slopeaspect_cropped_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
                                             'dem_slopeaspect.envi', sep='_'))
