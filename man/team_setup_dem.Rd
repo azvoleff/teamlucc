@@ -38,7 +38,8 @@ Setup the DEM mosaic for a particular TEAM site
 \examples{
 \dontrun{
 dem_path <- 'H:/Data/TEAM/VB/Rasters/DEM/ASTER'
-team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
+team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/',
+               list(c(15,53)))
 }
 }
 

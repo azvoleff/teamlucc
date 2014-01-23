@@ -19,10 +19,11 @@
 #' @examples
 #' \dontrun{
 #' dem_path <- 'H:/Data/TEAM/VB/Rasters/DEM/ASTER'
-#' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
+#' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/', 
+#'                list(c(15,53)))
 #' }
-team_setup_dem <- function(dem_path, sitecode, output_path, pathrows, 
-                           n_cpus=1, overwrite=FALSE, notify=print) {
+team_setup_dem <- function(dem_path, sitecode, output_path, pathrows, n_cpus=1, 
+                           overwrite=FALSE, notify=print) {
     if (!require(lspathrow)) {
         stop('lspathrow not found - to install, type: install_github("azvoleff/lspathrow")')
     }
@@ -62,8 +63,6 @@ team_setup_dem <- function(dem_path, sitecode, output_path, pathrows,
     dem_mosaic <- round(dem_mosaic)
     dataType(dem_mosaic) <- 'INT2S'
 
-    pathrows <- list(c(15,53))
-    pathrow <- pathrows[[1]]
     for (pathrow in pathrows) {
         pathrow_label <- paste0(sprintf('%03i', pathrow[1]), sprintf('%03i', pathrow[2]))
         aoi_wgs <- pathrow_poly(pathrow[1], pathrow[2]) 
