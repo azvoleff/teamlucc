@@ -5,6 +5,7 @@
 #'
 #' @export
 #' @docType methods
+#' @import methods
 #' @rdname scale_raster-methods
 #' @param x a \code{Raster*} object
 #' @param power_of raster will be scaled using the highest possible power of 

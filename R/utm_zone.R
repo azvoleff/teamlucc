@@ -7,9 +7,8 @@
 #'
 #' @export
 #' @docType methods
+#' @import methods
 #' @rdname utm_zone-methods
-#' @param long a longitude (with western hemisphere longitudes negative)
-#' @param lat a latitude (with southern hemisphere latitudes negative)
 #' @param proj4string if FALSE (default) return the UTM zone as a string (for 
 #' example "34S" for UTM Zone 34 South). If TRUE, return a proj4string using 
 #' the EPSG code as an initialization string.
@@ -66,6 +65,8 @@ utm_zone_calc <- function(x, y, proj4string) {
 
 #' @rdname utm_zone-methods
 #' @aliases utm_zone,numeric,numeric,logical-method
+#' @param x a longitude (with western hemisphere longitudes negative)
+#' @param y a latitude (with southern hemisphere latitudes negative)
 setMethod("utm_zone", signature(x="numeric", y="numeric"),
     function(x, y, proj4string=FALSE) {
         return(utm_zone_calc(x, y, proj4string))
@@ -75,6 +76,7 @@ setMethod("utm_zone", signature(x="numeric", y="numeric"),
 #' @rdname utm_zone-methods
 #' @importFrom rgeos gCentroid
 #' @importFrom sp Spatial coordinates
+#' @param x a Spatial object (UTM zone will be given for the object's centroid)
 #' @aliases utm_zone,Spatial,logical-method
 setMethod("utm_zone", signature(x='Spatial'),
     function(x, proj4string=FALSE) {

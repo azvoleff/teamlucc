@@ -14,16 +14,19 @@ utm_zone(x, y, ...)
 \S4method{utm_zone}{Spatial,ANY}(x, proj4string = FALSE)
 }
 \arguments{
-  \item{long}{a longitude (with western hemisphere
-  longitudes negative)}
-
-  \item{lat}{a latitude (with southern hemisphere latitudes
-  negative)}
-
   \item{proj4string}{if FALSE (default) return the UTM zone
   as a string (for example "34S" for UTM Zone 34 South). If
   TRUE, return a proj4string using the EPSG code as an
   initialization string.}
+
+  \item{x}{a longitude (with western hemisphere longitudes
+  negative)}
+
+  \item{y}{a latitude (with southern hemisphere latitudes
+  negative)}
+
+  \item{x}{a Spatial object (UTM zone will be given for the
+  object's centroid)}
 }
 \description{
 For a line or polygon, the UTM zone of the centroid is
