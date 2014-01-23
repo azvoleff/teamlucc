@@ -28,8 +28,9 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
 
     if (n_cpus > 1) beginCluster(n_cpus)
 
-    # Below should recognize ASTER GDEMV2 or SRTM tiles from Earth Explorer
-    dem_list <- dir(dem_path, pattern='(\\.bil)|(_dem\\.tif)$')
+    # Below should recognize ASTER GDEMV2, SRTM tiles from Earth Explorer, or 
+    # CGIAR-SRTM tiles renamed locally with the rename_tiles.R script
+    dem_list <- dir(dem_path, pattern='(_3arc_v2\\.bil)|(_dem\\.tif)|(cgiar_srtm_[EW][0-9]{3}_[NS][0-9]{2}.tif$)')
     dem_list <- file.path(dem_path, dem_list)
     dem_rasts <- lapply(dem_list, raster)
 
