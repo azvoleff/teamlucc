@@ -1,13 +1,14 @@
 #' Setup the DEM mosaic for a particular TEAM site
 #'
 #' @export
+#' @importFrom sp spTransform
 #' @param dem_path a list of digital elevation models (DEMs) that (when 
 #' mosaiced) covers the full extent of all the images in the image_list.
 #' @param sitecode code to use as a prefix for all filenames
 #' @param output_path the path to use for the output 
-#' @param sample_image a \code{Raster*} or the path to an image in a format 
-#' readable by \code{raster}. The sample image will be used to set the 
-#' projection system for the output DEM mosaic.
+#' @param pathrows a list of path and row numbers of the Landsat path and rows 
+#' needed to cover the TEAM site. For example: list(c(53, 15), c(53, 16)) would 
+#' mean two Landsat images, covering path/row 53/15 and path/row 53/16.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -20,8 +21,11 @@
 #' dem_path <- 'H:/Data/TEAM/VB/Rasters/DEM/ASTER'
 #' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/')
 #' }
-team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL, 
+team_setup_dem <- function(dem_path, sitecode, output_path, pathrows, 
                            n_cpus=1, overwrite=FALSE, notify=print) {
+    if (!require(lspathrow)) {
+        stop('lspathrow not found - to install, type: install_github("azvoleff/lspathrow")')
+    }
     timer <- Track_time(notify)
 
     timer <- start_timer(timer, label='Setting up DEMs')
@@ -58,50 +62,59 @@ team_setup_dem <- function(dem_path, sitecode, output_path, sample_image=NULL,
     dem_mosaic <- round(dem_mosaic)
     dataType(dem_mosaic) <- 'INT2S'
 
-    dem_mosaic_filename <- file.path(output_path,
-                                     paste0(sitecode, '_dem_mosaic.envi'))
-    if (is.null(sample_image) | compareRaster(sample_image, dem_mosaic,
-                                              extent=FALSE, rowcol=FALSE, 
-                                              crs=TRUE, res=TRUE, orig=TRUE, 
-                                              stopiffalse=FALSE)) {
-        dem_mosaic <- writeRaster(dem_mosaic, dem_mosaic_filename, 
-                                  overwrite=overwrite, 
-                                  datatype=dataType(dem_mosaic))
-    } else {
-        timer <- start_timer(timer, label='Reprojecting DEM mosaic')
+    pathrows <- list(c(15,53))
+    pathrow <- pathrows[[1]]
+    for (pathrow in pathrows) {
+        pathrow_label <- paste0(sprintf('%03i', pathrow[1]), sprintf('%03i', pathrow[2]))
+        aoi_wgs <- pathrow_poly(pathrow[1], pathrow[2]) 
+        aoi_utm <- spTransform(aoi, CRS(utm_zone(aoi, proj4string=TRUE)))
+        # Add a 10km buffer in UTM coordinate system (as LEDAPS SR is in UTM) 
+        # then transform back to WGS84 to use for cropping the dem mosaic
+        aoi_utm <- gBuffer(aoi_utm, width=10000, byid=TRUE)
+        aoi_wgs <- spTransform(aoi_utm, CRS('+init=epsg:4326'))
+
+        timer <- start_timer(timer, label=paste('Cropping DEM mosaic for', pathrow_label))
+        dem_mosaic_crop <- crop(dem_mosaic, aoi_wgs)
+        timer <- start_timer(timer, label=paste('Cropping DEM mosaic for', pathrow_label))
+
+        timer <- start_timer(timer, label=paste('Reprojecting DEM mosaic for', pathrow_label))
+        dem_mosaic_filename <- file.path(output_path,
+                                         paste0(sitecode, '_dem_', 
+                                                pathrow_label, '.envi'))
         # The below lines construct to_ext as the extent the image will be 
-        # projected to. This extent must cover the same area as the dem_mosaic, 
-        # but must have the same resolution, CRS and origin as the sample_image
-        to_ext <- projectExtent(dem_mosaic, crs(sample_image))
-        to_res <- res(sample_image)
+        # projected to. This extent must cover the same area as the dem_mosaic_crop, 
+        # but must have the same resolution, CRS and origin as aoi_utm
+        to_ext <- projectExtent(dem_mosaic_crop, crs(aoi_utm))
+        to_res <- c(30, 30)
         xmin(to_ext) <- floor(xmin(to_ext) / to_res[1]) * to_res[1]
         xmax(to_ext) <- ceiling(xmax(to_ext) / to_res[1]) * to_res[1]
         ymin(to_ext) <- floor(ymin(to_ext) / to_res[2]) * to_res[2]
         ymax(to_ext) <- ceiling(ymax(to_ext) / to_res[2]) * to_res[2]
         res(to_ext) <- to_res
-        dem_mosaic <- projectRaster(from=dem_mosaic, to=to_ext,
+        dem_mosaic_crop <- projectRaster(from=dem_mosaic_crop, to=to_ext,
                                     filename=dem_mosaic_filename, 
                                     overwrite=overwrite, 
-                                    datatype=dataType(dem_mosaic))
-        timer <- stop_timer(timer, label='Reprojecting DEM mosaic')
-    }
+                                    datatype=dataType(dem_mosaic_crop))
+        timer <- stop_timer(timer, label=paste('Reprojecting DEM mosaic for', pathrow_label))
 
-    timer <- start_timer(timer, label='Calculating slope and aspect')
-    slopeaspect_filename <- file.path(output_path,
-                                     paste0(sitecode, '_dem_mosaic_slopeaspect.envi'))
-    # Note that the default output of 'terrain' is in radians
-    slopeaspect <- terrain(dem_mosaic, opt=c('slope', 'aspect'))
-    slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {
-        vals[vals >= 2*pi] <- 0
-        vals
-        })
-    # Note that slopeaspect is scaled - slope by 10000, and aspect by 1000 so 
-    # that the layers can be saved as INT2S
-    slopeaspect <- stack(round(raster(slopeaspect, layer=1) * 10000),
-                         round(raster(slopeaspect, layer=2) * 1000))
-    slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_filename, 
-                               overwrite=overwrite, datatype='INT2S')
-    timer <- stop_timer(timer, label='Calculating slope and aspect')
+        timer <- start_timer(timer, label=paste('Calculating slope and aspect for', pathrow_label))
+        slopeaspect_filename <- file.path(output_path,
+                                          paste0(sitecode, '_dem_slopeaspect_',
+                                                 pathrow_label, '.envi'))
+        # Note that the default output of 'terrain' is in radians
+        slopeaspect <- terrain(dem_mosaic_crop, opt=c('slope', 'aspect'))
+        slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {
+            vals[vals >= 2*pi] <- 0
+            vals
+            })
+        # Note that slopeaspect is scaled - slope by 10000, and aspect by 1000 so 
+        # that the layers can be saved as INT2S
+        slopeaspect <- stack(round(raster(slopeaspect, layer=1) * 10000),
+                             round(raster(slopeaspect, layer=2) * 1000))
+        slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_filename, 
+                                   overwrite=overwrite, datatype='INT2S')
+        timer <- stop_timer(timer, label=paste('Calculating slope and aspect for', pathrow_label))
+    }
 
     if (n_cpus > 1) endCluster()
 

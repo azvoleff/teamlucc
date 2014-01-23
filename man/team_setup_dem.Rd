@@ -2,8 +2,8 @@
 \alias{team_setup_dem}
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
-team_setup_dem(dem_path, sitecode, output_path, sample_image = NULL,
-  n_cpus = 1, overwrite = FALSE, notify = print)
+team_setup_dem(dem_path, sitecode, output_path, pathrows, n_cpus = 1,
+  overwrite = FALSE, notify = print)
 }
 \arguments{
   \item{dem_path}{a list of digital elevation models (DEMs)
@@ -15,10 +15,11 @@ team_setup_dem(dem_path, sitecode, output_path, sample_image = NULL,
 
   \item{output_path}{the path to use for the output}
 
-  \item{sample_image}{a \code{Raster*} or the path to an
-  image in a format readable by \code{raster}. The sample
-  image will be used to set the projection system for the
-  output DEM mosaic.}
+  \item{pathrows}{a list of path and row numbers of the
+  Landsat path and rows needed to cover the TEAM site. For
+  example: list(c(53, 15), c(53, 16)) would mean two
+  Landsat images, covering path/row 53/15 and path/row
+  53/16.}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
