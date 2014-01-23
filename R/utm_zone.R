@@ -6,6 +6,8 @@
 #' Based on the code on gis.stackexchange.com at http://bit.ly/17SdcuN.
 #'
 #' @export
+#' @docType methods
+#' @rdname utm_zone-methods
 #' @param long a longitude (with western hemisphere longitudes negative)
 #' @param lat a latitude (with southern hemisphere latitudes negative)
 #' @param proj4string if FALSE (default) return the UTM zone as a string (for 
@@ -15,33 +17,37 @@
 #' utm_zone(45, 10)
 #' utm_zone(45, -10)
 #' utm_zone(45, 10, proj4string=TRUE)
-utm_zone <- function(long, lat, proj4string=FALSE) {
-    if (long < -180 || long > 180) {
+setGeneric("utm_zone", function(x, y, ...) {
+    standardGeneric("utm_zone")
+})
+
+utm_zone_calc <- function(x, y, proj4string) {
+    if (x < -180 || x > 180) {
         stop("longitude must be between -180 and 180")
     }
-    if (lat < -90 || lat > 90) {
+    if (y < -90 || y > 90) {
         stop("latitude must be between -90 and 90")
     }
 
-    zone_num <- floor((long + 180)/6) + 1
-    if (lat >= 56.0 && lat < 64.0 && long >= 3.0 && long < 12.0) {
+    zone_num <- floor((x + 180)/6) + 1
+    if (y >= 56.0 && y < 64.0 && x >= 3.0 && x < 12.0) {
         zone_num <- 32
     }
 
     # Special zone_nums for Svalbard
-    if (lat >= 72.0 && lat < 84.0) {
-        if (long >= 0.0 && long < 9.0) {
+    if (y >= 72.0 && y < 84.0) {
+        if (x >= 0.0 && x < 9.0) {
             zone_num <- 31
-        } else if (long >= 9.0 && long < 21.0) {
+        } else if (x >= 9.0 && x < 21.0) {
             zone_num <- 33
-        } else if (long >= 21.0 && long < 33.0) {
+        } else if (x >= 21.0 && x < 33.0) {
             zone_num <- 35
-        } else if (long >= 33.0 && long < 42.0) {
+        } else if (x >= 33.0 && x < 42.0) {
             zone_num <- 37
         }
     }
 
-    if (lat >= 0) {
+    if (y >= 0) {
         ns <- 'N'
     } else {
         ns <- 'S'
@@ -57,3 +63,22 @@ utm_zone <- function(long, lat, proj4string=FALSE) {
         return(paste0(zone_num, ns))
     }
 }
+
+#' @rdname utm_zone-methods
+#' @aliases utm_zone,numeric,numeric,logical-method
+setMethod("utm_zone", signature(x="numeric", y="numeric"),
+    function(x, y, proj4string=FALSE) {
+        return(utm_zone_calc(x, y, proj4string))
+    }
+)
+
+#' @rdname utm_zone-methods
+#' @importFrom rgeos gCentroid
+#' @importFrom sp Spatial coordinates
+#' @aliases utm_zone,Spatial,logical-method
+setMethod("utm_zone", signature(x='Spatial'),
+    function(x, proj4string=FALSE) {
+        centroid <- coordinates(gCentroid(x))
+        return(utm_zone_calc(centroid[1], centroid[2], proj4string))
+    }
+)
