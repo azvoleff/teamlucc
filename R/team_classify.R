@@ -18,15 +18,17 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @examples
 #' #TODO: Add example
-team_classify <- function(predictors, train_data, output_path, n_cpus, 
+team_classify <- function(predictors, train_data, output_path, n_cpus=1, 
                           overwrite=FALSE, notify=print) {
+    timer <- Track_time(notify)
+
     timer <- start_timer(timer, label='Classifying image')
 
     if (n_cpus > 1) beginCluster(n_cpus)
 
     notify("Starting classification...")
 
-    classification <- classify_image(predictors, train_data)
+    classification <- classify_image(predictors, train_data, notify=notify)
     classification$model
     plot(classification$pred_classes)
 
