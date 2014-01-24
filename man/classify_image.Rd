@@ -2,9 +2,9 @@
 \alias{classify_image}
 \title{Runs an image classification}
 \usage{
-classify_image(x, train_data, pred_classes_filename = NULL,
-  pred_probs_filename = NULL, classProbs = TRUE, use_training_flag = TRUE,
-  tune_length = 8, train_control = NULL, tune_grid = NULL)
+classify_image(x, train_data, classProbs = TRUE, use_training_flag = TRUE,
+  tune_length = 8, train_control = NULL, tune_grid = NULL,
+  notify = print)
 }
 \arguments{
   \item{x}{a \code{Raster*} image with the predictor
@@ -13,17 +13,6 @@ classify_image(x, train_data, pred_classes_filename = NULL,
   \item{train_data}{a data table with a column labeled 'y'
   with the observed classes, and one or more columns with
   the values of predictor(s) at each location.}
-
-  \item{pred_classes_filename}{the filename to use to save
-  the predicted classes \code{RasterLayer}. If 'NULL' (the
-  default) a temporary file will be used if necessary (if
-  the size of the output raster exceeds available memory).}
-
-  \item{pred_probs_filename}{the filename to use to save
-  the class probabilities \code{RasterLayer} or
-  \code{RasterBrick}. If 'NULL' (the default) a temporary
-  file will be used if necessary (if the size of the output
-  raster exceeds available memory).}
 
   \item{classProbs}{whether to also calculate and return
   the probabilities of membership for each class}
@@ -47,6 +36,11 @@ classify_image(x, train_data, pred_classes_filename = NULL,
   \item{train_grid}{the training grid to be used for
   training the classifier. Must be a \code{data.frame} with
   two columns: ".sigma" and ".C".}
+
+  \item{notify}{notifier to use (defaults to \code{print}
+  function). See the \code{notifyR} package for one way of
+  sending notifications from R. The \code{notify} function
+  should accept a string as the only argument.}
 }
 \value{
 a list with 3 elements: the trained classifier, the

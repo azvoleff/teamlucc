@@ -9,14 +9,6 @@
 #' @param train_data a data table with a column labeled 'y' with the observed 
 #' classes, and one or more columns with the values of predictor(s) at each 
 #' location.
-#' @param pred_classes_filename the filename to use to save the predicted 
-#' classes \code{RasterLayer}. If 'NULL' (the default) a temporary file will be 
-#' used if necessary (if the size of the output raster exceeds available 
-#' memory).
-#' @param pred_probs_filename the filename to use to save the class 
-#' probabilities \code{RasterLayer} or \code{RasterBrick}. If 'NULL' (the 
-#' default) a temporary file will be used if necessary (if the size of the 
-#' output raster exceeds available memory).
 #' @param classProbs whether to also calculate and return the probabilities of 
 #' membership for each class
 #' @param use_training_flag indicates whether to exclude data flagged as 
@@ -30,6 +22,9 @@
 #' automatically).  For details see \code{\link{trainControl}}.
 #' @param train_grid the training grid to be used for training the classifier.  
 #' Must be a \code{data.frame} with two columns: ".sigma" and ".C".
+#' @param notify notifier to use (defaults to \code{print} function). See the 
+#' \code{notifyR} package for one way of sending notifications from R. The 
+#' \code{notify} function should accept a string as the only argument.
 #' @return a list with 3 elements: the trained classifier, the predicted classes 
 #' \code{RasterLayer} and the class probabilities \code{RasterBrick}
 #' @details processing can be done in parallel using all available CPUs through 
@@ -52,10 +47,9 @@
 #' plot(classified_LT5SR_1986$pred_probs)
 #' summary(accuracy(classified_LT5SR_1986$model))
 #' }
-classify_image <- function(x, train_data, pred_classes_filename=NULL, 
-                           pred_probs_filename=NULL, classProbs=TRUE, 
+classify_image <- function(x, train_data, classProbs=TRUE, 
                            use_training_flag=TRUE, tune_length=8, 
-                           train_control=NULL, tune_grid=NULL) {
+                           train_control=NULL, tune_grid=NULL, notify=print) {
 
     cl <- options('rasterClusterObject')[[1]]
     if (is.null(cl)) {
@@ -68,7 +62,7 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
         inparallel <- TRUE
     }
 
-    message('Training classifier...')
+    notify('Training classifier...')
     if (is.null(train_control)) {
         train_control <- trainControl(method="repeatedcv", repeats=5, 
                                       classProbs=classProbs)
@@ -90,7 +84,7 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
                    tuneLength=tune_length, trControl=train_control, 
                    tuneGrid=tune_grid)
 
-    message('Predicting classes...')
+    notify('Predicting classes...')
     n_classes <- length(levels(model))
     if (inparallel) {
         pred_classes <- clusterR(x, predict, args=list(model))
@@ -100,7 +94,7 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
     names(pred_classes) <- 'cover'
 
     if (classProbs) {
-        message('Calculating class probabilities...')
+        notify('Calculating class probabilities...')
         if (inparallel) {
             pred_probs <- clusterR(x, predict, args=list(model, type="prob", index=c(1:n_classes)))
         } else {
