@@ -274,6 +274,18 @@ team_preprocess_landsat <- function(image_dirs, sitecode, output_path,
 
         ######################################################################
         # Layer stack predictor layers:
+        # Classify aspect into north facing, east facing, etc., recalling that 
+        # the aspect is stored in radians scaled by 1000.
+        #     1: north facing (0-45, 315-360)
+        #     2: east facing (45-135)
+        #     3: south facing (135-225)
+        #     4: west facing (225-315)
+        aspect_cut <- cut(slopeaspect$aspect/1000,
+                          c(-1, 45, 135, 225, 315, 361)*(pi/180))
+        # Code both 0-45 and 315-360 aspect as North facing (1)
+        aspect_cut[aspect_cut == 5] <- 1
+        names(aspect_cut) <- 'aspect'
+        
         timer <- start_timer(timer, label=paste(image_basename, '-', 'write predictors'))
         predictors <- stack(raster(image_stack, layer=1),
                             raster(image_stack, layer=2),
@@ -285,9 +297,9 @@ team_preprocess_landsat <- function(image_dirs, sitecode, output_path,
                             scale_raster(MSAVI2_glcm$glcm_mean),
                             scale_raster(MSAVI2_glcm$glcm_variance),
                             scale_raster(MSAVI2_glcm$glcm_dissimilarity),
-                            cropped_dem$dem,
+                            cropped_dem,
                             slopeaspect$slope,
-                            slopeaspect$aspect)
+                            aspect_cut)
         predictors_filename <- file.path(output_path,
                                          paste(sitecode, image_basename, 
                                                'predictors.envi', sep='_'))
