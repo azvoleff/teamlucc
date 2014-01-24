@@ -22,23 +22,24 @@ team_classify <- function(predictors, train_data, output_path, n_cpus=1,
                           overwrite=FALSE, notify=print) {
     timer <- Track_time(notify)
 
-    timer <- start_timer(timer, label='Classifying image')
+    timer <- start_timer(timer, label='Running team_classify')
 
     if (n_cpus > 1) beginCluster(n_cpus)
 
-    notify("Starting classification...")
-
+    timer <- start_timer(timer, label='Running classify_image')
     classification <- classify_image(predictors, train_data, notify=notify)
+    timer <- stop_timer(timer, label='Running classify_image')
     classification$model
     plot(classification$pred_classes)
 
     # Perform accuracy assessment using an independent dataset:
-    notify("Starting accuracy assessment...")
+    timer <- start_timer(timer, label='Running accuracy assessment')
     acc <- accuracy(classification$model, 
                     pop=classification$pred_classes)
     summary(acc)
+    timer <- stop_timer(timer, label='Running accuracy assessment')
 
     if (n_cpus > 1) endCluster()
 
-    timer <- stop_timer(timer, label='Classifying image')
+    timer <- stop_timer(timer, label='Running team_classify')
 }
