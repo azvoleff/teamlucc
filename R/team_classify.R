@@ -20,6 +20,10 @@
 #' #TODO: Add example
 team_classify <- function(predictors, train_data, output_path, n_cpus, 
                           overwrite=FALSE, notify=print) {
+    timer <- start_timer(timer, label='Classifying image')
+
+    if (n_cpus > 1) beginCluster(n_cpus)
+
     notify("Starting classification...")
 
     classification <- classify_image(predictors, train_data)
@@ -31,4 +35,8 @@ team_classify <- function(predictors, train_data, output_path, n_cpus,
     acc <- accuracy(classification$model, 
                     pop=classification$pred_classes)
     summary(acc)
+
+    if (n_cpus > 1) endCluster()
+
+    timer <- stop_timer(timer, label='Classifying image')
 }

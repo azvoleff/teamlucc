@@ -3,7 +3,6 @@
 #' Currently only supports classification using a support vector machine (SVM).
 #'
 #' @export
-#' @importFrom spatial.tools rasterEngine
 #' @import caret
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
@@ -18,8 +17,6 @@
 #' probabilities \code{RasterLayer} or \code{RasterBrick}. If 'NULL' (the 
 #' default) a temporary file will be used if necessary (if the size of the 
 #' output raster exceeds available memory).
-#' @param train_grid the training grid to be used for training the classifier. Must be 
-#' a \code{data.frame} with two columns: ".sigma" and ".C".
 #' @param classProbs whether to also calculate and return the probabilities of 
 #' membership for each class
 #' @param use_training_flag indicates whether to exclude data flagged as 
@@ -27,6 +24,12 @@
 #' train_data \code{data.frame} must have a column named 'Training' that 
 #' indicates, for each pixel, whether that pixel is a training pixel (coded as 
 #' TRUE) or testing pixel (coded as FALSE).
+#' @param tune_length the number of levels of each parameter that should be 
+#' tried by \code{train} when training the classifier
+#' @param train_control default is NULL (reasonable value will be set 
+#' automatically).  For details see \code{\link{trainControl}}.
+#' @param train_grid the training grid to be used for training the classifier.  
+#' Must be a \code{data.frame} with two columns: ".sigma" and ".C".
 #' @return a list with 3 elements: the trained classifier, the predicted classes 
 #' \code{RasterLayer} and the class probabilities \code{RasterBrick}
 #' @details processing can be done in parallel using all available CPUs through 
@@ -42,11 +45,7 @@
 #' train_data_1986 <- extract_training_data(L5TSR_1986, 
 #'                                          polys=L5TSR_1986_2001_training,
 #'                                          classcol="class_1986", training=.7)
-#' # Supply a small training grid for classify_image to save processing time for 
-#' # the purposes of this example - in normal use, train_grid can be left 
-#' # unspecified.
-#' classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986, 
-#'     train_grid=data.frame(.sigma=.0495, .C=0.5), classProbs=TRUE)
+#' classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986)
 #'
 #' classified_LT5SR_1986$model
 #' plot(classified_LT5SR_1986$pred_classes)
@@ -54,21 +53,31 @@
 #' summary(accuracy(classified_LT5SR_1986$model))
 #' }
 classify_image <- function(x, train_data, pred_classes_filename=NULL, 
-                           pred_probs_filename=NULL, train_grid=NULL,
-                           classProbs=FALSE, use_training_flag=TRUE) {
+                           pred_probs_filename=NULL, classProbs=TRUE, 
+                           use_training_flag=TRUE, tune_length=8, 
+                           train_control=NULL, tune_grid=NULL) {
+
+    cl <- options('rasterClusterObject')[[1]]
+    if (is.null(cl)) {
+        inparallel <- FALSE
+    } else {
+        if (!require(doSNOW)) {
+            warning('Cluster object found, but "doSNOW" package is required to run training in parallel. Running sequentially.')
+        }
+        registerDoSNOW(cl)
+        inparallel <- TRUE
+    }
+
     message('Training classifier...')
-    if (is.null(train_grid)) {
-        sig_dist <- as.vector(sigest(y ~ ., data=train_data, frac=1))
-        train_grid <- data.frame(.sigma=sig_dist[1], .C=2^(-6:12))
+    if (is.null(train_control)) {
+        train_control <- trainControl(method="repeatedcv", repeats=5, 
+                                      classProbs=classProbs)
     }
     if (use_training_flag) {
         if (!('Training' %in%names(train_data))) {
             stop('when use_training_flag is TRUE, train_data must have a "Training" column')
         }
     }
-    svm_train_control <- trainControl(method="repeatedcv",
-                                      repeats=5,
-                                      classProbs=classProbs)
     # Build the formula, excluding the training flag column (if it exists) from 
     # the model formula
     formula_vars <- names(train_data)
@@ -78,31 +87,25 @@ classify_image <- function(x, train_data, pred_classes_filename=NULL,
 
     model <- train(model_formula, data=train_data, method="svmRadial",
                    preProc=c('center', 'scale'), subset=train_data$Training,
-                   tuneGrid=train_grid, trControl=svm_train_control)
+                   tuneLength=tune_length, trControl=train_control, 
+                   tuneGrid=tune_grid)
 
     message('Predicting classes...')
-    calc_preds <- function(in_rast, model, n_classes, classProbs, ...) {
-        preds <- predict(in_rast, model)
-        if (classProbs) {
-            pred_probs <- predict(in_rast, model, type="prob", 
-                                  index=c(1:n_classes))
-            preds <- stack(preds, pred_probs)
-        }
-        preds <- array(getValues(preds), dim=c(dim(in_rast)[2], 
-                                               dim(in_rast)[1], 
-                                               nlayers(preds)))
-        return(preds)
-    }
     n_classes <- length(levels(model))
-    preds <- rasterEngine(in_rast=x, fun=calc_preds,
-                          args=list(model=model, n_classes=n_classes, 
-                                    classProbs=classProbs), 
-                          filename=pred_probs_filename, chunk_format="raster")
-    pred_classes <- raster(preds, layer=1)
+    if (inparallel) {
+        pred_classes <- clusterR(x, predict, args=list(model))
+    } else {
+        pred_classes <- predict(x, model)
+    }
     names(pred_classes) <- 'cover'
+
     if (classProbs) {
-        pred_probs <- dropLayer(preds, 1)
-        names(pred_probs) <- levels(model)
+        message('Calculating class probabilities...')
+        if (inparallel) {
+            pred_probs <- clusterR(x, predict, args=list(model, type="prob", index=c(1:n_classes)))
+        } else {
+            pred_probs <- predict(x, model, type="prob", index=c(1:n_classes))
+        }
         return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs))
     } else {
         return(list(model=model, pred_classes=pred_classes))

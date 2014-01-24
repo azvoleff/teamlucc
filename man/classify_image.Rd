@@ -3,8 +3,8 @@
 \title{Runs an image classification}
 \usage{
 classify_image(x, train_data, pred_classes_filename = NULL,
-  pred_probs_filename = NULL, train_grid = NULL, classProbs = FALSE,
-  use_training_flag = TRUE)
+  pred_probs_filename = NULL, classProbs = TRUE, use_training_flag = TRUE,
+  tune_length = 8, train_control = NULL, tune_grid = NULL)
 }
 \arguments{
   \item{x}{a \code{Raster*} image with the predictor
@@ -25,10 +25,6 @@ classify_image(x, train_data, pred_classes_filename = NULL,
   file will be used if necessary (if the size of the output
   raster exceeds available memory).}
 
-  \item{train_grid}{the training grid to be used for
-  training the classifier. Must be a \code{data.frame} with
-  two columns: ".sigma" and ".C".}
-
   \item{classProbs}{whether to also calculate and return
   the probabilities of membership for each class}
 
@@ -39,6 +35,18 @@ classify_image(x, train_data, pred_classes_filename = NULL,
   that indicates, for each pixel, whether that pixel is a
   training pixel (coded as TRUE) or testing pixel (coded as
   FALSE).}
+
+  \item{tune_length}{the number of levels of each parameter
+  that should be tried by \code{train} when training the
+  classifier}
+
+  \item{train_control}{default is NULL (reasonable value
+  will be set automatically).  For details see
+  \code{\link{trainControl}}.}
+
+  \item{train_grid}{the training grid to be used for
+  training the classifier. Must be a \code{data.frame} with
+  two columns: ".sigma" and ".C".}
 }
 \value{
 a list with 3 elements: the trained classifier, the
@@ -63,11 +71,7 @@ set.seed(0)
 train_data_1986 <- extract_training_data(L5TSR_1986,
                                          polys=L5TSR_1986_2001_training,
                                          classcol="class_1986", training=.7)
-# Supply a small training grid for classify_image to save processing time for
-# the purposes of this example - in normal use, train_grid can be left
-# unspecified.
-classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986,
-    train_grid=data.frame(.sigma=.0495, .C=0.5), classProbs=TRUE)
+classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986)
 
 classified_LT5SR_1986$model
 plot(classified_LT5SR_1986$pred_classes)
