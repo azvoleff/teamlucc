@@ -45,13 +45,13 @@ print.summary.accuracy <- function(x, ...) {
 
 #' @S3method print accuracy
 print.accuracy <- function(x, ...) {
-    summary(x, ...)
+    print(summary(x, ...))
 }
 
 #' Show an accuracy object
 #'
 #' @export
-setMethod("show", signature(object="accuracy"), function(object) summary(object))
+setMethod("show", signature(object="accuracy"), function(object) print(object))
 
 .calc_pop_ct <- function(ct, pop) {
     # Below uses the notation of Pontius and Millones (2011)
@@ -147,8 +147,31 @@ accuracy <- function(model, test_data=NULL, pop=NULL) {
         test_data <- test_data[!test_data$Training, ]
     }
 
+    cl <- options('rasterClusterObject')[[1]]
+    inparallel <- FALSE
+    if (!is.null(cl)) {
+        if (!require(foreach)) {
+             warning('Cluster object found, but "foreach" is required to run in parallel. Running sequentially.')
+        } else if (!require(itertools)) {
+            warning('Cluster object found, but "itertools" package is required to run in parallel. Running sequentially.')
+        } else if (!require(doSNOW)) {
+            warning('Cluster object found, but "doSNOW" package is required to run in parallel. Running sequentially.')
+        } else {
+            registerDoSNOW(cl)
+            inparallel <- TRUE
+        }
+    }
+
     observed <- test_data$y
-    predicted <- predict(model, test_data)
+    if (inparallel) {
+        predicted <- foreach(sub_test_data=isplitRows(test_data, chunks=length(cl)), 
+                             .packages='caret') %dopar% {
+                predict(model, newdata=sub_test_data)
+            }
+        predicted <- unlist(predicted)
+    } else {
+        predicted <- predict(model, test_data)
+    }
     # ct is the sample contigency table
     ct <- table(predicted, observed)
 
