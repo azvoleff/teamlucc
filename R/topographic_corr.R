@@ -62,20 +62,19 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
     aspect <- raster(slopeaspect, layer=2)
 
     cl <- options('rasterClusterObject')[[1]]
-    if (is.null(cl) || (nlayers(x) == 1)) {
-        inparallel <- FALSE
-    } else if (!require(foreach)) {
-        warning('Cluster object found, but "foreach" is required to run topographic correction in parallel. Running sequentially.')
-        inparallel <- FALSE
-    } else if (!require(doSNOW)) {
-        warning('Cluster object found, but "doSNOW" is required to run topographic correction in parallel. Running sequentially.')
-        inparallel <- FALSE
-    } else {
-        inparallel <- TRUE
+    inparallel <- FALSE
+    if ((!is.null(cl)) || (nlayers(x) > 1)) {
+        if (!require(foreach)) {
+            warning('Cluster object found, but "foreach" is required to run topographic correction in parallel. Running sequentially.')
+        } else if (!require(doSNOW)) {
+            warning('Cluster object found, but "doSNOW" is required to run topographic correction in parallel. Running sequentially.')
+        } else {
+            inparallel <- TRUE
+            registerDoSNOW(cl)
+        }
     }
 
     if (inparallel) {
-        registerDoSNOW(cl)
         # Set uncorr_layer to NULL to pass R CMD CHECK without notes
         uncorr_layer=NULL
         corr_img <- foreach(uncorr_layer=unstack(x), .combine='addLayer', 

@@ -52,14 +52,14 @@ classify_image <- function(x, train_data, classProbs=TRUE,
                            train_control=NULL, tune_grid=NULL, notify=print) {
 
     cl <- options('rasterClusterObject')[[1]]
-    if (is.null(cl)) {
-        inparallel <- FALSE
-    } else {
+    inparallel <- FALSE
+    if (!is.null(cl)) {
         if (!require(doSNOW)) {
             warning('Cluster object found, but "doSNOW" package is required to run training in parallel. Running sequentially.')
+        } else {
+            registerDoSNOW(cl)
+            inparallel <- TRUE
         }
-        registerDoSNOW(cl)
-        inparallel <- TRUE
     }
 
     notify('Training classifier...')
