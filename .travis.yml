@@ -15,7 +15,7 @@ before_install:
     # teamr R imports deps
   - ./travis-tool.sh install_r_binary Rcpp RcppArmadillo rgeos rgdal mgcv plyr reshape2 ggplot2 spatial.tools caret sp mclust lubridate XML
     # teamr R suggested
-  - ./travis-tool.sh install_r_binary testthat kernlab e1071 landsat foreach doSNOW gridExtra
+  - ./travis-tool.sh install_r_binary testthat kernlab e1071 landsat foreach doSNOW gridExtra itertools
     # others
   - ./travis-tool.sh install_r_binary devtools httr
 
