@@ -63,7 +63,7 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
 
     cl <- options('rasterClusterObject')[[1]]
     inparallel <- FALSE
-    if ((!is.null(cl)) || (nlayers(x) > 1)) {
+    if ((!is.null(cl)) && (nlayers(x) > 1)) {
         if (!require(foreach)) {
             warning('Cluster object found, but "foreach" is required to run topographic correction in parallel. Running sequentially.')
         } else if (!require(doSNOW)) {
