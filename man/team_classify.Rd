@@ -16,7 +16,7 @@ team_classify(predictor_file, train_shp, output_path, class_col = "Poly_Type",
 
   \item{output_path}{the path to use for the output}
 
-  \item{classcol}{the name of the column containing the
+  \item{class_col}{the name of the column containing the
   response variable (for example the land cover type of
   each pixel)}
 

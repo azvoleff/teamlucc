@@ -20,7 +20,7 @@
 #' tried by \code{train} when training the classifier
 #' @param train_control default is NULL (reasonable value will be set 
 #' automatically).  For details see \code{\link{trainControl}}.
-#' @param train_grid the training grid to be used for training the classifier.  
+#' @param tune_grid the training grid to be used for training the classifier.  
 #' Must be a \code{data.frame} with two columns: ".sigma" and ".C".
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 

@@ -11,8 +11,8 @@
 #' @param train_shp a training dataset as output by 
 #' \code{extract_training_data}
 #' @param output_path the path to use for the output
-#' @param classcol the name of the column containing the response variable (for 
-#' example the land cover type of each pixel)
+#' @param class_col the name of the column containing the response variable 
+#' (for example the land cover type of each pixel)
 #' @param training indicator of which polygons to use in training. Can be: 1) a 
 #' string giving the name of a column indicating whether each polygon is to be 
 #' used in training (column equal to TRUE) or in testing (column equal to 
@@ -47,7 +47,8 @@ team_classify <- function(predictor_file, train_shp, output_path,
 
     timer <- start_timer(timer, label='Running classify_image')
     classification <- classify_image(predictors, train_data, notify=notify)
-    save(classification$model,
+    model <- classification$model
+    save(model,
          file=file.path(output_path, paste(pred_rast_basename, 'predmodel.RData', sep='_')))
     writeRaster(classification$pred_classes,
                 filename=file.path(output_path, paste(pred_rast_basename, 'predclasses.envi', sep='_')),

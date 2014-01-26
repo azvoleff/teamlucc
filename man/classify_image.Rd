@@ -33,7 +33,7 @@ classify_image(x, train_data, classProbs = TRUE, use_training_flag = TRUE,
   will be set automatically).  For details see
   \code{\link{trainControl}}.}
 
-  \item{train_grid}{the training grid to be used for
+  \item{tune_grid}{the training grid to be used for
   training the classifier. Must be a \code{data.frame} with
   two columns: ".sigma" and ".C".}
 
