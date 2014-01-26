@@ -39,7 +39,8 @@
 #' set.seed(0)
 #' train_data_1986 <- extract_training_data(L5TSR_1986, 
 #'                                          polys=L5TSR_1986_2001_training,
-#'                                          classcol="class_1986", training=.7)
+#'                                          class_col="class_1986", 
+#'                                          training=.7)
 #' classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986)
 #'
 #' classified_LT5SR_1986$model

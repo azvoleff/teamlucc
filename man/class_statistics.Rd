@@ -2,7 +2,7 @@
 \alias{class_statistics}
 \title{Exports statistics on pixels within each of a set of land cover classes}
 \usage{
-class_statistics(x, y, classcol)
+class_statistics(x, y, class_col)
 }
 \arguments{
   \item{x}{A \code{RasterLayer} from which class statistics
@@ -11,7 +11,7 @@ class_statistics(x, y, classcol)
   \item{y}{A \code{SpatialPolygonsDataFrame} with cover
   class polygons}
 
-  \item{classcol}{the name of the column containing the
+  \item{class_col}{the name of the column containing the
   response variable (for example the land cover type of
   each pixel)}
 }

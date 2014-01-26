@@ -7,17 +7,17 @@
 #' calculated.
 #' @param y A \code{SpatialPolygonsDataFrame} with cover class 
 #' polygons
-#' @param classcol the name of the column containing the response variable (for 
-#' example the land cover type of each pixel)
+#' @param class_col the name of the column containing the response variable 
+#' (for example the land cover type of each pixel)
 #' @return A data.frame of class statistics.
 #' @examples
 #' class_statistics(L5TSR_1986, L5TSR_1986_2001_training, "class_1986")
-class_statistics <- function(x, y, classcol) {
+class_statistics <- function(x, y, class_col) {
     if (projection(x) != projection(y)) {
         stop('Coordinate systems do not match')
     }
     if (class(y) == "SpatialPolygonsDataFrame") {
-        pixels <- extract_training_data(x, y, classcol)
+        pixels <- extract_training_data(x, y, class_col)
     } else if (class(y) %in% c("RasterLayer", "RasterBrick", 
                                          "RasterStack")) {
         stop('class_statistics cannot yet handle Raster* objects')

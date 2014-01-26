@@ -164,6 +164,7 @@ accuracy <- function(model, test_data=NULL, pop=NULL) {
 
     observed <- test_data$y
     if (inparallel) {
+        sub_test_data <- NULL # Keep R CMD CHECK happy
         predicted <- foreach(sub_test_data=isplitRows(test_data, chunks=length(cl)), 
                              .packages='caret') %dopar% {
                 predict(model, newdata=sub_test_data)

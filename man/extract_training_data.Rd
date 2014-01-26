@@ -2,7 +2,7 @@
 \alias{extract_training_data}
 \title{Extract training data for use in a classification}
 \usage{
-extract_training_data(x, polys, classcol, training = 1)
+extract_training_data(x, polys, class_col, training = 1)
 }
 \arguments{
   \item{x}{a \code{Raster*} object from which training data
@@ -13,7 +13,7 @@ extract_training_data(x, polys, classcol, training = 1)
   \item{polys}{a \code{SpatialPolygonsDataFrame} with
   training data polygons}
 
-  \item{classcol}{the name of the column containing the
+  \item{class_col}{the name of the column containing the
   response variable (for example the land cover type of
   each pixel)}
 
@@ -28,7 +28,7 @@ extract_training_data(x, polys, classcol, training = 1)
 }
 \value{
 A data.frame with the training data. Each row will contain
-the response (the column chosen by \code{classcol}) as the
+the response (the column chosen by \code{class_col}) as the
 first column, with the remaining columns containing the
 values at that location of each band in the raster stack.
 }

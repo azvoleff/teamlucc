@@ -5,7 +5,7 @@
 #' Training data will be extracted from each layer in a \code{RasterBrick} or 
 #' \code{RasterStack}.
 #' @param polys a \code{SpatialPolygonsDataFrame} with training data polygons
-#' @param classcol the name of the column containing the response variable (for 
+#' @param class_col the name of the column containing the response variable (for 
 #' example the land cover type of each pixel)
 #' @param training indicator of which polygons to use in training. Can be: 1) a 
 #' string giving the name of a column indicating whether each polygon is to be 
@@ -15,19 +15,19 @@
 #' randomly selected for use in training.
 #' @return A data.frame
 #' with the training data. Each row will contain the response (the column 
-#' chosen by \code{classcol}) as the first column, with the remaining columns 
+#' chosen by \code{class_col}) as the first column, with the remaining columns 
 #' containing the values at that location of each band in the raster stack.  
 #' @examples
 #' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training, 
 #' "class_1986")
-extract_training_data <- function(x, polys, classcol, training=1) {
+extract_training_data <- function(x, polys, class_col, training=1) {
     if (projection(x) != projection(polys)) {
         stop('Coordinate systems do not match')
     }
-    # Convert classcol from the name of the column to an index
-    classcolnum <- grep(paste0('^', classcol, '$'), names(polys))
-    if (length(classcolnum) == 0) {
-        stop(paste0('"', classcol, '" not found in polys'))
+    # Convert class_col from the name of the column to an index
+    class_colnum <- grep(paste0('^', class_col, '$'), names(polys))
+    if (length(class_colnum) == 0) {
+        stop(paste0('"', class_col, '" not found in polys'))
     }
     polys$FID <- row.names(polys)
     if (is.character(training)) {
@@ -55,7 +55,7 @@ extract_training_data <- function(x, polys, classcol, training=1) {
                       rand_vals <= quantile(rand_vals, training)
             }
             polys$Training <- unlist(tapply(polys@data$FID, 
-                                            polys@data[classcolnum], 
+                                            polys@data[class_colnum], 
                                             sample_strata))
         }
     } else if ((length(training) == length(polys)) && is.logical(training)) {
@@ -66,7 +66,7 @@ extract_training_data <- function(x, polys, classcol, training=1) {
     }
     pixels <- extract(x, polys, small=TRUE, df=TRUE)
     poly_pixel_match <- match(pixels$ID, seq(1, nrow(polys)))
-    pixels <- cbind(y=polys@data[poly_pixel_match, classcolnum], pixels,
+    pixels <- cbind(y=polys@data[poly_pixel_match, class_colnum], pixels,
                     Poly_FID=polys@data[poly_pixel_match, ]$FID,
                     Training=polys@data[poly_pixel_match, ]$Training)
     pixels <- pixels[!(names(pixels) == 'ID')]
