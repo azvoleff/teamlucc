@@ -4,6 +4,8 @@
 #' function.
 #'
 #' @export
+#' @importFrom rgdal readOGR
+#' @importFrom sp spTransform
 #' @importFrom tools file_path_sans_ext
 #' @param predictor_file a \code{Raster*} of predictor layers output by the 
 #' \code{team_preprocess} function or path to an image stack in a format 
