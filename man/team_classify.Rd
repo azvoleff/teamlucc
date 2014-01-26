@@ -2,19 +2,32 @@
 \alias{team_classify}
 \title{Classify a preprocessed surface reflectance image}
 \usage{
-team_classify(predictors, train_data, output_path, n_cpus = 1,
-  overwrite = FALSE, notify = print)
+team_classify(predictor_file, train_shp, output_path, class_col = "Poly_Type",
+  training = 0.6, n_cpus = 1, overwrite = FALSE, notify = print)
 }
 \arguments{
-  \item{predictors}{a \code{Raster*} of predictor layers
-  output by the \code{team_preprocess} function or path to
-  an image stack in a format readable by the \code{raster}
-  package.}
+  \item{predictor_file}{a \code{Raster*} of predictor
+  layers output by the \code{team_preprocess} function or
+  path to an image stack in a format readable by the
+  \code{raster} package.}
 
-  \item{train_data}{a training dataset as output by
+  \item{train_shp}{a training dataset as output by
   \code{extract_training_data}}
 
   \item{output_path}{the path to use for the output}
+
+  \item{classcol}{the name of the column containing the
+  response variable (for example the land cover type of
+  each pixel)}
+
+  \item{training}{indicator of which polygons to use in
+  training. Can be: 1) a string giving the name of a column
+  indicating whether each polygon is to be used in training
+  (column equal to TRUE) or in testing (column equal to
+  FALSE), or 2) a logical vector of length equal to
+  length(polys), or 3) a number between 0 and 1 indicating
+  the fraction of the polygons to be randomly selected for
+  use in training.}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
