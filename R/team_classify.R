@@ -44,7 +44,6 @@ team_classify <- function(predictor_file, train_shp, output_path,
     train_data <- extract_training_data(predictors, train_polys, 
                                         class_col=class_col, training=training)
 
-
     if (n_cpus > 1) beginCluster(n_cpus)
 
     timer <- start_timer(timer, label='Running classify_image')
@@ -59,6 +58,14 @@ team_classify <- function(predictor_file, train_shp, output_path,
                 filename=file.path(output_path, paste(pred_rast_basename, 'predprobs.envi', sep='_')),
                 datatype='INT2S', overwrite=overwrite)
     timer <- stop_timer(timer, label='Running classify_image')
+
+    cls <- levels(train_data$y) 
+    cls <- data.frame(code=seq(1:length(cls)), name=cls)
+    color_image(predclasses, cls,
+                file.path(output_path, paste(pred_rast_basename, 'predclasses_colored.envi', sep='_')))
+
+    color_image(classification$predclasses, levels(train_data$y), 
+                file.path(output_path, paste(pred_rast_basename, 'predclasses_colored.envi', sep='_')))
 
     # Perform accuracy assessment using an independent dataset:
     timer <- start_timer(timer, label='Running accuracy assessment')
