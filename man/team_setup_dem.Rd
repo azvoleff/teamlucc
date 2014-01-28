@@ -2,7 +2,7 @@
 \alias{team_setup_dem}
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
-team_setup_dem(dem_path, sitecode, output_path, pathrows, n_cpus = 1,
+team_setup_dem(dem_path, output_path, aoi_file, n_cpus = 1,
   overwrite = FALSE, notify = print)
 }
 \arguments{
@@ -10,16 +10,10 @@ team_setup_dem(dem_path, sitecode, output_path, pathrows, n_cpus = 1,
   that (when mosaiced) covers the full extent of all the
   images in the image_list.}
 
-  \item{sitecode}{code to use as a prefix for all
-  filenames}
+  \item{aoi_file}{area of interest (AOI) shapefile to use
+  as as bounding box when selecting DEMs}
 
   \item{output_path}{the path to use for the output}
-
-  \item{pathrows}{a list of path and row numbers of the
-  Landsat path and rows needed to cover the TEAM site. For
-  example: list(c(53, 15), c(53, 16)) would mean two
-  Landsat images, covering path/row 53/15 and path/row
-  53/16.}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}

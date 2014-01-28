@@ -2,8 +2,9 @@
 \alias{team_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-team_preprocess_landsat(image_dirs, sitecode, output_path, aoi = NULL,
-  n_cpus = 1, cleartmp = FALSE, overwrite = FALSE, notify = print)
+team_preprocess_landsat(image_dirs, sitecode, output_path, dem_path,
+  aoi = NULL, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
+  notify = print)
 }
 \arguments{
   \item{image_dirs}{list of paths to a set of Landsat CDR
@@ -14,6 +15,9 @@ team_preprocess_landsat(image_dirs, sitecode, output_path, aoi = NULL,
   filenames}
 
   \item{output_path}{the path to use for the output}
+
+  \item{dem_path}{path to a set of DEMs as output by
+  \code{team_setup_dem}}
 
   \item{aoi}{an area of interest (AOI) to crop from each
   image}

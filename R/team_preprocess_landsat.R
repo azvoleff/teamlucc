@@ -6,6 +6,7 @@
 #' format as output by the \code{unstack_ledapscdr} function.
 #' @param sitecode code to use as a prefix for all filenames
 #' @param output_path the path to use for the output
+#' @param dem_path path to a set of DEMs as output by \code{team_setup_dem}
 #' @param aoi an area of interest (AOI) to crop from each image
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
@@ -23,8 +24,9 @@
 #' team_preprocess(image_dirs, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
 #' }
 team_preprocess_landsat <- function(image_dirs, sitecode, output_path, 
-                                    aoi=NULL, n_cpus=1, cleartmp=FALSE,  
-                                    overwrite=FALSE, notify=print) {
+                                    dem_path, aoi=NULL, n_cpus=1, 
+                                    cleartmp=FALSE,  overwrite=FALSE, 
+                                    notify=print) {
     timer <- Track_time(notify)
 
     timer <- start_timer(timer, label='Preprocessing images')
@@ -153,13 +155,12 @@ team_preprocess_landsat <- function(image_dirs, sitecode, output_path,
 
         ######################################################################
         # Crop dem, slope, and aspect
-        dem_filename <- file.path(output_path, paste0(sitecode, '_dem_', 
-                                                      WRS_Path, WRS_Row, 
-                                                      '.envi'))
+        dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, WRS_Row, 
+                                                   '.envi'))
         dem <- raster(dem_filename)
 
-        slopeaspect_filename <- file.path(output_path,
-                                          paste0(sitecode, '_dem_slopeaspect_',
+        slopeaspect_filename <- file.path(dem_path,
+                                          paste0('dem_slopeaspect_', 
                                                  WRS_Path, WRS_Row, '.envi'))
         slopeaspect <- brick(slopeaspect_filename)
 
