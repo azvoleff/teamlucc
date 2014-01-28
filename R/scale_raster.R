@@ -1,7 +1,8 @@
-#' Scales a layer by power of a given integer and rounds to nearest integer
+#' Scales a \code{Raster*} by a power of a given integer and rounds to nearest 
+#' integer
 #'
-#' Useful for scaling a layer and rounding to integer so that a layer can be 
-#' saved as 'INT2' or 'INT2S'.
+#' Useful for scaling and (optionally) rounding a \code{RasterLayer} to integer 
+#' so that a layer can be saved as 'INT2' or 'INT2S'.
 #'
 #' @export
 #' @docType methods

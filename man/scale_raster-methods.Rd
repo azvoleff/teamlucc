@@ -7,7 +7,8 @@
 \alias{scale_raster,RasterLayer-method}
 \alias{scale_raster,RasterStack,ANY-method}
 \alias{scale_raster,RasterStack-method}
-\title{Scales a layer by power of a given integer and rounds to nearest integer}
+\title{Scales a \code{Raster*} by a power of a given integer and rounds to nearest
+integer}
 \usage{
 scale_raster(x, power_of = 10, max_out = 32767, round_output = TRUE,
   do_scaling = TRUE)
@@ -44,7 +45,8 @@ a \code{Raster*} if \code{do_scaling} is TRUE, or a list of
 scaling factors if \code{do_scaling} is false.
 }
 \description{
-Useful for scaling a layer and rounding to integer so that
-a layer can be saved as 'INT2' or 'INT2S'.
+Useful for scaling and (optionally) rounding a
+\code{RasterLayer} to integer so that a layer can be saved
+as 'INT2' or 'INT2S'.
 }
 
