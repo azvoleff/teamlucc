@@ -180,8 +180,8 @@ team_preprocess_landsat <- function(image_dirs, sitecode, output_path,
         proj4string(dem) <- proj4string(image_stack)
         proj4string(slopeaspect) <- proj4string(image_stack)
 
-        image_extent_poly <- get_extent_poly(image_stack)
-        dem_extent_poly <- get_extent_poly(dem)
+        image_extent_poly <- <- as(extent(image_stack), 'SpatialPolygons')
+        dem_extent_poly <- as(extent(dem), 'SpatialPolygons')
         if (!gContains(dem_extent_poly, image_extent_poly)) {
             warning(paste("DEM does not fully cover extent of", image_basename))
         }
