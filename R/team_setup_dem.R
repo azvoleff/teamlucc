@@ -101,9 +101,11 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
                                          paste0('dem_', pathrow_label, 
                                                 '.envi'))
         # The below lines construct to_ext as the extent the image will be 
-        # projected to. This extent must cover the same area as the dem_mosaic_crop, 
-        # but must have the same resolution, CRS and origin as pathrow_utm
-        to_ext <- projectExtent(dem_mosaic_crop, crs(pathrow_utm))
+        # projected to. This extent must cover the same area as the 
+        # dem_mosaic_crop, but must have the same resolution, CRS and origin as 
+        # the pathrow
+        to_ext <- projectExtent(dem_mosaic_crop,
+                                utm_zone(pathrow_buff, proj4string=TRUE))
         to_res <- c(30, 30)
         xmin(to_ext) <- floor(xmin(to_ext) / to_res[1]) * to_res[1]
         xmax(to_ext) <- ceiling(xmax(to_ext) / to_res[1]) * to_res[1]
