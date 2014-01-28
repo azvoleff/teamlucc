@@ -61,10 +61,7 @@ team_classify <- function(predictor_file, train_shp, output_path,
 
     cls <- levels(train_data$y) 
     cls <- data.frame(code=seq(1:length(cls)), name=cls)
-    color_image(predclasses, cls,
-                file.path(output_path, paste(pred_rast_basename, 'predclasses_colored.envi', sep='_')))
-
-    color_image(classification$predclasses, levels(train_data$y), 
+    color_image(classification$predclasses, cls,
                 file.path(output_path, paste(pred_rast_basename, 'predclasses_colored.envi', sep='_')))
 
     # Perform accuracy assessment using an independent dataset:

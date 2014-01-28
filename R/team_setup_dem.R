@@ -64,7 +64,7 @@ team_setup_dem <- function(dem_path, sitecode, output_path, pathrows, n_cpus=1,
 
     for (pathrow in pathrows) {
         pathrow_label <- paste0(sprintf('%03i', pathrow[1]), sprintf('%03i', pathrow[2]))
-        aoi_wgs <- pathrow_poly(pathrow[1], pathrow[2]) 
+        aoi_wgs <- get_pathrow_poly(pathrow[1], pathrow[2]) 
         aoi_utm <- spTransform(aoi_wgs, CRS(utm_zone(aoi_wgs, proj4string=TRUE)))
         # Add a 10km buffer in UTM coordinate system (as LEDAPS SR is in UTM) 
         # then transform back to WGS84 to use for cropping the dem mosaic
