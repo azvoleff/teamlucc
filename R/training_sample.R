@@ -10,7 +10,7 @@
 #' probability of selection than those in the interior).
 #'
 #' @export
-#' @import rgdal
+#' @importFrom rgdal writeOGR
 #' @param x a \code{Raster*}
 #' @param size the sample size (number of sample polygons to return)
 #' @param side the length each side of the sample polygon
