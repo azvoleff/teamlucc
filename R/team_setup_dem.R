@@ -82,21 +82,14 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         dem_mosaic <- dem_rasts[[1]]
     }
 
-    for (n in 1:length(pathrows)) {
-        pathrow <- pathrows[n, ]
-        pathrow_label <- paste0(sprintf('%03i', pathrow@data$PATH), 
-                                sprintf('%03i', pathrow@data$ROW))
-        pathrow_wgs <- pathrow_poly(pathrow@data$PATH, pathrow@data$ROW)
-        pathrow_utm <- spTransform(pathrow_wgs,
-                                   CRS(utm_zone(pathrow_wgs, proj4string=TRUE)))
-        # Add a 20km buffer in UTM coordinate system (as LEDAPS SR is in UTM) 
-        # then transform back to WGS84 to use for cropping the dem mosaic
-        pathrow_utm <- gBuffer(pathrow_utm, width=20000, byid=TRUE)
-        pathrow_wgs <- spTransform(pathrow_utm, CRS('+init=epsg:4326'))
+    for (n in 1:length(pathrows_buff)) {
+        pathrow_buff <- pathrows[n, ]
+        pathrow_label <- paste0(sprintf('%03i', pathrow_buff@data$PATH), 
+                                sprintf('%03i', pathrow_buff@data$ROW))
 
         timer <- start_timer(timer, label=paste('Cropping DEM mosaic for', 
                                                 pathrow_label))
-        dem_mosaic_crop <- crop(dem_mosaic, pathrow_wgs)
+        dem_mosaic_crop <- crop(dem_mosaic, pathrow_buff)
         dem_mosaic_crop <- round(dem_mosaic_crop)
         dataType(dem_mosaic_crop) <- 'INT2S'
         timer <- stop_timer(timer, label=paste('Cropping DEM mosaic for', 
