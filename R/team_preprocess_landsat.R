@@ -4,9 +4,9 @@
 #' @importFrom rgeos gContains gUnion
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
-#' @param sitecode code to use as a prefix for all filenames
 #' @param output_path the path to use for the output
 #' @param dem_path path to a set of DEMs as output by \code{team_setup_dem}
+#' @param sitecode code to use as a prefix for all filenames
 #' @param aoi an area of interest (AOI) to crop from each image
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
@@ -21,10 +21,11 @@
 #' image_dirs <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc',
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
-#' team_preprocess(image_dirs, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
+#' team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis', 
+#' 'H:/Data/TEAM/VB/LCLUC_Analysis', "VB", 3, TRUE)
 #' }
-team_preprocess_landsat <- function(image_dirs, sitecode, output_path, 
-                                    dem_path, aoi=NULL, n_cpus=1, 
+team_preprocess_landsat <- function(image_dirs, output_path, dem_path, 
+                                    sitecode, aoi=NULL, n_cpus=1, 
                                     cleartmp=FALSE,  overwrite=FALSE, 
                                     notify=print) {
     timer <- Track_time(notify)

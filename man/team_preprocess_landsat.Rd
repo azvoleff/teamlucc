@@ -2,7 +2,7 @@
 \alias{team_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-team_preprocess_landsat(image_dirs, sitecode, output_path, dem_path,
+team_preprocess_landsat(image_dirs, output_path, dem_path, sitecode,
   aoi = NULL, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
   notify = print)
 }
@@ -11,13 +11,13 @@ team_preprocess_landsat(image_dirs, sitecode, output_path, dem_path,
   image files in ENVI format as output by the
   \code{unstack_ledapscdr} function.}
 
-  \item{sitecode}{code to use as a prefix for all
-  filenames}
-
   \item{output_path}{the path to use for the output}
 
   \item{dem_path}{path to a set of DEMs as output by
   \code{team_setup_dem}}
+
+  \item{sitecode}{code to use as a prefix for all
+  filenames}
 
   \item{aoi}{an area of interest (AOI) to crop from each
   image}
@@ -45,7 +45,8 @@ archive
 image_dirs <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc',
                 'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
-team_preprocess(image_dirs, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis', 3, TRUE)
+team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis',
+'H:/Data/TEAM/VB/LCLUC_Analysis', "VB", 3, TRUE)
 }
 }
 
