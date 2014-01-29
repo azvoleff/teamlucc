@@ -33,6 +33,16 @@
 team_classify <- function(predictor_file, train_shp, output_path, 
                           class_col="Poly_Type", training=.6, n_cpus=1, 
                           overwrite=FALSE, notify=print) {
+    if (!file_test("-f", train_shp)) {
+        stop(paste(train_shp, "does not exist"))
+    }
+    if (!file_test("-f", predictor_file)) {
+        stop(paste(predictor_file, "does not exist"))
+    }
+    if (!file_test("-d", output_path)) {
+        stop(paste(output_path, "does not exist"))
+    }
+
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Running team_classify')
 

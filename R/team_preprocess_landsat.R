@@ -28,6 +28,13 @@ team_preprocess_landsat <- function(image_dirs, output_path, dem_path,
                                     sitecode, aoi=NULL, n_cpus=1, 
                                     cleartmp=FALSE,  overwrite=FALSE, 
                                     notify=print) {
+    if (!file_test("-d", dem_path)) {
+        stop(paste(dem_path, "does not exist"))
+    }
+    if (!file_test("-d", output_path)) {
+        stop(paste(output_path, "does not exist"))
+    }
+
     timer <- Track_time(notify)
 
     timer <- start_timer(timer, label='Preprocessing images')

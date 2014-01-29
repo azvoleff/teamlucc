@@ -28,6 +28,14 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
     if (!require(wrspathrow)) {
         stop('wrspathrow not found - to install, type: install_github("azvoleff/wrspathrow")')
     }
+
+    if (!file_test("-d", dem_path)) {
+        stop(paste(dem_path, "does not exist"))
+    }
+    if (!file_test("-d", output_path)) {
+        stop(paste(output_path, "does not exist"))
+    }
+
     timer <- Track_time(notify)
 
     timer <- start_timer(timer, label='Setting up DEMs')
