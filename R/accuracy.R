@@ -137,9 +137,15 @@ accuracy <- function(model, test_data=NULL, pop=NULL) {
     if (('train' %in% class(model)) && is.null(test_data)) {
         test_data <- model$trainingData
         names(test_data)[names(test_data) == '.outcome'] <- 'y'
+    } else if (!is.null(test_data)) {
+        test_data <- cbind(y=test_data$y, 
+                           test_data$x,
+                           Training=test_data$Training)
+    } else {
+        stop('test_data must be supplied if model is not a "train" object')
     }
     if (!('Training' %in% names(test_data))) {
-        warning('no Training column found - assuming none of "test_data" was used for model training')
+        warning('no Training variable found - assuming none of "test_data" was used for model training')
     } else {
         if (sum(test_data$Training) == 0) {
             stop('cannot conduct accuracy assessment without independent testing data')

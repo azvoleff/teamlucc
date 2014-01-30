@@ -71,7 +71,7 @@ classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986)
 classified_LT5SR_1986$model
 plot(classified_LT5SR_1986$pred_classes)
 plot(classified_LT5SR_1986$pred_probs)
-summary(accuracy(classified_LT5SR_1986$model))
+accuracy(classified_LT5SR_1986$model)
 }
 }
 

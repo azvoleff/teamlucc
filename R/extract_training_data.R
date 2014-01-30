@@ -66,14 +66,14 @@ extract_training_data <- function(x, polys, class_col, training=1) {
     }
     pixels <- extract(x, polys, small=TRUE, df=TRUE)
     poly_pixel_match <- match(pixels$ID, seq(1, nrow(polys)))
-    pixels <- cbind(y=polys@data[poly_pixel_match, class_colnum], pixels,
-                    Poly_FID=polys@data[poly_pixel_match, ]$FID,
-                    Training=polys@data[poly_pixel_match, ]$Training)
     pixels <- pixels[!(names(pixels) == 'ID')]
 
-    # Convert classes to valid R variable names - if they are not valid R 
+    # Convert y classes to valid R variable names - if they are not valid R 
     # variable names, the classification algorithm may throw an error
-    pixels$y <- factor(make.names(pixels$y))
+    y <- factor(make.names(polys@data[poly_pixel_match, class_colnum]))
 
-    return(pixels)
+    return(list(y=y,
+                x=pixels,
+                Poly_FID=polys@data[poly_pixel_match, ]$FID,
+                Training=polys@data[poly_pixel_match, ]$Training))
 }

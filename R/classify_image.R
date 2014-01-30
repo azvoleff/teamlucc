@@ -46,7 +46,7 @@
 #' classified_LT5SR_1986$model
 #' plot(classified_LT5SR_1986$pred_classes)
 #' plot(classified_LT5SR_1986$pred_probs)
-#' summary(accuracy(classified_LT5SR_1986$model))
+#' accuracy(classified_LT5SR_1986$model)
 #' }
 classify_image <- function(x, train_data, classProbs=TRUE, 
                            use_training_flag=TRUE, tune_length=8, 
@@ -69,16 +69,18 @@ classify_image <- function(x, train_data, classProbs=TRUE,
                                       classProbs=classProbs)
     }
     if (use_training_flag) {
-        if (!('Training' %in%names(train_data))) {
+        if (!('Training' %in% names(train_data))) {
             stop('when use_training_flag is TRUE, train_data must have a "Training" column')
         }
     }
     # Build the formula, excluding the training flag column (if it exists) from 
     # the model formula
-    formula_vars <- names(train_data)
-    formula_vars <- formula_vars[!(formula_vars %in% c('y', 'Training', 
-                                                       'Poly_FID'))]
-    model_formula <- formula(paste('y ~', paste(formula_vars, collapse=' + ')))
+    model_formula <- formula(paste('y ~',
+                                   paste(names(train_data$x), collapse=' + ')))
+    train_data <- cbind(y=train_data$y, 
+                        train_data$x,
+                        Training=train_data$Training,
+                        Poly_FID=train_data$Poly_FID)
 
     model <- train(model_formula, data=train_data, method="svmRadial",
                    preProc=c('center', 'scale'), subset=train_data$Training,
