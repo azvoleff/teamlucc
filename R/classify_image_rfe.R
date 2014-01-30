@@ -1,9 +1,11 @@
-#' Runs an image classification
+#' Runs an SVM image classification with recursive feature selection
 #'
-#' Currently only supports classification using a support vector machine (SVM).
+#' Uses the \code{rfe} function from the \code{caret} package to run a a 
+#' recursive feature selection to select the best features to include in the
+#' SVM model.
 #'
 #' @export
-#' @import caret e1071 kernlab randomForest
+#' @import caret
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
 #' @param train_data a data table with a column labeled 'y' with the observed 
@@ -43,12 +45,12 @@
 #'                                          training=.7)
 #' classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986)
 #'
-#' classified_LT5SR_1986$model
+#' classified_LT5SR_1986$svmRFE
 #' plot(classified_LT5SR_1986$pred_classes)
 #' plot(classified_LT5SR_1986$pred_probs)
-#' accuracy(classified_LT5SR_1986$model)
+#' summary(accuracy(classified_LT5SR_1986$svmRFE))
 #' }
-classify_image <- function(x, train_data, classProbs=TRUE, 
+classify_image_rfe <- function(x, train_data, classProbs=TRUE, 
                            use_training_flag=TRUE, tune_length=8, 
                            train_control=NULL, tune_grid=NULL, notify=print) {
 
@@ -65,46 +67,61 @@ classify_image <- function(x, train_data, classProbs=TRUE,
 
     notify('Training classifier...')
     if (is.null(train_control)) {
-        train_control <- trainControl(method="repeatedcv", repeats=5, 
+        train_control <- trainControl(method="repeatedcv",
+                                      repeats=5, 
                                       classProbs=classProbs)
     }
     if (use_training_flag) {
         if (!('Training' %in% names(train_data))) {
             stop('when use_training_flag is TRUE, train_data must have a "Training" column')
         }
+        train_data$x <- train_data$x[train_data$Training]
+        train_data$y <- train_data$y[train_data$Training]
     }
-    # Build the formula, excluding the training flag column (if it exists) from 
-    # the model formula
-    model_formula <- formula(paste('y ~',
-                                   paste(names(train_data$x), collapse=' + ')))
-    train_data <- cbind(y=train_data$y, 
-                        train_data$x,
-                        Training=train_data$Training,
-                        Poly_FID=train_data$Poly_FID)
 
-    model <- train(model_formula, data=train_data, method="svmRadial",
-                   preProc=c('center', 'scale'), subset=train_data$Training,
-                   tuneLength=tune_length, trControl=train_control, 
-                   tuneGrid=tune_grid)
+    # This recursive feature elimination procedure follows Algorithm 19.5 in 
+    # Kuhn and Johnson 2013
+    svmFuncs <- caretFuncs
+    
+    # First center and scale
+    normalization <- preProcess(train_data$x, method='range')
+    scaled_predictors <- predict(normalization, train_data$x)
+    scaled_predictors <- as.data.frame(scaled_predictors)
+    subsets <- c(1:ncol(scaled_predictors))
+    ctrl <- rfeControl(method="repeatedcv",
+                       repeats=5,
+                       verbose=TRUE,
+                       functions=svmFuncs)
 
+    svmRFE <- rfe(x=scaled_predictors,
+                  y=train_data$y,
+                  sizes=subsets,
+                  metric="ROC",
+                  rfeControl=ctrl,
+                  method="svmRadial",
+                  tuneLength=tune_length,
+                  trControl=train_control)
+                  
     notify('Predicting classes...')
-    n_classes <- length(levels(model))
+    n_classes <- length(levels(svmRFE))
     if (inparallel) {
-        pred_classes <- clusterR(x, predict, args=list(model))
+        pred_classes <- clusterR(x, predict, args=list(svmRFE))
     } else {
-        pred_classes <- predict(x, model)
+        pred_classes <- predict(x, svmRFE)
     }
     names(pred_classes) <- 'cover'
 
     if (classProbs) {
         notify('Calculating class probabilities...')
         if (inparallel) {
-            pred_probs <- clusterR(x, predict, args=list(model, type="prob", index=c(1:n_classes)))
+            pred_probs <- clusterR(x, predict, args=list(svmRFE, type="prob", 
+                                                         index=c(1:n_classes)))
         } else {
-            pred_probs <- predict(x, model, type="prob", index=c(1:n_classes))
+            pred_probs <- predict(x, svmRFE, type="prob", index=c(1:n_classes))
         }
-        return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs))
+        return(list(model=svmRFE, pred_classes=pred_classes, 
+                    pred_probs=pred_probs))
     } else {
-        return(list(model=model, pred_classes=pred_classes))
+        return(list(model=svmRFE, pred_classes=pred_classes))
     }
 }
