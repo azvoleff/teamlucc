@@ -90,6 +90,8 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         dem_mosaic <- dem_rasts[[1]]
     }
 
+    timer <- start_timer(timer, label=paste('Processing', nrow(pathrows),  
+                                            'path/rows'))
     for (n in 1:length(pathrows_buff)) {
         pathrow_buff <- pathrows[n, ]
         pathrow_label <- paste0(sprintf('%03i', pathrow_buff@data$PATH), 
@@ -152,6 +154,8 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         timer <- stop_timer(timer, label=paste('Calculating slope/aspect for', 
                                                 pathrow_label))
     }
+    timer <- stop_timer(timer, label=paste('Processing', nrow(pathrows),  
+                                           'path/rows'))
 
     if (n_cpus > 1) endCluster()
 

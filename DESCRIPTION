@@ -19,7 +19,7 @@ Imports:
     reshape2,
     ggplot2,
     grid,
-    spatial.tools (>= 1.2.2),
+    spatial.tools,
     caret,
     sp,
     mclust,
