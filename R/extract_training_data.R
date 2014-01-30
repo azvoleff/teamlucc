@@ -18,8 +18,9 @@
 #' chosen by \code{class_col}) as the first column, with the remaining columns 
 #' containing the values at that location of each band in the raster stack.  
 #' @examples
+#' set.seed(1)
 #' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training, 
-#' "class_1986")
+#'                                     "class_1986", training=.6)
 extract_training_data <- function(x, polys, class_col, training=1) {
     if (projection(x) != projection(polys)) {
         stop('Coordinate systems do not match')

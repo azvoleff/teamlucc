@@ -36,7 +36,8 @@ values at that location of each band in the raster stack.
 Extract training data for use in a classification
 }
 \examples{
+set.seed(1)
 train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training,
-"class_1986")
+                                    "class_1986", training=.6)
 }
 
