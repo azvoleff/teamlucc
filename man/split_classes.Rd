@@ -1,0 +1,35 @@
+\name{split_classes}
+\alias{split_classes}
+\title{Split classes in a training dataset using normal mixture modeling}
+\usage{
+split_classes(train_data, split_levels, verbose = FALSE)
+}
+\arguments{
+  \item{train_data}{a training data set as output by
+  \code{extract_training_data}}
+
+  \item{split_levels}{(optional) a list giving the names of
+  the levels to split. If missing, all levels will be
+  split.}
+
+  \item{verbose}{whether to report status while running}
+}
+\description{
+This function can be used to aid in classifying spectrally
+diverse classes by splitting the input classes into
+subclasses using a clustering algorithm. After
+classification, these subclasses are merged back into their
+original parent classes.
+}
+\details{
+For example, the training data for an agriculture class
+might have both fallow and planted fields in the training
+data, or fields planted with different crops that are
+spectrally dissimilar.  This function can be used to
+automatically split the agriculture class into a number of
+subclasses. The classifier is then run on this larger set
+of classes, and following classification, these subclasses
+can all be merged together into a single overall
+agriculture class.
+}
+

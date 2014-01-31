@@ -9,7 +9,7 @@
 #' @param train_data a data table with a column labeled 'y' with the observed 
 #' classes, and one or more columns with the values of predictor(s) at each 
 #' location.
-#' @param classProbs whether to also calculate and return the probabilities of 
+#' @param class_probs whether to also calculate and return the probabilities of 
 #' membership for each class
 #' @param use_training_flag indicates whether to exclude data flagged as 
 #' testing data when training the classifier. For this to work the input 
@@ -22,17 +22,20 @@
 #' automatically).  For details see \code{\link{trainControl}}.
 #' @param tune_grid the training grid to be used for training the classifier.  
 #' Must be a \code{data.frame} with two columns: ".sigma" and ".C".
+#' @param split_classes whether to use normal mixture modeling to split the 
+#' input classes into subsets to aid in classifying spectrally diverse classes
+#' @param use_rfe whether to use Recursive Feature Extraction (RFE) as 
+#' implemented in the \code{caret} package to select a subset of the input 
+#' features to be used in the classification
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
 #' @return a list with 3 elements: the trained classifier, the predicted classes 
 #' \code{RasterLayer} and the class probabilities \code{RasterBrick}
-#' @details processing can be done in parallel using all available CPUs through 
-#' the use of the cluster facilities in the \code{spatial.tools} package. To 
-#' enable clustering, call \code{sfQuickInit} before running 
-#' \code{classify_image}. To stop the cluster when finished, call 
-#' \code{sfQuickStop}.
-#'
+#' @details Processing can be done in parallel using all using the cluster 
+#' facilities in the \code{spatial.tools} package. To enable clustering, call 
+#' \code{beginCluster} before running \code{classify_image}.  To stop the 
+#' cluster when finished, call \code{endCluster}.
 #' @examples
 #' \dontrun{
 #' # Don't run long example
@@ -48,10 +51,10 @@
 #' plot(classified_LT5SR_1986$pred_probs)
 #' accuracy(classified_LT5SR_1986$model)
 #' }
-classify_image <- function(x, train_data, classProbs=TRUE, 
+classify_image <- function(x, train_data, class_probs=TRUE, 
                            use_training_flag=TRUE, tune_length=8, 
-                           train_control=NULL, tune_grid=NULL, notify=print) {
-
+                           train_control=NULL, tune_grid=NULL, 
+                           split_classes=FALSE, use_rfe=FALSE, notify=print) {
     cl <- options('rasterClusterObject')[[1]]
     inparallel <- FALSE
     if (!is.null(cl)) {
@@ -66,7 +69,7 @@ classify_image <- function(x, train_data, classProbs=TRUE,
     notify('Training classifier...')
     if (is.null(train_control)) {
         train_control <- trainControl(method="repeatedcv", repeats=5, 
-                                      classProbs=classProbs)
+                                      classProbs=class_probs)
     }
     if (use_training_flag) {
         if (!('Training' %in% names(train_data))) {
@@ -77,15 +80,52 @@ classify_image <- function(x, train_data, classProbs=TRUE,
     # the model formula
     model_formula <- formula(paste('y ~',
                                    paste(names(train_data$x), collapse=' + ')))
-    train_data <- cbind(y=train_data$y, 
-                        train_data$x,
-                        Training=train_data$Training,
-                        Poly_FID=train_data$Poly_FID)
 
-    model <- train(model_formula, data=train_data, method="svmRadial",
-                   preProc=c('center', 'scale'), subset=train_data$Training,
-                   tuneLength=tune_length, trControl=train_control, 
-                   tuneGrid=tune_grid)
+    if (split_classes) {
+        training_split <- split_class(train_data)
+        train_data <- cbind(y=training_split$y, 
+                            orig_y=train_data$y, 
+                            train_data$x,
+                            Training=train_data$Training,
+                            Poly_FID=train_data$Poly_FID)
+
+    } else {
+        train_data <- cbind(y=train_data$y, 
+                            train_data$x,
+                            Training=train_data$Training,
+                            Poly_FID=train_data$Poly_FID)
+    }
+
+    if (use_rfe) {
+        # This recursive feature elimination procedure follows Algorithm 19.5 
+        # in Kuhn and Johnson 2013
+        svmFuncs <- caretFuncs
+        # First center and scale
+        normalization <- preProcess(train_data$x, method='range')
+        scaled_predictors <- predict(normalization, train_data$x)
+        scaled_predictors <- as.data.frame(scaled_predictors)
+        subsets <- c(1:ncol(scaled_predictors))
+        ctrl <- rfeControl(method="repeatedcv",
+                           repeats=5,
+                           verbose=TRUE,
+                           functions=svmFuncs)
+
+        model <- rfe(x=scaled_predictors,
+                     y=train_data$y,
+                     sizes=subsets,
+                     metric="ROC",
+                     rfeControl=ctrl,
+                     method="svmRadial",
+                     tuneLength=tune_length,
+                     trControl=train_control,
+                     form=model_formula,
+                     subset=train_data$Training)
+    } else {
+        model <- train(model_formula, data=train_data, method="svmRadial",
+                       preProc=c('center', 'scale'), subset=train_data$Training,
+                       tuneLength=tune_length, trControl=train_control, 
+                       tuneGrid=tune_grid)
+    }
 
     notify('Predicting classes...')
     n_classes <- length(levels(model))
@@ -96,15 +136,32 @@ classify_image <- function(x, train_data, classProbs=TRUE,
     }
     names(pred_classes) <- 'cover'
 
-    if (classProbs) {
+
+    if (class_probs) {
         notify('Calculating class probabilities...')
         if (inparallel) {
             pred_probs <- clusterR(x, predict, args=list(model, type="prob", index=c(1:n_classes)))
         } else {
             pred_probs <- predict(x, model, type="prob", index=c(1:n_classes))
         }
-        return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs))
     } else {
-        return(list(model=model, pred_classes=pred_classes))
+        pred_probs <- NULL
     }
+
+    if (split_classes) {
+        notify('Recoding split classes...')
+        is_becomes <- cbind(training_split$reclass_mat$split_id,
+                            training_split$reclass_mat$id)
+        pred_classes_recode <- reclassify(pred_classes, is_becomes)
+        if (class_probs) {
+            pred_probs <- stackApply(pred_probs, is_becomes[, 2], sum)
+            names(pred_probs_recode) <- unique(reclass_mat$name)
+        }
+    } else {
+        pred_probs_recode <- NULL
+        pred_probs_recode <- NULL
+    }
+
+    return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs, 
+                split_classes=split_classes))
 }

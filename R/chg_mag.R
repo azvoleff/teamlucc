@@ -15,6 +15,10 @@
 #' \code{RasterLayer}
 #' @param ... additional parameters to pass to rasterEngine
 #' @return \code{Raster*} object with change magnitude image
+#' @details Processing can be done in parallel using all using the cluster 
+#' facilities in the \code{spatial.tools} package. To enable clustering, call 
+#' \code{beginCluster} before running \code{classify_image}.  To stop the 
+#' cluster when finished, call \code{endCluster}.
 #' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
 #' Land-use/land-cover change detection using improved change-vector analysis.
 #' Photogrammetric Engineering and Remote Sensing 69:369-380.
@@ -22,7 +26,6 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
 #' posterior probability space: a new method for land cover change detection.  
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-#'
 chg_mag <- function(t1p, t2p, filename=NULL, ...) {
     if (proj4string(t1p) != proj4string(t2p)) {
         stop('t0 and t1 coordinate systems do not match')

@@ -2,9 +2,9 @@
 \alias{classify_image}
 \title{Runs an image classification}
 \usage{
-classify_image(x, train_data, classProbs = TRUE, use_training_flag = TRUE,
+classify_image(x, train_data, class_probs = TRUE, use_training_flag = TRUE,
   tune_length = 8, train_control = NULL, tune_grid = NULL,
-  notify = print)
+  split_classes = FALSE, use_rfe = FALSE, notify = print)
 }
 \arguments{
   \item{x}{a \code{Raster*} image with the predictor
@@ -14,7 +14,7 @@ classify_image(x, train_data, classProbs = TRUE, use_training_flag = TRUE,
   with the observed classes, and one or more columns with
   the values of predictor(s) at each location.}
 
-  \item{classProbs}{whether to also calculate and return
+  \item{class_probs}{whether to also calculate and return
   the probabilities of membership for each class}
 
   \item{use_training_flag}{indicates whether to exclude
@@ -37,6 +37,15 @@ classify_image(x, train_data, classProbs = TRUE, use_training_flag = TRUE,
   training the classifier. Must be a \code{data.frame} with
   two columns: ".sigma" and ".C".}
 
+  \item{split_classes}{whether to use normal mixture
+  modeling to split the input classes into subsets to aid
+  in classifying spectrally diverse classes}
+
+  \item{use_rfe}{whether to use Recursive Feature
+  Extraction (RFE) as implemented in the \code{caret}
+  package to select a subset of the input features to be
+  used in the classification}
+
   \item{notify}{notifier to use (defaults to \code{print}
   function). See the \code{notifyR} package for one way of
   sending notifications from R. The \code{notify} function
@@ -52,11 +61,11 @@ Currently only supports classification using a support
 vector machine (SVM).
 }
 \details{
-processing can be done in parallel using all available CPUs
-through the use of the cluster facilities in the
-\code{spatial.tools} package. To enable clustering, call
-\code{sfQuickInit} before running \code{classify_image}. To
-stop the cluster when finished, call \code{sfQuickStop}.
+Processing can be done in parallel using all using the
+cluster facilities in the \code{spatial.tools} package. To
+enable clustering, call \code{beginCluster} before running
+\code{classify_image}.  To stop the cluster when finished,
+call \code{endCluster}.
 }
 \examples{
 \dontrun{

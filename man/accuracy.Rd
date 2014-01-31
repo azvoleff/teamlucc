@@ -2,7 +2,7 @@
 \alias{accuracy}
 \title{Calculate statistics summarizing classification accuracy}
 \usage{
-accuracy(model, test_data = NULL, pop = NULL)
+accuracy(model, test_data = NULL, pop = NULL, reclass_mat = NULL)
 }
 \arguments{
   \item{model}{a classification model with a \code{predict}

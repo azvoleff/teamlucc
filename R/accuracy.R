@@ -131,7 +131,7 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #' Sensing of Environment 129:122-131.
 #' @examples
 #' accuracy(classified_LT5SR_1986$model)
-accuracy <- function(model, test_data=NULL, pop=NULL) {
+accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
     training_type <- NULL
     training_sample <- NULL
     if (('train' %in% class(model)) && is.null(test_data)) {
@@ -179,6 +179,14 @@ accuracy <- function(model, test_data=NULL, pop=NULL) {
     } else {
         predicted <- predict(model, test_data)
     }
+
+    if (!is.null(reclass_mat)) {
+        new_levels <- levels(classified_split$pred_classes)[[1]]
+        new_levels$orig_value <- gsub('_clust[0-9]*$', '', new_levels$value)
+        new_levels$orig_ID <- match(new_levels$orig_value, 
+                                    unique(new_levels$orig_value))
+    }
+
     # ct is the sample contigency table
     ct <- table(predicted, observed)
 
