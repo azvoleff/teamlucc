@@ -22,7 +22,7 @@ class_statistics <- function(x, y, class_col) {
                                          "RasterStack")) {
         stop('class_statistics cannot yet handle Raster* objects')
     }
-    pixels <- melt(cbind(pixels$x, y=pixels$y), idvar='y')
+    pixels <- melt(data.frame(pixels@x, y=pixels@y), idvar='y')
     # Set y and variable to NULL to pass R CMD CHECK without notes
     value=variable=NULL
     class_stats <- ddply(pixels, .(y, variable), summarize,
