@@ -101,7 +101,7 @@ classify_image <- function(x, train_data, class_probs=TRUE,
 
         # For the rfe modeling, extract the training data from the main 
         # train_data dataset - no need to pass the testing data to rfe
-        rfe_y <- scaled_predictors[train_data@training_flag, ]
+        rfe_x <- scaled_predictors[train_data@training_flag, ]
         rfe_y <- train_data@y[train_data@training_flag, ]
 
         rfe_res <- rfe(x=rfe_x, rfe_y,

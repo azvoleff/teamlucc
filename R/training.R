@@ -17,6 +17,7 @@ summary.Training_data <- function(object, ...) {
     obj[['n_pixels']] <- nrow(object@x)
     training_df <- data.frame(y=object@y, poly_ID=object@poly_ID, 
                               training_flag=object@training_flag)
+    y=poly_ID=training_flag=NULL # Keep R CMD CHECK happy
     class_stats <- ddply(training_df, .(class=y), summarize,
                          n_pixels=length(y),
                          n_polys=length(unique(poly_ID)),
@@ -43,8 +44,8 @@ print.summary.Training_data <- function(x, ...) {
 }
 
 #' @S3method levels Training_data
-levels.Training_data <- function(object, ...) {
-    return(levels(object@y))
+levels.Training_data <- function(x) {
+    return(levels(x@y))
 }
 
 #' @S3method print Training_data
@@ -90,7 +91,7 @@ extract_training_data <- function(x, polys, class_col, training=1) {
     if (length(class_colnum) == 0) {
         stop(paste0('"', class_col, '" not found in polys'))
     }
-    polys$FID <- row.names(polys)
+    polys$ID <- row.names(polys)
     if (is.character(training)) {
         # Handle case of having column name suppled as 'training'
         training_col_index <- grep(training, names(polys))
@@ -115,7 +116,7 @@ extract_training_data <- function(x, polys, class_col, training=1) {
                 rand_vals <- runif(length(x))
                 rand_vals <= quantile(rand_vals, training)
             }
-            polys$training_flag <- unlist(tapply(polys@data$FID, 
+            polys$training_flag <- unlist(tapply(polys@data$ID, 
                                                  polys@data[class_colnum], 
                                                  sample_strata))
         }
@@ -134,6 +135,6 @@ extract_training_data <- function(x, polys, class_col, training=1) {
     y <- factor(make.names(polys@data[poly_pixel_match, class_colnum]))
 
     return(new("Training_data", x=pixels, y=y, 
-               poly_ID=polys@data[poly_pixel_match, ]$FID,
+               poly_ID=polys@data[poly_pixel_match, ]$ID,
                training_flag=polys@data[poly_pixel_match, ]$training_flag))
 }
