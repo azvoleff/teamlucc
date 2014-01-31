@@ -1,7 +1,7 @@
 #' Setup the DEM mosaic for a particular TEAM site
 #'
 #' @export
-#' @importFrom rgdal readOGR
+#' @importFrom rgdal readOGR writeOGR
 #' @importFrom sp spTransform
 #' @importFrom rgeos gBuffer gIntersects gUnaryUnion
 #' @importFrom tools file_path_sans_ext
@@ -49,6 +49,21 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
     aoi <- spTransform(aoi, CRS(proj4string(cgiar_srtm_extents)))
     
     pathrows <- get_pathrow(aoi, wrs_type=2, wrs_mode='D', as_polys=TRUE)
+
+    writeOGR(pathrows, output_path, 
+             paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows'), 
+             driver='ESRI Shapefile', overwrite_layer=overwrite)
+
+    png(file.path(output_path, 
+        paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows.png')),
+        width=900, height=900)
+    plot(pathrows, lwd=2)
+    plot(aoi, add=TRUE, lty=2, col="#00ff0050", lwd=2)
+    text(coordinates(pathrows), labels=paste(pathrows@data$PATH, 
+                                             pathrows@data$ROW, sep=', '), 
+         cex=2)
+    dev.off()
+
     pathrows_utm <- spTransform(pathrows,
                                 CRS(utm_zone(pathrows, proj4string=TRUE)))
     # Add a 20km buffer in UTM coordinate system (as LEDAPS SR is in UTM) then 
