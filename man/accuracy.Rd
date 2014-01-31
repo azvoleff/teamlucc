@@ -26,6 +26,10 @@ accuracy(model, test_data = NULL, pop = NULL, reclass_mat = NULL)
   population for each class, or 3) the predicted cover map
   from \code{model} as a \code{RasterLayer}, from which the
   population frequencies will be tabulated.}
+
+  \item{reclass_mat}{a reclassification matrix to be used
+  in the case of a model fit by \code{classify_image} with
+  the \code{do_split} option selected}
 }
 \value{
 \code{\link{accuracy-class}} instance

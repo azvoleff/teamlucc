@@ -22,7 +22,7 @@
 #' automatically).  For details see \code{\link{trainControl}}.
 #' @param tune_grid the training grid to be used for training the classifier.  
 #' Must be a \code{data.frame} with two columns: ".sigma" and ".C".
-#' @param split_classes whether to use normal mixture modeling to split the 
+#' @param do_split whether to use normal mixture modeling to split the 
 #' input classes into subsets to aid in classifying spectrally diverse classes
 #' @param use_rfe whether to use Recursive Feature Extraction (RFE) as 
 #' implemented in the \code{caret} package to select a subset of the input 
@@ -54,7 +54,7 @@
 classify_image <- function(x, train_data, class_probs=TRUE, 
                            use_training_flag=TRUE, tune_length=8, 
                            train_control=NULL, tune_grid=NULL, 
-                           split_classes=FALSE, use_rfe=FALSE, notify=print) {
+                           do_split=FALSE, use_rfe=FALSE, notify=print) {
     cl <- options('rasterClusterObject')[[1]]
     inparallel <- FALSE
     if (!is.null(cl)) {
@@ -81,8 +81,8 @@ classify_image <- function(x, train_data, class_probs=TRUE,
     model_formula <- formula(paste('y ~',
                                    paste(names(train_data$x), collapse=' + ')))
 
-    if (split_classes) {
-        training_split <- split_class(train_data)
+    if (do_split) {
+        training_split <- split_classes(train_data)
         train_data <- cbind(y=training_split$y, 
                             orig_y=train_data$y, 
                             train_data$x,
@@ -90,6 +90,7 @@ classify_image <- function(x, train_data, class_probs=TRUE,
                             Poly_FID=train_data$Poly_FID)
 
     } else {
+        training_split <- NULL
         train_data <- cbind(y=train_data$y, 
                             train_data$x,
                             Training=train_data$Training,
@@ -148,14 +149,14 @@ classify_image <- function(x, train_data, class_probs=TRUE,
         pred_probs <- NULL
     }
 
-    if (split_classes) {
+    if (do_split) {
         notify('Recoding split classes...')
         is_becomes <- cbind(training_split$reclass_mat$split_id,
                             training_split$reclass_mat$id)
         pred_classes_recode <- reclassify(pred_classes, is_becomes)
         if (class_probs) {
             pred_probs <- stackApply(pred_probs, is_becomes[, 2], sum)
-            names(pred_probs_recode) <- unique(reclass_mat$name)
+            names(pred_probs_recode) <- unique(training_split$reclass_mat$name)
         }
     } else {
         pred_probs_recode <- NULL
@@ -163,5 +164,5 @@ classify_image <- function(x, train_data, class_probs=TRUE,
     }
 
     return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs, 
-                split_classes=split_classes))
+                split_classes=training_split))
 }

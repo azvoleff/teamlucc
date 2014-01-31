@@ -4,7 +4,7 @@
 \usage{
 classify_image(x, train_data, class_probs = TRUE, use_training_flag = TRUE,
   tune_length = 8, train_control = NULL, tune_grid = NULL,
-  split_classes = FALSE, use_rfe = FALSE, notify = print)
+  do_split = FALSE, use_rfe = FALSE, notify = print)
 }
 \arguments{
   \item{x}{a \code{Raster*} image with the predictor
@@ -37,9 +37,9 @@ classify_image(x, train_data, class_probs = TRUE, use_training_flag = TRUE,
   training the classifier. Must be a \code{data.frame} with
   two columns: ".sigma" and ".C".}
 
-  \item{split_classes}{whether to use normal mixture
-  modeling to split the input classes into subsets to aid
-  in classifying spectrally diverse classes}
+  \item{do_split}{whether to use normal mixture modeling to
+  split the input classes into subsets to aid in
+  classifying spectrally diverse classes}
 
   \item{use_rfe}{whether to use Recursive Feature
   Extraction (RFE) as implemented in the \code{caret}

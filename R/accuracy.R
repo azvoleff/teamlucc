@@ -121,6 +121,8 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #' total number of pixels in the entire population for each class, or 3) the 
 #' predicted cover map from \code{model} as a \code{RasterLayer}, from which 
 #' the population frequencies will be tabulated.
+#' @param reclass_mat a reclassification matrix to be used in the case of a 
+#' model fit by \code{classify_image} with the \code{do_split} option selected
 #' @return \code{\link{accuracy-class}} instance
 #' @references Pontius, R. G., and M. Millones. 2011. Death to Kappa: birth of 
 #' quantity disagreement and allocation disagreement for accuracy assessment.  
