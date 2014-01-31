@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @import ggplot2
-#' @importFrom plyr ddply transform .
+#' @importFrom plyr ddply .
 #' @param eedf a list of Landsat scenes as output from the save metadata 
 #' function on http://earthexplorer.usgs.gov, as a \code{data.frame}
 #' @return used for side effect of producing a plot
