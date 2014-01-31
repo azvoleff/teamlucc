@@ -180,13 +180,6 @@ accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
         predicted <- predict(model, test_data)
     }
 
-    if (!is.null(reclass_mat)) {
-        new_levels <- levels(classified_split$pred_classes)[[1]]
-        new_levels$orig_value <- gsub('_clust[0-9]*$', '', new_levels$value)
-        new_levels$orig_ID <- match(new_levels$orig_value, 
-                                    unique(new_levels$orig_value))
-    }
-
     # ct is the sample contigency table
     ct <- table(predicted, observed)
 
