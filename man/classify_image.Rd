@@ -10,9 +10,7 @@ classify_image(x, train_data, class_probs = TRUE, use_training_flag = TRUE,
   \item{x}{a \code{Raster*} image with the predictor
   layer(s) for the classification}
 
-  \item{train_data}{a data table with a column labeled 'y'
-  with the observed classes, and one or more columns with
-  the values of predictor(s) at each location.}
+  \item{train_data}{a \code{link{Training_data}} object}
 
   \item{class_probs}{whether to also calculate and return
   the probabilities of membership for each class}
@@ -20,10 +18,10 @@ classify_image(x, train_data, class_probs = TRUE, use_training_flag = TRUE,
   \item{use_training_flag}{indicates whether to exclude
   data flagged as testing data when training the
   classifier. For this to work the input train_data
-  \code{data.frame} must have a column named 'Training'
-  that indicates, for each pixel, whether that pixel is a
-  training pixel (coded as TRUE) or testing pixel (coded as
-  FALSE).}
+  \code{data.frame} must have a column named
+  'training_flag' that indicates, for each pixel, whether
+  that pixel is a training pixel (coded as TRUE) or testing
+  pixel (coded as FALSE).}
 
   \item{tune_length}{the number of levels of each parameter
   that should be tried by \code{train} when training the

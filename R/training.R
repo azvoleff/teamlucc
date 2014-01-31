@@ -1,3 +1,63 @@
+#' Class to represent training data for training machine learning algorithms 
+#'
+#' @import methods
+#' @export
+#' @name Training_data-class
+setClass('Training_data', slots=c(x='data.frame', y='factor', 
+                                  poly_ID='character', training_flag='logical')
+)
+
+#' @importFrom plyr ddply summarize .
+#' @S3method summary Training_data
+summary.Training_data <- function(object, ...) {
+    obj = list()
+    obj[['class']] <- class(object)
+    obj[['n_classes']] <- nlevels(object)
+    obj[['n_polys']] <- length(unique(object@poly_ID))
+    obj[['n_pixels']] <- nrow(object@x)
+    training_df <- data.frame(y=object@y, poly_ID=object@poly_ID, 
+                              training_flag=object@training_flag)
+    class_stats <- ddply(training_df, .(class=y), summarize,
+                         n_pixels=length(y),
+                         n_polys=length(unique(poly_ID)),
+                         train_frac=round(sum(training_flag) / length(training_flag), 2))
+    obj[['class_stats']]  <- class_stats
+    obj[['training_frac']] <- sum(object@training_flag==TRUE) / length(object@training_flag)
+    class(obj) <- 'summary.Training_data'
+    obj
+}
+
+#' @S3method print summary.Training_data
+print.summary.Training_data <- function(x, ...) {
+    cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
+    cat('\n')
+    cat(paste('Number of classes:\t', x[['n_classes']], '\n', sep=''))
+    cat(paste('Number of polygons:\t', x[['n_polys']], '\n', sep=''))
+    cat(paste('Number of pixels:\t', x[['n_pixels']], '\n', sep=''))
+    cat('\n')
+    cat('Training data statistics:\n')
+    print(x[['class_stats']])
+    cat('\n')
+    cat(paste('Training fraction:\t', round(x[['training_frac']], 2), '\n', sep=''))
+    invisible(x)
+}
+
+#' @S3method levels Training_data
+levels.Training_data <- function(object, ...) {
+    return(levels(object@y))
+}
+
+#' @S3method print Training_data
+print.Training_data <- function(x, ...) {
+    print(summary(x, ...))
+}
+
+#' Show a Training_data object
+#'
+#' @export
+setMethod("show", signature(object="Training_data"), function(object) 
+          print(object))
+
 #' Extract training data for use in a classification
 #'
 #' @export
@@ -43,25 +103,25 @@ extract_training_data <- function(x, polys, class_col, training=1) {
     } else if (is.numeric(training) && (length(training) == 1) &&
                (training >= 0) && (training <= 1)) {
         # Handle case of having fraction supplied as 'training'
-        if ('Training' %in% names(polys)) {
-            stop('"Training" column already present in polys')
+        if ('training_flag' %in% names(polys)) {
+            stop('"training_flag" column already present in polys')
         }
         if (training == 0) {
             # Handle training=0 separately to enable use of quantile function 
             # below.
-            polys$Training <- FALSE
+            polys$training_flag <- FALSE
         } else {
             sample_strata <- function(x) {
-                      rand_vals <- runif(length(x))
-                      rand_vals <= quantile(rand_vals, training)
+                rand_vals <- runif(length(x))
+                rand_vals <= quantile(rand_vals, training)
             }
-            polys$Training <- unlist(tapply(polys@data$FID, 
-                                            polys@data[class_colnum], 
-                                            sample_strata))
+            polys$training_flag <- unlist(tapply(polys@data$FID, 
+                                                 polys@data[class_colnum], 
+                                                 sample_strata))
         }
     } else if ((length(training) == length(polys)) && is.logical(training)) {
         # Handle case of having vector supplied as 'training'
-        polys$Training <- training
+        polys$training_flag <- training
     } else {
         stop('"training" must be a column name, vector of same length as polys, or length 1 numeric')
     }
@@ -73,8 +133,7 @@ extract_training_data <- function(x, polys, class_col, training=1) {
     # variable names, the classification algorithm may throw an error
     y <- factor(make.names(polys@data[poly_pixel_match, class_colnum]))
 
-    return(list(y=y,
-                x=pixels,
-                Poly_FID=polys@data[poly_pixel_match, ]$FID,
-                Training=polys@data[poly_pixel_match, ]$Training))
+    return(new("Training_data", x=pixels, y=y, 
+               poly_ID=polys@data[poly_pixel_match, ]$FID,
+               training_flag=polys@data[poly_pixel_match, ]$training_flag))
 }

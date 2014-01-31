@@ -6,14 +6,12 @@
 #' @import caret e1071 kernlab randomForest
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
-#' @param train_data a data table with a column labeled 'y' with the observed 
-#' classes, and one or more columns with the values of predictor(s) at each 
-#' location.
+#' @param train_data a \code{link{Training_data}} object
 #' @param class_probs whether to also calculate and return the probabilities of 
 #' membership for each class
 #' @param use_training_flag indicates whether to exclude data flagged as 
 #' testing data when training the classifier. For this to work the input 
-#' train_data \code{data.frame} must have a column named 'Training' that 
+#' train_data \code{data.frame} must have a column named 'training_flag' that 
 #' indicates, for each pixel, whether that pixel is a training pixel (coded as 
 #' TRUE) or testing pixel (coded as FALSE).
 #' @param tune_length the number of levels of each parameter that should be 
@@ -66,67 +64,70 @@ classify_image <- function(x, train_data, class_probs=TRUE,
         }
     }
 
-    notify('Training classifier...')
     if (is.null(train_control)) {
         train_control <- trainControl(method="repeatedcv", repeats=5, 
                                       classProbs=class_probs)
     }
-    if (use_training_flag) {
-        if (!('Training' %in% names(train_data))) {
-            stop('when use_training_flag is TRUE, train_data must have a "Training" column')
-        }
-    }
     # Build the formula, excluding the training flag column (if it exists) from 
     # the model formula
+    predictor_names <- names(train_data@x)
     model_formula <- formula(paste('y ~',
-                                   paste(names(train_data$x), collapse=' + ')))
+                                   paste(predictor_names, collapse=' + ')))
 
     if (do_split) {
+        notify('Performing pre-classification clustering...')
         training_split <- split_classes(train_data)
-        train_data <- cbind(y=training_split$y, 
-                            orig_y=train_data$y, 
-                            train_data$x,
-                            Training=train_data$Training,
-                            Poly_FID=train_data$Poly_FID)
+        y <- training_split$y
 
     } else {
         training_split <- NULL
-        train_data <- cbind(y=train_data$y, 
-                            train_data$x,
-                            Training=train_data$Training,
-                            Poly_FID=train_data$Poly_FID)
+        y <- train_data@y
     }
 
     if (use_rfe) {
+        notify('Training classifier using RFE...')
         # This recursive feature elimination procedure follows Algorithm 19.5 
         # in Kuhn and Johnson 2013
         svmFuncs <- caretFuncs
         # First center and scale
-        normalization <- preProcess(train_data$x, method='range')
-        scaled_predictors <- predict(normalization, train_data$x)
+        normalization <- preProcess(train_data@x, method='range')
+        scaled_predictors <- predict(normalization, train_data@x)
         scaled_predictors <- as.data.frame(scaled_predictors)
-        subsets <- c(1:ncol(scaled_predictors))
+        subsets <- c(1:length(predictor_names))
         ctrl <- rfeControl(method="repeatedcv",
                            repeats=5,
                            verbose=TRUE,
                            functions=svmFuncs)
 
-        model <- rfe(x=scaled_predictors,
-                     y=train_data$y,
-                     sizes=subsets,
-                     metric="ROC",
-                     rfeControl=ctrl,
-                     method="svmRadial",
-                     tuneLength=tune_length,
-                     trControl=train_control,
-                     form=model_formula,
-                     subset=train_data$Training)
-    } else {
-        model <- train(model_formula, data=train_data, method="svmRadial",
-                       preProc=c('center', 'scale'), subset=train_data$Training,
-                       tuneLength=tune_length, trControl=train_control, 
+        # For the rfe modeling, extract the training data from the main 
+        # train_data dataset - no need to pass the testing data to rfe
+        rfe_y <- scaled_predictors[train_data@training_flag, ]
+        rfe_y <- train_data@y[train_data@training_flag, ]
+
+        rfe_res <- rfe(x=rfe_x, rfe_y,
+                       sizes=subsets,
+                       metric="ROC",
+                       rfeControl=ctrl,
+                       method="svmRadial",
+                       tuneLength=tune_length,
+                       trControl=train_control,
                        tuneGrid=tune_grid)
+
+        #TODO: Extract best model from rfe_res
+    } else {
+        rfe_res <- NULL
     }
+
+    train_data <- cbind(y=y,
+                        train_data@x,
+                        training_flag=train_data@training_flag,
+                        poly_ID=train_data@poly_ID)
+
+    notify('Training classifier...')
+    model <- train(model_formula, data=train_data, method="svmRadial",
+                   preProc=c('range'), subset=train_data$training_flag,
+                   tuneLength=tune_length, trControl=train_control, 
+                   tuneGrid=tune_grid)
 
     notify('Predicting classes...')
     n_classes <- length(levels(model))
@@ -154,15 +155,22 @@ classify_image <- function(x, train_data, class_probs=TRUE,
         is_becomes <- cbind(training_split$reclass_mat$split_id,
                             training_split$reclass_mat$id)
         pred_classes_recode <- reclassify(pred_classes, is_becomes)
+        pred_classes_recode <- ratify(pred_classes_recode)
+        rat <- levels(pred_classes_recode)[[1]]
+        rat$value <- unique(training_split$reclass_mat$name)
+        levels(pred_classes_recode) <- rat
+        names(pred_classes_recode) <- names(pred_classes)
         if (class_probs) {
-            pred_probs <- stackApply(pred_probs, is_becomes[, 2], sum)
+            pred_probs_recode <- stackApply(pred_probs, is_becomes[, 2], sum)
             names(pred_probs_recode) <- unique(training_split$reclass_mat$name)
         }
     } else {
-        pred_probs_recode <- NULL
+        pred_classes_recode <- NULL
         pred_probs_recode <- NULL
     }
 
     return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs, 
-                split_classes=training_split))
+                split_classes=training_split, 
+                pred_probs_recode=pred_probs_recode, 
+                pred_classes_recode=pred_classes_recode))
 }

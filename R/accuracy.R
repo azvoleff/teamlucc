@@ -108,12 +108,12 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #'
 #' @export
 #' @param model a classification model with a \code{predict} method
-#' @param test_data a training/testing dataset as output by the 
-#' \code{extract_training_data} function. If a 'Training' column is included, 
-#' \code{accuracy} will use only the data not used in training for evaluating 
-#' model accuracy. If test_data is NULL, \code{accuracy} will try to use the 
-#' trainingData included in the model object (this will only work if the model 
-#' object is of class \code{train} from the \code{caret} package.
+#' @param test_data a \code{link{Training_data}} object, or NULL. If test_data 
+#' is NULL, \code{accuracy} will try to use the training data included in the 
+#' \code{model} object (this will only work if the model object is of class 
+#' \code{train} from the \code{caret} package. If test_data is a 
+#' \code{Training_data} object, \code{accuracy} will use the included 
+#' \code{training_flag} indicator to separate testing and training data.
 #' @param pop (optional) used to convert from sample matrix to population 
 #' matrix as in Pontius and Millones 2011.Can be: 1) NULL, in which case the 
 #' sample frequencies will be used as estimates of the population frequencies, 
@@ -134,25 +134,23 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #' @examples
 #' accuracy(classified_LT5SR_1986$model)
 accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
-    training_type <- NULL
-    training_sample <- NULL
     if (('train' %in% class(model)) && is.null(test_data)) {
         test_data <- model$trainingData
         names(test_data)[names(test_data) == '.outcome'] <- 'y'
     } else if (!is.null(test_data)) {
-        test_data <- cbind(y=test_data$y, 
-                           test_data$x,
-                           Training=test_data$Training)
+        test_data <- cbind(y=test_data@y, 
+                           test_data@x,
+                           training_flag=test_data@training_flag)
     } else {
         stop('test_data must be supplied if model is not a "train" object')
     }
-    if (!('Training' %in% names(test_data))) {
-        warning('no Training variable found - assuming none of "test_data" was used for model training')
+    if (!('training_flag' %in% names(test_data))) {
+        warning('no training_flag variable found - assuming none of "test_data" was used for model training')
     } else {
-        if (sum(test_data$Training) == 0) {
+        if (sum(test_data$training_flag) == 0) {
             stop('cannot conduct accuracy assessment without independent testing data')
         }
-        test_data <- test_data[!test_data$Training, ]
+        test_data <- test_data[!test_data$training_flag, ]
     }
 
     cl <- options('rasterClusterObject')[[1]]
@@ -205,7 +203,7 @@ accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
     Q <- .calc_Q(pop_ct)
     A <- .calc_A(pop_ct)
 
-    return(new("accuracy", ct=ct, 
-               pop_ct=pop_ct, Q=Q, A=A, 
-               n_train=length(model$finalModel@fitted), n_test=length(observed)))
+    return(new("accuracy", ct=ct, pop_ct=pop_ct, Q=Q, A=A, 
+               n_train=length(model$finalModel@fitted), 
+               n_test=length(observed)))
 }

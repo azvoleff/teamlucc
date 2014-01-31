@@ -5,8 +5,7 @@
 split_classes(train_data, split_levels, verbose = FALSE)
 }
 \arguments{
-  \item{train_data}{a training data set as output by
-  \code{extract_training_data}}
+  \item{train_data}{a \code{link{Training_data}} object}
 
   \item{split_levels}{(optional) a list giving the names of
   the levels to split. If missing, all levels will be

@@ -15,20 +15,19 @@
 #'
 #' @export
 #' @importFrom mclust Mclust
-#' @param train_data a training data set as output by 
-#' \code{extract_training_data}
+#' @param train_data a \code{link{Training_data}} object
 #' @param split_levels (optional) a list giving the names of the levels to 
 #' split. If missing, all levels will be split.
 #' @param verbose whether to report status while running
 split_classes <- function(train_data, split_levels, verbose=FALSE) {
-    y_reclass <- vector('numeric', nrow(train_data$x))
+    y_reclass <- vector('numeric', nrow(train_data@x))
     if (missing(split_levels)) {
-        split_levels <- levels(train_data$y)
+        split_levels <- levels(train_data)
     }
     for (level in split_levels) {
-        level_ind <- train_data$y == level
-        model <- Mclust(train_data$x[level_ind, ])
-        y_reclass[level_ind]  <- paste(train_data$y[level_ind], 
+        level_ind <- train_data@y == level
+        model <- Mclust(train_data@x[level_ind, ])
+        y_reclass[level_ind]  <- paste(train_data@y[level_ind], 
                                        model$classification, sep='_clust')
         if (verbose) print(paste(level, 'split into', model$g, 'classes'))
     }

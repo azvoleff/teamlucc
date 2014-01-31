@@ -8,14 +8,14 @@ accuracy(model, test_data = NULL, pop = NULL, reclass_mat = NULL)
   \item{model}{a classification model with a \code{predict}
   method}
 
-  \item{test_data}{a training/testing dataset as output by
-  the \code{extract_training_data} function. If a
-  'Training' column is included, \code{accuracy} will use
-  only the data not used in training for evaluating model
-  accuracy. If test_data is NULL, \code{accuracy} will try
-  to use the trainingData included in the model object
+  \item{test_data}{a \code{link{Training_data}} object, or
+  NULL. If test_data is NULL, \code{accuracy} will try to
+  use the training data included in the \code{model} object
   (this will only work if the model object is of class
-  \code{train} from the \code{caret} package.}
+  \code{train} from the \code{caret} package. If test_data
+  is a \code{Training_data} object, \code{accuracy} will
+  use the included \code{training_flag} indicator to
+  separate testing and training data.}
 
   \item{pop}{(optional) used to convert from sample matrix
   to population matrix as in Pontius and Millones 2011.Can
