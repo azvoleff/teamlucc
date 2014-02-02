@@ -3,8 +3,13 @@
 #' @export
 #' @import ggplot2
 #' @importFrom plyr ddply .
-#' @param eedf a list of Landsat scenes as output from the save metadata 
-#' function on http://earthexplorer.usgs.gov, as a \code{data.frame}
+#' @param x a \code{data.frame} with a list of Landsat scenes as output from 
+#' the save metadata function on http://earthexplorer.usgs.gov
+#' @param start_year an integer indicating the first year to plot
+#' @param end_year an integer indicating the last year to plot
+#' @param min_clear the minimum percent clear to plot (calculated as 1 - 
+#' percent cloud cover). Images with less than \code{min_clear} fraction of the 
+#' image area free of clouds will be ignored.
 #' @return used for side effect of producing a plot
 plot_ee <- function(x, start_year, end_year, min_clear=.7) {
     x$Date.Acquired <- as.Date(as.character(x$Date.Acquired))
@@ -22,6 +27,7 @@ plot_ee <- function(x, start_year, end_year, min_clear=.7) {
     if (!missing(end_year)) {
         x <- x[x$Year <= end_year, ]
     }
+    YearMonth=Month=Cum_Month=Path_Row=Frac_Clear=Null # Keep R CMD CHECK happy
     x <- ddply(x, .(YearMonth), transform,
                Cum_Month=cumsum(rep(1, length(Month))))
     p <- ggplot(x, aes(xmin=Month,
