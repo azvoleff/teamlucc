@@ -27,7 +27,7 @@ plot_ee <- function(x, start_year, end_year, min_clear=.7) {
     if (!missing(end_year)) {
         x <- x[x$Year <= end_year, ]
     }
-    YearMonth=Month=Cum_Month=Path_Row=Frac_Clear=Null # Keep R CMD CHECK happy
+    YearMonth=Month=Cum_Month=Path_Row=Frac_Clear=NULL # Keep R CMD CHECK happy
     x <- ddply(x, .(YearMonth), transform,
                Cum_Month=cumsum(rep(1, length(Month))))
     p <- ggplot(x, aes(xmin=Month,
