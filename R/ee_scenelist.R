@@ -1,7 +1,7 @@
 #' Save scenelist from EarthExplorer metadata for upload to ESPA
 #'
 #' @export
-#' @importFrom lubridate as.interval new_period %within%
+#' @importFrom lubridate new_interval %within%
 #' @param x a \code{data.frame} with a list of Landsat scenes as output from 
 #' the save metadata function on http://earthexplorer.usgs.gov
 #' @param start_date starting date as a \code{Date} object
@@ -33,7 +33,6 @@ ee_scenelist <- function(x, start_date, end_date, out_file, min_clear=.7,
     if (nrow(x) == 0) {
         stop('no data to plot - try different start/end dates')
     }
-    x <- x[x$Date.Acquired %within% sel_interval, ]
     x$Sensor <- substr(x$Landsat.Scene.Identifier, 1, 3)
     x <- x[!(x$Sensor %in% exclude), ]
     x$Frac_Clear <- (100 - x$Cloud.Cover) / 100

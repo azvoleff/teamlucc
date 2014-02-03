@@ -3,7 +3,7 @@
 #' @export
 #' @import ggplot2
 #' @importFrom plyr ddply .
-#' @importFrom lubridate as.interval new_period %within%
+#' @importFrom lubridate new_interval %within%
 #' @param x a \code{data.frame} with a list of Landsat scenes as output from 
 #' the save metadata function on http://earthexplorer.usgs.gov
 #' @param start_date starting date as a \code{Date} object
