@@ -5,8 +5,8 @@
 #' @importFrom plyr ddply .
 #' @param x a \code{data.frame} with a list of Landsat scenes as output from 
 #' the save metadata function on http://earthexplorer.usgs.gov
-#' @param start_year an integer indicating the first year to plot
-#' @param end_year an integer indicating the last year to plot
+#' @param start_date starting date as a \code{Date} object
+#' @param end_date end date as a \code{Date} object
 #' @param min_clear the minimum percent clear to plot (calculated as 1 - 
 #' percent cloud cover). Images with less than \code{min_clear} fraction of the 
 #' image area free of clouds will be ignored.
@@ -14,7 +14,14 @@
 #' \code{exclude=c('LE7', 'LT4')} to exclude Landsat 7 ETM+ and Landsat 4 TM 
 #' images.
 #' @return used for side effect of producing a plot
-plot_ee_line <- function(x, start_year, end_year, min_clear=.7, exclude=list()) {
+plot_ee_line <- function(x, start_date, end_date, min_clear=.7,
+                         exclude=list()) {
+    if (!class(start_date) == 'Date') {
+        stop('start_date must be a "Date" object')
+    }
+    if (!class(end_date) == 'Date') {
+        stop('end_date must be a "Date" object')
+    }
     x$Sensor <- substr(x$Landsat.Scene.Identifier, 1, 3)
     x <- x[!(x$Sensor %in% exclude), ]
     x$Sensor <- factor(x$Sensor)
@@ -27,14 +34,15 @@ plot_ee_line <- function(x, start_year, end_year, min_clear=.7, exclude=list()) 
     x$Frac_Clear <- (100 - x$Cloud.Cover) / 100
     x <- x[order(x$WRS.Path, x$WRS.Row), ]
     x <- x[x$Frac_Clear >= min_clear, ]
-    if (!missing(start_year)) {
-        x <- x[x$Year >= start_year, ]
-    }
-    if (!missing(end_year)) {
-        x <- x[x$Year <= end_year, ]
+    if ((!missing(start_date) && missing(end_date)) ||
+        (missing(start_date) && !missing(end_date))) {
+        stop('both start_date and end_date must be provided')
+    } else if (!missing(start_date) && !missing(end_date)) {
+        sel_interval <- new_interval(start_date, end_date)
+        x <- x[x$Date.Acquired %within% sel_interval, ]
     }
     if (nrow(x) == 0) {
-        stop('no data to plot - try different start/end years')
+        stop('no data to plot - try different start/end dates')
     }
     # Keep R CMD CHECK happy:
     YearMonth=Path_Row=Year=Month=Max_Frac_Clear=Frac_Clear=Sum_Max_Frac_Clear=NULL

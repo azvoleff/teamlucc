@@ -2,7 +2,7 @@
 \alias{ee_scenelist}
 \title{Save scenelist from EarthExplorer metadata for upload to ESPA}
 \usage{
-ee_scenelist(x, start_date, out_file, num_months = 12, min_clear = 0.7,
+ee_scenelist(x, start_date, end_date, out_file, min_clear = 0.7,
   exclude = list())
 }
 \arguments{
@@ -12,10 +12,10 @@ ee_scenelist(x, start_date, out_file, num_months = 12, min_clear = 0.7,
 
   \item{start_date}{starting date as a \code{Date} object}
 
+  \item{end_date}{end date as a \code{Date} object}
+
   \item{out_file}{filename for output text file for later
   upload to ESPA}
-
-  \item{num_months}{number of months to include}
 
   \item{min_clear}{the minimum percent clear to plot
   (calculated as 1 - percent cloud cover). Images with less

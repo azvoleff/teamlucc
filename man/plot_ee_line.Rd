@@ -2,18 +2,16 @@
 \alias{plot_ee_line}
 \title{Plot EarthExplorer metadata file as a line plot}
 \usage{
-plot_ee_line(x, start_year, end_year, min_clear = 0.7, exclude = list())
+plot_ee_line(x, start_date, end_date, min_clear = 0.7, exclude = list())
 }
 \arguments{
   \item{x}{a \code{data.frame} with a list of Landsat
   scenes as output from the save metadata function on
   http://earthexplorer.usgs.gov}
 
-  \item{start_year}{an integer indicating the first year to
-  plot}
+  \item{start_date}{starting date as a \code{Date} object}
 
-  \item{end_year}{an integer indicating the last year to
-  plot}
+  \item{end_date}{end date as a \code{Date} object}
 
   \item{min_clear}{the minimum percent clear to plot
   (calculated as 1 - percent cloud cover). Images with less
