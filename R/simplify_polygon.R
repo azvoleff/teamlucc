@@ -42,6 +42,11 @@ nverts <- function(poly_obj) {
 #' # simplify_polygon(poly_obj, 3)
 simplify_polygon <- function(poly_obj, max_vertices, maxit=100, multiplier=1.25, 
                          initial_tolerance='dynamic') {
+    if (class(poly_obj) == 'SpatialPolygonsDataFrame') {
+        poly_data <- poly_obj@data
+    } else {
+        poly_data <- NULL
+    }
     n_parts <- sapply(poly_obj@polygons, function(x) length(x))
     if (length(n_parts) > 1)
         stop('ZOI shapefile contains more than one polygon')
@@ -76,6 +81,10 @@ simplify_polygon <- function(poly_obj, max_vertices, maxit=100, multiplier=1.25,
         warning(paste('Simplified polygon has no vertices.'))
     else if (n_verts <= 2)
         warning(paste('Simplified polygon has only', n_verts, 'vertices.'))
+
+    if (!is.null(poly_data)) {
+        poly_obj <- SpatialPolygonsDataFrame(poly_obj, data=poly_data)
+    }
 
     return(poly_obj)
 }
