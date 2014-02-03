@@ -14,7 +14,7 @@
 #' \code{exclude=c('LE7', 'LT4')} to exclude Landsat 7 ETM+ and Landsat 4 TM 
 #' images.
 #' @return used for side effect of producing a plot
-plot_ee <- function(x, start_year, end_year, min_clear=.7, exclude=list()) {
+plot_ee_line <- function(x, start_year, end_year, min_clear=.7, exclude=list()) {
     x$Sensor <- substr(x$Landsat.Scene.Identifier, 1, 3)
     x <- x[!(x$Sensor %in% exclude), ]
     x$Sensor <- factor(x$Sensor)
@@ -37,17 +37,19 @@ plot_ee <- function(x, start_year, end_year, min_clear=.7, exclude=list()) {
         stop('no data to plot - try different start/end years')
     }
     YearMonth=Month=Cum_Month=Path_Row=Frac_Clear=NULL # Keep R CMD CHECK happy
-    x <- ddply(x, .(YearMonth), transform,
-               Cum_Month=cumsum(rep(1, length(Month))))
-    p <- ggplot(x, aes(xmin=Month,
-                       xmax=Month + 1, 
-                       ymin=Cum_Month - 1, 
-                       ymax=Cum_Month,
-                       colour=Sensor,
-                       fill=Path_Row,
-                       alpha=Frac_Clear)) +
-        geom_rect() + facet_grid(Year ~ ., scales='free_y', space='free_y') +
-        xlab('Month') +
+    Frac_Clear_Stats <- ddply(x, .(YearMonth, Path_Row), summarize,
+                              Year=Year[1], Month=Month[1],
+                              Max_Frac_Clear=max(Frac_Clear))
+    Frac_Clear_Stats <- ddply(Frac_Clear_Stats, .(YearMonth), summarize,
+                              Year=Year[1], Month=Month[1],
+                              Sum_Max_Frac_Clear=sum(Max_Frac_Clear))
+
+    p <- ggplot(Frac_Clear_Stats, aes(xmin=Month + .05,
+                                      xmax=Month + 1-.05, 
+                                      ymin=0, 
+                                      ymax=Sum_Max_Frac_Clear)) +
+        geom_rect() + facet_grid(Year ~ .) +
+        xlab('Month') + ylab('Total Fraction Clear') +
         scale_x_continuous(breaks=c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
                            labels=c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')) +
@@ -56,8 +58,6 @@ plot_ee <- function(x, start_year, end_year, min_clear=.7, exclude=list()) {
               panel.grid.major.x=element_blank()) +
         theme(axis.ticks.y=element_blank(),
               axis.text.y=element_blank()) +
-        scale_colour_brewer(type='qual', palette='Set1', drop=FALSE, name='Sensor') +
-        scale_fill_brewer(type='qual', palette='Set2', drop=FALSE, name='Path/Row') +
-        scale_alpha(name='Fraction Clear')
+        geom_hline(yintercept=seq(1,length(unique(x$Path_Row))), colour='white', linetype='dashed')
     return(p)
 }

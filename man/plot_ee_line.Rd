@@ -1,8 +1,8 @@
-\name{plot_ee}
-\alias{plot_ee}
+\name{plot_ee_line}
+\alias{plot_ee_line}
 \title{Plot EarthExplorer metadata file}
 \usage{
-plot_ee(x, start_year, end_year, min_clear = 0.7, exclude = list())
+plot_ee_line(x, start_year, end_year, min_clear = 0.7, exclude = list())
 }
 \arguments{
   \item{x}{a \code{data.frame} with a list of Landsat
