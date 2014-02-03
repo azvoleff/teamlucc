@@ -36,7 +36,7 @@ plot_ee <- function(x, start_year, end_year, min_clear=.7, exclude=list()) {
     if (nrow(x) == 0) {
         stop('no data to plot - try different start/end years')
     }
-    YearMonth=Month=Cum_Month=Path_Row=Frac_Clear=NULL # Keep R CMD CHECK happy
+    YearMonth=Month=Cum_Month=Path_Row=Sensor=Frac_Clear=NULL # Keep R CMD CHECK happy
     x <- ddply(x, .(YearMonth), transform,
                Cum_Month=cumsum(rep(1, length(Month))))
     p <- ggplot(x, aes(xmin=Month,

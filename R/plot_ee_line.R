@@ -1,4 +1,4 @@
-#' Plot EarthExplorer metadata file
+#' Plot EarthExplorer metadata file as a line plot
 #'
 #' @export
 #' @import ggplot2
@@ -36,7 +36,8 @@ plot_ee_line <- function(x, start_year, end_year, min_clear=.7, exclude=list()) 
     if (nrow(x) == 0) {
         stop('no data to plot - try different start/end years')
     }
-    YearMonth=Month=Cum_Month=Path_Row=Frac_Clear=NULL # Keep R CMD CHECK happy
+    # Keep R CMD CHECK happy:
+    YearMonth=Path_Row=Year=Month=Max_Frac_Clear=Frac_Clear=Sum_Max_Frac_Clear=NULL
     Frac_Clear_Stats <- ddply(x, .(YearMonth, Path_Row), summarize,
                               Year=Year[1], Month=Month[1],
                               Max_Frac_Clear=max(Frac_Clear))
