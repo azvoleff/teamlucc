@@ -14,7 +14,7 @@
 #' \code{exclude=c('LE7', 'LT4')} to exclude Landsat 7 ETM+ and Landsat 4 TM 
 #' images.
 #' @return used for side effect of producing ESPA scene list
-ee_scenelist <- function(x, start_date, end_date, out_file, min_clear=.7, 
+espa_scenelist <- function(x, start_date, end_date, out_file, min_clear=.7, 
                          exclude=list()) {
     if (!class(start_date) == 'Date') {
         stop('start_date must be a "Date" object')

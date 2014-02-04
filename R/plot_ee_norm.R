@@ -15,7 +15,7 @@
 #' \code{exclude=c('LE7', 'LT4')} to exclude Landsat 7 ETM+ and Landsat 4 TM 
 #' images.
 #' @return used for side effect of producing a plot
-plot_ee_line <- function(x, start_date, end_date, min_clear=.7,
+plot_ee_norm <- function(x, start_date, end_date, min_clear=.7,
                          exclude=list()) {
     if (!class(start_date) == 'Date') {
         stop('start_date must be a "Date" object')
