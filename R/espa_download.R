@@ -1,6 +1,7 @@
-verify_download <- function(remote_url, local_path) {
+#' @importFrom bitops cksum
+verify_download <- function(espa_url, local_path) {
     cksum_file <- tempfile()
-    ret_code <- download.file(gsub('\\.tar\\.gz$', '.cksum', remote_url), 
+    ret_code <- download.file(gsub('\\.tar\\.gz$', '.cksum', espa_url), 
                               cksum_file, mode="w", quiet=TRUE)
     if (ret_code != 0) {
         message(paste('Warning: problem downloading cksum for', local_path))
@@ -12,16 +13,22 @@ verify_download <- function(remote_url, local_path) {
         espa_checksum <- scan(cksum_file, what=c('integer', 'integer', 
                                                  'character'), quiet=TRUE)
         unlink(cksum_file)
+        local_size <- file.info(local_path)$size
         # TODO: Figure out how to compute a checksum in R that matches the checksum 
         # output ESPA gives. It appears the ESPA checksum is a CRC from 'cksum' 
         # command run on Linux. This is not a CRC-32 checksum, so the R digest 
         # package won't work for computing it. bitops has a function, 'cksum' that 
         # might work.
-        # local_crc <- strtoi(digest(local_path, algo="crc32", file=TRUE), base=16L)
+        #local_crc <- strtoi(digest(, algo="crc32", file=TRUE), base=16L)
+
+        # f = file(local_path,"rb")
+        # local_crc <- cksum(rawToChar(readBin(f, raw(), n=local_size)))
+        # close(f)
+
         # if (espa_checksum[1] != local_crc) {
         #     return(2)
-        # } else if (espa_checksum[2] != file.info(local_path)$size) {
-        if (espa_checksum[2] != file.info(local_path)$size) {
+        # } else if (espa_checksum[2] != local_size) {
+        if (espa_checksum[2] != local_size) {
             return(3)
         } else {
             return(0)
@@ -63,6 +70,9 @@ espa_download <- function(email, order_ID, output_folder) {
     if (!grepl('^[0-9]{6}-[0-9]{6}$', order_ID)) {
         stop(paste(order_ID, 'does not appear to be a valid ESPA order ID'))
     }
+    if (!file_test('-d', output_folder)) {
+        stop(paste(output_folder, 'does not appear to be a valid directory'))
+    }
 
     # Parse ESPA page for download links
     email_noat <- gsub('@', '%40', email)
@@ -70,6 +80,7 @@ espa_download <- function(email, order_ID, output_folder) {
                              "-", order_ID), what='character', quiet=TRUE)
     url_re <- paste0('http://espa\\.cr\\.usgs\\.gov/orders/', email, '-', 
                      order_ID, '/L[ET][0-9]{14}-SC[0-9]{14}\\.tar\\.gz')
+    espa_urls <- espa_page[grepl(url_re, espa_page)]
     espa_urls <- str_extract(espa_urls, url_re)
 
     successes <- 0
