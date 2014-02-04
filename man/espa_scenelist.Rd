@@ -1,8 +1,8 @@
-\name{ee_scenelist}
-\alias{ee_scenelist}
+\name{espa_scenelist}
+\alias{espa_scenelist}
 \title{Save scenelist from EarthExplorer metadata for upload to ESPA}
 \usage{
-ee_scenelist(x, start_date, end_date, out_file, min_clear = 0.7,
+espa_scenelist(x, start_date, end_date, out_file, min_clear = 0.7,
   exclude = list())
 }
 \arguments{

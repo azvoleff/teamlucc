@@ -1,8 +1,8 @@
-\name{plot_ee_line}
-\alias{plot_ee_line}
+\name{plot_ee_norm}
+\alias{plot_ee_norm}
 \title{Plot EarthExplorer metadata file as a line plot}
 \usage{
-plot_ee_line(x, start_date, end_date, min_clear = 0.7, exclude = list())
+plot_ee_norm(x, start_date, end_date, min_clear = 0.7, exclude = list())
 }
 \arguments{
   \item{x}{a \code{data.frame} with a list of Landsat

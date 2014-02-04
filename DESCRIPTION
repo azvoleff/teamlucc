@@ -18,6 +18,7 @@ Imports:
     plyr,
     reshape2,
     ggplot2,
+    stringr,
     kernlab,
     e1071,
     randomForest,
