@@ -53,6 +53,5 @@ chg_mag <- function(t1p, t2p, filename=NULL, ...) {
     out <- rasterEngine(t1p=t1p, t2p=t2p, fun=calc_chg_mag, 
                      args=list(n_classes=n_classes), filename=filename,
                      outbands=1, ...)
-
     return(out)
 }
