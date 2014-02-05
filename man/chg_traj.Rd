@@ -2,8 +2,8 @@
 \alias{chg_traj}
 \title{Calculate change-trajectory image}
 \usage{
-chg_traj(initial, chg_mag, chg_dir, threshold, filename = NULL,
-  classnames = NULL, ignorepersistence = TRUE)
+chg_traj(initial, chg_mag, chg_dir, threshold, classnames = NULL,
+  ignorepersistence = TRUE, filename = NULL, ...)
 }
 \arguments{
   \item{initial}{initial cover class as \code{RasterLayer}}
@@ -18,15 +18,17 @@ chg_traj(initial, chg_mag, chg_dir, threshold, filename = NULL,
   determining change areas (can use \code{DFPS} to
   determine this value).}
 
-  \item{filename}{filename to save the output
-  \code{RasterLayer} to disk (optional)}
-
   \item{classnames}{an optional vector of classnames to
   output with the returned trajectory lookup table}
 
   \item{ignorepersistence}{whether to ignore persistence of
   a class (if ignored all pixels where a class persists
   will be set to NA)}
+
+  \item{filename}{filename to save the output
+  \code{RasterLayer} to disk (optional)}
+
+  \item{...}{additional parameters to pass to rasterEngine}
 }
 \value{
 a table of all possible trajectories, with their
