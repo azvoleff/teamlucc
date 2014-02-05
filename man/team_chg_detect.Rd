@@ -17,6 +17,9 @@ team_chg_detect(t1_classes, t1_probs, t2_probs, output_basename, output_path,
 
   \item{output_path}{the path to use for the output}
 
+  \item{output_basename}{the base filename for output files
+  from \code{team_chg_detect} (without an extension)}
+
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
 

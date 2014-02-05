@@ -11,6 +11,8 @@
 #' @param t2_probs per class probabilities as output from 
 #' \code{team_classify_image} for time 2 image
 #' @param output_path the path to use for the output
+#' @param output_basename the base filename for output files from 
+#' \code{team_chg_detect} (without an extension)
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -37,12 +39,12 @@ team_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename,
     chg_dir_filename <- filename=file.path(output_path, 
                                            paste(output_basename, 
                                                  'chg_dir.envi', sep='_'))
-    chg_dir_image <- chg_dir(t0_probs, t1_probs, filename=chg_dir_filename, 
+    chg_dir_image <- chg_dir(t1_probs, t2_probs, filename=chg_dir_filename, 
                              overwrite=overwrite)
     chg_mag_filename <- filename=file.path(output_path, 
                                            paste(output_basename, 
                                                  'chg_mag.envi', sep='_'))
-    chg_mag_image <- chg_mag(t0_probs, t1_probs, filename=chg_mag_filename, 
+    chg_mag_image <- chg_mag(t1_probs, t2_probs, filename=chg_mag_filename, 
                              overwrite=overwrite)
     timer <- stop_timer(timer, label='Change magnitude and direction')
 
@@ -54,6 +56,7 @@ team_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename,
                                            paste(output_basename, 
                                                  'chg_traj.envi', sep='_'))
     #TODO: Determine threshold with DFPS or automatic algorithm
+    threshold <- NULL
     chg_traj_traj <- chg_traj(t1_classes, chg_mag_image, chg_dir_image, 
                               classnames=levels(t1_classes),
                               threshold=threshold, overwrite=overwrite, 
