@@ -2,7 +2,29 @@
 \alias{team_fill_clouds}
 \title{Perform heavy cloud filling}
 \usage{
-team_fill_clouds()
+team_fill_clouds(img_cloudy, img_clear, img_cloud_mask,
+  script_path = "CLOUD_REMOVE.sav", num_class = 1, extent1 = 1,
+  DN_min = 0, DN_max = 255,
+  idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe")
+}
+\arguments{
+  \item{img_cloudy}{the clear image (base image)}
+
+  \item{img_clear}{the cloudy image}
+
+  \item{img_cloud_mask}{cloud mask, with clouded areas set
+  to}
+
+  \item{num_class}{set the estimated number of classes in
+  image}
+
+  \item{extent1}{set the range of cloud neighborhood}
+
+  \item{DN_min}{minimum of DN}
+
+  \item{DN_max}{maximum of DN}
+
+  \item{patch_long}{block size when process large image}
 }
 \description{
 Calls CLOUD_REMOVE.pro IDL script by Zhu Xiaolin to fill

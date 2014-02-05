@@ -8,4 +8,6 @@
 #' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 
 #' Environment 124, 49-60.
 team_fill_gaps <- function() {
+
+    system()
 }

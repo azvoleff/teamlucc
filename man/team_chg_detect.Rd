@@ -2,7 +2,8 @@
 \alias{team_chg_detect}
 \title{Perform change detection for two Landsat CDR surface reflectance images}
 \usage{
-team_chg_detect(t1_predictions, t2_predictions, notify)
+team_chg_detect(t1_classes, t1_probs, t2_probs, output_basename, output_path,
+  n_cpus = 1, overwrite = FALSE, notify = print)
 }
 \arguments{
   \item{t1_classes}{cover classes as output from
