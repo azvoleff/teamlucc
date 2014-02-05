@@ -43,6 +43,8 @@ team_classify <- function(predictor_file, train_shp, output_path,
         stop(paste(output_path, "does not exist"))
     }
 
+    if (n_cpus > 1) beginCluster(n_cpus)
+
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Running team_classify')
 
@@ -53,8 +55,6 @@ team_classify <- function(predictor_file, train_shp, output_path,
     train_polys <- spTransform(train_polys, crs(predictors))
     train_data <- extract_training_data(predictors, train_polys, 
                                         class_col=class_col, training=training)
-
-    if (n_cpus > 1) beginCluster(n_cpus)
 
     timer <- start_timer(timer, label='Running classify_image')
     classification <- classify_image(predictors, train_data, notify=notify)
