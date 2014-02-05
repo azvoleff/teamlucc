@@ -1,4 +1,3 @@
-#' @importFrom bitops cksum
 verify_download <- function(espa_url, local_path) {
     cksum_file <- tempfile()
     ret_code <- download.file(gsub('\\.tar\\.gz$', '.cksum', espa_url), 
