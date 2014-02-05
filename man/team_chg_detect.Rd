@@ -5,11 +5,22 @@
 team_chg_detect(t1_predictions, t2_predictions, notify)
 }
 \arguments{
-  \item{t1_predictions}{output from
+  \item{t1_classes}{cover classes as output from
   \code{team_classify_image} for time 1 image}
 
-  \item{t2_predictions}{output from
+  \item{t1_probs}{per class probabilities as output from
+  \code{team_classify_image} for time 1 image}
+
+  \item{t2_probs}{per class probabilities as output from
   \code{team_classify_image} for time 2 image}
+
+  \item{output_path}{the path to use for the output}
+
+  \item{n_cpus}{the number of CPUs to use for processes
+  that can run in parallel}
+
+  \item{overwrite}{whether to overwrite existing files
+  (otherwise an error will be raised)}
 
   \item{notify}{notifier to use (defaults to \code{print}
   function). See the \code{notifyR} package for one way of
