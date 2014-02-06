@@ -154,25 +154,10 @@ END
 ;                  main program
 ;##################################################################
 
-PRO gnspi
+PRO gnspi, slc_off_file, input_file, timeseries_files, out_base, sample_size,$
+    size_wind, class_num, DN_min, DN_max, patch_long, temp_dir
+
     COMPILE_OPT idl2, hidden
-
-    args = COMMAND_LINE_ARGS(COUNT=count)
-
-    slc_off_file = args[0]
-    input_file = args[1]
-    timeseries_files = args[2]
-    out_base = args[3]
-    sample_size = args[4]
-    size_wind = args[5]
-    class_num = args[6]
-    DN_min = args[7]
-    DN_max = args[8]
-    patch_long = args[9]
-    temp_dir = args[10]
-    journal_file = args[11]
-
-    journal, journal_file
 
     e = ENVI(/HEADLESS)
     ENVI_BATCH_STATUS_WINDOW, /ON
@@ -673,5 +658,4 @@ PRO gnspi
 
     PRINT, 'time used:', FLOOR((SYSTIME(1)-t0)/3600), 'h',FLOOR(((SYSTIME(1)-t0) MOD 3600)/60),'m',(SYSTIME(1)-t0) MOD 60,'s'
 
-    journal
 END

@@ -1,3 +1,4 @@
+
 ;-------------------------------------------------------------------------------------------------
 ;                REMOVE THICK CLOUD IN SATELLITE IMAGES
 ;
@@ -59,25 +60,10 @@ End
 ;                  main body of the program
 ;-------------------------------------------------------------------
 
-pro CLOUD_REMOVE
+pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
+    min_pixel, extent1, DN_min, DN_max, patch_long
+
     COMPILE_OPT idl2, hidden
-
-    args = COMMAND_LINE_ARGS(COUNT=count)
-    
-    cloudy_file = args[0]
-    clear_file = args[1]
-    mask_file = args[2]
-    out_name = args[3]
-    num_class = UINT(args[4])
-    min_pixel = UINT(args[5])
-    extent1 = UINT(args[6])
-    DN_min = UINT(args[7])
-    DN_max = UINT(args[8])
-    patch_long = UINT(args[9])
-    journal_file = args[10]
-
-    journal, journal_file
-
     e = ENVI(/HEADLESS)
     ENVI_BATCH_STATUS_WINDOW, /ON
 
@@ -360,6 +346,5 @@ pro CLOUD_REMOVE
     endfor
 
     print, 'time used', floor((systime(1)-t0)/3600), 'hour',floor(((systime(1)-t0) mod 3600)/60),'m',(systime(1)-t0) mod 60,'s'
-    
-    journal
+
 end
