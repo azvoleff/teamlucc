@@ -1,23 +1,37 @@
 # Function to ensure only character variables handed to IDL are quoted
-format_IDL_arg <- function(varname, varvalue) {
+format_IDL_param <- function(varname, varvalue) {
     if (is.character(varvalue)) {
-        paste0(varname, '="', varvalue, '"\n')
+        param <- paste0(varname, '="', varvalue, '"\n')
+    } else if (is.list(varvalue)) {
+        param <- paste0(varname, '=[')
+        for (n in 1:length(varvalue)) {
+            if (is.numeric(varvalue[n])) {
+                param <- paste0(param, varvalue[n])
+            } else {
+                param <- paste0(param, '"', varvalue[n], '"')
+            }
+            if (n != length(varvalue)) {
+                param <- paste0(param, ', ')
+            }
+        }
+        param <- paste0(param, ']\n')
     } else {
-        paste0(varname, '=', varvalue, '\n')
+        param <- paste0(varname, '=', varvalue, '\n')
     }
+    return(param)
 }
 
 #' Perform heavy cloud filling
 #'
 #' Calls CLOUD_REMOVE.pro IDL script by Zhu Xiaolin to fill heavy clouds in 
-#' Landsat image.
+#' Landsat image. The CLOUD_REMOVE script should be provided as a .sav file.
 #'
 #' @export
 #' @importFrom tools file_path_sans_ext
 #' @param img_cloudy the clear image (base image)
 #' @param img_clear the cloudy image
 #' @param img_cloud_mask cloud mask, with clouded areas set to
-#' @param script_path the path to the CLOUD_REMOVE.pro file
+#' @param script_path the path to the CLOUD_REMOVE.sav file
 #' @param num_class set the estimated number of classes in image
 #' @param extent1 set the range of cloud neighborhood
 #' @param DN_min minimum of DN
@@ -42,22 +56,38 @@ team_fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NUL
     # DN_max <- 255
     # patch_long <- 1000
     # idl <- "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe"
+    #
+    if (!(file_test('-x', idl) || file_test('-f', idl))) {
+        stop('IDL not found - check "idl" parameter')
+    }
+    if (!(file_test('-f', script_path))) {
+        stop('CLOUD_REMOVE.sav not found - check script_path parameter')
+    }
+    if (!(file_test('-f', img_cloudy))) {
+        stop('input file for cloudy image not found- check img_cloudy parameter')
+    }
+    if (!(file_test('-f', img_clear))) {
+        stop('input file for clear image not found- check img_clear parameter')
+    }
+    if (!(file_test('-f', img_cloud_mask))) {
+        stop('input file for cloud mask not found - check img_cloud_mask parameter')
+    }
 
     if (is.null(out_name)) {
         out_name <- paste0(file_path_sans_ext(img_cloudy), '_cloud_remove.envi')
     }
 
-    varnames <- c("cloudy_file", "clear_file", "mask_file", "out_name", 
+    param_names <- c("cloudy_file", "clear_file", "mask_file", "out_name", 
                   "num_class", "extent1", "DN_min", "DN_max", "patch_long")
-    varvalues <- list(img_cloudy, img_clear, img_cloud_mask, out_name, 
+    param_vals <- list(img_cloudy, img_clear, img_cloud_mask, out_name, 
                       num_class, extent1, DN_min, DN_max, patch_long)
-
-    script_vars <- mapply(format_IDL_arg, varnames, varvalues)
-    script_vars <- paste(script_vars, collapse='')
+    idl_params <- mapply(format_IDL_param, param_names, param_vals)
+    idl_params <- paste(idl_params, collapse='')
 
     script_dir <- dirname(script_path)
     idl_script <- tempfile(fileext='.pro')
-    idl_cmd <- paste0('CD, "', script_dir, '"\n', script_vars, 'CLOUD_REMOVE,', paste(varnames, collapse=','), '\nexit')
+    idl_cmd <- paste0('CD, "', script_dir, '"\n', idl_params, 'CLOUD_REMOVE,', 
+                      paste(param_names, collapse=','), '\nexit')
 
     f <- file(idl_script, 'wt')
     writeLines(idl_cmd, f)
@@ -65,7 +95,7 @@ team_fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NUL
 
     idl_out <- system(paste(shQuote(idl), shQuote(idl_script)), intern=TRUE)
 
-    log_file <- paste0(file_path_sans_ext(out_name), '_log.txt')
+    log_file <- paste0(file_path_sans_ext(out_name), '_idllog.txt')
     idl_out <- gsub('\r', '', idl_out)
     f <- file(log_file, 'wt')
     writeLines(idl_out, f) 

@@ -15,7 +15,7 @@ team_fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
   \item{img_cloud_mask}{cloud mask, with clouded areas set
   to}
 
-  \item{script_path}{the path to the CLOUD_REMOVE.pro file}
+  \item{script_path}{the path to the CLOUD_REMOVE.sav file}
 
   \item{num_class}{set the estimated number of classes in
   image}
@@ -32,7 +32,8 @@ team_fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
 }
 \description{
 Calls CLOUD_REMOVE.pro IDL script by Zhu Xiaolin to fill
-heavy clouds in Landsat image.
+heavy clouds in Landsat image. The CLOUD_REMOVE script
+should be provided as a .sav file.
 }
 \references{
 Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
