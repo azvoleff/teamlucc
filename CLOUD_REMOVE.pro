@@ -6,13 +6,17 @@
 ;                  Developed and coded by Zhu Xiaolin
 ;           Department of Geography,the Ohio State University
 ;                    Email:zhuxiaolin55@gmail.com
-;                           2013-04-24
-;     Reference: Zhu, X., Gao, F., Liu, D. and Chen, J. A modified
+;                           updated：2013-10-23
+;     Debug history:
+;         2013-10-23 correct:1) the bug of similar pixel searching
+;                            2) the bug of using wrong values in cloudy image
+;
+;     Please cite: Zhu, X., Gao, F., Liu, D. and Chen, J. A modified
 ;     neighborhood similar pixel interpolator approach for removing
 ;     thick clouds in Landsat images. IEEE Geoscience and Remote
 ;     Sensing Letters, 2012, 9(3), 521-525
-;     NOTE: to improve the efficiency for large image, some process in the paper
-;     was simplified a little, but the accuracy is comparable
+;     NOTE: the efficiency may be low for large image.If so, please use CLOUD_REMOVE_FAST,
+;     in which some process was simplified, but the accuracy is still satisfactory
 ;-------------------------------------------------------------------------------------------------
 
 ;function of open file
@@ -147,123 +151,135 @@ pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, exten
 
             num_cloud_path=max(cloud[cloud_posite])
             ;
-            for icloud=1,num_cloud_path,1 do begin       ; remove each could patches
+            for icloud=1,num_cloud_path,1 do begin       ; remove each cloud patches
                 cloud_area=where(cloud eq icloud,num_cloud1)
+
                 if (num_cloud1 gt 0) then begin
 
                     cloud_pixel_locate=intarr(2,num_cloud1)
-                    for ic=0.0,num_cloud1-1.0,1.0 do begin
-                        cloud_pixel_locate[1,ic]=fix(cloud_area[ic]/ns1)
-                        cloud_pixel_locate[0,ic]=cloud_area[ic]-ns1*cloud_pixel_locate[1,ic]
-                    endfor
-                    left_cloud=min(cloud_pixel_locate[0,*])
+                    cloud_pixel_locate[1,*]=fix(cloud_area/ns1)
+                    cloud_pixel_locate[0,*]=cloud_area-ns1*cloud_pixel_locate[1,*]
+                    left_cloud=min(cloud_pixel_locate[0,*])     ;find out the cloud area
                     right_cloud=max(cloud_pixel_locate[0,*])
                     up_cloud=min(cloud_pixel_locate[1,*])
                     down_cloud=max(cloud_pixel_locate[1,*])
                     cloud_area=0 ;clear it
-                    cloud_pixel_locate=0
-                    ;
+                    cloud_pixel_locate=0 ;clear it
 
-                    left_region=max([0,left_cloud-extent1])            ;neigborhood of cloud area: rectangle which can completely cover cloud
+                    ;neigborhood of cloud area: rectangle which can completely cover cloud
+                    left_region=max([0,left_cloud-extent1])
                     right_region=min([ns1-1,right_cloud+extent1])
                     up_region=max([0,up_cloud-extent1])
                     down_region=min([nl1-1,down_cloud+extent1])
 
-                    fine1_sub=fine1[left_region:right_region,up_region:down_region,*]
+
                     a_region=right_region-left_region+1
                     b_region=down_region-up_region+1
                     x_center=a_region/2.0      ; the position of cloud center
                     y_center=b_region/2.0
-                    fine2_sub=fine2[left_region:right_region,up_region:down_region,*]
-                    cloud_sub=cloud[left_region:right_region,up_region:down_region]
-
-                    fine2_1=reform(fine2_sub,long(a_region)*b_region,nb)    ; classify the cloud-free image, used for selecting similar pixels
-                    fine2_1=transpose(fine2_1)
-                    weights = CLUST_WTS(fine2_1, N_CLUSTERS =num_class)
-                    class_img=CLUSTER(fine2_1, weights, N_CLUSTERS =num_class)
-                    class_img=reform(class_img,a_region,b_region)
-                    fine2_1=0;clear it
-                    weights=0;clear it
 
 
-                    ;----------------------------------------------------------------------
+                    sub_fine1=fine1[left_region:right_region,up_region:down_region,*]
+                    sub_fine2=fine2[left_region:right_region,up_region:down_region,*]
+                    sub_cloud=cloud[left_region:right_region,up_region:down_region]
 
-                    indcloud_sub=where(cloud_sub eq icloud,num_cloud)
-
-                    fine02=fine1_sub
                     ;---------------------remove background-----------------
-                    fine1_value=cloud_sub
+                    fine1_value=sub_cloud
                     fine1_value[*,*]=0
                     fine2_value=fine1_value
                     for ib=0,nb-1,1 do begin
-                        fine1_value=mean(fine1_value+fine1_sub[*,*,ib])
-                        fine2_value=mean(fine2_value+fine2_sub[*,*,ib])
+                        fine1_value=mean(fine1_value+sub_fine1[*,*,ib])
+                        fine2_value=mean(fine2_value+sub_fine2[*,*,ib])
                     endfor
                     ind_com=where(fine1_value eq 0 or fine2_value eq 0, c_com)
                     if (c_com gt 0) then begin
-                        cloud_sub[ind_com]=-1
+                        sub_cloud[ind_com]=-1          ;mask out background
                     endif
                     fine1_value=0
                     fine2_value=0
 
-
-                    for ic=0,num_class-1,1 do begin
-                        ind_clear=where(cloud_sub eq 0 and class_img eq ic,c_clear)
-                        ind_cloud=where(cloud_sub eq icloud and class_img eq ic,c_cloud)
-
-                        if(c_clear gt 0 and c_cloud gt 0) then begin
-                            fine2_clear=fltarr(c_clear,nb)
-                            fine1_clear=fltarr(c_clear,nb)
-                            for ib=0,nb-1,1 do begin
-                                fine2_clear[*,ib]=(fine2_sub[*,*,ib])[ind_clear]
-                                fine1_clear[*,ib]=(fine2_sub[*,*,ib])[ind_clear]
-                            endfor
-                            xy_clear=fltarr(2,c_clear)                    ;the location of each clear pixel
-                            for iclear=0.0,c_clear-1.0,1.0 do begin
-                                xy_clear[1,iclear]=fix(ind_clear[iclear]/a_region)
-                                xy_clear[0,iclear]=ind_clear[iclear]-a_region*xy_clear[1,iclear]
-                            endfor
-                            for ip_c=0,c_cloud-1.0, 1l do begin
-                                ri=fix(ind_cloud[ip_c]/a_region)    ; the location of target cloudy pixel
-                                ci=ind_cloud[ip_c]-a_region*ri
-                                s_dis=((xy_clear[0,*]-ci)^2+(xy_clear[1,*]-ri)^2)^0.5 ; spatial distance of all clear pixels to the target pixel
-                                order_dis=sort(s_dis)
-                                number_similar=min([c_clear,20])
-                                s_d=fltarr(number_similar)
-                                s_rmsd=fltarr(number_similar)
-                                for i_similar=0, number_similar-1,1 do begin
-                                    ;caculate RMSD of each same-class pixel to the target cloudy pixel
-                                    s_rmsd[i_similar]=((total((fine2_clear[order_dis[i_similar],*]-fine1_sub[ci,ri,*])^2))/float(nb))^0.5
-                                    s_d[i_similar]=s_dis[order_dis[i_similar]]
-                                endfor
-                                C_D=s_d*s_rmsd+0.0000001
-                                weight=(1.0/C_D)/total(1.0/C_D)
-                                r1=mean(s_d)                      ; the weight of two predictions
-                                r2=((ci-x_center)^2+(ri-y_center)^2)^0.5
-                                W_T1=(1/r1)/(1/r1+1/r2)
-                                W_T2=(1/r2)/(1/r1+1/r2)
-
-                                for iband=0,nb-1,1 do begin
-                                    fine1_similar=(fine1_clear[*,iband])[order_dis[0:(number_similar-1)]]
-                                    fine2_similar=(fine2_clear[*,iband])[order_dis[0:(number_similar-1)]]
-                                    predict_1=total(fine1_similar*weight)
-                                    predict_2=fine2_sub[ci,ri,iband]+total((fine1_similar-fine2_similar)*weight)
-                                    if (predict_2 gt DN_min and predict_2 lt DN_max) then begin
-                                        fine1_sub[ci,ri,iband]=W_T1*predict_1+W_T2*predict_2
-                                    endif else begin
-                                        fine1_sub[ci,ri,iband]=predict_1
-                                    endelse
-                                endfor
-                            endfor
-
-                        endif else begin
-                            if (c_cloud gt 0 and c_clear eq 0 ) then begin
-                                fine1_sub[ind_cloud,*]=fine2_sub[ind_cloud,*]
-                            endif
-                        endelse
+                    similar_th_band=fltarr(nb)
+                    for iband=0,nb-1,1 do begin
+                        similar_th_band[iband]=stddev(sub_fine2[*,*,iband])*2.0/float(num_class)    ;compute the threshold of similar pixel
                     endfor
 
-                    fine1[left_region:right_region,up_region:down_region,*]=fine1_sub
+                    ind_cloud=where(sub_cloud eq icloud,num_cloud)
+                    ind_clear=where(sub_cloud eq 0,num_clear)
+                    xy_clear=fltarr(2,num_clear)                    ;the location of each clear pixel
+                    xy_clear[1,*]=fix(ind_clear/(a_region))
+                    xy_clear[0,*]=ind_clear-(a_region)*xy_clear[1,*]
+                    fine2_clear=fltarr(num_clear,nb)
+                    fine1_clear=fltarr(num_clear,nb)
+                    for ib=0,nb-1,1 do begin
+                        fine2_clear[*,ib]=(sub_fine2[*,*,ib])[ind_clear]
+                        fine1_clear[*,ib]=(sub_fine1[*,*,ib])[ind_clear]
+                    endfor
+
+                    for ic=0.0,num_cloud-1.0,1.0 do begin
+                        ri=fix(ind_cloud[ic]/(a_region))    ; the location of target pixel
+                        ci=ind_cloud[ic]-(a_region)*ri
+                        center_dis=((x_center-ci)^2+(y_center-ri)^2)^0.5; the distance between target pixel and center of cloud
+                        s_dis=((xy_clear[0,*]-ci)^2+(xy_clear[1,*]-ri)^2)^0.5
+
+                        order_clear=sort(s_dis,/L64)
+
+                        iclear=0
+                        isimilar=0
+                        fine1_similar=fltarr(min_pixel,nb)
+                        fine2_similar=fltarr(min_pixel,nb)
+                        rmse_similar=fltarr(min_pixel)
+                        dis_similar=fltarr(min_pixel)
+                        similar_rmse12=fltarr(min_pixel)
+                        while (isimilar le min_pixel-1 and iclear le num_clear-1.0 ) do begin
+                            indicate_similar=0
+                            for iband=0,nb-1,1 do begin
+                                if (abs(fine2_clear[order_clear[iclear],iband]-sub_fine2[ci,ri,iband])le similar_th_band[iband]) then begin
+                                    indicate_similar=indicate_similar+1
+                                endif
+                            endfor
+                            if (indicate_similar eq nb) then begin
+                                for ib=0, nb-1,1 do begin
+                                    fine1_similar[isimilar,ib]=(fine1_clear[*,ib])[order_clear[iclear]]
+                                    fine2_similar[isimilar,ib]=(fine2_clear[*,ib])[order_clear[iclear]]
+                                endfor
+                                rmse_similar[isimilar]=((total((fine2_clear[order_clear[iclear],*]-sub_fine2[ci,ri,*])^2))/float(nb))^0.5
+                                dis_similar[isimilar]=s_dis[order_clear[iclear]]
+                                similar_rmse12[isimilar]=((total((fine2_clear[order_clear[iclear],*]-fine1_clear[order_clear[iclear],*])^2))/float(nb))^0.5
+                                isimilar=isimilar+1
+                            endif
+                            iclear=iclear+1
+                        endwhile
+
+                        ; if similar pixel larger than 0
+                        if (isimilar gt 0 ) then begin
+                            ind_null=where(dis_similar gt 0)
+                            rmse_similar1=(rmse_similar[ind_null]-min(rmse_similar[ind_null]))/(max(rmse_similar[ind_null])-min(rmse_similar[ind_null])+0.000001)+1.0
+                            dis_similar1=(dis_similar[ind_null]-min(dis_similar[ind_null]))/(max(dis_similar[ind_null])-min(dis_similar[ind_null])+0.000001)+1.0
+                            C_D=(rmse_similar1)*dis_similar1+0.0000001
+                            weight=(1.0/C_D)/total(1.0/C_D)
+
+                            ;compute the time weight
+                            W_T1=center_dis/(center_dis+mean(dis_similar[ind_null]))
+                            W_T2=mean(dis_similar[ind_null])/(center_dis+mean(dis_similar[ind_null]))
+                            for iband=0,nb-1,1 do begin
+                                predict_1=total((fine1_similar[*,iband])[ind_null]*weight)
+                                predict_2=sub_fine2[ci,ri,iband]+total(((fine1_similar[*,iband])[ind_null]-(fine2_similar[*,iband])[ind_null])*weight)
+                                if (predict_2 gt DN_min and predict_2 lt DN_max) then begin
+                                    sub_fine1[ci,ri,iband]=W_T1*predict_1+W_T2*predict_2
+                                endif else begin
+                                    sub_fine1[ci,ri,iband]=predict_1
+                                endelse
+                            endfor
+                        endif else begin
+                            ; if no similar pixel, use all similar pixels
+                            for iband=0,nb-1,1 do begin
+                                diff=mean(fine1_clear[*,iband]-fine2_clear[*,iband])
+                                sub_fine1[ci,ri,iband]=sub_fine2[ci,ri,iband]+diff
+                            endfor
+                        endelse
+
+                    endfor
+                    fine1[left_region:right_region,up_region:down_region,*]=sub_fine1
                 endif
             endfor
         endif

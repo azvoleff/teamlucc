@@ -1,7 +1,7 @@
 ;-------------------------------------------------------------------------------------------------
 ;                REMOVE THICK CLOUD IN SATELLITE IMAGES
 ;                          * A FSAT VERSION*
-;
+;          Need about 1/8 time of the original version CLOUD_REMOVE
 ;               Faster VERSION: can be used for whole TM scene
 ;                  Developed and coded by Zhu Xiaolin
 ;           Department of Geography,the Ohio State University
@@ -56,7 +56,7 @@ pro  CLOUD_REMOVE_FAST
  extent1=1    ;set the range of cloud neighborhood
  DN_min=0     ;set the range of DN
  DN_max=255
- patch_long=1000 ;set the block size
+ patch_long=500 ;set the block size when process large image, 500~1000 recommend
  ;-------------------------------------------------
 
   FileName1 = Dialog_PickFile(title = 'Open the cloudy image:')
