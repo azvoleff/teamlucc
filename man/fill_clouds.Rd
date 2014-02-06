@@ -35,9 +35,10 @@ fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
   \item{idl}{path to the IDL binary}
 }
 \description{
-Calls CLOUD_REMOVE.pro IDL script by Zhu Xiaolin to fill
-heavy clouds in Landsat image. The CLOUD_REMOVE script
-should be provided as a .sav file.
+Calls either of the CLOUD_REMOVE.pro or
+CLOUD_REMOVE_FAST.pro IDL scripts by Zhu Xiaolin to fill
+heavy clouds in Landsat image. The CLOUD_REMOVE or
+CLOUD_REMOVE_FAST script should be provided as a .sav file.
 }
 \references{
 Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
