@@ -2,10 +2,9 @@ Package: teamr
 Version: 0.1
 Date: 2013-11-11
 Title: TEAM Remote Sensing Data Processing Toolkit
-Authors@R: c(
-    person("Alex", "Zvoleff", email="azvoleff@conservation.org", role=c("aut", "cre")),
-	person("Sarah", "Goslee", role = "ctb"),
-	person("Xiaolin", "Zhu", role = "ctb"))
+Authors@R: c(person("Alex", "Zvoleff", email="azvoleff@conservation.org",
+    role=c("aut", "cre")), person("Sarah", "Goslee", role = "ctb"),
+    person("Xiaolin", "Zhu", role = "ctb"))
 Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
     R (>= 2.10.0),
