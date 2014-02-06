@@ -3,8 +3,8 @@
 \title{Perform heavy cloud filling}
 \usage{
 fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
-  script_path = "CLOUD_REMOVE.sav", num_class = 1, extent1 = 1,
-  DN_min = 0, DN_max = 255, patch_long = 1000,
+  script_path = "CLOUD_REMOVE.sav", num_class = 1, min_pixel = 20,
+  extent1 = 1, DN_min = 0, DN_max = 255, patch_long = 1000,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe")
 }
 \arguments{
@@ -23,6 +23,8 @@ fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
 
   \item{num_class}{set the estimated number of classes in
   image}
+
+  \item{min_pixel}{the sample size of similar pixels}
 
   \item{extent1}{set the range of cloud neighborhood}
 
