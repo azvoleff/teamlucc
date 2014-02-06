@@ -303,7 +303,7 @@ PRO gnspi, slc_off_file, input_file, timeseries_files, out_base, sample_size,$
                     result=regress(x_variable,y_variable,SIGMA=sigma, CONST=const,ftest=fvalue)
                     regress_result[iband,iclass,0]=const
                     regress_result[iband,iclass,1]=result
-                    sig=1.0-f_pdf(fvalue,1,num_class-2)
+                    sig=1.0-f_pdf(fvalue,1,num_class-2) ; get underflow here
                 ENDIF ELSE BEGIN
                     regress_result[iband,iclass,0]=0
                     regress_result[iband,iclass,1]=1
