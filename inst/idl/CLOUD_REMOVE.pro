@@ -17,7 +17,13 @@
 ;     Sensing Letters, 2012, 9(3), 521-525
 ;     NOTE: the efficiency may be low for large image.If so, please use CLOUD_REMOVE_FAST,
 ;     in which some process was simplified, but the accuracy is still satisfactory
-;-------------------------------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+;
+; Modified from original by Xiaolin Zhu on Feb 6, 2014 by Alex Zvoleff for 
+; inclusion in the 'teamr' R package. For the original version, see Xiaolin's 
+; website at: http://geography.osu.edu/grads/xzhu/
+;
+;-----------------------------------------------------------------------------
 
 ;function of open file
 Pro GetData,ImgData = ImgData,ns = ns,nl = nl,nb = nb,Data_Type = Data_Type,$

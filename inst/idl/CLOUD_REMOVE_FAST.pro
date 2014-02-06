@@ -13,8 +13,13 @@
 ;     Sensing Letters, 2012, 9(3), 521-525
 ;     NOTE: to improve the efficiency for large image, some process in the paper
 ;     was LARGELY simplified, but the accuracy is still acceptable
-;---------------------------------------------------------------------------
-
+;-----------------------------------------------------------------------------
+;
+; Modified from original by Xiaolin Zhu on Feb 6, 2014 by Alex Zvoleff for 
+; inclusion in the 'teamr' R package. For the original version, see Xiaolin's 
+; website at: http://geography.osu.edu/grads/xzhu/
+;
+;-----------------------------------------------------------------------------
 
 ;function of open file
 

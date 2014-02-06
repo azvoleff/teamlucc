@@ -11,7 +11,13 @@
 ; Zhu, X., Liu, D. and Chen, J. 2012. A new geostatistical approach for filling
 ;      gaps in Landsat ETM+ SLC-off images, Remote Sensing of Environment,
 ;      124,49-60.
-;---------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+;
+; Modified from original by Xiaolin Zhu on Feb 6, 2014 by Alex Zvoleff for 
+; inclusion in the 'teamr' R package. For the original version, see Xiaolin's 
+; website at: http://geography.osu.edu/grads/xzhu/
+;
+;-----------------------------------------------------------------------------
 
 
 ;function for open the file
