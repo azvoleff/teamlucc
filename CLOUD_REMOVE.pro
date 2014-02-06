@@ -54,8 +54,8 @@ End
 ;                  main body of the program
 ;-------------------------------------------------------------------
 
-pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, extent1, DN_min,$
-    DN_max, patch_long
+pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
+    extent1, DN_min, DN_max, patch_long
 
     COMPILE_OPT idl2, hidden
     e = ENVI(/HEADLESS)
