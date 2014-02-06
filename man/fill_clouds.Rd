@@ -3,8 +3,8 @@
 \title{Perform heavy cloud filling}
 \usage{
 fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
-  fast = TRUE, num_class = 1, min_pixel = 20, extent1 = 1, DN_min = 0,
-  DN_max = 255, patch_long = 1000,
+  script_path = "CLOUD_REMOVE.sav", num_class = 1, min_pixel = 20,
+  extent1 = 1, DN_min = 0, DN_max = 255, patch_long = 1000,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe")
 }
 \arguments{
@@ -19,9 +19,7 @@ fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
   an output name will be automatically assigned based on
   \code{img_clear}}
 
-  \item{fast}{if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro
-  script. If \code{FALSE}, use the CLOUD_REMOVE.pro
-  script.}
+  \item{script_path}{the path to the CLOUD_REMOVE.sav file}
 
   \item{num_class}{set the estimated number of classes in
   image}
@@ -40,8 +38,9 @@ fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
 }
 \description{
 Calls either of the CLOUD_REMOVE.pro or
-CLOUD_REMOVE_FAST.pro IDL scripts by Xiaolin Zhu to fill
-heavy clouds in a Landsat image.
+CLOUD_REMOVE_FAST.pro IDL scripts by Zhu Xiaolin to fill
+heavy clouds in Landsat image. The CLOUD_REMOVE or
+CLOUD_REMOVE_FAST script should be provided as a .sav file.
 }
 \references{
 Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
