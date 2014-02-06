@@ -55,7 +55,7 @@ End
 ;-------------------------------------------------------------------
 
 pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
-    extent1, DN_min, DN_max, patch_long
+    min_pixel, extent1, DN_min, DN_max, patch_long
 
     COMPILE_OPT idl2, hidden
     e = ENVI(/HEADLESS)
@@ -339,8 +339,6 @@ pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
         envi_file_mng, id=mfid[i], /remove, /delete
     endfor
 
-
     print, 'time used', floor((systime(1)-t0)/3600), 'hour',floor(((systime(1)-t0) mod 3600)/60),'m',(systime(1)-t0) mod 60,'s'
-
 
 end

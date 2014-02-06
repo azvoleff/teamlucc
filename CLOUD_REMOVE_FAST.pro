@@ -53,12 +53,11 @@ End
 ;-------------------------------------------------------------------
 
 pro CLOUD_REMOVE_FAST, cloudy_file, clear_file, mask_file, out_name, $
-    num_class, extent1, DN_min, DN_max, patch_long
+    num_class, min_pixel, extent1, DN_min, DN_max, patch_long
 
     COMPILE_OPT idl2, hidden
     e = ENVI(/HEADLESS)
     ENVI_BATCH_STATUS_WINDOW, /ON
-
 
     t0=systime(1)
 
@@ -316,11 +315,9 @@ pro CLOUD_REMOVE_FAST, cloudy_file, clear_file, mask_file, out_name, $
         y0[isub]=ind_patch[2,isub]
     endfor
 
-
     xsize = orig_ns
     ysize = orig_nl
     pixel_size = [1.,1.]
-
 
     use_see_through = replicate(1L,n_ns*n_nl)
     see_through_val = replicate(0L,n_ns*n_nl)
@@ -332,13 +329,10 @@ pro CLOUD_REMOVE_FAST, cloudy_file, clear_file, mask_file, out_name, $
         background=0, see_through_val=see_through_val, $
         use_see_through=use_see_through
 
-
     for i=0,n_ns*n_nl-1,1 do begin
         envi_file_mng, id=mfid[i], /remove, /delete
     endfor
 
-
     print, 'time used', floor((systime(1)-t0)/3600), 'hour',floor(((systime(1)-t0) mod 3600)/60),'m',(systime(1)-t0) mod 60,'s'
-
 
 end
