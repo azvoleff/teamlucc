@@ -26,7 +26,7 @@ fill_gaps <- function(slc_off_file, input_file, timeseries_files,
                       out_base=NULL, sample_size=20, size_wind=12, class_num=4, 
                       DN_min=0.0, DN_max=1.0, patch_long=1000,
                       idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
-    script_path <- system.file("inst/idl", "GNSPI.pro", package="teamr")
+    script_path <- system.file("idl", "GNSPI.pro", package="teamr")
 
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
         stop('IDL not found - check "idl" parameter')

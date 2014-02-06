@@ -50,10 +50,10 @@ fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
                         DN_min=0, DN_max=255, patch_long=1000,
                         idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
     if (fast) {
-        script_path <- system.file("inst/idl", "CLOUD_REMOVE_FAST.pro", 
+        script_path <- system.file("idl", "CLOUD_REMOVE_FAST.pro", 
                                    package="teamr")
     } else {
-        script_path <- system.file("inst/idl", "CLOUD_REMOVE.pro", 
+        script_path <- system.file("idl", "CLOUD_REMOVE.pro", 
                                    package="teamr")
     }
     
