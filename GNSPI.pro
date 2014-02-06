@@ -3,7 +3,7 @@
 ;           GNSPI algorithm for FILLING THE SLC-OFF GAP OF ETM+ IMAGES
 ;                           Using TM input images
 ;        Can process whole ETM+ scene using block strategy
-;            Developed by Xiaolin Zhu,email: zhu.381@osu.edu
+;            Developed by Xiaolin Zhu, email: zhu.381@osu.edu
 ;             Department of Geography,The Ohio State University
 ;                         update date:  3/17/2013
 ;                     Copyright belong to Xiaolin Zhu
@@ -148,7 +148,9 @@ END
 ;                  main program
 ;##################################################################
 
-PRO gnspi
+PRO gnspi, slc_off_file, input_file, timeseries_files, out_base, sample_size,$
+    size_wind, class_num, DN_min, DN_max, patch_long, temp_dir
+
     COMPILE_OPT idl2, hidden
 
     e = ENVI(/HEADLESS)
@@ -156,22 +158,8 @@ PRO gnspi
 
     t0=SYSTIME(1)                  ;the initial time of program running
 
-    ;please set the following parameters
-    ;----------------------------------------------------------------------
-    sample_size=20                 ;set the sample size of sample pixels
-    size_wind=12                   ;set the maximum window size
-    class_num=4                    ;set the estimated number of classes
-    num_series=1                   ;set the number of images in the time-series except the input image
-    DN_min=0.0                       ;set the range of DN value of the image,If byte, 0 and 255
-    DN_max=1.0
-    patch_long=500                ;set the size of block,if process whole ETM scene, set 1000
-    temp_file='C:\Users\azvoleff\Desktop\temp'            ;set the temporary file location
-    ;------------------------------------------------------------------------
-
-
     ;open the SLC-off ETM+ image
-    FileName1 = DIALOG_PICKFILE(title = 'Open the target SLC-off ETM+ image:')
-    ENVI_OPEN_FILE,FileName1,r_fid=fid
+    ENVI_OPEN_FILE,slc_off_file,r_fid=fid
     ENVI_FILE_QUERY,fid,ns=ns,nl=nl,nb=nb,dims=dims
     map_info = ENVI_GET_MAP_INFO(fid=fid)
     orig_ns=ns
@@ -203,7 +191,7 @@ PRO gnspi
         ENDFOR
     ENDFOR
 
-    tempoutname=temp_file+'\temp_target'
+    tempoutname=temp_dir+'\temp_target'
 
     pos=INDGEN(nb)
     FOR isub=0,n_ns*n_nl-1,1 DO BEGIN
@@ -216,9 +204,8 @@ PRO gnspi
     ENVI_FILE_MNG, id=fid, /remove
 
     ;-----------------------------------------------------------      ;input no-gap image and divide into block
-    FileName2 = DIALOG_PICKFILE(title = 'Open the input image:')
-    ENVI_OPEN_FILE,FileName2,r_fid=fid
-    tempoutname=temp_file+'\temp_input'
+    ENVI_OPEN_FILE,input_file,r_fid=fid
+    tempoutname=temp_dir+'\temp_input'
     pos=INDGEN(nb)
     FOR isub=0,n_ns*n_nl-1,1 DO BEGIN
         dims=[-1,ind_patch[0,isub],ind_patch[1,isub],ind_patch[2,isub],ind_patch[3,isub]]
@@ -229,10 +216,11 @@ PRO gnspi
     ENVI_FILE_MNG, id=fid, /remove
 
     ;-----------------------------------------------------------      ;input no-gap time-series and divide into block
+    num_series=SIZE(timeseries_files, /N_ELEMENTS)
     FOR i_timeseries=1,num_series,1 DO BEGIN
-        FileName2 = DIALOG_PICKFILE(title = 'Open the_'+STRTRIM(i_timeseries,1)+'_image of the time-series:')
-        ENVI_OPEN_FILE,FileName2,r_fid=fid
-        tempoutname=temp_file+'\temp_series'+STRTRIM(i_timeseries,1)
+        timeseries_file=timeseries_files[i_timeseries-1]
+        ENVI_OPEN_FILE,timeseries_file,r_fid=fid
+        tempoutname=temp_dir+'\temp_series'+STRTRIM(i_timeseries,1)
         pos=INDGEN(nb)
         FOR isub=0,n_ns*n_nl-1,1 DO BEGIN
             dims=[-1,ind_patch[0,isub],ind_patch[1,isub],ind_patch[2,isub],ind_patch[3,isub]]
@@ -246,8 +234,8 @@ PRO gnspi
     ;------------------------------------------------------------------
     ; begin process the gap for each block
     ;-------------------------------------------------------------------
-    tempoutname1=temp_file+'\temp_filled'
-    tempoutname2=temp_file+'\temp_uncertainty'
+    tempoutname1=temp_dir+'\temp_filled'
+    tempoutname2=temp_dir+'\temp_uncertainty'
 
     PRINT,'there are total',n_ns*n_nl,' blocks'
 
@@ -257,13 +245,13 @@ PRO gnspi
 
         ;open each block image
 
-        FileName = temp_file+'\temp_target'
+        FileName = temp_dir+'\temp_target'
         getdata,ImgData=ImgData,ns = ns,nl = nl,nb = nb,Data_Type = Data_Type,FileName = FileName+STRTRIM(isub+1,1),Fid = Fid1
         fine1=FLOAT(ImgData)
         fine0=fine1[location[0,isub]:location[1,isub],location[2,isub]:location[3,isub],*]    ;place the new image value
         error=fine0-fine0 ;output the prediction variance
 
-        FileName = temp_file+'\temp_input'
+        FileName = temp_dir+'\temp_input'
         getdata,ImgData=ImgData,FileName = FileName+STRTRIM(isub+1,1),Fid = Fid2
         fine2=FLOAT(ImgData)
         ImgData=0 ;clear this variable
@@ -271,7 +259,7 @@ PRO gnspi
         image_series=FLTARR(ns,nl,nb,num_series+1)
         image_series[*,*,*,0]=fine2
         FOR i_timeseries=1,num_series,1 DO BEGIN
-            FileName = temp_file+'\temp_series'+STRTRIM(i_timeseries,1)
+            FileName = temp_dir+'\temp_series'+STRTRIM(i_timeseries,1)
             getdata,ImgData=ImgData,FileName = FileName+STRTRIM(isub+1,1),Fid = Fid3
             image_series[*,*,*,i_timeseries]=FLOAT(ImgData)
             ImgData=0 ;clear this variable
@@ -607,7 +595,7 @@ PRO gnspi
     use_see_through = REPLICATE(1L,n_ns*n_nl)
     see_through_val = REPLICATE(0L,n_ns*n_nl)
 
-    out_name=FileName1+'_filled_GNSPI'
+    out_name=out_base + '_GNSPI.envi'
     ENVI_DOIT, 'mosaic_doit', fid=mfid, pos=mpos, $
         dims=mdims, out_name=out_name, xsize=xsize, $
         ysize=ysize, x0=x0, y0=y0, georef=0,MAP_INFO=map_info, $
@@ -650,7 +638,7 @@ PRO gnspi
     use_see_through = REPLICATE(1L,n_ns*n_nl)
     see_through_val = REPLICATE(0L,n_ns*n_nl)
 
-    out_name=FileName1+'_uncertainty_GNSPI'
+    out_name=out_base+'_GNSPI_uncertainty.envi'
     ENVI_DOIT, 'mosaic_doit', fid=mfid, pos=mpos, $
         dims=mdims, out_name=out_name, xsize=xsize, $
         ysize=ysize, x0=x0, y0=y0, georef=0,MAP_INFO=map_info, $
