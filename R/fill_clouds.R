@@ -24,8 +24,7 @@ format_IDL_param <- function(varname, varvalue) {
 #' Perform heavy cloud filling
 #'
 #' Calls either of the CLOUD_REMOVE.pro or CLOUD_REMOVE_FAST.pro IDL scripts by 
-#' Zhu Xiaolin to fill heavy clouds in Landsat image. The CLOUD_REMOVE or 
-#' CLOUD_REMOVE_FAST script should be provided as a .sav file.
+#' Xiaolin Zhu to fill heavy clouds in a Landsat image.
 #'
 #' @export
 #' @importFrom tools file_path_sans_ext
@@ -34,7 +33,8 @@ format_IDL_param <- function(varname, varvalue) {
 #' @param img_cloud_mask cloud mask, with clouded areas set to
 #' @param out_name name for output image, or NULL. If null an output name will 
 #' be automatically assigned based on \code{img_clear}
-#' @param script_path the path to the CLOUD_REMOVE.sav file
+#' @param fast if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro script. If 
+#' \code{FALSE}, use the CLOUD_REMOVE.pro script.
 #' @param num_class set the estimated number of classes in image
 #' @param min_pixel the sample size of similar pixels
 #' @param extent1 set the range of cloud neighborhood
@@ -46,29 +46,19 @@ format_IDL_param <- function(varname, varvalue) {
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521-525.
 fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
-                        script_path='CLOUD_REMOVE.sav', num_class=1, 
-                        min_pixel=20, extent1=1, DN_min=0, DN_max=255, 
-                        patch_long=1000,
+                        fast=TRUE, num_class=1, min_pixel=20, extent1=1, 
+                        DN_min=0, DN_max=255, patch_long=1000,
                         idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
-    img_cloudy <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/cloud_removal/test data/L20080724_cloudy'
-    img_clear <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/cloud_removal/test data/L20080606'
-    img_cloud_mask <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/cloud_removal/test data/cloud_mask'
-    script_path <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/cloud_removal/CLOUD_REMOVE.pro'
-    script_path <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/cloud_removal/CLOUD_REMOVE_FAST.pro'
-    out_name=NULL
-    num_class <- 1
-    min_pixel <- 20
-    extent1 <- 1
-    DN_min <- 0
-    DN_max <- 255
-    patch_long <- 1000
-    idl <- "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe"
+    if (fast) {
+        script_path <- system.file("inst/idl", "CLOUD_REMOVE_FAST.pro", 
+                                   package="teamr")
+    } else {
+        script_path <- system.file("inst/idl", "CLOUD_REMOVE.pro", 
+                                   package="teamr")
+    }
     
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
         stop('IDL not found - check "idl" parameter')
-    }
-    if (!(file_test('-f', script_path))) {
-        stop('CLOUD_REMOVE.sav not found - check script_path parameter')
     }
     if (!(file_test('-f', img_cloudy))) {
         stop('input file for cloudy image not found- check img_cloudy parameter')
