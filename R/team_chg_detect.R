@@ -32,13 +32,12 @@ team_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename,
 
     if (n_cpus > 1) beginCluster(n_cpus)
 
-    ################################################################################
+    ###########################################################################
     # Calculate change magnitude and direction
-    ################################################################################
+    ###########################################################################
     timer <- start_timer(timer, label='Change magnitude and direction')
-    chg_dir_filename <- filename=file.path(output_path, 
-                                           paste(output_basename, 
-                                                 'chg_dir.envi', sep='_'))
+    chg_dir_filename <- file.path(output_path, paste(output_basename, 
+                                                     'chg_dir.envi', sep='_'))
     chg_dir_image <- chg_dir(t1_probs, t2_probs, filename=chg_dir_filename, 
                              overwrite=overwrite)
     chg_mag_filename <- filename=file.path(output_path, 
@@ -48,13 +47,13 @@ team_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename,
                              overwrite=overwrite)
     timer <- stop_timer(timer, label='Change magnitude and direction')
 
-    ################################################################################
+    ###########################################################################
     # Calculate change trajectories
-    ################################################################################
+    ###########################################################################
     timer <- start_timer(timer, label='Change trajectories')
-    chg_traj_filename <- filename=file.path(output_path, 
-                                           paste(output_basename, 
-                                                 'chg_traj.envi', sep='_'))
+    chg_traj_filename <- file.path(output_path,
+                                   paste(output_basename, 'chg_traj.envi', 
+                                         sep='_'))
     #TODO: Determine threshold with DFPS or automatic algorithm
     threshold <- NULL
     chg_traj_traj <- chg_traj(t1_classes, chg_mag_image, chg_dir_image, 

@@ -18,6 +18,7 @@
 #' @param DN_min the minimum DN value of the image
 #' @param DN_max the maximum DN value of the image
 #' @param patch_long the size of block, to process whole ETM scene, set to 1000
+#' @param idl path to the IDL binary
 #' @export
 #' @references Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical approach 
 #' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 

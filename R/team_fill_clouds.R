@@ -31,13 +31,15 @@ format_IDL_param <- function(varname, varvalue) {
 #' @param img_cloudy the clear image (base image)
 #' @param img_clear the cloudy image
 #' @param img_cloud_mask cloud mask, with clouded areas set to
+#' @param out_name name for output image, or NULL. If null an output name will 
+#' be automatically assigned based on \code{img_clear}
 #' @param script_path the path to the CLOUD_REMOVE.sav file
 #' @param num_class set the estimated number of classes in image
 #' @param extent1 set the range of cloud neighborhood
 #' @param DN_min minimum of DN
 #' @param DN_max maximum of DN
 #' @param patch_long block size when process large image
-#' @param idl the path to the IDL binary
+#' @param idl path to the IDL binary
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified 
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521-525.

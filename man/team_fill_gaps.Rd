@@ -37,6 +37,8 @@ team_fill_gaps(slc_off_file, input_file, timeseries_files,
 
   \item{patch_long}{the size of block, to process whole ETM
   scene, set to 1000}
+
+  \item{idl}{path to the IDL binary}
 }
 \description{
 Calls GNSPI.pro IDL script by Zhu Xiaolin to fill gaps in

@@ -15,6 +15,10 @@ team_fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
   \item{img_cloud_mask}{cloud mask, with clouded areas set
   to}
 
+  \item{out_name}{name for output image, or NULL. If null
+  an output name will be automatically assigned based on
+  \code{img_clear}}
+
   \item{script_path}{the path to the CLOUD_REMOVE.sav file}
 
   \item{num_class}{set the estimated number of classes in
@@ -28,7 +32,7 @@ team_fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
 
   \item{patch_long}{block size when process large image}
 
-  \item{idl}{the path to the IDL binary}
+  \item{idl}{path to the IDL binary}
 }
 \description{
 Calls CLOUD_REMOVE.pro IDL script by Zhu Xiaolin to fill
