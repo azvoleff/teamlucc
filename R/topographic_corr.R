@@ -1,10 +1,10 @@
 #' Topographically correct a raster
 #'
 #' Performs topographic correction using code based on \code{topocorr} from the 
-#' \code{Landsat} package. The code in this package has been modifed from 
-#' \code{topocorr} to allow using a subsample of the image for Minnaert k 
-#' calculations, and to provide the option of running the topographic 
-#' correction in parallel using \code{foreach}.
+#' \code{landsat} package by Sarah Goslee. The code in this package has been 
+#' modifed from \code{topocorr} to allow using a subsample of the image for 
+#' Minnaert k calculations, and to provide the option of running the 
+#' topographic correction in parallel using \code{foreach}.
 #'
 #' @export
 #' @param x an image to correct
@@ -29,6 +29,10 @@
 #' datatype and filename)
 #' @return The topographically corrected image as a \code{RasterLayer} or 
 #' \code{RasterStack}
+#' @references
+#' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
+#' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
+#' http://www.jstatsoft.org/v43/i04/
 #' @examples
 #' \dontrun{
 #' # Mosaic the two ASTER DEM tiles needed to a Landsat image

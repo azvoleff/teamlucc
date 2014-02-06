@@ -49,11 +49,12 @@ or \code{RasterStack}
 }
 \description{
 Performs topographic correction using code based on
-\code{topocorr} from the \code{Landsat} package. The code
-in this package has been modifed from \code{topocorr} to
-allow using a subsample of the image for Minnaert k
-calculations, and to provide the option of running the
-topographic correction in parallel using \code{foreach}.
+\code{topocorr} from the \code{landsat} package by Sarah
+Goslee. The code in this package has been modifed from
+\code{topocorr} to allow using a subsample of the image for
+Minnaert k calculations, and to provide the option of
+running the topographic correction in parallel using
+\code{foreach}.
 }
 \examples{
 \dontrun{
@@ -73,5 +74,10 @@ L5TSR_1986_topocorr <- topographic_corr(L5TSR_1986, slopeaspect, sunelev,
 plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 }
+}
+\references{
+Sarah Goslee. Analyzing Remote Sensing Data in {R}: The
+{landsat} Package. Journal of Statistical Software, 2011,
+43:4, pg 1--25. http://www.jstatsoft.org/v43/i04/
 }
 
