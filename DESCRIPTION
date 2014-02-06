@@ -39,9 +39,9 @@ Suggests:
     notifyR,
     wrspathrow
 SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
-    Landsat scenes with heavy clouds, an IDL installation and the GNSPI.pro and
-    CLOUD_REMOVE.pro scripts by Zhu Xiaolin at the Ohio State University are
-    required.
+    Landsat scenes with heavy clouds using the \code{fill_gaps} or
+    \code{fill_clouds} functions requires an IDL installation and the GNSPI.pro
+    and CLOUD_REMOVE.pro scripts by Zhu Xiaolin at the Ohio State University.
 LinkingTo: Rcpp, RcppArmadillo
 Description: Routines for processing imagery and other spatial data for the
     Tropical Ecology Assessment and Monitoring (TEAM) Network.

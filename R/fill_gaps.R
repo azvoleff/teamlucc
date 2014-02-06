@@ -23,11 +23,11 @@
 #' @references Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical approach 
 #' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 
 #' Environment 124, 49-60.
-team_fill_gaps <- function(slc_off_file, input_file, timeseries_files, 
-                           script_path='GNSPI.sav', out_base=NULL, 
-                           sample_size=20, size_wind=12, class_num=4, 
-                           DN_min=0.0, DN_max=1.0, patch_long=1000,
-                           idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
+fill_gaps <- function(slc_off_file, input_file, timeseries_files, 
+                      script_path='GNSPI.sav', out_base=NULL, sample_size=20, 
+                      size_wind=12, class_num=4, DN_min=0.0, DN_max=1.0, 
+                      patch_long=1000,
+                      idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
 
     slc_off_file <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/gap_fill/test data/TM20100429_toaR_gap'
     input_file <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/gap_fill/test data/TM20100208_toaR'

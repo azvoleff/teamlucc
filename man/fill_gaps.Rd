@@ -1,8 +1,8 @@
-\name{team_fill_gaps}
-\alias{team_fill_gaps}
+\name{fill_gaps}
+\alias{fill_gaps}
 \title{Perform SLC-off gap fill of Landsat 7 ETM+ image}
 \usage{
-team_fill_gaps(slc_off_file, input_file, timeseries_files,
+fill_gaps(slc_off_file, input_file, timeseries_files,
   script_path = "GNSPI.sav", out_base = NULL, sample_size = 20,
   size_wind = 12, class_num = 4, DN_min = 0, DN_max = 1,
   patch_long = 1000,

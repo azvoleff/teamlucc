@@ -43,10 +43,10 @@ format_IDL_param <- function(varname, varvalue) {
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified 
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521-525.
-team_fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
-                             script_path='CLOUD_REMOVE.sav', num_class=1, 
-                             extent1=1, DN_min=0, DN_max=255, patch_long=1000,
-                             idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
+fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
+                        script_path='CLOUD_REMOVE.sav', num_class=1, extent1=1, 
+                        DN_min=0, DN_max=255, patch_long=1000,
+                        idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
     # img_cloudy <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/cloud_removal/test data/L20080724_cloudy'
     # img_clear <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/cloud_removal/test data/L20080606'
     # img_cloud_mask <- 'C:/Users/azvoleff/Code/TEAM/team_IDL_code/cloud_removal/test data/cloud_mask'
