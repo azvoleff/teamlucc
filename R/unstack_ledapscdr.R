@@ -12,7 +12,7 @@
 #' @export
 #' @importFrom tools file_path_sans_ext
 #' @param x input HDF4 file
-#' @param out output file
+#' @param out output folder
 #' @param overwrite whether to overwrite existing files
 unstack_ledapscdr <- function(x, out, overwrite=FALSE) {
     if (!require(gdalUtils)) {

@@ -7,7 +7,7 @@ unstack_ledapscdr(x, out, overwrite = FALSE)
 \arguments{
   \item{x}{input HDF4 file}
 
-  \item{out}{output file}
+  \item{out}{output folder}
 
   \item{overwrite}{whether to overwrite existing files}
 }
