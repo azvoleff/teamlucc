@@ -32,14 +32,19 @@ unstack_ledapscdr <- function(x, out, overwrite=FALSE) {
         stop_char <- start_char + attr(loc, 'match.length')[n]
         band_name <- substr(sds[[n]], start_char, stop_char)
         this_out <- paste0(file.path(out, out_basename), '_', band_name, '.envi')
-        if (file.exists(this_out) & overwrite) {
-            unlink(this_out)
-            if(file.exists(extension(this_out, 'hdr'))) 
-                unlink(extension(this_out, 'hdr'))
-            if(file.exists(extension(this_out, 'envi.aux.xml'))) 
-                unlink(extension(this_out, 'envi.aux.xml'))
-            if(file.exists(extension(this_out, 'envi.enp'))) 
-                unlink(extension(this_out, 'envi.enp'))
+        if (file.exists(this_out)) {
+            if (overwrite) {
+                unlink(this_out)
+                if(file.exists(extension(this_out, 'hdr'))) 
+                    unlink(extension(this_out, 'hdr'))
+                if(file.exists(extension(this_out, 'envi.aux.xml'))) 
+                    unlink(extension(this_out, 'envi.aux.xml'))
+                if(file.exists(extension(this_out, 'envi.enp'))) 
+                    unlink(extension(this_out, 'envi.enp'))
+            } else {
+                warning(paste(this_out, 'already exists - skipping file'))
+                next
+            }
         }
         out_rast <- gdal_translate(x, of="ENVI", sd_index=n, this_out, 
                                    outRaster=TRUE)
