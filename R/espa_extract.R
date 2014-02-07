@@ -41,8 +41,11 @@ espa_extract <- function(in_folder, out_folder) {
         metadata_string <- str_extract(zipfile, '^((LT4)|(LT5)|(LE7))[0-9]{13}')
         year <- substr(metadata_string, 10, 13)
         julian_day <- substr(metadata_string, 14, 16)
+        img_path <- substr(metadata_string, 4, 6)
+        img_row <- substr(metadata_string, 7, 9)
         this_out_folder <- file.path(out_folder,
-                                     paste(year, julian_day, sensor, sep='_'))
+                                     paste0(img_path,'-', img_row, '_', year, 
+                                            '-', julian_day, '_', sensor))
         if (!file_test('-d', this_out_folder)) {
             dir.create(this_out_folder)
         } else {

@@ -19,8 +19,7 @@ ls_catalog <- function(in_folder) {
     for (outer_item in dir(in_folder)) {
         outer_item_full <- file.path(in_folder, outer_item)
         # First cycle through the yearly folders
-        if (!grepl('^[0-9]{4}_[0-9]{3}_((LT4)|(LT5)|(LE7))$', outer_item) || 
-            !file_test('-d', outer_item_full)) {
+        if (!file_test('-d', outer_item_full)) {
             next
         }
         for (inner_item in dir(outer_item_full)) {
