@@ -66,7 +66,7 @@ espa_download <- function(email, order_ID, output_folder) {
     }
     # Below is for old format ESPA order IDs (through end of 2013)
     #if (!grepl('^[0-9]{13}$', order_ID)) {
-    if (!grepl('^[0-9]{6}-[0-9]{6}$', order_ID)) {
+    if (!grepl('^[0-9]{6}-[0-9]{5,6}$', order_ID)) {
         stop(paste(order_ID, 'does not appear to be a valid ESPA order ID'))
     }
     if (!file_test('-d', output_folder)) {
@@ -81,6 +81,9 @@ espa_download <- function(email, order_ID, output_folder) {
                      order_ID, '/L[ET][0-9]{14}-SC[0-9]{14}\\.tar\\.gz')
     espa_urls <- espa_page[grepl(url_re, espa_page)]
     espa_urls <- str_extract(espa_urls, url_re)
+    if (length(espa_urls) == 0) {
+        stop('no download links found')
+    }
 
     successes <- 0
     failures <- 0
