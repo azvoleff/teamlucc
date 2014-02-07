@@ -7,6 +7,7 @@
 #' "LT50150531986037-SC20130816144215.tar.gz" would be extracted into a 
 #' subfolder named "1986_037_LT5', for 1986, Julian day 37, and Landsat 5 TM.
 #'
+#' @export
 #' @importFrom stringr str_extract
 #' @param in_folder Path to a folder of .tar.gz Landsat surface reflectance 
 #' images

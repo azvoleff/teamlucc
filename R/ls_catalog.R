@@ -5,6 +5,7 @@
 #' series of subfolders named following the naming scheme of 
 #' \code{\link{espa_extract}}.
 #'
+#' @export
 #' @importFrom stringr str_extract
 #' @param in_folder path to a folder of Landsat surface reflectance images (for 
 #' example, as extracted by the \code{espa_extract} function).
