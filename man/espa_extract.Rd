@@ -15,7 +15,7 @@ used for side effect of unzipping Landsat tarballs
 }
 \description{
 Each image .tar.gz file will be extracted into a subfolder
-within \cpde{output_folder}. The subfolders will be named
+within \code{output_folder}. The subfolders will be named
 according to the year and Julian date of capture, and the
 sensor type (LT4, LT5 or LE7 for Landsat 4 TM, Landsat 5
 TM, and Landsat 7 ETM+ respectively). For example,

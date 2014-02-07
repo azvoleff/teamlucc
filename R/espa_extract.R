@@ -1,7 +1,7 @@
 #' Extract a set of Landsat tarballs into a folder tree organized by image date
 #'
 #' Each image .tar.gz file will be extracted into a subfolder within 
-#' \cpde{output_folder}. The subfolders will be named according to the year and 
+#' \code{output_folder}. The subfolders will be named according to the year and 
 #' Julian date of capture, and the sensor type (LT4, LT5 or LE7 for Landsat 4 
 #' TM, Landsat 5 TM, and Landsat 7 ETM+ respectively). For example, 
 #' "LT50150531986037-SC20130816144215.tar.gz" would be extracted into a 
@@ -13,6 +13,12 @@
 #' @param out_folder output folder
 #' @return used for side effect of unzipping Landsat tarballs
 espa_extract <- function(in_folder, out_folder) {
+    if (!file_test('-d', in_folder)) {
+        stop(paste(in_folder, 'does not exist'))
+    }
+    if (!file_test('-d', out_folder)) {
+        stop(paste(out_folder, 'does not exist'))
+    }
     for (zipfile in dir(in_folder, pattern='^.*.tar.gz(ip)?$')) {
         zipfile_path <- file.path(in_folder, zipfile)
         if (!file_test('-f', zipfile_path)) {
