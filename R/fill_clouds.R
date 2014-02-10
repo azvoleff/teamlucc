@@ -57,6 +57,13 @@ fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
                                    package="teamr")
     }
     
+    # Setup cloud mask
+    # First merge cloud and cloud shadow (use same coding)
+    
+    # Set water to 0 (background)
+    
+    # Use ConnCompLabel from the SDMTools package to label the cloud patches
+    
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
         stop('IDL not found - check "idl" parameter')
     }
