@@ -30,7 +30,9 @@ format_IDL_param <- function(varname, varvalue) {
 #' @importFrom tools file_path_sans_ext
 #' @param img_cloudy the clear image (base image)
 #' @param img_clear the cloudy image
-#' @param img_cloud_mask cloud mask, with clouded areas set to
+#' @param img_cloud_mask cloud mask, with cloud patches assigned unique integer 
+#' codes, and all background coded as zero. The \code{ConnCompLabel} function 
+#' in the \code{SDMTools} package can automate this process.
 #' @param out_name name for output image, or NULL. If null an output name will 
 #' be automatically assigned based on \code{img_clear}
 #' @param fast if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro script. If 
@@ -56,13 +58,6 @@ fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
         script_path <- system.file("idl", "CLOUD_REMOVE.pro", 
                                    package="teamr")
     }
-    
-    # Setup cloud mask
-    # First merge cloud and cloud shadow (use same coding)
-    
-    # Set water to 0 (background)
-    
-    # Use ConnCompLabel from the SDMTools package to label the cloud patches
     
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
         stop('IDL not found - check "idl" parameter')

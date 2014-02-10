@@ -12,8 +12,10 @@ fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
 
   \item{img_clear}{the cloudy image}
 
-  \item{img_cloud_mask}{cloud mask, with clouded areas set
-  to}
+  \item{img_cloud_mask}{cloud mask, with cloud patches
+  assigned unique integer codes, and all background coded
+  as zero. The \code{ConnCompLabel} function in the
+  \code{SDMTools} package can automate this process.}
 
   \item{out_name}{name for output image, or NULL. If null
   an output name will be automatically assigned based on
