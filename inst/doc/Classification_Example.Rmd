@@ -11,6 +11,7 @@ Load required R packages, and setup parallel computation with spatial.tools.
 
 ```{r setup_libraries, cache=FALSE}
 library(teamr)
+library(glcm)
 library(spatial.tools)
 data_dir <- 'D:/azvoleff/Data/'
 sfQuickInit(2)

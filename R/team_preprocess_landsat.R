@@ -2,6 +2,7 @@
 #'
 #' @export
 #' @importFrom rgeos gContains gUnion
+#' @importFrom glcm glcm
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
 #' @param output_path the path to use for the output
