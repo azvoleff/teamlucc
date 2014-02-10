@@ -21,6 +21,7 @@ before_install:
 
 install:
   - ./travis-tool.sh install_github azvoleff/spatial.tools
+  - ./travis-tool.sh install_github azvoleff/wrspathrowData
   - ./travis-tool.sh install_github azvoleff/wrspathrow
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github hadley/devtools

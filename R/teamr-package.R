@@ -11,7 +11,6 @@
 #' @title TEAM Remote Sensing Processing Tools
 #' @author Alex Zvoleff, \email{azvoleff@@conservation.org}
 #' @keywords package
-#' @useDynLib teamr
 NULL
 #' Landsat 5 Surface Reflectance Image from February 6, 1986 (path 15, row 53)
 #' 

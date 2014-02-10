@@ -11,8 +11,7 @@ Depends:
     methods,
     raster (>= 2.2-6)
 Imports:
-    Rcpp (>= 0.10.1),
-    RcppArmadillo,
+    glcm,
     rgeos,
     rgdal,
     mgcv,
@@ -44,7 +43,6 @@ SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
     Landsat scenes with heavy clouds using the \code{fill_gaps} or
     \code{fill_clouds} functions requires an IDL installation and the GNSPI.pro
     and CLOUD_REMOVE.pro scripts by Xiaolin Zhu at the Ohio State University.
-LinkingTo: Rcpp, RcppArmadillo
 Description: Routines for processing imagery and other spatial data for the
     Tropical Ecology Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
