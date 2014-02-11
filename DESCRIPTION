@@ -12,6 +12,7 @@ Depends:
     raster (>= 2.2-6)
 Imports:
     glcm,
+    wrspathrow,
     rgeos,
     rgdal,
     mgcv,
@@ -36,8 +37,7 @@ Suggests:
     landsat,
     foreach,
     doSNOW,
-    notifyR,
-    wrspathrow
+    notifyR
 SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
     Landsat scenes with heavy clouds using the \code{fill_gaps} or
     \code{fill_clouds} functions requires an IDL installation and the GNSPI.pro
