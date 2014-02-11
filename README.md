@@ -66,10 +66,6 @@ install_github('teamr', username='azvoleff')
 
 at the R prompt to install `teamr`.
 
-If you are installing on Windows, you will first need to install the 
-appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
-for your version of R (as `teamr` contains C++ code).
-
 ## Author Contact Information
 
 [Alex Zvoleff](mailto:azvoleff@conservation.org)  
