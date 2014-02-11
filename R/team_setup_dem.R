@@ -48,7 +48,7 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
     aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
     aoi <- spTransform(aoi, CRS(proj4string(cgiar_srtm_extents)))
     
-    pathrows <- get_pathrow(aoi, wrs_type=2, wrs_mode='D', as_polys=TRUE)
+    pathrows <- pathrow_num(aoi, wrs_type=2, wrs_mode='D', as_polys=TRUE)
 
     writeOGR(pathrows, output_path, 
              paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows'), 
@@ -59,9 +59,8 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         width=900, height=900)
     plot(pathrows, lwd=2)
     plot(aoi, add=TRUE, lty=2, col="#00ff0050", lwd=2)
-    text(coordinates(pathrows), labels=paste(pathrows@data$PATH, 
-                                             pathrows@data$ROW, sep=', '), 
-         cex=2)
+    text(coordinates(pathrows), labels=paste(pathrows$PATH, pathrows$ROW, 
+                                             sep=', '), cex=2)
     dev.off()
 
     pathrows_utm <- spTransform(pathrows,
