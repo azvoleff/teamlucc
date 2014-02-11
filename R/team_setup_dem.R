@@ -1,6 +1,7 @@
 #' Setup the DEM mosaic for a particular TEAM site
 #'
 #' @export
+#' @importFrom wrspathrow pathrow_num
 #' @importFrom rgdal readOGR writeOGR
 #' @importFrom sp spTransform
 #' @importFrom rgeos gBuffer gIntersects gUnaryUnion
@@ -25,10 +26,6 @@
 #' }
 team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1, 
                            overwrite=FALSE, notify=print) {
-    if (!require(wrspathrow)) {
-        stop('wrspathrow not found - to install, type: install_github("azvoleff/wrspathrow")')
-    }
-
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
     }
