@@ -57,8 +57,8 @@ sudo apt-get install gdal-bin libgdal-dev
 As `teamr` is still under development, it is not yet listed on 
 [CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
 version) of the `teamr` package is using the 
-[devtools](http://cran.r-project.org/web/packages/devtools/index.html) package 
-from Hadley Wickham. After installing `devtools` from CRAN, type:
+[`devtools`](http://cran.r-project.org/web/packages/devtools/index.html) 
+package by Hadley Wickham. After installing `devtools` from CRAN, type:
 
 ```R
 install_github('teamr', username='azvoleff')

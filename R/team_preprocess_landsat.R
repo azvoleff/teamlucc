@@ -76,8 +76,10 @@ team_preprocess_landsat <- function(image_dirs, output_path, dem_path,
             # Read gain and offset from the metadata file as raster does not 
             # support passing as.is=TRUE to readGDAL, meaning that GDAL 
             # automatically scales the returned data turning it into floats.
-            gain(image_stack) <- 1/as.numeric(get_metadata_item(band_files[1], 'scale_factor'))
-            offs(image_stack) <- as.numeric(get_metadata_item(band_files[1], 'add_offset'))
+            gain(image_stack) <- 1/as.numeric(get_metadata_item(band_files[1], 
+                                                                'scale_factor'))
+            offs(image_stack) <- as.numeric(get_metadata_item(band_files[1], 
+                                                              'add_offset'))
 
             mask_band_files <- c()
             for (mask_band in mask_bands) {
