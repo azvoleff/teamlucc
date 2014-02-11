@@ -1,6 +1,21 @@
-team_preprocess_landsat <- function(image_dirs, output_path, n_cpus=1, 
-                                    cleartmp=FALSE, overwrite=FALSE, 
-                                    notify=print) {
+#' Calculate predictor layers for a classification
+#'
+#' @export
+#' @importFrom glcm glcm
+#' @param image_dirs list of paths to a set of Landsat images that have been 
+#' preprocessed by the \code{team_preprocess_landsat} function.
+#' @param output_path the path to use for the output
+#' @param n_cpus the number of CPUs to use for processes that can run in 
+#' parallel
+#' @param cleartmp whether to clear temp files on each run through the loop
+#' @param overwrite whether to overwrite existing files (otherwise an error 
+#' will be raised)
+#' @param notify notifier to use (defaults to \code{print} function). See the 
+#' \code{notifyR} package for one way of sending notifications from R. The 
+#' \code{notify} function should accept a string as the only argument.
+team_calc_predictors <- function(image_dirs, output_path, n_cpus=1, 
+                                 cleartmp=FALSE, overwrite=FALSE,
+                                 notify=print) {
 
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
@@ -42,16 +57,19 @@ team_preprocess_landsat <- function(image_dirs, output_path, n_cpus=1,
                 stop(paste('no pre-processed files found for', image_basename))
             }
 
-            image_stack <- brick(poss_files[exist_files])
+            image_path <- poss_files[exist_files]
 
-            sitecode <- str_extract(image_basename, '^[a-zA-Z]{2,3}')
+            # Update the basename to refer the chosen file
+            image_basename <- basename(file_path_sans_ext(image_path))
+
+            image_stack <- brick(image_path)
 
             ######################################################################
             # Calculate additional predictor layers (MSAVI and textures)
             timer <- start_timer(timer, label=paste(image_basename, '-', 'MSAVI2'))
             MSAVI2_filename <- file.path(output_path,
-                                         paste(sitecode, image_basename, 
-                                               'masked_tc_MSAVI2.envi', sep='_'))
+                                         paste(image_basename, 'MSAVI2.envi', 
+                                               sep='_'))
             MSAVI2_layer <- MSAVI2(red=raster(image_stack, layer=3),
                                    nir=raster(image_stack, layer=4))
             # Truncate MSAVI2 to range between 0 and 1, and scale by 10,000 so it 
@@ -65,8 +83,8 @@ team_preprocess_landsat <- function(image_dirs, output_path, n_cpus=1,
 
             timer <- start_timer(timer, label=paste(image_basename, '-', 'glcm'))
             MSAVI2_glcm_filename <- file.path(output_path,
-                                              paste(sitecode, image_basename, 
-                                                    'masked_tc_MSAVI2_glcm.envi', 
+                                              paste(image_basename, 
+                                                    'MSAVI2_glcm.envi', 
                                                     sep='_'))
             glcm_statistics <- c('mean', 'variance', 'homogeneity', 'contrast', 
                                  'dissimilarity', 'entropy', 'second_moment', 
@@ -98,7 +116,7 @@ team_preprocess_landsat <- function(image_dirs, output_path, n_cpus=1,
                                 slopeaspect$slope,
                                 aspect_cut)
             predictors_filename <- file.path(output_path,
-                                             paste(sitecode, image_basename, 
+                                             paste(image_basename, 
                                                    'predictors.envi', sep='_'))
             predictors <- mask(predictors, image_stack_mask, maskvalue=0, 
                                filename=predictors_filename, overwrite=overwrite,
