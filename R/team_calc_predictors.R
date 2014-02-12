@@ -4,6 +4,7 @@
 #' @importFrom glcm glcm
 #' @param image_dirs list of paths to a set of Landsat images that have been 
 #' preprocessed by the \code{team_preprocess_landsat} function.
+#' @param dem_path path to a set of DEMs as output by \code{team_setup_dem}
 #' @param output_path the path to use for the output
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
@@ -13,10 +14,12 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
-team_calc_predictors <- function(image_dirs, output_path, n_cpus=1, 
+team_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1, 
                                  cleartmp=FALSE, overwrite=FALSE,
                                  notify=print) {
-
+    if (!file_test("-d", dem_path)) {
+        stop(paste(dem_path, "does not exist"))
+    }
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
@@ -100,6 +103,26 @@ team_calc_predictors <- function(image_dirs, output_path, n_cpus=1,
             timer <- stop_timer(timer, label=paste(image_basename, '-', 'glcm'))
 
             ######################################################################
+            # Load DEM, slope, and aspect, and reclass aspect
+            timer <- start_timer(timer, label=paste(image_basename, '-', 'process dem and slopeaspect'))
+            
+            #TODO: load dem and slopeaspect layers
+            cropped_dem <- NULL
+            slopeaspect <- NULL
+            # Classify aspect into north facing, east facing, etc., recalling 
+            # that the aspect is stored in radians scaled by 1000.
+            #     1: north facing (0-45, 315-360)
+            #     2: east facing (45-135)
+            #     3: south facing (135-225)
+            #     4: west facing (225-315)
+            aspect_cut <- raster::cut(slopeaspect$aspect/1000,
+                                      c(-1, 45, 135, 225, 315, 361)*(pi/180))
+            # Code both 0-45 and 315-360 aspect as North facing (1)
+            aspect_cut[aspect_cut == 5] <- 1
+            names(aspect_cut) <- 'aspect'
+            timer <- stop_timer(timer, label=paste(image_basename, '-', 'process dem and slopeaspect'))
+
+            ######################################################################
             # Layer stack predictor layers:
             timer <- start_timer(timer, label=paste(image_basename, '-', 'write predictors'))
             predictors <- stack(raster(image_stack, layer=1),
@@ -118,6 +141,9 @@ team_calc_predictors <- function(image_dirs, output_path, n_cpus=1,
             predictors_filename <- file.path(output_path,
                                              paste(image_basename, 
                                                    'predictors.envi', sep='_'))
+            #TODO: load mask
+            image_stack_mask <- NULL
+
             predictors <- mask(predictors, image_stack_mask, maskvalue=0, 
                                filename=predictors_filename, overwrite=overwrite,
                                datatype='INT2S')

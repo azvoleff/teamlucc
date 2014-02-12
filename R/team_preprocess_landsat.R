@@ -237,18 +237,6 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                                      overwrite=overwrite)
         names(slopeaspect) <- c('slope', 'aspect')
 
-        # Classify aspect into north facing, east facing, etc., recalling that 
-        # the aspect is stored in radians scaled by 1000.
-        #     1: north facing (0-45, 315-360)
-        #     2: east facing (45-135)
-        #     3: south facing (135-225)
-        #     4: west facing (225-315)
-        aspect_cut <- raster::cut(slopeaspect$aspect/1000,
-                                  c(-1, 45, 135, 225, 315, 361)*(pi/180))
-        # Code both 0-45 and 315-360 aspect as North facing (1)
-        aspect_cut[aspect_cut == 5] <- 1
-        names(aspect_cut) <- 'aspect'
-
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop and reclass slope/aspect'))
 
         ######################################################################

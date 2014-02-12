@@ -2,13 +2,16 @@
 \alias{team_calc_predictors}
 \title{Calculate predictor layers for a classification}
 \usage{
-team_calc_predictors(image_dirs, output_path, n_cpus = 1, cleartmp = FALSE,
-  overwrite = FALSE, notify = print)
+team_calc_predictors(image_dirs, dem_path, output_path, n_cpus = 1,
+  cleartmp = FALSE, overwrite = FALSE, notify = print)
 }
 \arguments{
   \item{image_dirs}{list of paths to a set of Landsat
   images that have been preprocessed by the
   \code{team_preprocess_landsat} function.}
+
+  \item{dem_path}{path to a set of DEMs as output by
+  \code{team_setup_dem}}
 
   \item{output_path}{the path to use for the output}
 
