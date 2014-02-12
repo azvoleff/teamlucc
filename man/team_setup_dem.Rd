@@ -11,7 +11,8 @@ team_setup_dem(dem_path, output_path, aoi_file, n_cpus = 1,
   images in the image_list.}
 
   \item{aoi_file}{area of interest (AOI) shapefile to use
-  as as bounding box when selecting DEMs}
+  as as bounding box when selecting DEMs, in a file format
+  readable by \code{readOGR}}
 
   \item{output_path}{the path to use for the output}
 

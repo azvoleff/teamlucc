@@ -2,13 +2,16 @@
 #'
 #' @export
 #' @importFrom wrspathrow pathrow_poly
+#' @importFrom rgdal readOGR
 #' @importFrom rgeos gContains gIntersection
+#' @importFrom tools file_path_sans_ext
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
 #' @param output_path the path to use for the output
 #' @param dem_path path to a set of DEMs as output by \code{team_setup_dem}
 #' @param sitecode code to use as a prefix for all filenames
-#' @param aoi an area of interest (AOI) to crop from each image
+#' @param aoi_file an area of interest (AOI) to crop from each image, in a file 
+#' format readable by \code{readOGR}
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
@@ -26,7 +29,7 @@
 #' 'H:/Data/TEAM/VB/LCLUC_Analysis', "VB", 3, TRUE)
 #' }
 team_preprocess_landsat <- function(image_dirs, dem_path, sitecode, 
-                                    output_path=NULL, aoi=NULL, n_cpus=1, 
+                                    output_path=NULL, aoi_file=NULL, n_cpus=1, 
                                     cleartmp=FALSE,  overwrite=FALSE, 
                                     notify=print) {
     if (!file_test("-d", dem_path)) {
@@ -115,7 +118,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         WRS_Row <- sprintf('%03i', as.numeric(get_metadata_item(band1_imagefile, 'WRS_Row')))
         image_basename <- paste(paste0(WRS_Path, WRS_Row),
                                 format(aq_date, '%Y%j'), short_name, sep='_')
-        if (!is.null(aoi)) {
+        if (!is.null(aoi_file)) {
             image_basename <- paste(image_basename, 'crop', sep='_')
         }
 
@@ -125,23 +128,24 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         # Crop image to landsat path/row, after intersecting it with the 
         # supplied AOI
         timer <- start_timer(timer, label=paste(image_basename, '-', 'crop'))
-        if (!is.null(aoi)) {
-            if (class(aoi) != 'SpatialPolygonsDataFrame') {
-                stop('aoi must be a SpatialPolygonsDataFrame')
-            } else if (crs(aoi) != crs(image_stack)) {
-                stop(paste('projections of aoi and', image_basename, 'do not match'))
+        if (!is.null(aoi_file)) {
+            aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
+            if (proj4string(aoi) != proj4string(image_stack)) {
+                aoi <- spTransform(aoi, CRS(proj4string(image_stack)))
             }
             pathrow_area <- pathrow_poly(as.numeric(WRS_Path), 
                                          as.numeric(WRS_Row))
-            if (crs(pathrow_area) != crs(aoi)) {
-                pathrow_area <- spTransform(pathrow_area, aoi)
+            if (proj4string(pathrow_area) != proj4string(aoi)) {
+                pathrow_area <- spTransform(pathrow_area, 
+                                            CRS(proj4string(aoi)))
             }
-            crop_area <- gIntersection(pathrow_poly, aoi)
+            crop_area <- gIntersection(pathrow_area, aoi, byid=TRUE)
         } else {
             crop_area <- pathrow_poly(as.numeric(WRS_Path), 
                                       as.numeric(WRS_Row))
-            if (crs(crop_area) != crs(image_stack)) {
-                crop_area <- spTransform(crop_area, image_stack)
+            if (proj4string(crop_area) != proj4string(image_stack)) {
+                crop_area <- spTransform(crop_area, 
+                                         CRS(proj4string(image_stack)))
             }
         }
         image_stack <- crop(image_stack, crop_area)

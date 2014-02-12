@@ -9,7 +9,7 @@
 #' @param dem_path a list of digital elevation models (DEMs) that (when 
 #' mosaiced) covers the full extent of all the images in the image_list.
 #' @param aoi_file area of interest (AOI) shapefile to use as as bounding box 
-#' when selecting DEMs
+#' when selecting DEMs, in a file format readable by \code{readOGR}
 #' @param output_path the path to use for the output
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
