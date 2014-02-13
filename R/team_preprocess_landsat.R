@@ -116,8 +116,8 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         short_name  <- get_metadata_item(band1_imagefile, 'ShortName')
         WRS_Path <- sprintf('%03i', as.numeric(get_metadata_item(band1_imagefile, 'WRS_Path')))
         WRS_Row <- sprintf('%03i', as.numeric(get_metadata_item(band1_imagefile, 'WRS_Row')))
-        image_basename <- paste(paste0(WRS_Path, WRS_Row),
-                                format(aq_date, '%Y%j'), short_name, sep='_')
+        image_basename <- paste0(WRS_Path, '-', WRS_Row, '_',
+                                 format(aq_date, '%Y-%j'), '_', short_name)
         if (!is.null(aoi_file)) {
             image_basename <- paste(image_basename, 'crop', sep='_')
         }
@@ -149,8 +149,10 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
             }
         }
         image_stack <- crop(image_stack, crop_area)
+        image_stack <- mask(image_stack, crop_area)
         image_stack <- extend(image_stack, crop_area)
         mask_stack <- crop(mask_stack, crop_area)
+        image_stack <- mask(mask_stack, crop_area)
         mask_stack <- extend(mask_stack, crop_area)
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop'))
 
@@ -179,12 +181,14 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                 ((fmask == 0) | (fmask == 1)) & (fill == 0)
                 })
 
-        image_stack_masked_path <- file.path(output_path,
-                                            paste(sitecode, image_basename, 
-                                                  'masked.envi', sep='_'))
-        image_stack <- mask(image_stack, image_stack_mask, maskvalue=0,
-                            filename=image_stack_masked_path, 
-                            overwrite=overwrite, datatype=dataType(image_stack)[1])
+        image_stack <- mask(image_stack, image_stack_mask, maskvalue=0)
+
+        mask_stack_path <- file.path(output_path,
+                                     paste(sitecode, image_basename, 
+                                           'masks.envi', sep='_'))
+        mask_stack <- writeRaster(mask_stack, filename=mask_stack_path, 
+                                  overwrite=overwrite, 
+                                  datatype=dataType(mask_stack)[1])
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'masking'))
 
         ######################################################################
@@ -194,7 +198,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         dem <- raster(dem_filename)
 
         slopeaspect_filename <- file.path(dem_path,
-                                          paste0('dem_slopeaspect_', 
+                                          paste0('slopeaspect_', 
                                                  WRS_Path, WRS_Row, '.envi'))
         slopeaspect <- brick(slopeaspect_filename)
 
@@ -235,7 +239,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         timer <- start_timer(timer, label=paste(image_basename, '-', 'crop and reclass slope/aspect'))
         slopeaspect_cropped_file <- file.path(output_path,
                                       paste(sitecode, image_basename, 
-                                            'dem_slopeaspect.envi', sep='_'))
+                                            'slopeaspect.envi', sep='_'))
         slopeaspect <- match_rasters(image_stack, slopeaspect, 
                                      filename=slopeaspect_cropped_file, 
                                      overwrite=overwrite)
@@ -264,7 +268,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         sunazimuth <- as.numeric(get_metadata_item(band1_imagefile, 'SolarAzimuth'))
         topocorr_filename <- file.path(output_path,
                                        paste(sitecode, image_basename, 
-                                             'masked_tc.envi', sep='_'))
+                                             'tc.envi', sep='_'))
         image_stack <- topographic_corr(image_stack, slopeaspect_flt, sunelev, 
                                        sunazimuth, method='minnaert_full', 
                                        filename=topocorr_filename, 

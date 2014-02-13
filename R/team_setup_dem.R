@@ -148,7 +148,7 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         timer <- start_timer(timer, label=paste('Calculating slope/aspect for', 
                                                 pathrow_label))
         slopeaspect_filename <- file.path(output_path,
-                                          paste0('dem_slopeaspect_',
+                                          paste0('slopeaspect_',
                                                  pathrow_label, '.envi'))
         # Note that the default output of 'terrain' is in radians
         slopeaspect <- terrain(dem_mosaic_crop, opt=c('slope', 'aspect'))
