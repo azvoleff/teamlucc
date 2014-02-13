@@ -83,7 +83,7 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
         uncorr_layer=NULL
         corr_img <- foreach(uncorr_layer=unstack(x), .combine='addLayer', 
                             .multicombine=TRUE, .init=raster(), 
-                            .packages=c('raster', 'teamr')) %dopar% {
+                            .packages=c('raster', 'teamr', 'rgdal')) %dopar% {
             if (method == 'minnaert_full') {
                 minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
