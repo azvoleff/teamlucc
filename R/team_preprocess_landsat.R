@@ -193,7 +193,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                                            'masks.envi', sep='_'))
         mask_stack <- writeRaster(mask_stack, filename=mask_stack_path, 
                                   overwrite=overwrite, 
-                                  datatype=dataType(mask_stack)[1])
+                                  datatype='INT2S')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'masking'))
 
         ######################################################################
