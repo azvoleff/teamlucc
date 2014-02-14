@@ -195,13 +195,13 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
 
         ######################################################################
         # Crop dem, slope, and aspect
-        dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, WRS_Row, 
+        dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, '-', WRS_Row, 
                                                    '.envi'))
         dem <- raster(dem_filename)
 
         slopeaspect_filename <- file.path(dem_path,
                                           paste0('slopeaspect_', 
-                                                 WRS_Path, WRS_Row, '.envi'))
+                                                 WRS_Path, '-', WRS_Row, '.envi'))
         slopeaspect <- brick(slopeaspect_filename)
 
         if (!compareRaster(dem, image_stack, extent=FALSE, rowcol=FALSE, 

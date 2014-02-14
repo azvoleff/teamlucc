@@ -45,8 +45,8 @@ archive
 image_dirs <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc',
                 'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
-team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis',
-'H:/Data/TEAM/VB/LCLUC_Analysis', "VB", 3, TRUE)
+team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis', 'VB'
+'H:/Data/TEAM/VB/LCLUC_Analysis', n_cpus=3)
 }
 }
 

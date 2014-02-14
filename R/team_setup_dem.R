@@ -76,7 +76,7 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         cgiar_srtm_extents <- cgiar_srtm_extents[intersecting, ]
     }
 
-    dem_list <- file.path(dem_path, cgiar_srtm_extents@data$filename)
+    dem_list <- file.path(dem_path, cgiar_srtm_extents$filename)
     dem_rasts <- lapply(dem_list, raster)
 
     if (length(dem_list) > 1) {
@@ -105,8 +105,8 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
                                             'path/rows'))
     for (n in 1:length(pathrows_buff)) {
         pathrow_buff <- pathrows[n, ]
-        pathrow_label <- paste0(sprintf('%03i', pathrow_buff@data$PATH), 
-                                sprintf('%03i', pathrow_buff@data$ROW))
+        pathrow_label <- paste(sprintf('%03i', pathrow_buff$PATH), 
+                               sprintf('%03i', pathrow_buff$ROW), sep='-')
 
         timer <- start_timer(timer, label=paste('Cropping DEM mosaic for', 
                                                 pathrow_label))
