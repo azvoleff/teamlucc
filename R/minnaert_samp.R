@@ -49,7 +49,11 @@
 # the number of members in each class.
 clean_intervals <- function(counts, lims, n) {
     while(min(counts) < n) {
-        min_index <- match(TRUE, counts == min(counts))
+        # The "rev" below is so that the classes at the end are combined first 
+        # (as classes with higher slopes are more more likely to be more rare 
+        # and therefore have fewer members)
+        min_index <- length(counts) - match(TRUE,
+                                            rev(counts == min(counts))) + 1
         if (min_index == length(counts)) {
             counts[min_index - 1] <- counts[min_index - 1] + counts[min_index]
             lims <- lims[-(min_index - 1)]
@@ -66,7 +70,6 @@ clean_intervals <- function(counts, lims, n) {
         }
         counts <- counts[-min_index]
     }
-    #return(list(counts, lims))
     return(lims)
 }
 
@@ -108,27 +111,19 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
                           coverclass=NULL, sampleindices=NULL) {
 
     if (is.null(slopeclass)) {
+        # Have lims start above 1 degree of slope, so that no topographic
+        # correction is performed for low slope areas.
+        lims <- seq(1*pi/180, pi/2, length.out=30)
         if (is.null(sampleindices)) {
-            lims <- as.numeric(quantile(slope, seq(0, 1, .01), na.rm=TRUE))
-            lims <- unique(round(lims, 3))
-            # Have lims start above 1 degree of slope, so that no topographic
-            # correction is performed for low slope areas.
-            lims <- lims[lims > 1*(pi/180)]
             counts <- raster::freq(raster::cut(slope, lims,
                                                include.lowest=TRUE), 
                                    useNA='no')[, 2]
         } else {
-            lims <- as.numeric(quantile(slope[sampleindices], seq(0, 1, .01), 
-                                        na.rm=TRUE))
-            lims <- unique(round(lims, 3))
-            # Have lims start above 1 degree of slope, so that no topographic
-            # correction is performed for low slope areas.
-            lims <- lims[lims > 1*(pi/180)]
             counts <- as.numeric(table(cut(slope[sampleindices], lims, 
                                            include.lowest=TRUE), useNA='no'))
         }
         # The [-1] below is because clean_intervals only needs the upper limits
-        lims <- clean_intervals(counts, lims[-1], 500)
+        lims <- clean_intervals(counts, lims[-1], 1000)
         slopeclass <- c(1*pi/180, lims)
     } else {
         slopeclass <- (pi/180) * slopeclass
@@ -144,7 +139,8 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     k_table <- .calc_k_table(x, IL, slope, sampleindices, slopeclass, 
                              coverclass, sunzenith)
     
-    k_model <- with(k_table, bam(k ~ s(midpoint, k=length(midpoint) - 1), data=k_table))
+    k_model <- with(k_table, bam(k ~ s(midpoint, k=length(midpoint) - 1), 
+                                 data=k_table))
 
     # If slope is greater than modeled range, use maximum of modeled range. If 
     # slope is less than modeled range, treat it as flat.
