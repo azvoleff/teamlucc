@@ -3,7 +3,7 @@
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
 team_setup_dem(dem_path, output_path, aoi_file, n_cpus = 1,
-  overwrite = FALSE, notify = print)
+  overwrite = FALSE, crop_to_aoi = FALSE, notify = print)
 }
 \arguments{
   \item{dem_path}{a list of digital elevation models (DEMs)
@@ -21,6 +21,10 @@ team_setup_dem(dem_path, output_path, aoi_file, n_cpus = 1,
 
   \item{overwrite}{whether to overwrite existing files
   (otherwise an error will be raised)}
+
+  \item{crop_to_aoi}{whether to crop the dem to the
+  supplied AOI, or to the Landsat path/row polygon for that
+  particular path/row}
 
   \item{notify}{notifier to use (defaults to \code{print}
   function). See the \code{notifyR} package for one way of

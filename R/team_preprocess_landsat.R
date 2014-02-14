@@ -162,7 +162,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop'))
 
         ######################################################################
-        # Load data and mask out clouds and missing values
+        # Mask out clouds and missing values
         timer <- start_timer(timer, label=paste(image_basename, '-', 'masking'))
 
         # The combined cloud mask includes the cloud_QA, cloud_shadow_QA, and 
@@ -197,7 +197,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'masking'))
 
         ######################################################################
-        # Crop dem, slope, and aspect
+        # Load dem, slope, and aspect
         dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, '-', WRS_Row, 
                                                    '.envi'))
         dem <- raster(dem_filename)
@@ -222,35 +222,6 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         # so rgeos doesn't throw an error
         proj4string(dem) <- proj4string(image_stack)
         proj4string(slopeaspect) <- proj4string(image_stack)
-
-        image_extent_poly <- as(extent(image_stack), 'SpatialPolygons')
-        dem_extent_poly <- as(extent(dem), 'SpatialPolygons')
-        if (!gContains(dem_extent_poly, image_extent_poly)) {
-            warning(paste("DEM does not fully cover extent of", image_basename))
-        }
-
-        timer <- start_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
-        cropped_dem_file <- file.path(this_output_path,
-                                      paste(sitecode, image_basename, 
-                                            'dem.envi', sep='_'))
-        cropped_dem <- match_rasters(image_stack, dem)
-        cropped_dem <- calc(cropped_dem, fun=function(vals) {
-                round(vals)
-            }, filename=cropped_dem_file, overwrite=overwrite, 
-            datatype='INT2S')
-        names(cropped_dem) <- "dem"
-        timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
-
-        timer <- start_timer(timer, label=paste(image_basename, '-', 'crop and reclass slope/aspect'))
-        slopeaspect_cropped_file <- file.path(this_output_path,
-                                      paste(sitecode, image_basename, 
-                                            'slopeaspect.envi', sep='_'))
-        slopeaspect <- match_rasters(image_stack, slopeaspect, 
-                                     filename=slopeaspect_cropped_file, 
-                                     overwrite=overwrite)
-        names(slopeaspect) <- c('slope', 'aspect')
-
-        timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop and reclass slope/aspect'))
 
         ######################################################################
         # Perform topographic correction
