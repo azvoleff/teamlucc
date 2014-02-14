@@ -25,8 +25,8 @@
 #' image_dirs <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc',
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
 #'                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
-#' team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis', 
-#' 'H:/Data/TEAM/VB/LCLUC_Analysis', "VB", 3, TRUE)
+#' team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis', 'VB'
+#' 'H:/Data/TEAM/VB/LCLUC_Analysis', n_cpus=3)
 #' }
 team_preprocess_landsat <- function(image_dirs, dem_path, sitecode, 
                                     output_path=NULL, aoi_file=NULL, n_cpus=1, 
@@ -107,6 +107,8 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
 
         if (is.null(output_path)) {
             output_path <- dirname(band1_imagefile)
+        } else {
+            this_output_path  <- output_path
         }
 
         ######################################################################
@@ -163,7 +165,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         # The combined cloud mask includes the cloud_QA, cloud_shadow_QA, and 
         # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, while 
         # good pixels are coded as 1.
-        image_stack_mask_path <- file.path(output_path,
+        image_stack_mask_path <- file.path(this_output_path,
                                           paste(sitecode, image_basename, 
                                                 'mask.envi', sep='_'))
         # fmask_band key:
@@ -183,7 +185,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
 
         image_stack <- mask(image_stack, image_stack_mask, maskvalue=0)
 
-        mask_stack_path <- file.path(output_path,
+        mask_stack_path <- file.path(this_output_path,
                                      paste(sitecode, image_basename, 
                                            'masks.envi', sep='_'))
         mask_stack <- writeRaster(mask_stack, filename=mask_stack_path, 
@@ -225,7 +227,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         }
 
         timer <- start_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
-        cropped_dem_file <- file.path(output_path,
+        cropped_dem_file <- file.path(this_output_path,
                                       paste(sitecode, image_basename, 
                                             'dem.envi', sep='_'))
         cropped_dem <- match_rasters(image_stack, dem)
@@ -237,7 +239,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop DEM'))
 
         timer <- start_timer(timer, label=paste(image_basename, '-', 'crop and reclass slope/aspect'))
-        slopeaspect_cropped_file <- file.path(output_path,
+        slopeaspect_cropped_file <- file.path(this_output_path,
                                       paste(sitecode, image_basename, 
                                             'slopeaspect.envi', sep='_'))
         slopeaspect <- match_rasters(image_stack, slopeaspect, 
@@ -266,7 +268,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                                  raster(slopeaspect, layer=2) / 1000)
         sunelev <- 90 - as.numeric(get_metadata_item(band1_imagefile, 'SolarZenith'))
         sunazimuth <- as.numeric(get_metadata_item(band1_imagefile, 'SolarAzimuth'))
-        topocorr_filename <- file.path(output_path,
+        topocorr_filename <- file.path(this_output_path,
                                        paste(sitecode, image_basename, 
                                              'tc.envi', sep='_'))
         image_stack <- topographic_corr(image_stack, slopeaspect_flt, sunelev, 
