@@ -25,8 +25,8 @@
 #' results to integers (see \code{asinteger} argument).
 #' @param asinteger whether to round results to nearest integer. Can be used to 
 #' save space by saving results as, for example, an 'INT2S' \code{raster}.
-#' @param ... additional arguments to pass to \code{writeRaster} (such as 
-#' datatype and filename)
+#' @param ... additional arguments to pass to \code{minnaert_samp} or 
+#' \code{topocorr_samp}, depending on chosen topographic correction method
 #' @return The topographically corrected image as a \code{RasterLayer} or 
 #' \code{RasterStack}
 #' @references
@@ -88,12 +88,13 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
                 minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
                                                sunazimuth=sunazimuth, 
-                                               sampleindices=sampleindices)
+                                               sampleindices=sampleindices, ...)
                 corr_layer <- minnaert_data$minnaert
             } else {
                 corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
                                             sunelev=sunelev, sunazimuth=sunazimuth, 
-                                            method=method, sampleindices=sampleindices)
+                                            method=method, 
+                                            sampleindices=sampleindices, ...)
             }
         }
     } else {
@@ -108,14 +109,15 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
                 minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
                                                sunazimuth=sunazimuth, 
-                                               sampleindices=sampleindices)
+                                               sampleindices=sampleindices, 
+                                               ...)
                 corr_layer <- minnaert_data$minnaert
             } else {
                 corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
                                             sunelev=sunelev, 
                                             sunazimuth=sunazimuth, 
                                             method=method, 
-                                            sampleindices=sampleindices)
+                                            sampleindices=sampleindices, ...)
             }
             corr_layers <- c(corr_layers, list(corr_layer))
         }
@@ -131,9 +133,6 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
     }
     if (asinteger) {
         corr_img <- round(corr_img)
-    }
-    if (filename != '') {
-        writeRaster(corr_img, filename=filename, ...)
     }
     return(corr_img)
 }

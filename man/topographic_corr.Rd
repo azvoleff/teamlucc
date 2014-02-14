@@ -41,7 +41,8 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = "",
   for example, an 'INT2S' \code{raster}.}
 
   \item{...}{additional arguments to pass to
-  \code{writeRaster} (such as datatype and filename)}
+  \code{minnaert_samp} or \code{topocorr_samp}, depending
+  on chosen topographic correction method}
 }
 \value{
 The topographically corrected image as a \code{RasterLayer}
