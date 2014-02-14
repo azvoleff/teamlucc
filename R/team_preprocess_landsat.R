@@ -150,12 +150,15 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                                          CRS(proj4string(image_stack)))
             }
         }
+
         image_stack <- crop(image_stack, crop_area)
         image_stack <- mask(image_stack, crop_area)
         image_stack <- extend(image_stack, crop_area)
+
         mask_stack <- crop(mask_stack, crop_area)
-        image_stack <- mask(mask_stack, crop_area)
+        mask_stack <- mask(mask_stack, crop_area)
         mask_stack <- extend(mask_stack, crop_area)
+
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop'))
 
         ######################################################################
@@ -252,15 +255,19 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         ######################################################################
         # Perform topographic correction
         timer <- start_timer(timer, label=paste(image_basename, '-', 'topocorr'))
-        # Draw a sample for the Minnaert k regression
-        horizcells <- 10
-        vertcells <- 10
-        nsamp <- 200000 / (horizcells * vertcells)
-        # Note that rowmajor indices are needed as raster layers are stored in 
-        # rowmajor order, unlike most R objects that are addressed in column 
-        # major order
-        sampleindices <- gridsample(image_stack, horizcells=10, vertcells=10, 
-                                    nsamp=nsamp, rowmajor=TRUE)
+        if (ncell(image_stack) > 400000) {
+            # Draw a sample for the Minnaert k regression
+            horizcells <- 10
+            vertcells <- 10
+            nsamp <- 200000 / (horizcells * vertcells)
+            # Note that rowmajor indices are needed as raster layers are stored in 
+            # rowmajor order, unlike most R objects that are addressed in column 
+            # major order
+            sampleindices <- gridsample(image_stack, horizcells=10, vertcells=10, 
+                                        nsamp=nsamp, rowmajor=TRUE)
+        } else {
+            sampleindices <- NULL
+        }
         # Remember that slopeaspect layers are scaled to INT2S, but 
         # topographic_corr expects them as floats, so apply the scale factors 
         # used in team_setup_dem
