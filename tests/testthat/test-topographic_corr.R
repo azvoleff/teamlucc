@@ -17,7 +17,7 @@ sunazimuth <- 124.37 # From metadata file
 # Test that minslope methods match between landsat package 'topocorr' and teamr 
 # 'topographic_corr':
 teamr_tc_b1 <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, sunazimuth, 
-                             method='minslope')
+                                method='minslope')
 
 landsat_tc_b1 <- topocorr(as(L5TSR_1986_b1, "SpatialGridDataFrame"), slope_deg,
                           aspect_deg, sunelev, sunazimuth, method='minslope')
@@ -32,8 +32,8 @@ test_that("teamr and landsat minslope match", {
 set.seed(1)
 sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
 teamr_tc_b1_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
-                                    sunazimuth, method='minslope', 
-                                    sampleindices=sampleindices)
+                                       sunazimuth, method='minslope', 
+                                       sampleindices=sampleindices)
 
 test_that("teamr and landsat minslope match when sampling is used in teamr", {
           expect_equal(teamr_tc_b1_sample, expected=landsat_tc_b1, tolerance=.25)
@@ -58,7 +58,8 @@ test_that("teamr and landsat minslope match when multiple layers are processed i
 # Test that minnaert_full methods match between landsat package 'topocorr' and 
 # teamr 'topographic_corr' when using full image.
 teamr_minnaert <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
-                                   sunazimuth, method='minnaert_full')
+                                   sunazimuth, method='minnaert_full', 
+                                   slopeclass=c(1, 5, 10, 15, 20, 25, 30, 45))
 
 landsat_minnaert <- minnaert(as(L5TSR_1986_b1, "SpatialGridDataFrame"), slope_deg, 
                              aspect_deg, sunelev, sunazimuth)
@@ -76,8 +77,9 @@ test_that("teamr minnaert and landsat minnaert match", {
 set.seed(0)
 sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
 teamr_minnaert_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
-                                   sunazimuth, method='minnaert_full',
-                                   sampleindices=sampleindices)
+                                          sunazimuth, method='minnaert_full',
+                                          sampleindices=sampleindices,
+                                          slopeclass=c(1, 5, 10, 15, 20, 25, 30, 45))
 
 test_that("teamr minnaert sample and landsat minnaert match", {
           expect_equal(teamr_minnaert_sample, expected=landsat_minnaert, 

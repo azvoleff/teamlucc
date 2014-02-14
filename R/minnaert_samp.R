@@ -21,7 +21,7 @@
     ## K is between 0 and 1
     # IL can be <=0 under certain conditions
     # but that makes it impossible to take log10 so remove those elements
-    K <- K[!apply(K, 1, function(rowvals) any(is.na(rowvals))),]
+    K <- K[!apply(K, 1, function(rowvals) any(is.na(rowvals))), ]
     K <- K[K$x > 0, ]
     K <- K[K$IL > 0, ]
 
@@ -44,6 +44,32 @@
     return(k_table)
 }
 
+# Function to combine classes defined by the upper limits 'lims' with their 
+# smallest neighbors until each class has at least n members. 'counts' stores 
+# the number of members in each class.
+clean_intervals <- function(counts, lims, n) {
+    while(min(counts) < n) {
+        min_index <- match(TRUE, counts == min(counts))
+        if (min_index == length(counts)) {
+            counts[min_index - 1] <- counts[min_index - 1] + counts[min_index]
+            lims <- lims[-(min_index - 1)]
+        } else if (min_index == 1) {
+            counts[min_index + 1] <- counts[min_index + 1] + counts[min_index]
+            lims <- lims[-min_index]
+        } else if (counts[min_index - 1] < counts[min_index + 1]) {
+            counts[min_index - 1] <- counts[min_index - 1] + counts[min_index]
+            lims <- lims[-(min_index - 1)]
+        } else {
+            # We know counts[min_index - 1] > counts[min_index + 1]
+            counts[min_index + 1] <- counts[min_index + 1] + counts[min_index]
+            lims <- lims[-min_index]
+        }
+        counts <- counts[-min_index]
+    }
+    #return(list(counts, lims))
+    return(lims)
+}
+
 #' Topographic correction for satellite imagery using Minnaert method
 #'
 #' Perform topographic correction using the Minnaert method. This code is 
@@ -63,8 +89,11 @@
 #' @param sunazimuth sun azimuth in degrees
 #' @param IL.epsilon a small amount to add to calculated illumination values 
 #' that are equal to zero to avoid division by zero resulting in Inf values
-#' @param slopeclass the slope classes to calculate k for
+#' @param slopeclass the slope classes to calculate k for (in degrees), or 
+#' NULL, in which case an algorithm will be used to choose reasonable defaults 
+#' for the given image
 #' @param coverclass used to calculate k for specific cover class (optional)
+#' as \code{RasterLayer}
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
 #' the calculation of k values for the Minnaert correction. See
 #' \code{\link{gridsample}}.
@@ -75,14 +104,39 @@
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
 minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
-                          IL.epsilon=0.000001,
-                          slopeclass=c(1, 5, 10, 15, 20, 25, 30, 45), 
+                          IL.epsilon=0.000001, slopeclass=NULL, 
                           coverclass=NULL, sampleindices=NULL) {
+
+    if (is.null(slopeclass)) {
+        if (is.null(sampleindices)) {
+            lims <- as.numeric(quantile(slope, seq(0, 1, .01), na.rm=TRUE))
+            lims <- unique(round(lims, 3))
+            # Have lims start above 1 degree of slope, so that no topographic
+            # correction is performed for low slope areas.
+            lims <- lims[lims > 1*(pi/180)]
+            counts <- raster::freq(raster::cut(slope, lims,
+                                               include.lowest=TRUE), 
+                                   useNA='no')[, 2]
+        } else {
+            lims <- as.numeric(quantile(slope[sampleindices], seq(0, 1, .01), 
+                                        na.rm=TRUE))
+            lims <- unique(round(lims, 3))
+            # Have lims start above 1 degree of slope, so that no topographic
+            # correction is performed for low slope areas.
+            lims <- lims[lims > 1*(pi/180)]
+            counts <- as.numeric(table(cut(slope[sampleindices], lims, 
+                                           include.lowest=TRUE), useNA='no'))
+        }
+        # The [-1] below is because clean_intervals only needs the upper limits
+        lims <- clean_intervals(counts, lims[-1], 500)
+        slopeclass <- c(1*pi/180, lims)
+    } else {
+        slopeclass <- (pi/180) * slopeclass
+    }
 
     # some inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
-    slopeclass <- (pi/180) * slopeclass
 
     IL <- .calc_IL(slope, aspect, sunzenith, sunazimuth, IL.epsilon)
     rm(aspect, sunazimuth)

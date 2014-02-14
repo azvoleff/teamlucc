@@ -3,8 +3,7 @@
 \title{Topographic correction for satellite imagery using Minnaert method}
 \usage{
 minnaert_samp(x, slope, aspect, sunelev, sunazimuth, IL.epsilon = 1e-06,
-  slopeclass = c(1, 5, 10, 15, 20, 25, 30, 45), coverclass = NULL,
-  sampleindices = NULL)
+  slopeclass = NULL, coverclass = NULL, sampleindices = NULL)
 }
 \arguments{
   \item{x}{image as a \code{RasterLayer}}
@@ -23,10 +22,12 @@ minnaert_samp(x, slope, aspect, sunelev, sunazimuth, IL.epsilon = 1e-06,
   illumination values that are equal to zero to avoid
   division by zero resulting in Inf values}
 
-  \item{slopeclass}{the slope classes to calculate k for}
+  \item{slopeclass}{the slope classes to calculate k for
+  (in degrees), or NULL, in which case an algorithm will be
+  used to choose reasonable defaults for the given image}
 
   \item{coverclass}{used to calculate k for specific cover
-  class (optional)}
+  class (optional) as \code{RasterLayer}}
 
   \item{sampleindices}{(optional) row-major indices of
   sample pixels to use in the calculation of k values for
