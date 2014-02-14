@@ -254,27 +254,27 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         horizcells <- 10
         vertcells <- 10
         nsamp <- 200000 / (horizcells * vertcells)
-        # Remember that slopeaspect layers are scaled to INT2S, but 
-        # topographic_corr expects them as floats, so apply the scale factors 
-        # used in team_setup_dem
-        slopeaspect_flt <- stack(raster(slopeaspect, layer=1) / 10000,
-                                 raster(slopeaspect, layer=2) / 1000)
         # Note that rowmajor indices are needed as raster layers are stored in 
         # rowmajor order, unlike most R objects that are addressed in column 
         # major order
         sampleindices <- gridsample(image_stack, horizcells=10, vertcells=10, 
                                     nsamp=nsamp, rowmajor=TRUE)
+        # Remember that slopeaspect layers are scaled to INT2S, but 
+        # topographic_corr expects them as floats, so apply the scale factors 
+        # used in team_setup_dem
+        slopeaspect_flt <- stack(raster(slopeaspect, layer=1) / 10000,
+                                 raster(slopeaspect, layer=2) / 1000)
         sunelev <- 90 - as.numeric(get_metadata_item(band1_imagefile, 'SolarZenith'))
         sunazimuth <- as.numeric(get_metadata_item(band1_imagefile, 'SolarAzimuth'))
         topocorr_filename <- file.path(output_path,
                                        paste(sitecode, image_basename, 
                                              'tc.envi', sep='_'))
         image_stack <- topographic_corr(image_stack, slopeaspect_flt, sunelev, 
-                                       sunazimuth, method='minnaert_full', 
-                                       filename=topocorr_filename, 
-                                       overwrite=overwrite, datatype='INT2S',
-                                       sampleindices=sampleindices,
-                                       asinteger=TRUE)
+                                        sunazimuth, method='minnaert_full', 
+                                        asinteger=TRUE, 
+                                        sampleindices=sampleindices)
+        image_stack <- writeRaster(image_stack, filename=topocorr_filename, 
+                                   overwrite=overwrite, datatype='INT2S')
         timer <- stop_timer(timer, label=paste(image_basename, '-', 'topocorr'))
 
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
