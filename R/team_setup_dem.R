@@ -20,6 +20,8 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
+#' @param verbose whether to print detailed status messages and timing 
+#' information
 #' @examples
 #' \dontrun{
 #' dem_path <- 'H:/Data/TEAM/VB/Rasters/DEM/ASTER'
@@ -27,7 +29,8 @@
 #'                list(c(15,53)))
 #' }
 team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1, 
-                           overwrite=FALSE, crop_to_aoi=FALSE, notify=print) {
+                           overwrite=FALSE, crop_to_aoi=FALSE, notify=print, 
+                           verbose=FALSE) {
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
     }
@@ -37,8 +40,6 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
 
     timer <- Track_time(notify)
 
-    timer <- start_timer(timer, label='Setting up DEMs')
-
     if (n_cpus > 1) beginCluster(n_cpus)
 
     # Open datafile with the extents of each CGIAR DEM
@@ -46,6 +47,9 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
 
     aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
     pathrows <- pathrow_num(aoi, wrs_type=2, wrs_mode='D', as_polys=TRUE)
+
+    timer <- start_timer(timer, label=paste('Processing', nrow(pathrows), 
+                                            'path/rows'))
 
     writeOGR(pathrows, output_path, 
              paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows'), 
@@ -98,21 +102,20 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
 
         ######################################################################
         # Mosaic DEMs
-        timer <- start_timer(timer, label='Mosaicing DEMs')
+        if (verbose) timer <- start_timer(timer, label='Mosaicing DEMs')
         # See http://bit.ly/1dJPIeF re issue in raster that necessitates below 
         # workaround
         # TODO: Contact Hijmans re possible fix
         mosaicargs <- dem_rasts
         mosaicargs$fun <- mean
         dem_mosaic <- do.call(mosaic, mosaicargs)
-        timer <- stop_timer(timer, label='Mosaicing DEMs')
+        if (verbose) timer <- stop_timer(timer, label='Mosaicing DEMs')
     } else {
         dem_mosaic <- dem_rasts[[1]]
     }
 
-    timer <- start_timer(timer, label=paste('Processing', nrow(pathrows),  
-                                            'path/rows'))
     for (n in 1:length(pathrows)) {
+        timer <- start_timer(timer, label=paste('Processing', pathrow_label))
         pathrow <- pathrows[n, ]
         pathrow_buffered <- pathrows_buffered[n, ]
         pathrow_label <- paste(sprintf('%03i', pathrow@data$PATH), 
@@ -122,7 +125,7 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
                                                 CRS(proj4string(dem_mosaic)))
         dem_mosaic_crop <- crop(dem_mosaic, pathrow_buffered_demproj)
 
-        timer <- start_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
+        if (verbose) timer <- start_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
                                                 pathrow_label))
         # The below lines construct to_ext as the extent the image will be 
         # projected to. This extent must cover the same area as the 
@@ -158,10 +161,10 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         dem_mosaic_crop <- round(dem_mosaic_crop)
         writeRaster(dem_mosaic_crop, filename=dem_mosaic_filename, 
                     overwrite=overwrite, datatype='INT2S')
-        timer <- stop_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
+        if (verbose) timer <- stop_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
                                                pathrow_label))
 
-        timer <- start_timer(timer, label=paste('Calculating slope/aspect for', 
+        if (verbose) timer <- start_timer(timer, label=paste('Calculating slope/aspect for', 
                                                 pathrow_label))
         slopeaspect_filename <- file.path(output_path,
                                           paste0('slopeaspect_',
@@ -178,13 +181,13 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
                              round(raster(slopeaspect, layer=2) * 1000))
         slopeaspect <- writeRaster(slopeaspect, filename=slopeaspect_filename, 
                                    overwrite=overwrite, datatype='INT2S')
-        timer <- stop_timer(timer, label=paste('Calculating slope/aspect for', 
+        if (verbose) timer <- stop_timer(timer, label=paste('Calculating slope/aspect for', 
                                                 pathrow_label))
+        timer <- stop_timer(timer, label=paste('Processing', pathrow_label))
     }
-    timer <- stop_timer(timer, label=paste('Processing', nrow(pathrows),  
-                                           'path/rows'))
 
     if (n_cpus > 1) endCluster()
 
-    timer <- stop_timer(timer, label='Setting up DEMs')
+    timer <- stop_timer(timer, label=paste('Processing', nrow(pathrows),  
+                                           'path/rows'))
 }

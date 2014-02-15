@@ -20,6 +20,8 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
+#' @param verbose whether to print detailed status messages and timing 
+#' information
 #' @examples
 #' \dontrun{
 #' image_dirs <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc',
@@ -31,7 +33,7 @@
 team_preprocess_landsat <- function(image_dirs, dem_path, sitecode, 
                                     output_path=NULL, aoi_file=NULL, n_cpus=1, 
                                     cleartmp=FALSE,  overwrite=FALSE, 
-                                    notify=print) {
+                                    notify=print, verbose=FALSE) {
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
     }
@@ -129,7 +131,8 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         ######################################################################
         # Crop image to landsat path/row, after intersecting it with the 
         # supplied AOI
-        timer <- start_timer(timer, label=paste(image_basename, '-', 'crop'))
+        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
+                                                             '-', 'crop'))
         if (!is.null(aoi_file)) {
             aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
             if (proj4string(aoi) != proj4string(image_stack)) {
@@ -159,11 +162,13 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         mask_stack <- mask(mask_stack, crop_area)
         mask_stack <- extend(mask_stack, crop_area)
 
-        timer <- stop_timer(timer, label=paste(image_basename, '-', 'crop'))
+        if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
+                                                            '-', 'crop'))
 
         ######################################################################
         # Mask out clouds and missing values
-        timer <- start_timer(timer, label=paste(image_basename, '-', 'masking'))
+        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
+                                                             '-', 'masking'))
 
         # The combined cloud mask includes the cloud_QA, cloud_shadow_QA, and 
         # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, while 
@@ -194,7 +199,8 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         mask_stack <- writeRaster(mask_stack, filename=mask_stack_path, 
                                   overwrite=overwrite, 
                                   datatype='INT2S')
-        timer <- stop_timer(timer, label=paste(image_basename, '-', 'masking'))
+        if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
+                                                            '-', 'masking'))
 
         ######################################################################
         # Load dem, slope, and aspect
@@ -211,12 +217,18 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                            crs=TRUE, stopiffalse=FALSE)) {
             warning(paste("DEM projection does not match image projection - reprojecting", 
                           image_basename))
-            timer <- start_timer(timer, label=paste(image_basename, '-', 'reprojecting DEM'))
+            if (verbose) timer <- start_timer(timer, 
+                                              label=paste(image_basename, '-', 
+                                                          'reprojecting DEM'))
             dem <- projectRaster(dem, image_stack)
-            timer <- stop_timer(timer, label=paste(image_basename, '-', 'reprojecting DEM'))
-            timer <- start_timer(timer, label=paste(image_basename, '-', 'reprojecting slopeaspect'))
+            if (verbose) timer <- stop_timer(timer,
+                                             label=paste(image_basename, '-', 
+                                                         'reprojecting DEM'))
+            if (verbose) timer <- start_timer(timer,
+                                              label=paste(image_basename, '-', 'reprojecting slopeaspect'))
             slopeaspect <- projectRaster(slopeaspect, image_stack)
-            timer <- stop_timer(timer, label=paste(image_basename, '-', 'reprojecting slopeaspect'))
+            if (verbose) timer <- stop_timer(timer,
+                                             label=paste(image_basename, '-', 'reprojecting slopeaspect'))
         }
         # Since the projections match, make sure the proj4strings are identical 
         # so rgeos doesn't throw an error
@@ -225,7 +237,8 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
 
         ######################################################################
         # Perform topographic correction
-        timer <- start_timer(timer, label=paste(image_basename, '-', 'topocorr'))
+        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
+                                                             '-', 'topocorr'))
         if (ncell(image_stack) > 400000) {
             # Draw a sample for the Minnaert k regression
             horizcells <- 10
@@ -255,7 +268,8 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                                         sampleindices=sampleindices)
         image_stack <- writeRaster(image_stack, filename=topocorr_filename, 
                                    overwrite=overwrite, datatype='INT2S')
-        timer <- stop_timer(timer, label=paste(image_basename, '-', 'topocorr'))
+        if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
+                                                            '-', 'topocorr'))
 
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
 

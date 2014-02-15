@@ -3,7 +3,8 @@
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
 team_setup_dem(dem_path, output_path, aoi_file, n_cpus = 1,
-  overwrite = FALSE, crop_to_aoi = FALSE, notify = print)
+  overwrite = FALSE, crop_to_aoi = FALSE, notify = print,
+  verbose = FALSE)
 }
 \arguments{
   \item{dem_path}{a list of digital elevation models (DEMs)
@@ -30,6 +31,9 @@ team_setup_dem(dem_path, output_path, aoi_file, n_cpus = 1,
   function). See the \code{notifyR} package for one way of
   sending notifications from R. The \code{notify} function
   should accept a string as the only argument.}
+
+  \item{verbose}{whether to print detailed status messages
+  and timing information}
 }
 \description{
 Setup the DEM mosaic for a particular TEAM site

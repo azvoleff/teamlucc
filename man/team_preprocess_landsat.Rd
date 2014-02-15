@@ -4,7 +4,7 @@
 \usage{
 team_preprocess_landsat(image_dirs, dem_path, sitecode, output_path = NULL,
   aoi_file = NULL, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
-  notify = print)
+  notify = print, verbose = FALSE)
 }
 \arguments{
   \item{image_dirs}{list of paths to a set of Landsat CDR
@@ -35,6 +35,9 @@ team_preprocess_landsat(image_dirs, dem_path, sitecode, output_path = NULL,
   function). See the \code{notifyR} package for one way of
   sending notifications from R. The \code{notify} function
   should accept a string as the only argument.}
+
+  \item{verbose}{whether to print detailed status messages
+  and timing information}
 }
 \description{
 Preprocess surface reflectance imagery from the Landsat CDR
