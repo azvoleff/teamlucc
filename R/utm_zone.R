@@ -77,10 +77,11 @@ setMethod("utm_zone", signature("numeric", "numeric"),
 
 #' @rdname utm_zone-methods
 #' @importFrom rgeos gCentroid
-#' @importFrom sp Spatial coordinates
+#' @importFrom sp Spatial coordinates spTransform
 #' @aliases utm_zone,Spatial,missing,logical-method
 setMethod("utm_zone", signature(x='Spatial', y='missing'),
     function(x, proj4string) {
+        x <- spTransform(x, CRS('+init=epsg:4236'))
         centroid <- coordinates(gCentroid(x))
         return(utm_zone_calc(centroid[1], centroid[2], proj4string))
     }
