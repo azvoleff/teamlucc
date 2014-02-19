@@ -1,3 +1,21 @@
+# Function for retrieving frequencies from a raster frequency table, given a 
+# band name and value. Handles the case of a given code not occurring in a 
+# particular raster, in which case it will not show up as a row in the 
+# frequency table.
+get_freq <- function(band, value, freq_table) {
+    band_col <- grep(band, names(freq_table))
+    if (!(value %in% freq_table[, 1])) {
+        # Return 0 if this value never shows up in the raster
+        return(0)
+    }
+    frac <- freq_table[freq_table[1] == value, band_col]
+    if (is.na(frac)) {
+        return(0)
+    } else {
+        return(round(frac, 4))
+    }
+}
+
 #' Calculate statistics on imagery within an AOI
 #'
 #' @export
@@ -55,37 +73,19 @@ team_QA_stats <- function(image_dirs, aoi) {
             # Convert frequency table to fractions
             freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
 
-            # Make a function for retrieving frequencies from the frequency 
-            # table, given a band name and value. It needs to handle the case 
-            # of a given code not occurring in a particular raster, in which 
-            # case it will not show up as a row in the frequency table.
-            get_freq <- function(band, value) {
-                band_col <- grep(band, names(freq_table))
-                if (!(value %in% freq_table[, 1])) {
-                    # Return 0 if this value never shows up in the raster
-                    return(0)
-                }
-                frac <- freq_table[freq_table[1] == value, band_col]
-                if (is.na(frac)) {
-                    return(0)
-                } else {
-                    return(round(frac, 4))
-                }
-            }
-
             out <- c(out, list(list(img_path,
                                     img_row,
                                     year,
                                     julian_day,
                                     sensor,
-                                    get_freq('fill_QA', 0),
-                                    get_freq('fill_QA', 255),
-                                    get_freq('fmask_band', 0),
-                                    get_freq('fmask_band', 1),
-                                    get_freq('fmask_band', 2),
-                                    get_freq('fmask_band', 3),
-                                    get_freq('fmask_band', 4),
-                                    get_freq('fmask_band', 255))))
+                                    get_freq('fill_QA', 0, freq_table),
+                                    get_freq('fill_QA', 255, freq_table),
+                                    get_freq('fmask_band', 0, freq_table),
+                                    get_freq('fmask_band', 1, freq_table),
+                                    get_freq('fmask_band', 2, freq_table),
+                                    get_freq('fmask_band', 3, freq_table),
+                                    get_freq('fmask_band', 4, freq_table),
+                                    get_freq('fmask_band', 255, freq_table))))
         }
     }
 

@@ -98,7 +98,9 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         }
     }
 
+    if (n_cpus > 1) endCluster()
     for (n in 1:length(image_stacks)) {
+        if (n_cpus > 1) beginCluster(n_cpus)
         image_stack <- image_stacks[[n]]
         mask_stack <- mask_stacks[[n]]
         band1_imagefile <- image_files[[n]][1]
@@ -140,7 +142,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                                           label=paste(image_basename, '- reproject'))
         if (proj4string(image_stack) != proj4string(dem)) {
             image_stack <- projectRaster(image_stack, dem)
-            mask_stack <- projectRaster(mask_stack, dem)
+            mask_stack <- projectRaster(mask_stack, dem, method='ngb')
         }
         if (verbose) timer <- stop_timer(timer,
                                          label=paste(image_basename, '- reproject'))
@@ -221,8 +223,8 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
 
         if (cleartmp) removeTmpFiles(h=1)
+        if (n_cpus > 1) endCluster()
     }
-    if (n_cpus > 1) endCluster()
 
     timer <- stop_timer(timer, label='Preprocessing images')
 }
