@@ -2,9 +2,9 @@
 \alias{team_setup_dem}
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
-team_setup_dem(dem_path, output_path, aoi_file, n_cpus = 1,
-  overwrite = FALSE, crop_to_aoi = FALSE, notify = print,
-  verbose = FALSE)
+team_setup_dem(dem_path, aoi_file, output_path, n_cpus = 1,
+  overwrite = FALSE, crop_to_aoi = FALSE, aoi_buffer = 0,
+  notify = print, verbose = FALSE)
 }
 \arguments{
   \item{dem_path}{a list of digital elevation models (DEMs)
@@ -26,6 +26,10 @@ team_setup_dem(dem_path, output_path, aoi_file, n_cpus = 1,
   \item{crop_to_aoi}{whether to crop the dem to the
   supplied AOI, or to the Landsat path/row polygon for that
   particular path/row}
+
+  \item{aoi_buffer}{width in meters of buffer around AOI in
+  \code{aoi_file}. Only have an any effect if
+  \code{crop_to_aoi} is TRUE.}
 
   \item{notify}{notifier to use (defaults to \code{print}
   function). See the \code{notifyR} package for one way of

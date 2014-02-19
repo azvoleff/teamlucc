@@ -2,16 +2,12 @@
 #'
 #' @export
 #' @importFrom wrspathrow pathrow_poly
-#' @importFrom rgdal readOGR
-#' @importFrom rgeos gContains gIntersection
 #' @importFrom tools file_path_sans_ext
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
 #' @param output_path the path to use for the output
 #' @param dem_path path to a set of DEMs as output by \code{team_setup_dem}
 #' @param sitecode code to use as a prefix for all filenames
-#' @param aoi_file an area of interest (AOI) to crop from each image, in a file 
-#' format readable by \code{readOGR}
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
@@ -31,9 +27,9 @@
 #' 'H:/Data/TEAM/VB/LCLUC_Analysis', n_cpus=3)
 #' }
 team_preprocess_landsat <- function(image_dirs, dem_path, sitecode, 
-                                    output_path=NULL, aoi_file=NULL, n_cpus=1, 
-                                    cleartmp=FALSE,  overwrite=FALSE, 
-                                    notify=print, verbose=FALSE) {
+                                    output_path=NULL, n_cpus=1, cleartmp=FALSE,  
+                                    overwrite=FALSE, notify=print, 
+                                    verbose=FALSE) {
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
     }
@@ -108,7 +104,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         band1_imagefile <- image_files[[n]][1]
 
         if (is.null(output_path)) {
-            output_path <- dirname(band1_imagefile)
+            this_output_path <- dirname(band1_imagefile)
         } else {
             this_output_path  <- output_path
         }
@@ -122,48 +118,32 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         WRS_Row <- sprintf('%03i', as.numeric(get_metadata_item(band1_imagefile, 'WRS_Row')))
         image_basename <- paste0(WRS_Path, '-', WRS_Row, '_',
                                  format(aq_date, '%Y-%j'), '_', short_name)
-        if (!is.null(aoi_file)) {
-            image_basename <- paste(image_basename, 'crop', sep='_')
-        }
 
         timer <- start_timer(timer, label=paste('Preprocessing', image_basename))
 
         ######################################################################
-        # Crop image to landsat path/row, after intersecting it with the 
-        # supplied AOI
-        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
-                                                             '-', 'crop'))
-        if (!is.null(aoi_file)) {
-            aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
-            if (proj4string(aoi) != proj4string(image_stack)) {
-                aoi <- spTransform(aoi, CRS(proj4string(image_stack)))
-            }
-            pathrow_area <- pathrow_poly(as.numeric(WRS_Path), 
-                                         as.numeric(WRS_Row))
-            if (proj4string(pathrow_area) != proj4string(aoi)) {
-                pathrow_area <- spTransform(pathrow_area, 
-                                            CRS(proj4string(aoi)))
-            }
-            crop_area <- gIntersection(pathrow_area, aoi, byid=TRUE)
-        } else {
-            crop_area <- pathrow_poly(as.numeric(WRS_Path), 
-                                      as.numeric(WRS_Row))
-            if (proj4string(crop_area) != proj4string(image_stack)) {
-                crop_area <- spTransform(crop_area, 
-                                         CRS(proj4string(image_stack)))
-            }
+        # Load dem, slope, and aspect
+        dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, '-', WRS_Row, 
+                                                   '.envi'))
+        dem <- raster(dem_filename)
+
+        slopeaspect_filename <- file.path(dem_path,
+                                          paste0('slopeaspect_', 
+                                                 WRS_Path, '-', WRS_Row, '.envi'))
+        slopeaspect <- brick(slopeaspect_filename)
+
+        #######################################################################
+        # Reproject images to match the projection being used for this image.  
+        # This has been determined in team_setup_dem - the images will be 
+        # reprojected to match the slopeaspect and dem projections and extents.
+        if (verbose) timer <- start_timer(timer,
+                                          label=paste(image_basename, '- reproject'))
+        if (proj4string(image_stack) != proj4string(dem)) {
+            image_stack <- projectRaster(image_stack, dem)
+            mask_stack <- projectRaster(mask_stack, dem)
         }
-
-        image_stack <- crop(image_stack, crop_area)
-        image_stack <- mask(image_stack, crop_area)
-        image_stack <- extend(image_stack, crop_area)
-
-        mask_stack <- crop(mask_stack, crop_area)
-        mask_stack <- mask(mask_stack, crop_area)
-        mask_stack <- extend(mask_stack, crop_area)
-
-        if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
-                                                            '-', 'crop'))
+        if (verbose) timer <- stop_timer(timer,
+                                         label=paste(image_basename, '- reproject'))
 
         ######################################################################
         # Mask out clouds and missing values
@@ -201,39 +181,6 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
                                   datatype='INT2S')
         if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                             '-', 'masking'))
-
-        ######################################################################
-        # Load dem, slope, and aspect
-        dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, '-', WRS_Row, 
-                                                   '.envi'))
-        dem <- raster(dem_filename)
-
-        slopeaspect_filename <- file.path(dem_path,
-                                          paste0('slopeaspect_', 
-                                                 WRS_Path, '-', WRS_Row, '.envi'))
-        slopeaspect <- brick(slopeaspect_filename)
-
-        if (!compareRaster(dem, image_stack, extent=FALSE, rowcol=FALSE, 
-                           crs=TRUE, stopiffalse=FALSE)) {
-            warning(paste("DEM projection does not match image projection - reprojecting", 
-                          image_basename))
-            if (verbose) timer <- start_timer(timer, 
-                                              label=paste(image_basename, '-', 
-                                                          'reprojecting DEM'))
-            dem <- projectRaster(dem, image_stack)
-            if (verbose) timer <- stop_timer(timer,
-                                             label=paste(image_basename, '-', 
-                                                         'reprojecting DEM'))
-            if (verbose) timer <- start_timer(timer,
-                                              label=paste(image_basename, '-', 'reprojecting slopeaspect'))
-            slopeaspect <- projectRaster(slopeaspect, image_stack)
-            if (verbose) timer <- stop_timer(timer,
-                                             label=paste(image_basename, '-', 'reprojecting slopeaspect'))
-        }
-        # Since the projections match, make sure the proj4strings are identical 
-        # so rgeos doesn't throw an error
-        proj4string(dem) <- proj4string(image_stack)
-        proj4string(slopeaspect) <- proj4string(image_stack)
 
         ######################################################################
         # Perform topographic correction

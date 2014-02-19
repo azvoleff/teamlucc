@@ -17,6 +17,8 @@
 #' will be raised)
 #' @param crop_to_aoi whether to crop the dem to the supplied AOI, or to the
 #' Landsat path/row polygon for that particular path/row
+#' @param aoi_buffer width in meters of buffer around AOI in \code{aoi_file}.  
+#' Only have an any effect if \code{crop_to_aoi} is TRUE.
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
@@ -28,9 +30,9 @@
 #' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/', 
 #'                list(c(15,53)))
 #' }
-team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1, 
-                           overwrite=FALSE, crop_to_aoi=FALSE, notify=print, 
-                           verbose=FALSE) {
+team_setup_dem <- function(dem_path, aoi_file, output_path, n_cpus=1, 
+                           overwrite=FALSE, crop_to_aoi=FALSE, aoi_buffer=0,
+                           notify=print, verbose=FALSE) {
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
     }
@@ -46,9 +48,11 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
     load(file.path(dem_path, 'cgiar_srtm_extents.RData'))
 
     aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
+    aoi <- spTransform(aoi, CRS(utm_zone(aoi, proj4string=TRUE)))
+    if (aoi_buffer > 0) aoi <- gBuffer(aoi, width=aoi_buffer, byid=TRUE)
     pathrows <- pathrow_num(aoi, wrs_type=2, wrs_mode='D', as_polys=TRUE)
 
-    timer <- start_timer(timer, label=paste('Processing', nrow(pathrows), 
+    timer <- start_timer(timer, label=paste('Processing DEMS for', nrow(pathrows), 
                                             'path/rows'))
 
     writeOGR(pathrows, output_path, 
@@ -115,11 +119,11 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
     }
 
     for (n in 1:length(pathrows)) {
-        timer <- start_timer(timer, label=paste('Processing', pathrow_label))
         pathrow <- pathrows[n, ]
         pathrow_buffered <- pathrows_buffered[n, ]
         pathrow_label <- paste(sprintf('%03i', pathrow@data$PATH), 
                                sprintf('%03i', pathrow@data$ROW), sep='-')
+        timer <- start_timer(timer, label=paste('Processing', pathrow_label))
 
         pathrow_buffered_demproj <- spTransform(pathrow_buffered, 
                                                 CRS(proj4string(dem_mosaic)))
@@ -131,8 +135,13 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         # projected to. This extent must cover the same area as the 
         # dem_mosaic_crop, but must have the same resolution, CRS and origin as 
         # the pathrow
-        to_ext <- projectExtent(dem_mosaic_crop,
-                                utm_zone(pathrow, proj4string=TRUE))
+        if (crop_to_aoi) {
+            to_ext <- projectExtent(dem_mosaic_crop,
+                                    utm_zone(aoi, proj4string=TRUE))
+        } else {
+            to_ext <- projectExtent(dem_mosaic_crop,
+                                    utm_zone(pathrow, proj4string=TRUE))
+        }
         to_res <- c(30, 30)
         xmin(to_ext) <- floor(xmin(to_ext) / to_res[1]) * to_res[1]
         xmax(to_ext) <- ceiling(xmax(to_ext) / to_res[1]) * to_res[1]
@@ -143,24 +152,27 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
         xmin(to_ext) <- xmin(to_ext) + to_res[1]/2
         ymax(to_ext) <- ymax(to_ext) + to_res[2]/2
         res(to_ext) <- to_res
-        dem_mosaic_crop <- projectRaster(from=dem_mosaic_crop, to=to_ext,
+        dem_mosaic_crop <- projectRaster(dem_mosaic_crop, to_ext,
                                          method='bilinear')
-        # Crop after the reprojecting to ensure the full crop area is filled.
+        dem_mosaic_crop <- round(dem_mosaic_crop)
+
+        #######################################################################
+        # Calculate the final area to crop from each image, after intersecting 
+        # landsat path/row with the AOI (if cropping to AOI is desired)
+        aoi_prmos <- spTransform(aoi, CRS(proj4string(dem_mosaic_crop)))
+        pathrow_prmos <- spTransform(pathrow, CRS(proj4string(dem_mosaic_crop)))
         if (crop_to_aoi) {
-            aoi_demproj <- spTransform(aoi, CRS(proj4string(dem_mosaic_crop)))
-            dem_mosaic_crop <- crop(dem_mosaic_crop, aoi_demproj)
+            crop_area <- gIntersection(pathrow_prmos, aoi_prmos, byid=TRUE)
         } else {
-            pathrow_demproj <- spTransform(pathrow, 
-                                           CRS(proj4string(dem_mosaic_crop)))
-            dem_mosaic_crop <- crop(dem_mosaic_crop, pathrow_demproj)
+            crop_area <- pathrow_prmos
         }
 
         dem_mosaic_filename <- file.path(output_path,
                                          paste0('dem_', pathrow_label, 
                                                 '.envi'))
-        dem_mosaic_crop <- round(dem_mosaic_crop)
-        writeRaster(dem_mosaic_crop, filename=dem_mosaic_filename, 
-                    overwrite=overwrite, datatype='INT2S')
+        dem_mosaic_crop <- crop(dem_mosaic_crop, crop_area,
+                                filename=dem_mosaic_filename, 
+                                overwrite=overwrite, datatype='INT2S')
         if (verbose) timer <- stop_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
                                                pathrow_label))
 
@@ -188,6 +200,6 @@ team_setup_dem <- function(dem_path, output_path, aoi_file, n_cpus=1,
 
     if (n_cpus > 1) endCluster()
 
-    timer <- stop_timer(timer, label=paste('Processing', nrow(pathrows),  
-                                           'path/rows'))
+    timer <- stop_timer(timer, label=paste('Processing DEMS for', nrow(pathrows), 
+                                            'path/rows'))
 }

@@ -3,8 +3,8 @@
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
 team_preprocess_landsat(image_dirs, dem_path, sitecode, output_path = NULL,
-  aoi_file = NULL, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
-  notify = print, verbose = FALSE)
+  n_cpus = 1, cleartmp = FALSE, overwrite = FALSE, notify = print,
+  verbose = FALSE)
 }
 \arguments{
   \item{image_dirs}{list of paths to a set of Landsat CDR
@@ -18,9 +18,6 @@ team_preprocess_landsat(image_dirs, dem_path, sitecode, output_path = NULL,
 
   \item{sitecode}{code to use as a prefix for all
   filenames}
-
-  \item{aoi_file}{an area of interest (AOI) to crop from
-  each image, in a file format readable by \code{readOGR}}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
