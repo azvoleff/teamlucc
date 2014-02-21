@@ -23,6 +23,7 @@ Imports:
     kernlab,
     e1071,
     randomForest,
+    SDMTools,
     grid,
     spatial.tools,
     caret,
