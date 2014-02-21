@@ -71,10 +71,10 @@ fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
         stop('IDL not found - check "idl" parameter')
     }
     if (!(file_test('-f', img_cloudy))) {
-        stop('input file for cloudy image not found- check img_cloudy parameter')
+        stop('input file for cloudy image not found - check img_cloudy parameter')
     }
     if (!(file_test('-f', img_clear))) {
-        stop('input file for clear image not found- check img_clear parameter')
+        stop('input file for clear image not found - check img_clear parameter')
     }
     if (!(file_test('-f', img_cloud_mask))) {
         stop('input file for cloud mask not found - check img_cloud_mask parameter')
