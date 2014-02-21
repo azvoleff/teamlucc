@@ -24,7 +24,7 @@ imagery, including:
     * Downloading images from a USGS ESPA order
 
 * Preprocessing
-    * Extraction and file conversion of surface reflectance imagery from teh 
+    * Extraction and file conversion of surface reflectance imagery from the 
       Landsat Climate Data Record (CDR) archive
     * Topographic correction using parallel processing (Goslee, 2011)
     * Cloud fill and gap fill (for SLC-off Landsat 7 scenes) with R scripts 
