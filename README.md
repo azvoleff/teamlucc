@@ -29,8 +29,8 @@ imagery, including:
     * Topographic correction using parallel processing (Goslee, 2011)
     * Cloud fill and gap fill (for SLC-off Landsat 7 scenes) with R scripts 
       wrapping the modified Neighborhood Similar Pixel Interpolator (NSPI) 
-      Geostatistical Neighborhood Similar Pixel Interpolator (GNSPI) by Xiaolin 
-      Zhu et al. (2012a, 2012b)
+      Geostatistical Neighborhood Similar Pixel Interpolator (GNSPI) by Zhu et 
+      al. (2012a, 2012b)
     * Calculation of vegetation indices and image texture measures from 
       grey-level co-occurrence matrices (GLCMs)
 
