@@ -88,7 +88,10 @@ pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
         endfor
     endfor
 
-    temp_file=cloudy_file
+    ; Below line is necessary to remove file extensions from the middle of temp 
+    ; filenames
+    cloudy_file_split=strsplit(cloudy_file, '.', /EXTRACT)
+    temp_file=cloudy_file_split[0]
     tempoutname=temp_file+'_temp_cloud'
 
     pos=indgen(nb)
@@ -134,18 +137,14 @@ pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
 
         ;open each block
 
-        FileName = temp_file+'_temp_cloud'
-        GetData,ImgData=ImgData,ns = ns1,nl = nl1,nb = nb,Data_Type = Data_Type,FileName = FileName+strtrim(isub+1,1),Fid = Fid1
-        fine1=ImgData
+        fine1_FileName = temp_file + '_temp_cloud' + strtrim(isub+1,1)
+        GetData,ImgData=fine1,ns=ns1,nl=nl1,nb=nb,Data_Type=Data_Type,FileName=fine1_FileName,Fid = Fid1
 
+        fine2_FileName = temp_file+'_temp_clear'+strtrim(isub+1,1)
+        GetData,ImgData=fine2,FileName=fine2_FileName,Fid=Fid2
 
-        FileName = temp_file+'_temp_clear'
-        GetData,ImgData=ImgData,ns = ns2,nl = nl2,nb = nb,FileName = FileName+strtrim(isub+1,1),Fid = Fid2
-        fine2=ImgData
-
-        FileName = temp_file+'_temp_cloud_mask'
-        GetData,ImgData=ImgData,FileName = FileName+strtrim(isub+1,1),Fid = Fid3
-        cloud=ImgData
+        cloud_FileName = temp_file+'_temp_cloud_mask'+strtrim(isub+1,1)
+        GetData,ImgData=cloud,FileName=cloud_FileName,Fid=Fid3
 
 
         ;-----------------------------------------------------------------------
