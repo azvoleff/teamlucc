@@ -13,7 +13,35 @@ and population.
 
 `teamr` is designed to facilitate the processing and analysis of TEAM data and 
 remote sensing imagery of TEAM sites for measuring change in ecosystems from 
-the plot-landscape scales.
+the plot-landscape scales. TEAM supports a range of analyses using satellite 
+imagery, including:
+
+* Image selection from USGS archive
+    * Parsing metadata files from USGS EarthExplorer
+    * Plotting available imagery for an area of interest (AOI), including 
+      AOIs that cover more than one path/row
+    * Formatting an image order for upload to ESPA system
+    * Downloading images from a USGS ESPA order
+
+* Preprocessing
+    * Extraction and file conversion of surface reflectance imagery from teh 
+      Landsat Climate Data Record (CDR) archive
+    * Topographic correction using parallel processing (Goslee, 2011)
+    * Cloud fill and gap fill (for SLC-off Landsat 7 scenes) with R scripts 
+      wrapping the modified Neighborhood Similar Pixel Interpolator (NSPI) 
+      Geostatistical Neighborhood Similar Pixel Interpolator (GNSPI) by Xiaolin 
+      Zhu et al. (2012a, 2012b)
+    * Calculation of vegetation indices and image texture measures from 
+      grey-level co-occurrence matrices (GLCMs)
+
+* Image classification using support vector machine (SVM)
+
+* Change detection: implementation of Change Vector Analysis in Posterior 
+  Probability Space (CVAPS) and Double Window Flexible Pace Search (DFPS) 
+  algorithms (Chen et al. 2011)
+
+* Accuracy assessment using quantity agreement and disagreement (Pontius and 
+  Millones, 2011)
 
 The toolkit is still under active development. Follow the [TEAM 
 website](http://www.teamnetwork.org/) for news, and the [toolkit project page
@@ -31,7 +59,8 @@ installing GDAL.
 #### Windows:
 
 Download the [32bit](http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86.exe) 
-or [64bit](http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe) [OSGeo4W](http://trac.osgeo.org/osgeo4w/) installer.
+or [
+64bit](http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe) [OSGeo4W](http://trac.osgeo.org/osgeo4w/) installer.
 
 Run the installer. Choose the "Express Desktop Install".  On the "Select 
 Packages" screen, ensure the GDAL screen package is checked. You can uncheck 
@@ -75,3 +104,22 @@ Conservation International
 2011 Crystal Dr. Suite 500  
 Arlington, VA 22202  
 USA
+
+## References
+Chen, J., Chen, X., Cui, X., Chen, J., 2011. Change vector analysis in 
+posterior probability space: a new method for land cover change detection. IEEE 
+Geoscience and Remote Sensing Letters 8, 317--321.
+
+Goslee, S.C., 2011. Analyzing remote sensing data in R: the landsat package. 
+Journal of Statistical Software 43, 1--25.
+
+Pontius, R.G., Millones, M., 2011. Death to Kappa: birth of quantity 
+disagreement and allocation disagreement for accuracy assessment. International 
+Journal of Remote Sensing 32, 4407--4429.
+
+Zhu, X., Gao, F., Liu, D., Chen, J., 2012a. A modified neighborhood similar 
+pixel interpolator approach for removing thick clouds in Landsat images. 
+Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
+
+Zhu, X., Liu, D., Chen, J., 2012b. A new geostatistical approach for filling 
+gaps in Landsat ETM+ SLC-off images. Remote Sensing of Environment 124, 49--60.
