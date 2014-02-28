@@ -57,14 +57,24 @@ As `teamr` is still under development, it is not yet listed on
 [CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
 version) of the `teamr` package is using the 
 [`devtools`](http://cran.r-project.org/web/packages/devtools/index.html) 
-package by Hadley Wickham. After installing `devtools` from CRAN, type:
+package by Hadley Wickham.
+
+To install `devtools` type:
+
+```R
+install.packages('devtools')
+```
+
+at the R command prompt. This will fecth the latest version of `devtools` from 
+CRAN. After installing `devtools` type:
 
 ```R
 install_github('teamr', username='azvoleff')
 ```
 
-at the R prompt to install `teamr`.
-
+at the R prompt to install the latest version of `teamr`. Typing the above 
+command will also work if you already have `teamr` installed and want to 
+install an updated version of the package.
 
 ### (optional) Install IDL
 [IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) is required for 
