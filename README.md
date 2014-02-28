@@ -48,11 +48,35 @@ website](http://www.teamnetwork.org/) for news, and the [toolkit project page
 on github](https://github.com/azvoleff/teamr) for the latest version of the 
 code.
 
-## Package Installation
 
-### Step one - install GDAL
+## Package installation
 
-*NOTE*: this step is only required if you want to use the `unstack_ledapscdr` 
+### Installing `teamr`
+
+As `teamr` is still under development, it is not yet listed on 
+[CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
+version) of the `teamr` package is using the 
+[`devtools`](http://cran.r-project.org/web/packages/devtools/index.html) 
+package by Hadley Wickham. After installing `devtools` from CRAN, type:
+
+```R
+install_github('teamr', username='azvoleff')
+```
+
+at the R prompt to install `teamr`.
+
+
+### (optional) Install IDL
+[IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) is required for 
+running the cloud fill and Landsat 7 SLC-off gap fill routines in `teamr`. If 
+you do not have an IDL license, you can also use the (free) IDL virtual 
+machine (VM). See [this 
+page](http://www.exelisvis.com/Support/HelpArticlesDetail/TabId/219/ArtMID/900/ArticleID/12395/The-IDL-Virtual-Machine.aspx) 
+for details on the IDL VM.
+
+### (optional) Install GDAL
+
+This step is only required if you want to use the `unstack_ledapscdr` 
 function in `teamr`. All the other functions in `teamr` will work without 
 installing GDAL.
 
@@ -81,19 +105,6 @@ At a shell prompt, type:
 ``` sh
 sudo apt-get install gdal-bin libgdal-dev
 ```
-
-### Step two - install the `teamr` package in R
-As `teamr` is still under development, it is not yet listed on 
-[CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
-version) of the `teamr` package is using the 
-[`devtools`](http://cran.r-project.org/web/packages/devtools/index.html) 
-package by Hadley Wickham. After installing `devtools` from CRAN, type:
-
-```R
-install_github('teamr', username='azvoleff')
-```
-
-at the R prompt to install `teamr`.
 
 ## Author Contact Information
 
