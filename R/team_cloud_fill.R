@@ -4,7 +4,7 @@
 #' details.
 #'
 #' @export
-#' @importFrom lubridate as.duration interval
+#' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
 #' @param output_path the path to use for the output
@@ -79,7 +79,7 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                                 max(freq_table[clear_row, -1]))
     } else {
         base_date_diff <- lapply(img_dates, function(x) 
-                                 as.duration(interval(x,base_date)))
+                                 as.duration(new_interval(x, base_date)))
         base_date_diff <- unlist(abs(base_date_diff))
         base_img_index <- which(base_date_diff == min(base_date_diff))
     }
