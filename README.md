@@ -1,20 +1,20 @@
-# TEAM Data Processing Tools
+# teamlucc
 
 [![Build Status](https://travis-ci.org/azvoleff/teamlucc.png)](https://travis-ci.org/azvoleff/teamlucc)
 
 ## Overview
 
-The `teamlucc` package is designed to facilitate the work of the Tropical Ecology 
-Assessment and Monitoring (TEAM) Network. The [TEAM 
-Network](http://www.teamnetwork.org/) is a global network of sites in tropical 
-forests focused on collecting standardized real-time data measuring 
-the response of tropical forests to changing climate, land cover and land use, 
-and population.
+The `teamlucc` package is designed to facilitate analysis of land use and cover 
+change (LUCC) around the monitoring sites of the Tropical Ecology Assessment 
+and Monitoring (TEAM) Network. The [TEAM Network](http://www.teamnetwork.org/) 
+is a global network of sites in tropical forests focused on collecting 
+standardized real-time data measuring the response of tropical forests to 
+changing climate, land cover and land use, and population.
 
-`teamlucc` is designed to facilitate the processing and analysis of TEAM data and 
-remote sensing imagery of TEAM sites for measuring change in ecosystems from 
-the plot-landscape scales. TEAM supports a range of analyses using satellite 
-imagery, including:
+`teamlucc` assists with processing and analysis of TEAM data and remote sensing 
+imagery of TEAM sites for measuring change in ecosystems from the 
+plot-landscape scales. `teamlucc` supports a range of analyses using satellite 
+imagery with TEAM monitoring data, including:
 
 * Image selection from USGS archive
     * Parsing metadata files from USGS EarthExplorer
