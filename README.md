@@ -1,4 +1,4 @@
-# teamlucc
+# teamlucc (used to be named teamr)
 
 [![Build Status](https://travis-ci.org/azvoleff/teamlucc.png)](https://travis-ci.org/azvoleff/teamlucc)
 
