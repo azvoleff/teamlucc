@@ -1,4 +1,4 @@
-Package: teamr
+Package: teamlucc
 Version: 0.1
 Date: 2014-02-06
 Title: TEAM Remote Sensing Data Processing Toolkit
@@ -46,6 +46,6 @@ SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
 Description: Routines for processing imagery and other spatial data for the
     Tropical Ecology Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
-URL: https://github.com/azvoleff/teamr
-BugReports: https://github.com/azvoleff/teamr/issues
+URL: https://github.com/azvoleff/teamlucc
+BugReports: https://github.com/azvoleff/teamlucc/issues
 LazyData: true

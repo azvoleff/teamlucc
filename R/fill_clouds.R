@@ -61,10 +61,10 @@ fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
                         idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
     if (fast) {
         script_path <- system.file("idl", "CLOUD_REMOVE_FAST.pro", 
-                                   package="teamr")
+                                   package="teamlucc")
     } else {
         script_path <- system.file("idl", "CLOUD_REMOVE.pro", 
-                                   package="teamr")
+                                   package="teamlucc")
     }
     
     if (!(file_test('-x', idl) || file_test('-f', idl))) {

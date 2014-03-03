@@ -10,7 +10,7 @@ options(width=75)
 Load required R packages, and setup parallel computation with spatial.tools.
 
 ```{r setup_libraries, cache=FALSE}
-library(teamr)
+library(teamlucc)
 library(glcm)
 library(spatial.tools)
 data_dir <- 'D:/azvoleff/Data/'

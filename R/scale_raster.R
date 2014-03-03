@@ -74,7 +74,7 @@ scale_stack_or_brick <- function(x, power_of, max_out, round_output, do_scaling)
         if (do_scaling) {
             scale_outputs <- foreach(unscaled_layer=unstack(x), .combine='addLayer', 
                                 .multicombine=TRUE, .init=raster(), 
-                                .packages=c('raster', 'teamr'),
+                                .packages=c('raster', 'teamlucc'),
                                 .export=c('scale_layer')) %dopar% {
                 scale_output <- scale_layer(unscaled_layer, power_of, max_out, 
                                             round_output, do_scaling)
@@ -82,7 +82,7 @@ scale_stack_or_brick <- function(x, power_of, max_out, round_output, do_scaling)
         } else {
             scale_factors <- foreach(unscaled_layer=unstack(x), 
                                 .multicombine=TRUE, .init=raster(), 
-                                .packages=c('raster', 'teamr'),
+                                .packages=c('raster', 'teamlucc'),
                                 .export=c('scale_layer')) %dopar% {
                 scale_factor <- scale_layer(unscaled_layer, power_of, max_out, 
                                             round_output, do_scaling)

@@ -1,17 +1,17 @@
 # TEAM Data Processing Tools
 
-[![Build Status](https://travis-ci.org/azvoleff/teamr.png)](https://travis-ci.org/azvoleff/teamr)
+[![Build Status](https://travis-ci.org/azvoleff/teamlucc.png)](https://travis-ci.org/azvoleff/teamlucc)
 
 ## Overview
 
-The `teamr` package is designed to facilitate the work of the Tropical Ecology 
+The `teamlucc` package is designed to facilitate the work of the Tropical Ecology 
 Assessment and Monitoring (TEAM) Network. The [TEAM 
 Network](http://www.teamnetwork.org/) is a global network of sites in tropical 
 forests focused on collecting standardized real-time data measuring 
 the response of tropical forests to changing climate, land cover and land use, 
 and population.
 
-`teamr` is designed to facilitate the processing and analysis of TEAM data and 
+`teamlucc` is designed to facilitate the processing and analysis of TEAM data and 
 remote sensing imagery of TEAM sites for measuring change in ecosystems from 
 the plot-landscape scales. TEAM supports a range of analyses using satellite 
 imagery, including:
@@ -45,17 +45,17 @@ imagery, including:
 
 The toolkit is still under active development. Follow the [TEAM 
 website](http://www.teamnetwork.org/) for news, and the [toolkit project page
-on github](https://github.com/azvoleff/teamr) for the latest version of the 
+on github](https://github.com/azvoleff/teamlucc) for the latest version of the 
 code.
 
 
 ## Package installation
 
-### Installing `teamr`
+### Installing `teamlucc`
 
-As `teamr` is still under development, it is not yet listed on 
+As `teamlucc` is still under development, it is not yet listed on 
 [CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
-version) of the `teamr` package is using the 
+version) of the `teamlucc` package is using the 
 [`devtools`](http://cran.r-project.org/web/packages/devtools/index.html) 
 package by Hadley Wickham.
 
@@ -69,16 +69,16 @@ at the R command prompt. This will fecth the latest version of `devtools` from
 CRAN. After installing `devtools` type:
 
 ```R
-install_github('teamr', username='azvoleff')
+install_github('teamlucc', username='azvoleff')
 ```
 
-at the R prompt to install the latest version of `teamr`. Typing the above 
-command will also work if you already have `teamr` installed and want to 
+at the R prompt to install the latest version of `teamlucc`. Typing the above 
+command will also work if you already have `teamlucc` installed and want to 
 install an updated version of the package.
 
 ### (optional) Install IDL
 [IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) is required for 
-running the cloud fill and Landsat 7 SLC-off gap fill routines in `teamr`. If 
+running the cloud fill and Landsat 7 SLC-off gap fill routines in `teamlucc`. If 
 you do not have an IDL license, you can also use the (free) IDL virtual 
 machine (VM). See [this 
 page](http://www.exelisvis.com/Support/HelpArticlesDetail/TabId/219/ArtMID/900/ArticleID/12395/The-IDL-Virtual-Machine.aspx) 
@@ -87,7 +87,7 @@ for details on the IDL VM.
 ### (optional) Install GDAL
 
 This step is only required if you want to use the `unstack_ledapscdr` 
-function in `teamr`. All the other functions in `teamr` will work without 
+function in `teamlucc`. All the other functions in `teamlucc` will work without 
 installing GDAL.
 
 #### Windows:

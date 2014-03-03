@@ -4,7 +4,7 @@
 #' details.
 #'
 #' @export
-#' @import lubridate
+#' @importFrom lubridate as.duration interval
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
 #' @param output_path the path to use for the output
@@ -78,7 +78,9 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         base_img_index <- which(freq_table[clear_row, -1] == 
                                 max(freq_table[clear_row, -1]))
     } else {
-        base_date_diff <- abs(img_dates - base_date) # enabled by lubridate
+        base_date_diff <- lapply(img_dates, function(x) 
+                                 as.duration(interval(x,base_date)))
+        base_date_diff <- unlist(abs(base_date_diff))
         base_img_index <- which(base_date_diff == min(base_date_diff))
     }
 
@@ -139,7 +141,7 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                           fill_band=unstack(fill_img), 
                           coded_cloud_mask=coded_cloud_mask, 
                           .combine='addLayer', .multicombine=TRUE, 
-                          .init=raster(), .packages=c('raster', 'teamr', 
+                          .init=raster(), .packages=c('raster', 'teamlucc', 
                                                       'rgdal')) %dopar% {
             rasterOptions(format='ENVI')
             # Write in-memory rasters to file to hand off to IDL.

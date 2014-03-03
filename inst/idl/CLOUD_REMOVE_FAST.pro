@@ -16,7 +16,7 @@
 ;-----------------------------------------------------------------------------
 ;
 ; Modified from original by Xiaolin Zhu on Feb 6, 2014 by Alex Zvoleff for 
-; inclusion in the 'teamr' R package. For the original version, see Xiaolin's 
+; inclusion in the 'teamlucc' R package. For the original version, see Xiaolin's 
 ; website at: http://geography.osu.edu/grads/xzhu/
 ;
 ;-----------------------------------------------------------------------------

@@ -10,12 +10,12 @@ before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
-    # teamr R depends
+    # teamlucc R depends
   - ./travis-tool.sh install_r_binary raster
-    # teamr R imports deps
+    # teamlucc R imports deps
   - ./travis-tool.sh install_r_binary rgeos rgdal mgcv plyr reshape2 ggplot2 kernlab e1071 randomForest spatial.tools caret sp mclust lubridate XML
   - ./travis-tool.sh install_r SDMTools wrspathrowData wrspathrow glcm
-    # teamr R suggested
+    # teamlucc R suggested
   - ./travis-tool.sh install_r_binary testthat landsat foreach doSNOW gridExtra itertools
     # others
   - ./travis-tool.sh install_r_binary devtools httr

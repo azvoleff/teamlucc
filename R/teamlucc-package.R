@@ -5,8 +5,8 @@
 #' be used in conjunction with the set of Python scripts available in the 
 #' \href{https://github.com/azvoleff/teampy}{teampy repository} on github.
 #'
-#' @name teamr-package
-#' @aliases teamr
+#' @name teamlucc-package
+#' @aliases teamlucc
 #' @docType package
 #' @title TEAM Remote Sensing Processing Tools
 #' @author Alex Zvoleff, \email{azvoleff@@conservation.org}

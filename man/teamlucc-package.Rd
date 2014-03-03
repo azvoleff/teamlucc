@@ -1,7 +1,7 @@
 \docType{package}
-\name{teamr-package}
-\alias{teamr}
-\alias{teamr-package}
+\name{teamlucc-package}
+\alias{teamlucc}
+\alias{teamlucc-package}
 \title{TEAM Remote Sensing Processing Tools}
 \description{
 TEAM Remote Sensing Processing Tools
