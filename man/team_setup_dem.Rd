@@ -2,7 +2,7 @@
 \alias{team_setup_dem}
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
-team_setup_dem(dem_path, aoi_file, output_path, n_cpus = 1,
+team_setup_dem(aoi_file, output_path, dem_extents, n_cpus = 1,
   overwrite = FALSE, crop_to_aoi = FALSE, aoi_buffer = 0,
   notify = print, verbose = FALSE)
 }

@@ -6,11 +6,13 @@
 #' @importFrom sp spTransform
 #' @importFrom rgeos gBuffer gIntersects gUnaryUnion gIntersection
 #' @importFrom tools file_path_sans_ext
-#' @param dem_path a list of digital elevation models (DEMs) that (when 
-#' mosaiced) covers the full extent of all the images in the image_list.
 #' @param aoi_file area of interest (AOI) shapefile to use as as bounding box 
 #' when selecting DEMs, in a file format readable by \code{readOGR}
 #' @param output_path the path to use for the output
+#' @param dem_extents a \code{SpatialPolygonsDataFrame} of the extents and 
+#' filenames for a set of locally available DEM raster(s) that cover the AOI.  
+#' See the \code{\link{get_extent_polys}} function for one means of generating 
+#' this list.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -30,8 +32,8 @@
 #' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/', 
 #'                list(c(15,53)))
 #' }
-team_setup_dem <- function(dem_path, aoi_file, output_path, n_cpus=1, 
-                           overwrite=FALSE, crop_to_aoi=FALSE, aoi_buffer=0,
+team_setup_dem <- function(aoi_file, output_path, dem_extents, n_cpus=1, 
+                           overwrite=FALSE, crop_to_aoi=FALSE, aoi_buffer=0, 
                            notify=print, verbose=FALSE) {
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
@@ -43,9 +45,6 @@ team_setup_dem <- function(dem_path, aoi_file, output_path, n_cpus=1,
     timer <- Track_time(notify)
 
     if (n_cpus > 1) beginCluster(n_cpus)
-
-    # Open datafile with the extents of each CGIAR DEM
-    load(file.path(dem_path, 'cgiar_srtm_extents.RData'))
 
     aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
     aoi <- spTransform(aoi, CRS(utm_zone(aoi, proj4string=TRUE)))
@@ -84,16 +83,16 @@ team_setup_dem <- function(dem_path, aoi_file, output_path, n_cpus=1,
     pathrows_utm <- spTransform(pathrows,
                                 CRS(utm_zone(pathrows, proj4string=TRUE)))
     pathrows_buffered <- spTransform(gBuffer(pathrows_utm, width=500, byid=TRUE), 
-                                 CRS(proj4string(cgiar_srtm_extents)))
-    intersecting <- as.logical(gIntersects(cgiar_srtm_extents, 
+                                 CRS(proj4string(dem_extents)))
+    intersecting <- as.logical(gIntersects(dem_extents, 
                                            gUnaryUnion(pathrows_buffered), byid=TRUE))
     if (sum(intersecting) == 0) {
         stop('no intersecting dem extents found')
     } else {
-        cgiar_srtm_extents <- cgiar_srtm_extents[intersecting, ]
+        dem_extents <- dem_extents[intersecting, ]
     }
 
-    dem_list <- file.path(dem_path, cgiar_srtm_extents$filename)
+    dem_list <- file.path(dem_path, dem_extents$filename)
     dem_rasts <- lapply(dem_list, raster)
 
     if (length(dem_list) > 1) {
