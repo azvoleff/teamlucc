@@ -7,15 +7,17 @@ team_setup_dem(aoi_file, output_path, dem_extents, n_cpus = 1,
   notify = print, verbose = FALSE)
 }
 \arguments{
-  \item{dem_path}{a list of digital elevation models (DEMs)
-  that (when mosaiced) covers the full extent of all the
-  images in the image_list.}
-
   \item{aoi_file}{area of interest (AOI) shapefile to use
   as as bounding box when selecting DEMs, in a file format
   readable by \code{readOGR}}
 
   \item{output_path}{the path to use for the output}
+
+  \item{dem_extents}{a \code{SpatialPolygonsDataFrame} of
+  the extents and filenames for a set of locally available
+  DEM raster(s) that cover the AOI. See the
+  \code{\link{get_extent_polys}} function for one means of
+  generating this list.}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}

@@ -28,6 +28,7 @@ Imports:
     spatial.tools,
     caret,
     sp,
+    maptools,
     mclust,
     lubridate,
     XML
