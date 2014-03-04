@@ -18,17 +18,6 @@
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             output_path, base_date=NULL, n_cpus=1, 
                             overwrite=FALSE, notify=print) {
-
-    data_dir <- 'H:/Data/TEAM/MAS/Rasters/Landsat'
-    wrspath <- 230
-    wrsrow <- 62
-    start_date <- as.Date('1986-01-01')
-    end_date <- as.Date('1987-01-01')
-    output_path <- 'H:/Data/TEAM/MAS/LCLUC_Analysis'
-    base_date <- NULL
-    n_cpus <- 3
-    notify <- print
-
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
@@ -179,3 +168,14 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
     return(filled)
 }
+#
+# data_dir <- 'H:/Data/TEAM/MAS/Rasters/Landsat'
+# wrspath <- 230
+# wrsrow <- 62
+# start_date <- as.Date('1986-01-01')
+# end_date <- as.Date('1987-01-01')
+# output_path <- 'H:/Data/TEAM/MAS/LCLUC_Analysis'
+# base_date <- NULL
+# n_cpus <- 3
+# overwrite <- TRUE
+# notify <- print
