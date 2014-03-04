@@ -6,7 +6,28 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, output_path,
   base_date = NULL, n_cpus = 1, overwrite = FALSE, notify = print)
 }
 \arguments{
+  \item{data_dir}{folder where input images are located,
+  with filenames as output by the
+  \code{\link{team_preprocess_landsat}} function}
+
+  \item{wrspath}{World Reference System (WRS) path}
+
+  \item{wrsrow}{World Reference System (WRS) row}
+
+  \item{start_date}{start date of period from which images
+  will be chosen to fill cloudy areas in the base image (as
+  \code{Date} object)}
+
+  \item{end_date}{end date of period from which images will
+  be chosen to fill cloudy areas in the the base image (as
+  \code{Date} object)}
+
   \item{output_path}{the path to use for the output}
+
+  \item{base_date}{ideal date for base image (base image
+  will be chosen as the image among the available images
+  that is closest to this date). If NULL, then the base
+  image will be the image with the lowest cloud cover.}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}

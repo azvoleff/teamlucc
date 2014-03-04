@@ -7,7 +7,18 @@
 #' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
+#' @param data_dir folder where input images are located, with filenames as 
+#' output by the \code{\link{team_preprocess_landsat}} function
+#' @param wrspath World Reference System (WRS) path
+#' @param wrsrow World Reference System (WRS) row
+#' @param start_date start date of period from which images will be chosen to 
+#' fill cloudy areas in the base image (as \code{Date} object)
+#' @param end_date end date of period from which images will be chosen to fill 
+#' cloudy areas in the the base image (as \code{Date} object)
 #' @param output_path the path to use for the output
+#' @param base_date ideal date for base image (base image will be chosen as the 
+#' image among the available images that is closest to this date). If NULL, 
+#' then the base image will be the image with the lowest cloud cover.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -55,7 +66,6 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         this_img <- stack(file.path(data_dir, img_dir, img_file))
         imgs <- c(imgs, stack(this_img))
     }
-
     freq_table <- freq(stack(masks), useNA='no', merge=TRUE)
     # Convert frequency table to fractions
     freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
@@ -69,7 +79,7 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     } else {
         base_date_diff <- lapply(img_dates, function(x) 
                                  as.duration(new_interval(x, base_date)))
-        base_date_diff <- unlist(abs(base_date_diff))
+        base_date_diff <- abs(unlist(base_date_diff))
         base_img_index <- which(base_date_diff == min(base_date_diff))
     }
 
@@ -85,7 +95,6 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     for (n in 1:length(masks)) {
         masks[n] <- (masks[[n]] == 2) | (masks[[n]] == 4)
     }
-    
     base_img <- imgs[[base_img_index]]
     imgs <- imgs[-base_img_index]
     base_mask <- masks[[base_img_index]]
@@ -101,16 +110,22 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     }
     fill_areas_freq <- freq(stack(fill_areas), useNA='no', merge=TRUE)
 
+    # Select the fill image with the maximum number of available pixels 
+    # (counting only pixels in the fill image that are not ALSO clouded in the 
+    # fill image)
     avail_fill_row <- which(fill_areas_freq$value == 1)
     fill_img_index <- which(fill_areas_freq[avail_fill_row, -1] == 
                             max(fill_areas_freq[avail_fill_row, -1]))
-
     fill_img <- imgs[[fill_img_index]]
     imgs <- imgs[-fill_img_index]
-    fill_mask <- masks[[fill_img_index]]
+    fill_mask <- fill_areas[[fill_img_index]]
     masks <- masks[-base_img_index]
 
+    # Add numbered IDs to the cloud patches using ConnCompLabel from the 
+    # SDMTools package. Xiaolin Zhu's code requires these ID numbers.
     coded_cloud_mask <- ConnCompLabel(fill_mask)
+    #coded_cloud_mask_patchstats <- PatchStat(coded_cloud_mask)
+
     cl <- options('rasterClusterObject')[[1]]
     inparallel <- FALSE
     if ((!is.null(cl)) && (nlayers(base_img) > 1)) {
@@ -123,6 +138,9 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             registerDoSNOW(cl)
         }
     }
+
+    #base_img <- dropLayer(base_img, c(4, 5, 6))
+    #fill_img <- dropLayer(fill_img, c(4, 5, 6))
 
     if (inparallel) {
         uncorr_layer=NULL
@@ -168,14 +186,3 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
     return(filled)
 }
-#
-# data_dir <- 'H:/Data/TEAM/MAS/Rasters/Landsat'
-# wrspath <- 230
-# wrsrow <- 62
-# start_date <- as.Date('1986-01-01')
-# end_date <- as.Date('1987-01-01')
-# output_path <- 'H:/Data/TEAM/MAS/LCLUC_Analysis'
-# base_date <- NULL
-# n_cpus <- 3
-# overwrite <- TRUE
-# notify <- print
