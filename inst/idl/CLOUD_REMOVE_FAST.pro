@@ -22,7 +22,6 @@
 ;-----------------------------------------------------------------------------
 
 ;function of open file
-
 Pro GetData,ImgData = ImgData,ns = ns,nl = nl,nb = nb,Data_Type = Data_Type,$
     FileName = FileName,Map_info = map_Info, Fid = Fid
 
@@ -85,7 +84,10 @@ pro CLOUD_REMOVE_FAST, cloudy_file, clear_file, mask_file, out_name, $
         endfor
     endfor
 
-    temp_file=cloudy_file
+    ; Below line is necessary to remove file extensions from the middle of temp 
+    ; filenames
+    cloudy_file_split=strsplit(cloudy_file, '.', /EXTRACT)
+    temp_file=cloudy_file_split[0]
     tempoutname=temp_file+'_temp_cloud'
 
     pos=indgen(nb)
@@ -131,18 +133,14 @@ pro CLOUD_REMOVE_FAST, cloudy_file, clear_file, mask_file, out_name, $
 
         ;open each block
 
-        FileName = temp_file+'_temp_cloud'
-        GetData,ImgData=ImgData,ns = ns1,nl = nl1,nb = nb,Data_Type = Data_Type,FileName = FileName+strtrim(isub+1,1),Fid = Fid1
-        fine1=ImgData
+        fine1_FileName = temp_file + '_temp_cloud' + strtrim(isub+1,1)
+        GetData,ImgData=fine1,ns=ns1,nl=nl1,nb=nb,Data_Type=Data_Type,FileName=fine1_FileName,Fid = Fid1
 
+        fine2_FileName = temp_file+'_temp_clear'+strtrim(isub+1,1)
+        GetData,ImgData=fine2,FileName=fine2_FileName,Fid=Fid2
 
-        FileName = temp_file+'_temp_clear'
-        GetData,ImgData=ImgData,ns = ns2,nl = nl2,nb = nb,FileName = FileName+strtrim(isub+1,1),Fid = Fid2
-        fine2=ImgData
-
-        FileName = temp_file+'_temp_cloud_mask'
-        GetData,ImgData=ImgData,FileName = FileName+strtrim(isub+1,1),Fid = Fid3
-        cloud=ImgData
+        cloud_FileName = temp_file+'_temp_cloud_mask'+strtrim(isub+1,1)
+        GetData,ImgData=cloud,FileName=cloud_FileName,Fid=Fid3
 
 
         ;-----------------------------------------------------------------------
@@ -154,8 +152,9 @@ pro CLOUD_REMOVE_FAST, cloudy_file, clear_file, mask_file, out_name, $
 
             num_cloud_path=max(cloud[cloud_posite])
             ;
-            for icloud=1,num_cloud_path,1 do begin
+            for icloud=1,num_cloud_path,1 do begin       ; remove each cloud patches
                 cloud_area=where(cloud eq icloud,num_cloud1)
+
                 if (num_cloud1 gt 0) then begin
 
                     cloud_pixel_locate=intarr(2,num_cloud1)
