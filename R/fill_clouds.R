@@ -36,8 +36,8 @@ prep_fmask <- function(image_dir) {
 #'
 #' @export
 #' @importFrom tools file_path_sans_ext
-#' @param img_cloudy the clear image (base image)
-#' @param img_clear the cloudy image
+#' @param img_cloudy the cloudy image (base image)
+#' @param img_clear the clear image to use for filling \code{img_cloudy}
 #' @param img_cloud_mask cloud mask, with cloud patches assigned unique integer 
 #' codes, and all background coded as zero. The \code{ConnCompLabel} function 
 #' in the \code{SDMTools} package can automate this process.

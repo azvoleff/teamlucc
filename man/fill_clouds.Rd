@@ -8,9 +8,10 @@ fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe")
 }
 \arguments{
-  \item{img_cloudy}{the clear image (base image)}
+  \item{img_cloudy}{the cloudy image (base image)}
 
-  \item{img_clear}{the cloudy image}
+  \item{img_clear}{the clear image to use for filling
+  \code{img_cloudy}}
 
   \item{img_cloud_mask}{cloud mask, with cloud patches
   assigned unique integer codes, and all background coded
