@@ -19,6 +19,8 @@
 #' @param base_date ideal date for base image (base image will be chosen as the 
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
+#' @param fast if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro script. If 
+#' \code{FALSE}, use the CLOUD_REMOVE.pro script.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -27,7 +29,7 @@
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            output_path, base_date=NULL, n_cpus=1, 
+                            output_path, base_date=NULL, fast=FALSE, n_cpus=1, 
                             overwrite=FALSE, notify=print) {
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
@@ -159,8 +161,8 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             coded_cloud_mask <- writeRaster(coded_cloud_mask, rasterTmpFile(), 
                                             datatype='INT2S')
             fill_clouds(filename(base_band), filename(fill_band), 
-                        filename(coded_cloud_mask), num_class=3, DN_min=-300, 
-                        DN_max=17000, patch_long=2000)
+                        filename(coded_cloud_mask), fast=fast, num_class=3, 
+                        DN_min=-300, DN_max=17000, patch_long=2000)
         }
     } else {
         # Temporarily reset default raster output format to ENVI format, for 
@@ -174,8 +176,9 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         coded_cloud_mask <- writeRaster(coded_cloud_mask, rasterTmpFile(), 
                                         datatype='INT2S')
         filled <- fill_clouds(filename(base_img), filename(fill_img), 
-                              filename(coded_cloud_mask), num_class=3, 
-                              DN_min=-300, DN_max=17000, patch_long=2000)
+                              filename(coded_cloud_mask), fast=fast, 
+                              num_class=3, DN_min=-300, DN_max=17000, 
+                              patch_long=2000)
         rasterOptions(format=def_format)
     }
 

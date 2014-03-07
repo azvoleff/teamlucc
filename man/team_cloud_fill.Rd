@@ -3,7 +3,8 @@
 \title{Perform cloud fill for topographically corrected Landsat imagery}
 \usage{
 team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, output_path,
-  base_date = NULL, n_cpus = 1, overwrite = FALSE, notify = print)
+  base_date = NULL, fast = FALSE, n_cpus = 1, overwrite = FALSE,
+  notify = print)
 }
 \arguments{
   \item{data_dir}{folder where input images are located,
@@ -28,6 +29,10 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, output_path,
   will be chosen as the image among the available images
   that is closest to this date). If NULL, then the base
   image will be the image with the lowest cloud cover.}
+
+  \item{fast}{if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro
+  script. If \code{FALSE}, use the CLOUD_REMOVE.pro
+  script.}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
