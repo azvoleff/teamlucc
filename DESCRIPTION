@@ -8,6 +8,8 @@ Authors@R: c(person("Alex", "Zvoleff", email="azvoleff@conservation.org",
 Maintainer: Alex Zvoleff <azvoleff@conservation.org>
 Depends:
     R (>= 2.10.0),
+    Rcpp (>= 0.11.0),
+    RcppArmadillo (>= 0.2.0),
     methods,
     raster (>= 2.2-6)
 Imports:
@@ -40,6 +42,7 @@ Suggests:
     foreach,
     doSNOW,
     notifyR
+LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
     Landsat scenes with heavy clouds using the \code{fill_gaps} or
     \code{fill_clouds} functions requires an IDL installation and the GNSPI.pro

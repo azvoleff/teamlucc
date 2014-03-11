@@ -1,0 +1,52 @@
+\name{cloud_fill}
+\alias{cloud_fill}
+\title{Cloud fill using the algorithm developed by Xiaolin Zhu}
+\usage{
+cloud_fill(cloudy, clear, cloud_mask, dims, num_class, min_pixel, cloud_nbh,
+  DN_min, DN_max)
+}
+\arguments{
+  \item{cloudy}{the cloudy image, with pixels in columns
+  (in column-major order) and with number of columns equal
+  to number of bands}
+
+  \item{clear}{the clear image, with pixels in columns (in
+  column-major order) and with number of columns equal to
+  number of bands}
+
+  \item{cloud_mask}{the cloud mask image as a vector (in
+  column-major order), with clouds coded with unique
+  integer codes starting at 1, and with areas that are
+  clear in both images coded as 0. Areas that are missing
+  in the clear image, should be coded as -1.}
+
+  \item{dims}{the dimensions of the cloudy image as a
+  length 3 vector: (rows, columns, bands)}
+
+  \item{num_class}{set the estimated number of classes in
+  image}
+
+  \item{min_pixel}{the sample size of similar pixels}
+
+  \item{cloud_nbh}{the range of cloud neighborhood (in
+  pixels)}
+
+  \item{DN_min}{the minimum valid DN value}
+
+  \item{DN_max}{the maximum valid DN value}
+}
+\value{
+array with cloud filled image with dims: cols, rows, bands
+parameter, containing the selected textures measures
+}
+\description{
+This function is called by the \code{\link{fill_clouds}}
+function. It is not intended to be used directly.
+}
+\references{
+Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
+neighborhood similar pixel interpolator approach for
+removing thick clouds in Landsat images. Geoscience and
+Remote Sensing Letters, IEEE 9, 521--525.
+}
+

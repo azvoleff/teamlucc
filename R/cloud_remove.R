@@ -8,12 +8,15 @@
 #' patch assigned a unique integer code. Areas that are clear in both 
 #' \code{cloudy_rast} and \code{clear_rast} should be coded 0, while areas that 
 #' are clouded in \code{clear_rast} should be coded -1.
+#' @param out_name filename for cloud filled image
 #' @param num_class set the estimated number of classes in image
 #' @param min_pixel the sample size of similar pixels
 #' @param cloud_nbh the range of cloud neighborhood (in pixels)
+#' @param DN_min the minimum valid DN value
+#' @param DN_max the maximum valid DN value
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
-#' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521-525.
+#' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
 cloud_remove <- function(cloudy, clear, cloud_mask, out_name, 
                          num_class=1, min_pixel=20, cloud_nbh=1, DN_min=0, 
                          DN_max=255) {
