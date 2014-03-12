@@ -40,7 +40,7 @@ array with cloud filled image with dims: cols, rows, bands
 parameter, containing the selected textures measures
 }
 \description{
-This function is called by the \code{\link{fill_clouds}}
+This function is called by the \code{\link{cloud_remove}}
 function. It is not intended to be used directly.
 }
 \references{

@@ -1,9 +1,10 @@
 #' Perform cloud fill for topographically corrected Landsat imagery
 #'
-#' Uses the GNSPI algorithm from Xioalin Zhu. See \code{\link{fill_clouds}} for 
-#' details.
+#' Uses an R/C++ implementation of the NSPI algorithm from Xioalin Zhu. See 
+#' \code{\link{cloud_remove}} for details.
 #'
 #' @export
+#' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
@@ -15,7 +16,6 @@
 #' fill cloudy areas in the base image (as \code{Date} object)
 #' @param end_date end date of period from which images will be chosen to fill 
 #' cloudy areas in the the base image (as \code{Date} object)
-#' @param output_path the path to use for the output
 #' @param base_date ideal date for base image (base image will be chosen as the 
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
@@ -28,17 +28,15 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
+#' @param ... additional arguments passed to \code{\link{cloud_remove}}
+#' @return \code{Raster*} object with cloud filled image.
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            output_path, base_date=NULL, fast=FALSE, n_cpus=1, 
-                            overwrite=FALSE, notify=print) {
-    if (!file_test("-d", output_path)) {
-        stop(paste(output_path, "does not exist"))
-    }
-
+                            base_date=NULL, fast=FALSE, n_cpus=1, 
+                            overwrite=FALSE, notify=print, ...) {
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Cloud fill')
 
-    if (n_cpus > 1) beginCluster(n_cpus)
+    if (n_cpus > 1) sfQuickInit(n_cpus)
 
     wrspath <- sprintf('%03i', wrspath)
     wrsrow <- sprintf('%03i', wrsrow)
@@ -120,72 +118,25 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                             max(fill_areas_freq[avail_fill_row, -1]))
     fill_img <- imgs[[fill_img_index]]
     imgs <- imgs[-fill_img_index]
-    fill_mask <- fill_areas[[fill_img_index]]
-    masks <- masks[-base_img_index]
+    cloud_mask <- fill_areas[[fill_img_index]]
+    fill_img_mask <- masks[[fill_img_index]]
+    masks <- masks[-fill_img_index]
 
     # Add numbered IDs to the cloud patches using ConnCompLabel from the 
     # SDMTools package. Xiaolin Zhu's code requires these ID numbers.
-    coded_cloud_mask <- ConnCompLabel(fill_mask)
+    coded_cloud_mask <- ConnCompLabel(cloud_mask)
     #coded_cloud_mask_patchstats <- PatchStat(coded_cloud_mask)
 
-    cl <- options('rasterClusterObject')[[1]]
-    inparallel <- FALSE
-    if ((!is.null(cl)) && (nlayers(base_img) > 1)) {
-        if (!require(foreach)) {
-            warning('Cluster object found, but "foreach" is required to run topographic correction in parallel. Running sequentially.')
-        } else if (!require(doSNOW)) {
-            warning('Cluster object found, but "doSNOW" is required to run topographic correction in parallel. Running sequentially.')
-        } else {
-            inparallel <- TRUE
-            registerDoSNOW(cl)
-        }
-    }
+    # Mark areas of the cloud_mask where fill_img is blank (clouded) with -1
+    coded_cloud_mask[fill_img_mask] <- -1
 
-    #base_img <- dropLayer(base_img, c(4, 5, 6))
-    #fill_img <- dropLayer(fill_img, c(4, 5, 6))
-
-    if (inparallel) {
-        uncorr_layer=NULL
-        filled <- foreach(base_band=unstack(base_img), 
-                          fill_band=unstack(fill_img), 
-                          coded_cloud_mask=coded_cloud_mask, 
-                          .combine='addLayer', .multicombine=TRUE, 
-                          .init=raster(), .packages=c('raster', 'teamlucc', 
-                                                      'rgdal')) %dopar% {
-            rasterOptions(format='ENVI')
-            # Write in-memory rasters to file to hand off to IDL.
-            base_band <- writeRaster(base_band, rasterTmpFile(), 
-                                     datatype='INT2S')
-            fill_band <- writeRaster(fill_band, rasterTmpFile(), 
-                                     datatype='INT2S')
-            coded_cloud_mask <- writeRaster(coded_cloud_mask, rasterTmpFile(), 
-                                            datatype='INT2S')
-            fill_clouds(filename(base_band), filename(fill_band), 
-                        filename(coded_cloud_mask), fast=fast, num_class=3, 
-                        DN_min=-300, DN_max=17000, patch_long=2000)
-        }
-    } else {
-        # Temporarily reset default raster output format to ENVI format, for 
-        # compatibility with IDL.
-        def_format <- rasterOptions()$format
-        rasterOptions(format='ENVI')
-        base_img <- writeRaster(base_img, rasterTmpFile(), 
-                                datatype='INT2S')
-        fill_img <- writeRaster(fill_img, rasterTmpFile(), 
-                                 datatype='INT2S')
-        coded_cloud_mask <- writeRaster(coded_cloud_mask, rasterTmpFile(), 
-                                        datatype='INT2S')
-        filled <- fill_clouds(filename(base_img), filename(fill_img), 
-                              filename(coded_cloud_mask), fast=fast, 
-                              num_class=3, DN_min=-300, DN_max=17000, 
-                              patch_long=2000)
-        rasterOptions(format=def_format)
-    }
+    timer <- start_timer(timer, label='Cloud fill - cloud_remove')
+    filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
+    timer <- stop_timer(timer, label='Cloud fill - cloud_remove')
 
     timer <- stop_timer(timer, label='Cloud fill')
 
-
-    if (n_cpus > 1) endCluster()
+    if (n_cpus > 1) sfQuickStop()
 
     return(filled)
 }

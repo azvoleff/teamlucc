@@ -5,7 +5,7 @@ using namespace arma;
 
 //' Cloud fill using the algorithm developed by Xiaolin Zhu
 //'
-//' This function is called by the \code{\link{fill_clouds}} function. It is 
+//' This function is called by the \code{\link{cloud_remove}} function. It is
 //' not intended to be used directly.
 //'
 //' @param cloudy the cloudy image, with pixels in columns (in column-major 

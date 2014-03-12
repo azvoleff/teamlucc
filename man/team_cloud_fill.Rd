@@ -2,9 +2,9 @@
 \alias{team_cloud_fill}
 \title{Perform cloud fill for topographically corrected Landsat imagery}
 \usage{
-team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, output_path,
+team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   base_date = NULL, fast = FALSE, n_cpus = 1, overwrite = FALSE,
-  notify = print)
+  notify = print, ...)
 }
 \arguments{
   \item{data_dir}{folder where input images are located,
@@ -22,8 +22,6 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, output_path,
   \item{end_date}{end date of period from which images will
   be chosen to fill cloudy areas in the the base image (as
   \code{Date} object)}
-
-  \item{output_path}{the path to use for the output}
 
   \item{base_date}{ideal date for base image (base image
   will be chosen as the image among the available images
@@ -44,9 +42,15 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, output_path,
   function). See the \code{notifyR} package for one way of
   sending notifications from R. The \code{notify} function
   should accept a string as the only argument.}
+
+  \item{...}{additional arguments passed to
+  \code{\link{cloud_remove}}}
+}
+\value{
+\code{Raster*} object with cloud filled image.
 }
 \description{
-Uses the GNSPI algorithm from Xioalin Zhu. See
-\code{\link{fill_clouds}} for details.
+Uses an R/C++ implementation of the NSPI algorithm from
+Xioalin Zhu. See \code{\link{cloud_remove}} for details.
 }
 
