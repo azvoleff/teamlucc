@@ -183,7 +183,7 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name,
                                   cloud_nbh=cloud_nbh, DN_min=DN_min, 
                                   DN_max=DN_max),
                         filename=out_name,
-                        outbands=nlayers(cloudy), verbose=TRUE)
+                        outbands=nlayers(cloudy))
 
     return(out)
 }

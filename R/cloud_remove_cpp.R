@@ -14,12 +14,12 @@
 #' @param cloud_nbh the range of cloud neighborhood (in pixels)
 #' @param DN_min the minimum valid DN value
 #' @param DN_max the maximum valid DN value
+#' @param ... additional arguments to pass to rasterEngine
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
 cloud_remove_cpp <- function(cloudy, clear, cloud_mask, out_name, num_class=1, 
-                             min_pixel=20, cloud_nbh=1, DN_min=0, DN_max=255) {
-
+                             min_pixel=20, cloud_nbh=1, DN_min=0, DN_max=255, ...) {
     if (nlayers(cloudy) != nlayers(clear)) {
         stop('number of layers in cloudy_rast must match number of layers in clear_rast')
     }
@@ -28,24 +28,27 @@ cloud_remove_cpp <- function(cloudy, clear, cloud_mask, out_name, num_class=1,
     }
     
     # Wrapper around C++ cloud fill function
-    cloud_remove_block <- function(cloudy, clear, cloud_mask, num_class=1, min_pixel=20, 
-                           cloud_nbh=1, DN_min=0, DN_max=255, ...) {
+    cloud_fill_wrapper <- function(cloudy, clear, cloud_mask, num_class=1, 
+                                   min_pixel=20, cloud_nbh=1, DN_min=0, 
+                                   DN_max=255, ...) {
+        dims=dim(cloudy)
         cloudy <- array(cloudy, dim=c(dims[1] * dims[2], dims[3]))
         clear <- array(clear, dim=c(dims[1] * dims[2], dims[3]))
         cloud_mask <- array(cloud_mask, dim=c(dims[1] * dims[2]))
         filled <- cloud_fill(cloudy, clear, cloud_mask, dims, num_class, 
                              min_pixel, cloud_nbh, DN_min, DN_max)
+        filled <- array(filled, dim=c(dims[1], dims[2], dims[3]))
     }
 
     out <- rasterEngine(cloudy=cloudy, clear=clear, 
                         cloud_mask=cloud_mask,
-                        fun=cloud_fill,
+                        fun=cloud_fill_wrapper,
                         processing_unit='chunk',
                         args=list(num_class=num_class, min_pixel=min_pixel, 
                                   cloud_nbh=cloud_nbh, DN_min=DN_min, 
                                   DN_max=DN_max),
-                        filename=out_name,
-                        outbands=nlayers(cloudy), verbose=TRUE)
+                        outbands=nlayers(cloudy),
+                        ...)
 
     return(out)
 }

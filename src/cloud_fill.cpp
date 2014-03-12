@@ -106,15 +106,22 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
         uvec sub_cloud_col_i = floor(sub_cloud_vec_i / sub_cloud_mask.n_rows);
         uvec sub_cloud_row_i = sub_cloud_vec_i - sub_cloud_col_i * sub_cloud_mask.n_rows;
 
+        // ic is the current index within the sub_cloud_vec_i vector
         for(unsigned ic=0; ic < sub_cloud_vec_i.n_elem; ic++) {
             // Calculate row and column location of target pixel
             int ri = sub_cloud_row_i(ic);
             int ci = sub_cloud_col_i(ic);
 
+            // sub_row is the row of this cloud pixel in the 'sub_' column 
+            // vectors (sub_cloud, sub_clear, and sub_cloud_mask)
+            int sub_row = sub_cloud_vec_i(ic);
+
             // Calculate distance between target pixel and center of cloud
             double r2 = sqrt(pow(x_center - ri, 2) + pow(y_center - ci, 2));
-            // Note need to convert sub_cloud_row_i and sub_cloud_col_i from 
-            // type uvec to vec for the below calculations.
+            // clear_dists is the distance of each clear pixel from this 
+            // particular cloud pixel. Note need to convert sub_cloud_row_i and 
+            // sub_cloud_col_i from type uvec to vec for the below 
+            // calculations.
             vec clear_dists = sqrt(pow(conv_to<vec>::from(sub_clear_row_i) - ri, 2) +
                                    pow(conv_to<vec>::from(sub_clear_col_i) - ci, 2));
 
@@ -130,12 +137,12 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
             vec rmse_similar(min_pixel); // Based on spectral distance
             vec dis_similar(min_pixel); // Based on spatial distance
             while ((num_similar <= (min_pixel-1)) && (iclear <= (order_clear.n_elem - 1))) {
-                int indicate_similar = sum((sub_clear_clear.row(order_clear(iclear)) - sub_clear.row(ic)) <= similar_th_band);
+                int indicate_similar = sum((sub_clear_clear.row(order_clear(iclear)) - sub_clear.row(sub_row)) <= similar_th_band);
                 // Below only runs if there are similar pixels in all bands
                 if (indicate_similar == dims(2)) {
                     cloudy_similar.row(num_similar) = sub_cloudy_clear.row(order_clear(iclear));
                     clear_similar.row(num_similar) = sub_clear_clear.row(order_clear(iclear));
-                    rmse_similar(num_similar) = sqrt(sum(pow(sub_clear_clear.row(order_clear(iclear)) - sub_clear.row(ic), 2))
+                    rmse_similar(num_similar) = sqrt(sum(pow(sub_clear_clear.row(order_clear(iclear)) - sub_clear.row(sub_row), 2))
                             / dims(2));
                     dis_similar(num_similar) = clear_dists(order_clear(iclear));
                     num_similar++;
@@ -169,28 +176,20 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
 
                 mat predict_2 = cloudy_similar - clear_similar;
                 predict_2.each_col() %= weight;
-                predict_2 = sub_clear.row(ic) + sum(predict_2, 0);
+                predict_2 = sub_clear.row(sub_row) + sum(predict_2, 0);
                 for(unsigned iband=0; iband < dims(2); iband++) {
                     if (predict_2(iband) > DN_min && predict_2(iband) < DN_max) {
-                        sub_cloudy(ic, iband) = W_T1 * predict_1(iband) + W_T2 * predict_2(iband);
+                        cloudy_cube(up_row + ri, left_col + ci, iband) = W_T1 * predict_1(iband) + W_T2 * predict_2(iband);
                     } else {
-                        sub_cloudy(ic, iband) = predict_1(iband);
+                        cloudy_cube(up_row + ri, left_col + ci, iband) = predict_1(iband);
                     }
                 }
 
             } else {
                 // If no similar pixel, use mean of all pixels in cloud 
                 // neighborhood for a simple linear adjustment
-                sub_cloudy.row(ic) = sub_clear.row(ic) + mean_diff;
+                cloudy_cube.tube(up_row + ri, left_col + ci) = sub_clear.row(sub_row) + mean_diff;
             }
-        }
-        // Below is necessary because sub_cloudy is a matrix
-        for (unsigned iband=0; iband < dims(2); iband++) {
-            mat this_band = sub_cloudy.col(iband);
-            this_band.set_size(num_sub_rows, num_sub_cols);
-            cloudy_cube(span(up_row, down_row),
-                        span(left_col, right_col),
-                        span(iband)) = this_band;
         }
     }
     return(cloudy);

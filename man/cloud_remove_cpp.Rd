@@ -3,7 +3,7 @@
 \title{Xiaolin Zhu's CLOUD_REMOVE.pro script implemented in R}
 \usage{
 cloud_remove_cpp(cloudy, clear, cloud_mask, out_name, num_class = 1,
-  min_pixel = 20, cloud_nbh = 1, DN_min = 0, DN_max = 255)
+  min_pixel = 20, cloud_nbh = 1, DN_min = 0, DN_max = 255, ...)
 }
 \arguments{
   \item{cloudy}{the cloudy image (base image) as a
@@ -31,6 +31,8 @@ cloud_remove_cpp(cloudy, clear, cloud_mask, out_name, num_class = 1,
   \item{DN_min}{the minimum valid DN value}
 
   \item{DN_max}{the maximum valid DN value}
+
+  \item{...}{additional arguments to pass to rasterEngine}
 }
 \description{
 Xiaolin Zhu's CLOUD_REMOVE.pro script implemented in R
