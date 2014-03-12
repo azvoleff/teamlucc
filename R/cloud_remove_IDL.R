@@ -29,10 +29,13 @@ prep_fmask <- function(image_dir) {
     clouds <- (fmask_band == 2) | (fmask_band == 4)
 }
 
-#' Perform heavy cloud filling
+#' Wrapper of Xiaolin Zhu's CLOUD_REMOVE IDL script
 #'
 #' Calls either of the CLOUD_REMOVE.pro or CLOUD_REMOVE_FAST.pro IDL scripts by 
-#' Xiaolin Zhu to fill heavy clouds in a Landsat image.
+#' Xiaolin Zhu to fill heavy clouds in a Landsat image. See the 
+#' \code{\link{cloud_remove}} function for an R/C++ implementation of the 
+#' CLOUD_REMOVE_FAST.pro script (which will run much faster, and doesn't 
+#' require an IDL license).
 #'
 #' @export
 #' @importFrom tools file_path_sans_ext
@@ -55,7 +58,7 @@ prep_fmask <- function(image_dir) {
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified 
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521-525.
-fill_clouds <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
+cloud_remove_IDL <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
                         fast=TRUE, num_class=1, min_pixel=20, extent1=1, 
                         DN_min=0, DN_max=255, patch_long=1000,
                         idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {

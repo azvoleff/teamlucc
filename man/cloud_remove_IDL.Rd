@@ -1,8 +1,8 @@
-\name{fill_clouds}
-\alias{fill_clouds}
-\title{Perform heavy cloud filling}
+\name{cloud_remove_IDL}
+\alias{cloud_remove_IDL}
+\title{Wrapper of Xiaolin Zhu's CLOUD_REMOVE IDL script}
 \usage{
-fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
+cloud_remove_IDL(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
   fast = TRUE, num_class = 1, min_pixel = 20, extent1 = 1, DN_min = 0,
   DN_max = 255, patch_long = 1000,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe")
@@ -44,7 +44,10 @@ fill_clouds(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
 \description{
 Calls either of the CLOUD_REMOVE.pro or
 CLOUD_REMOVE_FAST.pro IDL scripts by Xiaolin Zhu to fill
-heavy clouds in a Landsat image.
+heavy clouds in a Landsat image. See the
+\code{\link{cloud_remove}} function for an R/C++
+implementation of the CLOUD_REMOVE_FAST.pro script (which
+will run much faster, and doesn't require an IDL license).
 }
 \references{
 Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
