@@ -2,25 +2,25 @@
 \alias{cloud_remove_IDL}
 \title{Wrapper of Xiaolin Zhu's CLOUD_REMOVE IDL script}
 \usage{
-cloud_remove_IDL(img_cloudy, img_clear, img_cloud_mask, out_name = NULL,
-  fast = TRUE, num_class = 1, min_pixel = 20, extent1 = 1, DN_min = 0,
+cloud_remove_IDL(cloudy, clear, cloud_mask, out_name = NULL, fast = TRUE,
+  num_class = 1, min_pixel = 20, extent1 = 1, DN_min = 0,
   DN_max = 255, patch_long = 1000,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe")
 }
 \arguments{
-  \item{img_cloudy}{the cloudy image (base image)}
+  \item{cloudy}{the cloudy image (base image)}
 
-  \item{img_clear}{the clear image to use for filling
-  \code{img_cloudy}}
+  \item{clear}{the clear image to use for filling
+  \code{cloudy}}
 
-  \item{img_cloud_mask}{cloud mask, with cloud patches
-  assigned unique integer codes, and all background coded
-  as zero. The \code{ConnCompLabel} function in the
-  \code{SDMTools} package can automate this process.}
+  \item{cloud_mask}{cloud mask, with cloud patches assigned
+  unique integer codes, and all background coded as zero.
+  The \code{ConnCompLabel} function in the \code{SDMTools}
+  package can automate this process.}
 
   \item{out_name}{name for output image, or NULL. If null
   an output name will be automatically assigned based on
-  \code{img_clear}}
+  \code{clear}}
 
   \item{fast}{if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro
   script. If \code{FALSE}, use the CLOUD_REMOVE.pro

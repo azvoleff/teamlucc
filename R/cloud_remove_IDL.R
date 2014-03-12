@@ -39,13 +39,13 @@ prep_fmask <- function(image_dir) {
 #'
 #' @export
 #' @importFrom tools file_path_sans_ext
-#' @param img_cloudy the cloudy image (base image)
-#' @param img_clear the clear image to use for filling \code{img_cloudy}
-#' @param img_cloud_mask cloud mask, with cloud patches assigned unique integer 
+#' @param cloudy the cloudy image (base image)
+#' @param clear the clear image to use for filling \code{cloudy}
+#' @param cloud_mask cloud mask, with cloud patches assigned unique integer 
 #' codes, and all background coded as zero. The \code{ConnCompLabel} function 
 #' in the \code{SDMTools} package can automate this process.
 #' @param out_name name for output image, or NULL. If null an output name will 
-#' be automatically assigned based on \code{img_clear}
+#' be automatically assigned based on \code{clear}
 #' @param fast if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro script. If 
 #' \code{FALSE}, use the CLOUD_REMOVE.pro script.
 #' @param num_class set the estimated number of classes in image
@@ -58,7 +58,7 @@ prep_fmask <- function(image_dir) {
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified 
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521-525.
-cloud_remove_IDL <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NULL,
+cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name=NULL,
                         fast=TRUE, num_class=1, min_pixel=20, extent1=1, 
                         DN_min=0, DN_max=255, patch_long=1000,
                         idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
@@ -73,24 +73,27 @@ cloud_remove_IDL <- function(img_cloudy, img_clear, img_cloud_mask, out_name=NUL
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
         stop('IDL not found - check "idl" parameter')
     }
-    if (!(file_test('-f', img_cloudy))) {
-        stop('input file for cloudy image not found - check img_cloudy parameter')
-    }
-    if (!(file_test('-f', img_clear))) {
-        stop('input file for clear image not found - check img_clear parameter')
-    }
-    if (!(file_test('-f', img_cloud_mask))) {
-        stop('input file for cloud mask not found - check img_cloud_mask parameter')
-    }
+
+    # Write in-memory rasters to file to hand off to IDL.
+    def_format <- rasterOptions()$format
+    rasterOptions(format='ENVI')
+    cloudy <- writeRaster(cloudy, rasterTmpFile(), datatype='INT2S')
+    clear <- writeRaster(clear, rasterTmpFile(), datatype='INT2S')
+    cloud_mask <- writeRaster(cloud_mask, rasterTmpFile(), datatype='INT2S')
+    cloudy_file <- filename(cloudy)
+    clear_file <- filename(clear)
+    cloud_mask_file <- filename(cloud_mask)
+    rasterOptions(format=def_format)
 
     if (is.null(out_name)) {
-        out_name <- paste0(file_path_sans_ext(img_cloudy), '_cloud_remove.envi')
+        out_name <- paste0(file_path_sans_ext(filename(cloudy)), 
+                           '_cloud_remove.envi')
     }
 
     param_names <- c("cloudy_file", "clear_file", "mask_file", "out_name", 
                      "num_class", "min_pixel", "extent1", "DN_min", "DN_max", 
                      "patch_long")
-    param_vals <- list(img_cloudy, img_clear, img_cloud_mask, out_name, 
+    param_vals <- list(cloudy_file, clear_file, cloud_mask_file, out_name, 
                        num_class, min_pixel, extent1, DN_min, DN_max, 
                        patch_long)
     idl_params <- mapply(format_IDL_param, param_names, param_vals)

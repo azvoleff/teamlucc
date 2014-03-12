@@ -4,7 +4,6 @@
 #' \code{\link{cloud_remove}} for details.
 #'
 #' @export
-#' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
@@ -33,10 +32,11 @@
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             base_date=NULL, fast=FALSE, n_cpus=1, 
                             overwrite=FALSE, notify=print, ...) {
+    if (!file_test('-d', data_dir)) {
+        stop('data_dir does not exist')
+    }
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Cloud fill')
-
-    if (n_cpus > 1) sfQuickInit(n_cpus)
 
     wrspath <- sprintf('%03i', wrspath)
     wrsrow <- sprintf('%03i', wrsrow)
@@ -122,21 +122,15 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     fill_img_mask <- masks[[fill_img_index]]
     masks <- masks[-fill_img_index]
 
-    # Add numbered IDs to the cloud patches using ConnCompLabel from the 
-    # SDMTools package. Xiaolin Zhu's code requires these ID numbers.
+    # Add numbered IDs to the cloud patches
     coded_cloud_mask <- ConnCompLabel(cloud_mask)
-    #coded_cloud_mask_patchstats <- PatchStat(coded_cloud_mask)
 
     # Mark areas of the cloud_mask where fill_img is blank (clouded) with -1
     coded_cloud_mask[fill_img_mask] <- -1
 
-    timer <- start_timer(timer, label='Cloud fill - cloud_remove')
-    filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
-    timer <- stop_timer(timer, label='Cloud fill - cloud_remove')
-
+    filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, n_cpus=n_cpus, 
+                           ...)
     timer <- stop_timer(timer, label='Cloud fill')
-
-    if (n_cpus > 1) sfQuickStop()
 
     return(filled)
 }
