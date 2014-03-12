@@ -76,6 +76,10 @@ at the R prompt to install the latest version of `teamlucc`. Typing the above
 command will also work if you already have `teamlucc` installed and want to 
 install an updated version of the package.
 
+*NOTE:* If you are installing on Windows, you will first need to install the 
+appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
+for your version of R (as `teamr` contains C++ code).
+
 ### (optional) Install IDL
 [IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) is required for 
 running the cloud fill and Landsat 7 SLC-off gap fill routines in `teamlucc`. If 
