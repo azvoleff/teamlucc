@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // cloud_fill
-arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear, arma::vec& cloud_mask, arma::vec dims, int num_class, int min_pixel, int cloud_nbh, int DN_min, int DN_max);
+arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear, arma::ivec& cloud_mask, arma::ivec dims, int num_class, int min_pixel, int cloud_nbh, int DN_min, int DN_max);
 RcppExport SEXP teamlucc_cloud_fill(SEXP cloudySEXP, SEXP clearSEXP, SEXP cloud_maskSEXP, SEXP dimsSEXP, SEXP num_classSEXP, SEXP min_pixelSEXP, SEXP cloud_nbhSEXP, SEXP DN_minSEXP, SEXP DN_maxSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -15,8 +15,8 @@ BEGIN_RCPP
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< arma::mat >::type cloudy(cloudySEXP );
         Rcpp::traits::input_parameter< arma::mat& >::type clear(clearSEXP );
-        Rcpp::traits::input_parameter< arma::vec& >::type cloud_mask(cloud_maskSEXP );
-        Rcpp::traits::input_parameter< arma::vec >::type dims(dimsSEXP );
+        Rcpp::traits::input_parameter< arma::ivec& >::type cloud_mask(cloud_maskSEXP );
+        Rcpp::traits::input_parameter< arma::ivec >::type dims(dimsSEXP );
         Rcpp::traits::input_parameter< int >::type num_class(num_classSEXP );
         Rcpp::traits::input_parameter< int >::type min_pixel(min_pixelSEXP );
         Rcpp::traits::input_parameter< int >::type cloud_nbh(cloud_nbhSEXP );

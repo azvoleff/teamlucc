@@ -30,21 +30,26 @@ using namespace arma;
 //' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
 // [[Rcpp::export]]
 arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
-        arma::vec& cloud_mask, arma::vec dims, int num_class,
+        arma::ivec& cloud_mask, arma::ivec dims, int num_class,
         int min_pixel, int cloud_nbh, int DN_min, int DN_max) {
 
-    // Allow also treating the multiband images as cubes
+    // Make a list of the cloud codes in this file - anything less than 1 is 
+    // not a cloud code (0 is no clear, and -1 means no data in the clear 
+    // image)
+    ivec cloud_codes = unique(cloud_mask);
+    cloud_codes = cloud_codes(find(cloud_codes >= 1));
+
+    // Allow treating the multiband images as cubes
     cube cloudy_cube(cloudy.begin(), dims(0), dims(1), dims(2), false);
     cube clear_cube(clear.begin(), dims(0), dims(1), dims(2), false);
     // Allow also treating cloud_mask as 2d matrix (row, cols)
-    mat cloud_mask_mat(cloud_mask.begin(), dims(0), dims(1), false);
+    imat cloud_mask_mat(cloud_mask.begin(), dims(0), dims(1), false);
 
-    vec cloud_codes = unique(cloud_mask);
-    // Anything less than 1 is not a cloud code
-    cloud_codes = cloud_codes(find(cloud_codes >= 1));
+    Rcpp::Rcout << cloud_codes.n_elem  << " cloud(s) to process" << std::endl;
 
     for(unsigned n=0; n < cloud_codes.n_elem; n++) {
         int cloud_code = cloud_codes(n);
+        Rcpp::Rcout << "Filling cloud " << cloud_code;
 
         // These indices refer to the position of cloud pixels within the 
         // overall cloud_mask block
@@ -82,7 +87,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
             sub_clear(elnum) = sub_clear_cube(elnum);
         }
 
-        mat sub_cloud_mask = cloud_mask_mat.submat(up_row, left_col, down_row, right_col);
+        imat sub_cloud_mask = cloud_mask_mat.submat(up_row, left_col, down_row, right_col);
 
         // Compute the threshold for what is a "similar" pixel
         rowvec similar_th_band = stddev(sub_clear, 0, 0) * 2 / num_class;
@@ -106,6 +111,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
         uvec sub_cloud_col_i = floor(sub_cloud_vec_i / sub_cloud_mask.n_rows);
         uvec sub_cloud_row_i = sub_cloud_vec_i - sub_cloud_col_i * sub_cloud_mask.n_rows;
 
+        Rcpp::Rcout << " (" << sub_cloud_vec_i.n_elem <<  " pixels)" << std::endl;
         // ic is the current index within the sub_cloud_vec_i vector
         for(unsigned ic=0; ic < sub_cloud_vec_i.n_elem; ic++) {
             // Calculate row and column location of target pixel
@@ -177,7 +183,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
                 mat predict_2 = cloudy_similar - clear_similar;
                 predict_2.each_col() %= weight;
                 predict_2 = sub_clear.row(sub_row) + sum(predict_2, 0);
-                for(unsigned iband=0; iband < dims(2); iband++) {
+                for(int iband=0; iband < dims(2); iband++) {
                     if (predict_2(iband) > DN_min && predict_2(iband) < DN_max) {
                         cloudy_cube(up_row + ri, left_col + ci, iband) = W_T1 * predict_1(iband) + W_T2 * predict_2(iband);
                     } else {
