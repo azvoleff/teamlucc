@@ -1,5 +1,6 @@
 #' R/C++ implementation of Xiaolin Zhu's CLOUD_REMOVE IDL script
 #'
+#' @export
 #' @importFrom spatial.tools rasterEngine sfQuickInit sfQuickStop
 #' @param cloudy the cloudy image (base image) as a \code{Raster*}
 #' @param clear the clear image as a \code{Raster*} to use for filling 
