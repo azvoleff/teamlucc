@@ -20,6 +20,7 @@ using namespace arma;
 //' columns, bands)
 //' @param num_class set the estimated number of classes in image
 //' @param min_pixel the sample size of similar pixels
+//' @param max_pixel the maximum sample size to search for similar pixels
 //' @param cloud_nbh the range of cloud neighborhood (in pixels)
 //' @param DN_min the minimum valid DN value
 //' @param DN_max the maximum valid DN value
@@ -31,7 +32,7 @@ using namespace arma;
 // [[Rcpp::export]]
 arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
         arma::ivec& cloud_mask, arma::ivec dims, int num_class,
-        int min_pixel, int cloud_nbh, int DN_min, int DN_max) {
+        int min_pixel, int max_pixel, int cloud_nbh, int DN_min, int DN_max) {
 
     // Make a list of the cloud codes in this file - anything less than 1 is 
     // not a cloud code (0 is no clear, and -1 means no data in the clear 
@@ -142,7 +143,8 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
             mat clear_similar(min_pixel, dims(2));
             vec rmse_similar(min_pixel); // Based on spectral distance
             vec dis_similar(min_pixel); // Based on spatial distance
-            while ((num_similar <= (min_pixel-1)) && (iclear <= (order_clear.n_elem - 1))) {
+            while ((num_similar <= (min_pixel-1)) && (iclear <= 
+                        (order_clear.n_elem - 1)) && (iclear <= max_pixel)) {
                 int indicate_similar = sum((sub_clear_clear.row(order_clear(iclear)) - sub_clear.row(sub_row)) <= similar_th_band);
                 // Below only runs if there are similar pixels in all bands
                 if (indicate_similar == dims(2)) {

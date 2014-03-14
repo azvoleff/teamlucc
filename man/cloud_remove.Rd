@@ -3,8 +3,8 @@
 \title{R/C++ implementation of Xiaolin Zhu's CLOUD_REMOVE IDL script}
 \usage{
 cloud_remove(cloudy, clear, cloud_mask, out_name, num_class = 1,
-  min_pixel = 20, cloud_nbh = 1, DN_min = 0, DN_max = 255, n_cpus = 1,
-  ...)
+  min_pixel = 20, max_pixel = 1000, cloud_nbh = 1, DN_min = 0,
+  DN_max = 255, n_cpus = 1, ...)
 }
 \arguments{
   \item{cloudy}{the cloudy image (base image) as a
@@ -25,6 +25,9 @@ cloud_remove(cloudy, clear, cloud_mask, out_name, num_class = 1,
   image}
 
   \item{min_pixel}{the sample size of similar pixels}
+
+  \item{max_pixel}{the maximum sample size to search for
+  similar pixels}
 
   \item{cloud_nbh}{the range of cloud neighborhood (in
   pixels)}

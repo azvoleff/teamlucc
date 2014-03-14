@@ -2,8 +2,8 @@
 \alias{cloud_fill}
 \title{Cloud fill using the algorithm developed by Xiaolin Zhu}
 \usage{
-cloud_fill(cloudy, clear, cloud_mask, dims, num_class, min_pixel, cloud_nbh,
-  DN_min, DN_max)
+cloud_fill(cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel,
+  cloud_nbh, DN_min, DN_max)
 }
 \arguments{
   \item{cloudy}{the cloudy image, with pixels in columns
@@ -27,6 +27,9 @@ cloud_fill(cloudy, clear, cloud_mask, dims, num_class, min_pixel, cloud_nbh,
   image}
 
   \item{min_pixel}{the sample size of similar pixels}
+
+  \item{max_pixel}{the maximum sample size to search for
+  similar pixels}
 
   \item{cloud_nbh}{the range of cloud neighborhood (in
   pixels)}
