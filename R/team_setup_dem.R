@@ -28,16 +28,13 @@
 #' information
 #' @examples
 #' \dontrun{
-#' dem_path <- 'H:/Data/TEAM/VB/Rasters/DEM/ASTER'
+#' #TODO: Fix example for latest code.
 #' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/', 
-#'                list(c(15,53)))
+#' list(c(15,53)))
 #' }
 team_setup_dem <- function(aoi_file, output_path, dem_extents, n_cpus=1, 
                            overwrite=FALSE, crop_to_aoi=FALSE, aoi_buffer=0, 
                            notify=print, verbose=FALSE) {
-    if (!file_test("-d", dem_path)) {
-        stop(paste(dem_path, "does not exist"))
-    }
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
@@ -90,7 +87,7 @@ team_setup_dem <- function(aoi_file, output_path, dem_extents, n_cpus=1,
         dem_extents <- dem_extents[intersecting, ]
     }
 
-    dem_list <- file.path(dem_path, dem_extents$filename)
+    dem_list <- dem_extents$filename
     dem_rasts <- lapply(dem_list, raster)
 
     if (length(dem_list) > 1) {
