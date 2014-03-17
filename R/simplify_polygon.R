@@ -19,6 +19,10 @@ nverts <- function(poly_obj) {
 
 #' Simplify a polygon to contain less than a certain number of vertices
 #'
+#' Useful for simplifying area of interest (AOI) polygons for use with online 
+#' data portals (like USGS EarthExplorer) that limit the number of vertices 
+#' allowed in uploaded AOI shapefiles.
+#'
 #' @export
 #' @importFrom rgeos gSimplify
 #' @param poly_obj a polygon as an sp object
@@ -33,15 +37,11 @@ nverts <- function(poly_obj) {
 #' automatically set the \code{initial_tolerance} to .01 * the length of the 
 #' diagonal of the bounding box of the polygon. \code{initial_tolerance} can 
 #' also be set to an arbitrary value, in the same units as the polygon object.
-#' @return The polygon with less than \code{max_vertices} vertices.  Useful for 
-#' simplifying area of interest (AOI) polygons for use with online data portals 
-#' that limit the number of vertices allowed in uploaded AOI shapefiles.
+#' @return polygon with less than \code{max_vertices} vertices
 #' @examples
-#' # TODO: Write an example. Will need to add a polygon object to the package.
-#' # poly_obj <- readOGR('H:/Data/TEAM/VB/Vectors', 'VB_ZOI_GEO')
-#' # simplify_polygon(poly_obj, 3)
-simplify_polygon <- function(poly_obj, max_vertices, maxit=100, multiplier=1.25, 
-                         initial_tolerance='dynamic') {
+#' # TODO: add an example
+simplify_polygon <- function(poly_obj, max_vertices, maxit=100, 
+                             multiplier=1.05, initial_tolerance='dynamic') {
     if (class(poly_obj) == 'SpatialPolygonsDataFrame') {
         poly_data <- poly_obj@data
     } else {
@@ -59,8 +59,6 @@ simplify_polygon <- function(poly_obj, max_vertices, maxit=100, multiplier=1.25,
         diag_seg_length <- sqrt((ext@xmax - ext@xmin)**2 +
                                 (ext@ymax - ext@ymin)**2)
         tolerance <- diag_seg_length / 100
-    } else if (!is.numeric(tolerance) | (length(tolerance) != 1)) {
-        stop('tolerance must be "dynamic" or a numeric of length one')
     } else {
         tolerance <- initial_tolerance
     }

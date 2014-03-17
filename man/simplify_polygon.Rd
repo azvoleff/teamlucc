@@ -2,7 +2,7 @@
 \alias{simplify_polygon}
 \title{Simplify a polygon to contain less than a certain number of vertices}
 \usage{
-simplify_polygon(poly_obj, max_vertices, maxit = 100, multiplier = 1.25,
+simplify_polygon(poly_obj, max_vertices, maxit = 100, multiplier = 1.05,
   initial_tolerance = "dynamic")
 }
 \arguments{
@@ -28,18 +28,15 @@ simplify_polygon(poly_obj, max_vertices, maxit = 100, multiplier = 1.25,
   value, in the same units as the polygon object.}
 }
 \value{
-The polygon with less than \code{max_vertices} vertices.
-Useful for simplifying area of interest (AOI) polygons for
-use with online data portals that limit the number of
-vertices allowed in uploaded AOI shapefiles.
+polygon with less than \code{max_vertices} vertices
 }
 \description{
-Simplify a polygon to contain less than a certain number of
-vertices
+Useful for simplifying area of interest (AOI) polygons for
+use with online data portals (like USGS EarthExplorer) that
+limit the number of vertices allowed in uploaded AOI
+shapefiles.
 }
 \examples{
-# TODO: Write an example. Will need to add a polygon object to the package.
-# poly_obj <- readOGR('H:/Data/TEAM/VB/Vectors', 'VB_ZOI_GEO')
-# simplify_polygon(poly_obj, 3)
+# TODO: add an example
 }
 
