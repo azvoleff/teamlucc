@@ -4,7 +4,7 @@
 \usage{
 cloud_remove(cloudy, clear, cloud_mask, out_name, num_class = 1,
   min_pixel = 20, max_pixel = 1000, cloud_nbh = 1, DN_min = 0,
-  DN_max = 255, n_cpus = 1, ...)
+  DN_max = 255, ...)
 }
 \arguments{
   \item{cloudy}{the cloudy image (base image) as a
@@ -35,9 +35,6 @@ cloud_remove(cloudy, clear, cloud_mask, out_name, num_class = 1,
   \item{DN_min}{the minimum valid DN value}
 
   \item{DN_max}{the maximum valid DN value}
-
-  \item{n_cpus}{the number of CPUs to use for processes
-  that can run in parallel}
 
   \item{...}{additional arguments to pass to rasterEngine}
 }

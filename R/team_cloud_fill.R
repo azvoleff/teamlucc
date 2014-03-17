@@ -38,6 +38,8 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Cloud fill')
 
+    if (n_cpus > 1) sfQuickStart(n_cpus)
+
     wrspath <- sprintf('%03i', wrspath)
     wrsrow <- sprintf('%03i', wrsrow)
 
@@ -127,10 +129,13 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
     # Mark areas of the cloud_mask where fill_img is blank (clouded) with -1
     coded_cloud_mask[fill_img_mask] <- -1
+    NAvalue(coded_cloud_mask) <- -2
 
-    filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, n_cpus=n_cpus, 
-                           ...)
+    filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
+
     timer <- stop_timer(timer, label='Cloud fill')
+
+    if (n_cpus > 1) sfQuickStop(n_cpus)
 
     return(filled)
 }

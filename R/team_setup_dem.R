@@ -44,8 +44,6 @@ team_setup_dem <- function(aoi_file, output_path, dem_extents, n_cpus=1,
 
     timer <- Track_time(notify)
 
-    if (n_cpus > 1) beginCluster(n_cpus)
-
     aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
     aoi <- spTransform(aoi, CRS(utm_zone(aoi, proj4string=TRUE)))
     if (aoi_buffer > 0) aoi <- gBuffer(aoi, width=aoi_buffer, byid=TRUE)
