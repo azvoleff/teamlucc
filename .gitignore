@@ -1,6 +1,7 @@
 .Rhistory
 .RData
 *.swp
+*.swo
 *.csv
 *.png
 *.rst
