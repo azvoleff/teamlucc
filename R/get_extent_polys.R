@@ -6,11 +6,13 @@
 #'
 #' @export
 #' @importFrom maptools spRbind
-#' @param rast_list a \code{list} of \code{Raster*} objects
+#' @param x a \code{Raster*} object, or \code{list} of\code{Raster*} objects
 #' @return \code{SpatialPolygonDataFrame} with the extent of each raster object 
 #' as a polygon, with a "filename" attribute giving the filename for the raster 
 #' object from with each extent is derived.
-get_extent_polys <- function(rast_list) {
+get_extent_polys <- function(x) {
+    if (!is.list(x)) rast_list <- list(x)
+
     proj4strings <- lapply(rast_list, function(x) proj4string(x))
     if (!all(proj4strings == proj4strings[[1]])) {
         stop('every raster in rast_list must have the same projection')
@@ -24,9 +26,11 @@ get_extent_polys <- function(rast_list) {
     # Convert from list of SpatialPolygons objects to a single SpatialPolygons 
     # object
     extent_sps <- extent_sps_list[[1]]
-    for (n in 2:length(extent_sps_list)) {
-        extent_sps <- spRbind(extent_sps, spChFIDs(extent_sps_list[[n]], 
-                                             as.character(n)))
+    if (length(extent_sps_list) > 1) {
+        for (n in 2:length(extent_sps_list)) {
+            extent_sps <- spRbind(extent_sps, spChFIDs(extent_sps_list[[n]], 
+                                                 as.character(n)))
+        }
     }
 
     # Finally convert the SpatialPolygons object into a 
