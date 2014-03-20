@@ -98,8 +98,8 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #' includes user's, producer's, and overall accuracies for an image 
 #' classification, and quantity disagreement \code{Q} and allocation 
 #' disagreement \code{A}. Q and A are calculated based on Pontius and Millones 
-#' (2011). 95% confidence intervals for the user's, producer's, and overall 
-#' accuracies are calculated as in Olofsson et al. (2013).
+#' (2011). 95 percent confidence intervals for the user's, producer's, and 
+#' overall accuracies are calculated as in Olofsson et al. (2013).
 #'
 #' To avoid bias due to the use of a sample contingency table, the contingency 
 #' table can be converted to a population contingency table, if the variable 
