@@ -3,8 +3,8 @@
 \title{Runs an image classification}
 \usage{
 classify_image_rf(x, train_data, class_probs = TRUE,
-  use_training_flag = TRUE, tune_length = 8, train_control = NULL,
-  tune_grid = NULL, use_rfe = FALSE, notify = print)
+  use_training_flag = TRUE, train_control = NULL, tune_grid = NULL,
+  use_rfe = FALSE, notify = print)
 }
 \arguments{
   \item{x}{a \code{Raster*} image with the predictor
@@ -51,8 +51,8 @@ predicted classes \code{RasterLayer} and the class
 probabilities \code{RasterBrick}
 }
 \description{
-Currently only supports classification using a support
-vector machine (SVM).
+Currently only supports classification using a random
+forest
 }
 \details{
 Processing can be done in parallel using all using the
