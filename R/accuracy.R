@@ -204,6 +204,6 @@ accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
     A <- .calc_A(pop_ct)
 
     return(new("accuracy", ct=ct, pop_ct=pop_ct, Q=Q, A=A, 
-               n_train=length(model$finalModel@fitted), 
+               n_train=length(predict(model$finalModel)), 
                n_test=length(observed)))
 }

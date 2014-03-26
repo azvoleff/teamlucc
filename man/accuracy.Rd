@@ -41,9 +41,9 @@ comparison. Contingency table includes user's, producer's,
 and overall accuracies for an image classification, and
 quantity disagreement \code{Q} and allocation disagreement
 \code{A}. Q and A are calculated based on Pontius and
-Millones (2011). 95% confidence intervals for the user's,
-producer's, and overall accuracies are calculated as in
-Olofsson et al. (2013).
+Millones (2011). 95 percent confidence intervals for the
+user's, producer's, and overall accuracies are calculated
+as in Olofsson et al. (2013).
 }
 \details{
 To avoid bias due to the use of a sample contingency table,
