@@ -67,16 +67,16 @@ sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(),
     xy[, 2] <- xy[, 2] + yres(x)/2
     # Coordinate order is: ll, lr, ur, ul, ll. Need to end with ll to close the 
     # polygon
-    xcoords <- cbind(xy[, 1] - side/2,
-                     xy[, 1] + side/2,
-                     xy[, 1] + side/2,
-                     xy[, 1] - side/2,
-                     xy[, 1] - side/2)
-    ycoords <- cbind(xy[, 2] - side/2,
-                     xy[, 2] - side/2,
-                     xy[, 2] + side/2,
-                     xy[, 2] + side/2,
-                     xy[, 2] - side/2)
+    xcoords <- cbind(xy[, 1],
+                     xy[, 1] + side,
+                     xy[, 1] + side,
+                     xy[, 1],
+                     xy[, 1])
+    ycoords <- cbind(xy[, 2] - side,
+                     xy[, 2] - side,
+                     xy[, 2],
+                     xy[, 2],
+                     xy[, 2] - side)
     xycoords <- array(cbind(xcoords, ycoords),
                       dim=c(nrow(xcoords), ncol(xcoords), 2))
 
