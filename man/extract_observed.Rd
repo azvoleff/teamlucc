@@ -1,8 +1,8 @@
-\name{extract_training_data}
-\alias{extract_training_data}
+\name{extract_observed}
+\alias{extract_observed}
 \title{Extract training data for use in a classification}
 \usage{
-extract_training_data(x, polys, class_col, training = 1)
+extract_observed(x, polys, class_col, training = 1)
 }
 \arguments{
   \item{x}{a \code{Raster*} object from which training data
@@ -37,7 +37,7 @@ Extract training data for use in a classification
 }
 \examples{
 set.seed(1)
-train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training,
+train_data <- extract_observed(L5TSR_1986, L5TSR_1986_2001_training,
                                     "class_1986", training=.6)
 }
 

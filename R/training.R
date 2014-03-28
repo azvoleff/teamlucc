@@ -59,30 +59,31 @@ print.Training_data <- function(x, ...) {
 setMethod("show", signature(object="Training_data"), function(object) 
           print(object))
 
-#' Extract training data for use in a classification
+#' Extract observed data for use in a classification (training or testing)
 #'
 #' @export
-#' @param x a \code{Raster*} object from which training data will be extracted.  
-#' Training data will be extracted from each layer in a \code{RasterBrick} or 
+#' @param x a \code{Raster*} object from which observed data will be extracted.  
+#' The data will be extracted from each layer in a \code{RasterBrick} or 
 #' \code{RasterStack}.
-#' @param polys a \code{SpatialPolygonsDataFrame} with training data polygons
-#' @param class_col the name of the column containing the response variable (for 
-#' example the land cover type of each pixel)
+#' @param polys a \code{SpatialPolygonsDataFrame} with polygons, each of which 
+#' has been assigned to a particular class (using the \code{class_col}
+#' @param class_col the name of the column containing the response variable 
+#' (for example the land cover type of each pixel)
 #' @param training indicator of which polygons to use in training. Can be: 1) a 
 #' string giving the name of a column indicating whether each polygon is to be 
 #' used in training (column equal to TRUE) or in testing (column equal to 
 #' FALSE), or 2) a logical vector of length equal to length(polys), or 3) a 
 #' number between 0 and 1 indicating the fraction of the polygons to be 
 #' randomly selected for use in training.
-#' @return A data.frame
-#' with the training data. Each row will contain the response (the column 
-#' chosen by \code{class_col}) as the first column, with the remaining columns 
-#' containing the values at that location of each band in the raster stack.  
+#' @return data.frame with the training data. Each row will contain the 
+#' response (the column chosen by \code{class_col}) as the first column, with 
+#' the remaining columns containing the values at that location of each band in 
+#' the raster stack.
 #' @examples
 #' set.seed(1)
-#' train_data <- extract_training_data(L5TSR_1986, L5TSR_1986_2001_training, 
-#'                                     "class_1986", training=.6)
-extract_training_data <- function(x, polys, class_col, training=1) {
+#' train_data <- extract_observed(L5TSR_1986, L5TSR_1986_2001_training, 
+#'                                "class_1986", training=.6)
+extract_observed <- function(x, polys, class_col, training=1) {
     if (projection(x) != projection(polys)) {
         stop('Coordinate systems do not match')
     }

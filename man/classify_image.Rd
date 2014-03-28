@@ -69,7 +69,7 @@ call \code{endCluster}.
 \dontrun{
 # Don't run long example
 set.seed(0)
-train_data_1986 <- extract_training_data(L5TSR_1986,
+train_data_1986 <- extract_observed(L5TSR_1986,
                                          polys=L5TSR_1986_2001_training,
                                          class_col="class_1986",
                                          training=.7)

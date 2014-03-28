@@ -11,7 +11,7 @@
 #' \code{team_preprocess} function or path to an image stack in a format 
 #' readable by the \code{raster} package.
 #' @param train_shp a training dataset as output by 
-#' \code{extract_training_data}
+#' \code{extract_observed}
 #' @param output_path the path to use for the output
 #' @param class_col the name of the column containing the response variable 
 #' (for example the land cover type of each pixel)
@@ -53,7 +53,7 @@ team_classify <- function(predictor_file, train_shp, output_path,
 
     train_polys <- readOGR(dirname(train_shp), basename(file_path_sans_ext(train_shp)))
     train_polys <- spTransform(train_polys, crs(predictors))
-    train_data <- extract_training_data(predictors, train_polys, 
+    train_data <- extract_observed(predictors, train_polys, 
                                         class_col=class_col, training=training)
 
     timer <- start_timer(timer, label='Running classify_image')

@@ -134,6 +134,10 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #' @examples
 #' accuracy(classified_LT5SR_1986$model)
 accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
+    if (!is.null(reclass_mat)) {
+        stop('reclass_mat not yet supported')
+    }
+
     if (('train' %in% class(model)) && is.null(test_data)) {
         test_data <- model$trainingData
         names(test_data)[names(test_data) == '.outcome'] <- 'y'

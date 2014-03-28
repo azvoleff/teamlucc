@@ -93,7 +93,7 @@ plot(L5TSR_1986_preds)
 Run classification with support vector machine (SVM) algorithm:
 ```{r tm_1986_classification, fig.cap='Classified image'}
 set.seed(0)
-train_data_1986 <- extract_training_data(L5TSR_1986_preds, 
+train_data_1986 <- extract_observed(L5TSR_1986_preds, 
                                          L5TSR_1986_2001_training, "class_1986", 
                                          training=.7)
 classification_1986_L5TSR <- classify_image(L5TSR_1986_preds, train_data_1986)
