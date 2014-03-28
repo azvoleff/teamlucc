@@ -4,7 +4,7 @@
 stratification}
 \usage{
 sample_observed(x, size, strata = NULL, side = xres(x), fields = c(),
-  out_file = NULL, validate = TRUE, validate.layer = 1, exp = 5)
+  validate = TRUE, validate.layer = 1, exp = 5)
 }
 \arguments{
   \item{x}{a \code{Raster*}}
@@ -20,9 +20,6 @@ sample_observed(x, size, strata = NULL, side = xres(x), fields = c(),
   \item{fields}{a list of fields to include in the output
   \code{SpatialPolygonsDataFrame} (such as a "class" field
   if you will be digitizing classes).}
-
-  \item{out_file}{(optional) shapefile to save to save
-  output}
 
   \item{validate}{whether to check that all sample polygons
   lie within image area (defined as having no NAs within

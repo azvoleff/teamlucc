@@ -20,7 +20,6 @@
 #' @param fields a list of fields to include in the output 
 #' \code{SpatialPolygonsDataFrame} (such as a "class" field if you will be 
 #' digitizing classes).
-#' @param out_file (optional) shapefile to save to save output
 #' @param validate whether to check that all sample polygons lie within image 
 #' area (defined as having no NAs within the polygon)
 #' @param validate.layer the index within \code{x} of the layer that should be 
@@ -39,23 +38,26 @@
 #' plot(training_polys, add=TRUE)
 #' }
 sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(), 
-                            out_file=NULL, validate=TRUE, validate.layer=1, 
-                            exp=5) {
+                            validate=TRUE, validate.layer=1, exp=5) {
     # Don't expand if no validation is being performed
     if (!validate) {exp <- 1}
 
     if (!is.null(strata)) {
+        stratified <- TRUE
         if (proj4string(strata) != proj4string(x)) {
             stop('x and strata must have the same coordinate system')
         }
-        if (extent(strata) != extent(x)) {
+        if (!identical(extent(strata), extent(x))) {
             stop('x and strata must have the same extent')
         }
-        if (res(strata) != res(x)) {
+        if (!identical(res(strata), res(x))) {
             stop('x and strata must have the same resolution')
         }
-        cell_nums <- sampleStratified(strata, size, exp=exp)
+        strat_sample <- sampleStratified(strata, size, exp=exp)
+        cell_nums <- strat_sample[, 1]
+        strataids <- strat_sample[, 2]
     } else {
+        stratified <- FALSE
         cell_nums <- sampleInt(ncell(x), size * exp)
     }
 
@@ -91,7 +93,11 @@ sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(),
     polys <- mapply(function(poly, ID) Polygons(poly, ID=ID),
                     polys, seq(1, length(polys)))
     Sr <- SpatialPolygons(polys, proj4string=CRS(proj4string(x)))
-    out_data <- data.frame(ID=names(Sr))
+    if (stratified) {
+        out_data <- data.frame(ID=names(Sr), strata=strataids)
+    } else {
+        out_data <- data.frame(ID=names(Sr))
+    }
     for (field in fields) {
         out_data <- cbind(out_data, rep('', nrow(out_data)))
         names(out_data)[ncol(out_data)] <- field
@@ -113,19 +119,26 @@ sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(),
 
         # If there are too still too many polys remaining in the sample, cut sample 
         # down to desired size,
-        if (length(polys) > size) {
-            polys <- polys[sampleInt(length(polys), size), ]
-        } else if (length(polys) < size) {
-            warning('length of polys < size. Try increasing exp.')
+        if (stratified) {
+            freqs <- table(polys$strata)
+            for (n in 1:length(freqs)) {
+                if (freqs[n] > size) {
+                    this_class <- names(freqs)[n]
+                    these_polys <- which(polys$strata == this_class)
+                    drop_polys <- these_polys[sampleInt(length(these_polys), freqs[n] - size)]
+                    polys <- polys[-drop_polys, ]
+                }
+            }
+        } else {
+            if (length(polys) > size) {
+                polys <- polys[sampleInt(length(polys), size), ]
+            } else if (length(polys) < size) {
+                warning('length of polys < size. Try increasing exp.')
+            }
         }
         # Ensure IDs are stills sequential
         polys$ID <- seq(1, length(polys))
     }
 
-    if (!is.null(out_file)) {
-        layer_name <- gsub('.shp$', '', basename(out_file), ignore.case=TRUE)
-        writeOGR(polys, dirname(out_file), layer_name, driver='ESRI Shapefile')
-    }
-    
     return(polys)
 }
