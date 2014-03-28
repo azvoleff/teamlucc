@@ -1,4 +1,5 @@
-#' Generate random sample polygons from a raster layer
+#' Generate random sample polygons from a raster layer, optionally with 
+#' stratification
 #'
 #' Useful for gathering training data for an image classification. With the 
 #' default settings, the output polygons will be perfectly aligned with the 
@@ -14,8 +15,11 @@
 #' @param x a \code{Raster*}
 #' @param size the sample size (number of sample polygons to return)
 #' @param side the length each side of the sample polygon
+#' @param strata (optional) a \code{RasterLayer} of integers giving the strata 
+#' of each pixel.
 #' @param fields a list of fields to include in the output 
-#' \code{SpatialPolygonsDataFrame}
+#' \code{SpatialPolygonsDataFrame} (such as a "class" field if you will be 
+#' digitizing classes).
 #' @param out_file (optional) shapefile to save to save output
 #' @param validate whether to check that all sample polygons lie within image 
 #' area (defined as having no NAs within the polygon)
@@ -29,17 +33,31 @@
 #' \dontrun{
 #' set.seed(0)
 #' L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
-#' training_polys <- training_sample(L5TSR_1986_b1, 30,
+#' training_polys <- sample_observed(L5TSR_1986_b1, 30,
 #'                                   side=6*xres(L5TSR_1986_b1))
 #' plot(L5TSR_1986_b1)
 #' plot(training_polys, add=TRUE)
 #' }
-training_sample <- function(x, size, side=2*xres(x), fields=c(), out_file=NULL, 
-                          validate=TRUE, validate.layer=1, exp=2) {
+sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(), 
+                            out_file=NULL, validate=TRUE, validate.layer=1, 
+                            exp=5) {
     # Don't expand if no validation is being performed
     if (!validate) {exp <- 1}
 
-    cell_nums <- sampleInt(ncell(x), size * exp)
+    if (!is.null(strata)) {
+        if (proj4string(strata) != proj4string(x)) {
+            stop('x and strata must have the same coordinate system')
+        }
+        if (extent(strata) != extent(x)) {
+            stop('x and strata must have the same extent')
+        }
+        if (res(strata) != res(x)) {
+            stop('x and strata must have the same resolution')
+        }
+        cell_nums <- sampleStratified(strata, size, exp=exp)
+    } else {
+        cell_nums <- sampleInt(ncell(x), size * exp)
+    }
 
     xy <- xyFromCell(x, cell_nums)
     # Convert from cell-center coordinates to ul corner of cell coordinates

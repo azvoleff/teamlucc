@@ -1,17 +1,17 @@
 \name{extract_observed}
 \alias{extract_observed}
-\title{Extract training data for use in a classification}
+\title{Extract observed data for use in a classification (training or testing)}
 \usage{
 extract_observed(x, polys, class_col, training = 1)
 }
 \arguments{
-  \item{x}{a \code{Raster*} object from which training data
-  will be extracted. Training data will be extracted from
-  each layer in a \code{RasterBrick} or
-  \code{RasterStack}.}
+  \item{x}{a \code{Raster*} object from which observed data
+  will be extracted. The data will be extracted from each
+  layer in a \code{RasterBrick} or \code{RasterStack}.}
 
   \item{polys}{a \code{SpatialPolygonsDataFrame} with
-  training data polygons}
+  polygons, each of which has been assigned to a particular
+  class (using the \code{class_col}}
 
   \item{class_col}{the name of the column containing the
   response variable (for example the land cover type of
@@ -27,17 +27,18 @@ extract_observed(x, polys, class_col, training = 1)
   use in training.}
 }
 \value{
-A data.frame with the training data. Each row will contain
+data.frame with the training data. Each row will contain
 the response (the column chosen by \code{class_col}) as the
 first column, with the remaining columns containing the
 values at that location of each band in the raster stack.
 }
 \description{
-Extract training data for use in a classification
+Extract observed data for use in a classification (training
+or testing)
 }
 \examples{
 set.seed(1)
 train_data <- extract_observed(L5TSR_1986, L5TSR_1986_2001_training,
-                                    "class_1986", training=.6)
+                               "class_1986", training=.6)
 }
 
