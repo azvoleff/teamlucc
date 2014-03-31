@@ -18,7 +18,7 @@ accuracy(model, test_data = NULL, pop = NULL, reclass_mat = NULL)
   separate testing and training data.}
 
   \item{pop}{(optional) used to convert from sample matrix
-  to population matrix as in Pontius and Millones 2011.Can
+  to population matrix as in Pontius and Millones 2011. Can
   be: 1) NULL, in which case the sample frequencies will be
   used as estimates of the population frequencies, 2) a
   list of length equal to the number of classes in the map

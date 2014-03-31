@@ -115,7 +115,7 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #' \code{Training_data} object, \code{accuracy} will use the included 
 #' \code{training_flag} indicator to separate testing and training data.
 #' @param pop (optional) used to convert from sample matrix to population 
-#' matrix as in Pontius and Millones 2011.Can be: 1) NULL, in which case the 
+#' matrix as in Pontius and Millones 2011. Can be: 1) NULL, in which case the 
 #' sample frequencies will be used as estimates of the population frequencies, 
 #' 2) a list of length equal to the number of classes in the map giving the 
 #' total number of pixels in the entire population for each class, or 3) the 
