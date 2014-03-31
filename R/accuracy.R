@@ -151,7 +151,7 @@ accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
     if (!('training_flag' %in% names(test_data))) {
         warning('no training_flag variable found - assuming none of "test_data" was used for model training')
     } else {
-        if (sum(test_data$training_flag) == 0) {
+        if (sum(test_data$training_flag == 1) == nrow(test_data)) {
             stop('cannot conduct accuracy assessment without independent testing data')
         }
         test_data <- test_data[!test_data$training_flag, ]
