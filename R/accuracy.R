@@ -54,12 +54,106 @@ print.accuracy <- function(x, ...) {
 #' @export
 setMethod("show", signature(object="accuracy"), function(object) print(object))
 
+#' Class to represent error-adjusted map areas
+#'
+#' @import methods
+#' @export
+#' @name error_adj_area-class
+setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
+
+#' Calculated adjusted class areas for an image classification
+#'
+#' Calculates the adjusted areas of each class in an image after taking account 
+#' of omission and commission errors. For unbiased adjustments, error rates 
+#' should be calculated using a population sample matrix (see 
+#' \code{\link{accuracy}}.
+#'
+#' Standard errors for the adjusted areas are calculated as in Olofsson et al.  
+#' (2013).
+#' @docType methods
+#' @rdname adj_areas-methods
+#' @param x an \code{accuracy} object or a list of populations a \code{numeric}
+#' @param y missing, or a contingency table
+#' @references Olofsson, P., G. M. Foody, S. V. Stehman, and C. E. Woodcock.  
+#' 2013. Making better use of accuracy data in land change studies: Estimating 
+#' accuracy and area and quantifying uncertainty using stratified estimation.  
+#' Remote Sensing of Environment 129:122-131.
+#' @export
+setGeneric("adj_areas", function(x, y) standardGeneric("adj_areas"))
+
+#' @rdname adj_areas-methods
+#' @aliases adj_areas,numeric,table-method
+setMethod("adj_areas", signature(x="numeric", y="table"),
+function(x, y) {
+    pop <- x
+    ct <- y
+    Wi <- pop / sum(pop)
+    adj_area_est <- sum(pop) * colSums(Wi * (ct / rowSums(ct)))
+    # Calculate standard errors of the proportions
+    std_err_p <- sqrt(colSums(Wi^2 *
+                              (((ct / rowSums(ct))*(1 - ct / rowSums(ct))) /
+                               (rowSums(ct) - 1))))
+    # Now calculate standard error of adjusted area estimate
+    std_err_area <- sum(pop) * std_err_p
+    adj_area_mat <- cbind(pop, adj_area_est, std_err_area, 1.96 * std_err_area)
+    adj_area_mat <- round(adj_area_mat, 0)
+    dimnames(adj_area_mat)[[1]] <- dimnames(ct)[[1]]
+    dimnames(adj_area_mat)[[2]] <- c('Mapped area', 'Adj. area', 'S.E.', 
+                                     '1.96 * S.E.')
+    return(new('error_adj_area', adj_area_mat=adj_area_mat))
+})
+
+#' @rdname adj_areas-methods
+#' @aliases adj_areas,numeric,matrix-method
+setMethod("adj_areas", signature(x="numeric", y="matrix"),
+function(x, y) {
+    class(y) <- "table"
+    adj_areas(x, y)
+})
+
+#' @rdname adj_areas-methods
+#' @aliases adj_areas,numeric,missing-method
+setMethod("adj_areas", signature(x="accuracy", y='missing'),
+function(x){
+    pop <- x@pop
+    ct <- x@ct
+    adj_areas(pop, ct)
+})
+
+#' Show an error_adj_area object
+#'
+#' @export
+setMethod("show", signature(object="error_adj_area"),
+function(object) {
+    cat('Accuracy-adjusted area table:\n')
+    print(object@adj_area_mat)
+})
+
+#' Plot an error_adj_area object
+#'
+#' @import ggplot2
+#' @param x an \code{error_adj_area} object
+#' @S3method plot error_adj_area
+plot.error_adj_area <- function(x) {
+    classes <- dimnames(x@adj_area_mat)[[1]]
+    areas <- x@adj_area_mat[, 2]
+    se <- x@adj_area_mat[, 3]
+    plt_data <- data.frame(x=classes, y=areas, se=se)
+    ggplot(plt_data, aes(x, y)) + geom_bar() + 
+        geom_errorbar(aes(ymin=y - 1.96 * se, ymax=y + 1.96 * se), width=.25) +
+        xlab("Class") + ylab("Area")
+}
+
 .calc_pop_ct <- function(ct, pop) {
     # Below uses the notation of Pontius and Millones (2011)
     nijsum <- matrix(rowSums(ct), nrow=nrow(ct), ncol=ncol(ct))
     Ni <- matrix(pop, nrow=nrow(ct), ncol=ncol(ct))
     # pop_ct is the population contigency table
-    return((ct / nijsum) * (Ni / sum(pop)))
+    pop_ct <- (ct / nijsum) * (Ni / sum(pop))
+    dimnames(pop_ct)[[1]] <- dimnames(ct)[[1]]
+    dimnames(pop_ct)[[2]] <- dimnames(ct)[[2]]
+    class(ct) <- 'table'
+    return(pop_ct)
 }
 
 .calc_Q <- function(pop_ct) {
@@ -76,13 +170,19 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
     return(sum(ag_mat) / 2)
 }
 
+# Adds margins to contingency table
 .add_ct_margins <- function(ct) {
-    # Adds margins to contingency table
+    # For user's, producer's, and overall accuracy formulas, see Table 
+    # 21.3 in Foody, G.M., Stehman, S.V., 2009. Accuracy Assessment, in: 
+    # Warner, T.A., Nellis, M.D., Foody, G.M. (Eds.), The SAGE Handbook of 
+    # Remote Sensing. SAGE.
     diag_indices <- which(diag(nrow(ct)) == TRUE)
     users_acc <- ct[diag_indices] / colSums(ct)
     prod_acc <- ct[diag_indices] / rowSums(ct)
     overall_acc <- sum(ct[diag_indices]) / sum(ct)
     ct <- addmargins(ct)
+    dimnames(ct)[[1]][nrow(ct)] <- "Total"
+    dimnames(ct)[[2]][nrow(ct)] <- "Total"
     ct <- rbind(ct, Producers=c(users_acc, NA))
     ct <- cbind(ct, Users=c(prod_acc, NA, overall_acc))
     ct <- round(ct, digits=4)
@@ -99,8 +199,9 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #' includes user's, producer's, and overall accuracies for an image 
 #' classification, and quantity disagreement \code{Q} and allocation 
 #' disagreement \code{A}. Q and A are calculated based on Pontius and Millones 
-#' (2011). 95 percent confidence intervals for the user's, producer's, and 
-#' overall accuracies are calculated as in Olofsson et al. (2013).
+#' (2011). Standard errors for 95 percent confidence intervals for the user's, 
+#' producer's, and (2011). Standard errors for the user's, producer's, and 
+#' overall accuracies are calculated as in Foody and Stehman (2009) Table 21.3.
 #'
 #' To avoid bias due to the use of a sample contingency table, the contingency 
 #' table can be converted to a population contingency table, if the variable 
@@ -132,6 +233,8 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #' better use of accuracy data in land change studies: Estimating accuracy and 
 #' area and quantifying uncertainty using stratified estimation.  Remote 
 #' Sensing of Environment 129:122-131.
+#' Foody, G.M., Stehman, S.V., 2009. Accuracy Assessment, in: Warner, T.A., 
+#' Nellis, M.D., Foody, G.M. (Eds.), The SAGE Handbook of Remote Sensing. SAGE.
 #' @examples
 #' accuracy(classified_LT5SR_1986$model)
 accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {

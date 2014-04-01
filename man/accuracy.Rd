@@ -41,9 +41,10 @@ comparison. Contingency table includes user's, producer's,
 and overall accuracies for an image classification, and
 quantity disagreement \code{Q} and allocation disagreement
 \code{A}. Q and A are calculated based on Pontius and
-Millones (2011). 95 percent confidence intervals for the
-user's, producer's, and overall accuracies are calculated
-as in Olofsson et al. (2013).
+Millones (2011). Standard errors for 95 percent confidence
+intervals for the user's, producer's, and (2011). Standard
+errors for the user's, producer's, and overall accuracies
+are calculated as in Foody and Stehman (2009) Table 21.3.
 }
 \details{
 To avoid bias due to the use of a sample contingency table,
@@ -64,5 +65,8 @@ Stehman, and C. E. Woodcock.  2013. Making better use of
 accuracy data in land change studies: Estimating accuracy
 and area and quantifying uncertainty using stratified
 estimation.  Remote Sensing of Environment 129:122-131.
+Foody, G.M., Stehman, S.V., 2009. Accuracy Assessment, in:
+Warner, T.A., Nellis, M.D., Foody, G.M. (Eds.), The SAGE
+Handbook of Remote Sensing. SAGE.
 }
 
