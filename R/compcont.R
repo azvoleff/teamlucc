@@ -7,7 +7,7 @@
 #' @return matrix with contingency table
 #' @references Pontius, R. G., and M. L. Cheuk. 2006.  A generalized 
 #' cross-tabulation matrix to compare soft-classified maps at multiple 
-#' resolutions.  International Journal of Geographical Information Science 
+#' resolutions. International Journal of Geographical Information Science 
 #' 20:1-30.
 compcont <- function() {
     stop('compcont is not yet finished')

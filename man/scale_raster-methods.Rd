@@ -47,6 +47,10 @@ scaling factors if \code{do_scaling} is false.
 \description{
 Useful for scaling and (optionally) rounding a
 \code{RasterLayer} to integer so that a layer can be saved
-as 'INT2' or 'INT2S'.
+as an integer datatype such as "INT1U", "INT1S", "INT2" or
+"INT2S".
+}
+\seealso{
+\code{\link{dataType}}
 }
 

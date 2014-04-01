@@ -2,12 +2,14 @@
 #' integer
 #'
 #' Useful for scaling and (optionally) rounding a \code{RasterLayer} to integer 
-#' so that a layer can be saved as 'INT2' or 'INT2S'.
+#' so that a layer can be saved as an integer datatype such as "INT1U", 
+#' "INT1S", "INT2" or "INT2S".
 #'
 #' @export
 #' @docType methods
 #' @import methods
 #' @rdname scale_raster-methods
+#' @seealso \code{\link{dataType}}
 #' @param x a \code{Raster*} object
 #' @param power_of raster will be scaled using the highest possible power of 
 #' this number
