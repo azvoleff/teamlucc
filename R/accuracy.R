@@ -4,7 +4,8 @@
 #' @export
 #' @name accuracy-class
 setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric', 
-                             A='numeric', n_train='numeric', n_test='numeric')
+                             A='numeric', n_train='numeric', n_test='numeric',
+                             pop='numeric')
 )
 
 #' @S3method summary accuracy
@@ -76,7 +77,7 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 }
 
 .add_ct_margins <- function(ct) {
-    # Get column-major indices of the diagonal of the ct
+    # Adds margins to contingency table
     diag_indices <- which(diag(nrow(ct)) == TRUE)
     users_acc <- ct[diag_indices] / colSums(ct)
     prod_acc <- ct[diag_indices] / rowSums(ct)
@@ -209,5 +210,5 @@ accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
 
     return(new("accuracy", ct=ct, pop_ct=pop_ct, Q=Q, A=A, 
                n_train=length(predict(model$finalModel)), 
-               n_test=length(observed)))
+               n_test=length(observed), pop=pop))
 }
