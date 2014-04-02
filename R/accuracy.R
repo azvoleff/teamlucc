@@ -138,7 +138,7 @@ plot.error_adj_area <- function(x) {
     areas <- x@adj_area_mat[, 2]
     se <- x@adj_area_mat[, 3]
     plt_data <- data.frame(x=classes, y=areas, se=se)
-    ggplot(plt_data, aes(x, y)) + geom_bar() + 
+    ggplot(plt_data, aes(x, y)) + geom_bar(stat="identity") + 
         geom_errorbar(aes(ymin=y - 1.96 * se, ymax=y + 1.96 * se), width=.25) +
         xlab("Class") + ylab("Area")
 }
@@ -293,8 +293,8 @@ setMethod("accuracy", signature(x="train", test_data="ANY",
             warning('no training_flag variable found - assuming none of "test_data" was used for model training')
         } else if (sum(test_data$training_flag == 1) == length(test_data$training_flag)) {
             stop('cannot conduct accuracy assessment without independent testing data')
-            test_data <- test_data[!test_data$training_flag, ]
         }
+        test_data <- test_data[!test_data$training_flag, ]
 
         predicted <- predict(x, test_data)
         observed <- test_data$y

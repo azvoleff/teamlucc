@@ -53,3 +53,36 @@ test_that(".calc_A works for Pontius and Millones (2011) example", {
          expect_equal(.calc_A(.calc_pop_ct(ct_pontius, pop=c(100, 200, 300, 400))), 
                       expected=.567193, tolerance=.00001)
 })
+
+###############################################################################
+# Test the handling of data by the S4 accuracy methods
+
+test_model <- classified_LT5SR_1986$model
+test_image <- L5TSR_1986
+test_preds <- classified_LT5SR_1986$pred_classes
+
+test_that("accuracy calculations will run with model as first input", {
+    expect_warning(accuracy(test_model))
+    expect_output(accuracy(test_model, pop=test_preds), 'Object of class "accuracy"')
+    # Test an error is thrown if a class_col is supplied when a model is used 
+    expect_error(accuracy(test_model, pop=test_preds, class_col='asdf'))
+})
+
+training_data <- extract_observed(test_preds, L5TSR_1986_2001_training, class_col='class_1986')
+test_that("accuracy calculations will run with RasterLayer as first input", {
+    expect_warning(accuracy(test_preds, L5TSR_1986_2001_training, class_col="class_1986"))
+    expect_error(accuracy(test_preds, L5TSR_1986_2001_training))
+    # Test an error is thrown if only data flagged as "training" is supplied
+    expect_error(accuracy(test_preds, training_data))
+})
+
+# Test error adjusted areas calculations
+adj_areas_expected <- matrix(c(22353, 45112, 10751, 21073,
+                               1122543, 1050067, 17652, 34598,
+                               610228, 659944, 18636, 36526), nrow=3, 
+                             byrow=TRUE)
+dimnames(adj_areas_expected)[[1]] <- c(1, 2, 3)
+dimnames(adj_areas_expected)[[2]] <- c("Mapped area", "Adj. area", "S.E.", "1.96 * S.E.")
+test_that("accuracy calculations will run with RasterLayer as first input", {
+    expect_equal(adj_areas(pop_olof, ct_olof)@adj_area_mat, adj_areas_expected)
+})
