@@ -1,10 +1,12 @@
 #' Class to represent training data for training machine learning algorithms 
 #'
 #' @import methods
+#' @importFrom sp SpatialPolygonsDataFrame
 #' @export
 #' @name Training_data-class
 setClass('Training_data', slots=c(x='data.frame', y='factor', 
-                                  poly_ID='character', training_flag='logical')
+                                  poly_ID='character', training_flag='logical', 
+                                  polys='SpatialPolygonsDataFrame')
 )
 
 #' @importFrom plyr ddply summarize .
@@ -137,5 +139,6 @@ extract_observed <- function(x, polys, class_col, training=1) {
 
     return(new("Training_data", x=pixels, y=y, 
                poly_ID=polys@data[poly_pixel_match, ]$ID,
-               training_flag=polys@data[poly_pixel_match, ]$training_flag))
+               training_flag=polys@data[poly_pixel_match, ]$training_flag,
+               polys=polys))
 }
