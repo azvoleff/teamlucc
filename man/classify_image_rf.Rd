@@ -23,10 +23,6 @@ classify_image_rf(x, train_data, class_probs = TRUE,
   that pixel is a training pixel (coded as TRUE) or testing
   pixel (coded as FALSE).}
 
-  \item{tune_length}{the number of levels of each parameter
-  that should be tried by \code{train} when training the
-  classifier}
-
   \item{train_control}{default is NULL (reasonable value
   will be set automatically).  For details see
   \code{\link{trainControl}}.}

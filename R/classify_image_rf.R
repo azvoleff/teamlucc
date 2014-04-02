@@ -14,8 +14,6 @@
 #' train_data \code{data.frame} must have a column named 'training_flag' that 
 #' indicates, for each pixel, whether that pixel is a training pixel (coded as 
 #' TRUE) or testing pixel (coded as FALSE).
-#' @param tune_length the number of levels of each parameter that should be 
-#' tried by \code{train} when training the classifier
 #' @param train_control default is NULL (reasonable value will be set 
 #' automatically).  For details see \code{\link{trainControl}}.
 #' @param tune_grid the training grid to be used for training the classifier.  

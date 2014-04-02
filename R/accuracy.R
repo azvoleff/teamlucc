@@ -4,7 +4,7 @@
 #' @export
 #' @name accuracy-class
 setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric', 
-                             A='numeric', n_train='numeric', n_test='numeric',
+                             A='numeric', n_test='numeric',
                              pop='numeric')
 )
 
@@ -16,7 +16,6 @@ summary.accuracy <- function(object, ...) {
     obj[['A']] <- object@A
     obj[['ct']] <- object@ct
     obj[['pop_ct']] <- object@pop_ct
-    obj[['n_train']] <- object@n_train
     obj[['n_test']] <- object@n_test
     margined_pop_ct <- .add_ct_margins(object@pop_ct)
     obj[['overall_acc']] <- margined_pop_ct[length(margined_pop_ct)]
@@ -28,7 +27,6 @@ summary.accuracy <- function(object, ...) {
 print.summary.accuracy <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
     cat('\n')
-    cat(paste('Training samples:\t', x[['n_train']], '\n', sep = ''))
     cat(paste('Testing samples:\t', x[['n_test']], '\n', sep = ''))
     cat('\n')
     cat('Sample contingency table:\n')
@@ -125,6 +123,7 @@ function(x){
 #' @export
 setMethod("show", signature(object="error_adj_area"),
 function(object) {
+    cat('Object of class: error_adj_area\n')
     cat('Accuracy-adjusted area table:\n')
     print(object@adj_area_mat)
 })
@@ -152,7 +151,7 @@ plot.error_adj_area <- function(x) {
     pop_ct <- (ct / nijsum) * (Ni / sum(pop))
     dimnames(pop_ct)[[1]] <- dimnames(ct)[[1]]
     dimnames(pop_ct)[[2]] <- dimnames(ct)[[2]]
-    class(ct) <- 'table'
+    class(pop_ct) <- 'table'
     return(pop_ct)
 }
 
@@ -198,33 +197,69 @@ plot.error_adj_area <- function(x) {
 #' classification accuracy assessment and map comparison. Contingency table 
 #' includes user's, producer's, and overall accuracies for an image 
 #' classification, and quantity disagreement \code{Q} and allocation 
-#' disagreement \code{A}. Q and A are calculated based on Pontius and Millones 
-#' (2011). Standard errors for 95 percent confidence intervals for the user's, 
-#' producer's, and (2011). Standard errors for the user's, producer's, and 
-#' overall accuracies are calculated as in Foody and Stehman (2009) Table 21.3.
+#' disagreement \code{A}. \code{Q} and \code{A} are calculated based on Pontius 
+#' and Millones (2011). Standard errors for 95 percent confidence intervals for 
+#' the user's, producer's and overall accuracies are calculated as in Foody and 
+#' Stehman (2009) Table 21.3. To avoid bias due to the use of a sample 
+#' contingency table, the contingency table will be converted to a population 
+#' contingency table if the variable 'pop' is provided. For an accuracy 
+#' assessment using testing data from a simple random sample, 'pop' does not 
+#' need to be provided (see Details).
 #'
-#' To avoid bias due to the use of a sample contingency table, the contingency 
-#' table can be converted to a population contingency table, if the variable 
-#' 'pop' is provided. For an accuracy assessment based on a random sample, 
-#' 'pop' does not need to be provided.
+#' \code{x} Can be one of:
+#' \enumerate{
 #'
+#'   \item A prediction model as output from one of the \code{teamlucc} 
+#'   \code{classify_image} functions. If \code{x} is a model, and testing data 
+#'   is included in the model, \code{pop} and \code{test_data} can both be 
+#'   missing, and accuracy will still run (though the output will in this case 
+#'   be biased unless the testing data is from a simple random sample). If 
+#'   \code{x} is a \code{RasterLayer}, then \code{test_data} must be supplied.
+#'
+#'   \item A \code{RasterLayer} with a predicted map
+#'
+#' }
+#'
+#' \code{test_data} can be one of:
+#' \enumerate{
+#'   \item \code{NULL}. If test_data is \code{NULL}, \code{accuracy} will try to use 
+#'         testing data included in \code{x}. This will only work if \code{x}
+#'         is a model of class \code{train} from the \code{caret} package, and 
+#'         if the model was run using the one of the \code{teamlucc} 
+#'         \code{classify_image} functions.
+#'   \item A \code{SpatialPolygonsDataFrame} object, in which case \code{accuracy} 
+#'         will extract the predicted classes within each polygon from \code{x}.  
+#'         This will only work if \code{x} is a \code{RasterLayer}.
+#'   \item A \code{Training_data} object, in which case \code{accuracy} will use the 
+#'         included \code{training_flag} indicator to separate testing and 
+#'         training data.
+#' }
+#'
+#' \code{pop} Can be one of:
+#' \enumerate{
+#'   \item NULL, in which case the sample frequencies will be used as estimates 
+#'         of the population frequencies of each class.
+#'   \item A list of length equal to the number of classes in the map giving 
+#'         the total number of pixels in the population for each class.
+#'   \item A predicted cover map from as a \code{RasterLayer}, from which the 
+#'         class frequencies will be tabulated and used as the population 
+#'         frequencies.
+#' }
 #' @export
-#' @param model a classification model with a \code{predict} method
-#' @param test_data a \code{link{Training_data}} object, or NULL. If test_data 
-#' is NULL, \code{accuracy} will try to use the training data included in the 
-#' \code{model} object (this will only work if the model object is of class 
-#' \code{train} from the \code{caret} package. If test_data is a 
-#' \code{Training_data} object, \code{accuracy} will use the included 
-#' \code{training_flag} indicator to separate testing and training data.
-#' @param pop (optional) used to convert from sample matrix to population 
-#' matrix as in Pontius and Millones 2011. Can be: 1) NULL, in which case the 
-#' sample frequencies will be used as estimates of the population frequencies, 
-#' 2) a list of length equal to the number of classes in the map giving the 
-#' total number of pixels in the entire population for each class, or 3) the 
-#' predicted cover map from \code{model} as a \code{RasterLayer}, from which 
-#' the population frequencies will be tabulated.
+#' @docType methods
+#' @rdname accuracy-methods
+#' @param x either a classification model with a \code{predict} method or a 
+#' matrix (see Details)
+#' predicted map (see Details).
+#' @param test_data a \code{link{Training_data}} object, 
+#' \code{SpatialPolygonsDataFrame}, or NULL (see Details).
+#' @param pop A \code{RasterLayer}, \code{numeric} of length equal to the 
+#' number of clasess, or NULL (see Details).
 #' @param reclass_mat a reclassification matrix to be used in the case of a 
 #' model fit by \code{classify_image} with the \code{do_split} option selected
+#' @param class_col required if \code{test_data} is a 
+#' \code{SpatialPolygonsDataFrame}. Defines the name of the column containing 
+#' the observed cover class IDs
 #' @return \code{\link{accuracy-class}} instance
 #' @references Pontius, R. G., and M. Millones. 2011. Death to Kappa: birth of 
 #' quantity disagreement and allocation disagreement for accuracy assessment.  
@@ -237,74 +272,92 @@ plot.error_adj_area <- function(x) {
 #' Nellis, M.D., Foody, G.M. (Eds.), The SAGE Handbook of Remote Sensing. SAGE.
 #' @examples
 #' accuracy(classified_LT5SR_1986$model)
-accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
-    if (!is.null(reclass_mat)) {
-        stop('reclass_mat not yet supported')
-    }
+setGeneric("accuracy", function(x, test_data, pop, class_col, reclass_mat) 
+           standardGeneric("accuracy"))
 
-    if (('train' %in% class(model)) && is.null(test_data)) {
-        test_data <- model$trainingData
-        names(test_data)[names(test_data) == '.outcome'] <- 'y'
-    } else if (!is.null(test_data)) {
-        test_data <- cbind(y=test_data@y, 
-                           test_data@x,
-                           training_flag=test_data@training_flag)
-    } else {
-        stop('test_data must be supplied if model is not a "train" object')
+#' @rdname accuracy-methods
+#' @aliases accuracy,train,ANY,ANY,missing,ANY-method
+setMethod("accuracy", signature(x="train", test_data="ANY", 
+                                pop="ANY", class_col="missing", 
+                                reclass_mat="ANY"),
+    function(x, test_data, pop, class_col, reclass_mat) {
+        if (missing(test_data)) {
+            test_data <- x$trainingData
+            names(test_data)[names(test_data) == '.outcome'] <- 'y'
+        } else {
+            test_data <- cbind(y=test_data@y, 
+                               test_data@x,
+                               training_flag=test_data@training_flag)
+        }
+        if (!('training_flag' %in% names(test_data))) {
+            warning('no training_flag variable found - assuming none of "test_data" was used for model training')
+        } else if (sum(test_data$training_flag == 1) == length(test_data$training_flag)) {
+            stop('cannot conduct accuracy assessment without independent testing data')
+            test_data <- test_data[!test_data$training_flag, ]
+        }
+
+        predicted <- predict(x, test_data)
+        observed <- test_data$y
+
+        calc_accuracy(predicted, observed, pop, reclass_mat)
     }
-    if (!('training_flag' %in% names(test_data))) {
-        warning('no training_flag variable found - assuming none of "test_data" was used for model training')
-    } else {
-        if (sum(test_data$training_flag == 1) == nrow(test_data)) {
+)
+
+#' @rdname accuracy-methods
+#' @aliases accuracy,RasterLayer,Training_data,ANY,missing,ANY-method
+setMethod("accuracy", signature(x="RasterLayer", test_data="Training_data", 
+                                pop="ANY", class_col="missing",
+                                reclass_mat="ANY"),
+    function(x, test_data, pop, class_col, reclass_mat) {
+        if (sum(test_data@training_flag == 1) == length(test_data@training_flag)) {
             stop('cannot conduct accuracy assessment without independent testing data')
         }
-        test_data <- test_data[!test_data$training_flag, ]
+        predicted <- extract_observed(x, test_data@polys[!test_data@training_flag, ])
+        observed <- test_data@y[!test_data@training_flag]
+        calc_accuracy(predicted, observed, pop, reclass_mat)
     }
+)
 
-    cl <- options('rasterClusterObject')[[1]]
-    inparallel <- FALSE
-    if (!is.null(cl)) {
-        if (!require(foreach)) {
-             warning('Cluster object found, but "foreach" is required to run in parallel. Running sequentially.')
-        } else if (!require(itertools)) {
-            warning('Cluster object found, but "itertools" package is required to run in parallel. Running sequentially.')
-        } else if (!require(doSNOW)) {
-            warning('Cluster object found, but "doSNOW" package is required to run in parallel. Running sequentially.')
-        } else {
-            registerDoSNOW(cl)
-            inparallel <- TRUE
-        }
+#' @rdname accuracy-methods
+#' @aliases accuracy,RasterLayer,SpatialPolygonsDataFrame,ANY,character,ANY-method
+setMethod("accuracy", signature(x="RasterLayer", 
+                                test_data="SpatialPolygonsDataFrame", 
+                                pop="ANY", class_col="character", 
+                                reclass_mat="ANY"),
+    function(x, test_data, pop, class_col, reclass_mat) {
+        ext <- extract_observed(x, test_data, class_col=class_col)
+        # Since x is the predicted image, the output of extract_observed gives 
+        # the predicted value in slot x, and the observed value in slot y.  
+        # However x is converted to a numeric from a factor, so it needs to be 
+        # converted back to a factor with the same levels as y.
+        observed <- ext@y
+        predicted <- factor(ext@x[, ], labels=levels(ext@y))
+        calc_accuracy(predicted, observed, pop, reclass_mat)
     }
+)
 
-    observed <- test_data$y
-    if (inparallel) {
-        sub_test_data <- NULL # Keep R CMD CHECK happy
-        predicted <- foreach(sub_test_data=isplitRows(test_data, chunks=length(cl)), 
-                             .packages='caret') %dopar% {
-                predict(model, newdata=sub_test_data)
-            }
-        predicted <- unlist(predicted)
-    } else {
-        predicted <- predict(model, test_data)
+calc_accuracy <- function(predicted, observed, pop, reclass_mat) {
+    if (!missing(reclass_mat)) {
+        stop('reclass_mat not yet supported')
     }
 
     # ct is the sample contigency table
     ct <- table(predicted, observed)
 
-    if ('RasterLayer' %in% class(pop)) {
+    if (missing(pop)) {
+        warning('pop was not provided - assuming sample frequencies equal population frequencies')
+        pop <- rowSums(ct)
+    } else if (class(pop) == 'RasterLayer') {
         pop <- freq(pop, useNA='no')[, 2]
         if (length(pop) != nrow(ct)) {
             stop('number of classes in pop must be equal to nrow(ct)')
         }
-    } else if (is.null(pop)) {
-        warning('pop was not provided - assuming sample frequencies equal population frequencies')
-        pop <- rowSums(ct)
     } else if (class(pop) %in% c('integer', 'numeric')) {
         if (length(pop) != nrow(ct)) {
-            stop('length(pop) must be equal to nrow(ct)')
+            stop('length(pop) must be equal to number of classes in the predicted data')
         }
     } else { 
-        stop('pop must be a numeric vector, integer vector, RasterLayer, or NULL')
+        stop('pop must be a numeric vector or integer vector of length equal to the number of classes in x, or a RasterLayer, or NULL')
     }
 
     pop_ct <- .calc_pop_ct(ct, pop)
@@ -312,6 +365,5 @@ accuracy <- function(model, test_data=NULL, pop=NULL, reclass_mat=NULL) {
     A <- .calc_A(pop_ct)
 
     return(new("accuracy", ct=ct, pop_ct=pop_ct, Q=Q, A=A, 
-               n_train=length(predict(model$finalModel)), 
                n_test=length(observed), pop=pop))
 }
