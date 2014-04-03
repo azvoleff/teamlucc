@@ -1,6 +1,6 @@
 \docType{data}
-\name{classified_LT5SR_1986}
-\alias{classified_LT5SR_1986}
+\name{L5TSR_1986_classified}
+\alias{L5TSR_1986_classified}
 \title{Example output from classify_image.R}
 \description{
 This is the output from running the classification example

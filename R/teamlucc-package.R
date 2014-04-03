@@ -68,5 +68,5 @@ NULL
 #' \code{classify_image} function.
 #' 
 #' @docType data
-#' @name classified_LT5SR_1986
+#' @name L5TSR_1986_classified
 NULL

@@ -57,9 +57,9 @@ test_that(".calc_A works for Pontius and Millones (2011) example", {
 ###############################################################################
 # Test the handling of data by the S4 accuracy methods
 
-test_model <- classified_LT5SR_1986$model
+test_model <- L5TSR_1986_classified$model
 test_image <- L5TSR_1986
-test_preds <- classified_LT5SR_1986$pred_classes
+test_preds <- L5TSR_1986_classified$pred_classes
 
 test_that("accuracy calculations will run with model as first input", {
     expect_warning(accuracy(test_model))

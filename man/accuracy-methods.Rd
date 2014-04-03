@@ -103,7 +103,7 @@ from which the class frequencies will be tabulated and used
 as the population frequencies. }
 }
 \examples{
-accuracy(classified_LT5SR_1986$model)
+accuracy(L5TSR_1986_classified$model)
 }
 \references{
 Pontius, R. G., and M. Millones. 2011. Death to Kappa:

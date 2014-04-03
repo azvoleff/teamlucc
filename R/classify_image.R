@@ -40,12 +40,12 @@
 #' set.seed(0)
 #' train_data_1986 <- get_pixels(L5TSR_1986, polys=L5TSR_1986_2001_training,
 #'                               class_col="class_1986", training=.7)
-#' classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986)
+#' L5TSR_1986_classified <- classify_image(L5TSR_1986, train_data_1986)
 #'
-#' classified_LT5SR_1986$model
-#' plot(classified_LT5SR_1986$pred_classes)
-#' plot(classified_LT5SR_1986$pred_probs)
-#' accuracy(classified_LT5SR_1986$model)
+#' L5TSR_1986_classified$model
+#' plot(L5TSR_1986_classified$pred_classes)
+#' plot(L5TSR_1986_classified$pred_probs)
+#' accuracy(L5TSR_1986_classified$model)
 #' }
 classify_image <- function(x, train_data, class_probs=TRUE, 
                            use_training_flag=TRUE, tune_length=8, 
