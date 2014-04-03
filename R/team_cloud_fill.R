@@ -1,9 +1,11 @@
-#' Perform cloud fill for topographically corrected Landsat imagery
+#' Perform cloud fill for Landsat imagery
 #'
 #' Uses an R/C++ implementation of the NSPI algorithm from Xioalin Zhu. See 
-#' \code{\link{cloud_remove}} for details.
+#' \code{\link{cloud_remove}} for details. In hilly areas, cloud fill should be 
+#' done after topographic correction.
 #'
 #' @export
+#' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
@@ -38,7 +40,7 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Cloud fill')
 
-    if (n_cpus > 1) sfQuickStart(n_cpus)
+    if (n_cpus > 1) sfQuickInit(n_cpus)
 
     wrspath <- sprintf('%03i', wrspath)
     wrsrow <- sprintf('%03i', wrsrow)

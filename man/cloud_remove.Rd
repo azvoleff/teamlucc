@@ -36,7 +36,8 @@ cloud_remove(cloudy, clear, cloud_mask, out_name, num_class = 1,
 
   \item{DN_max}{the maximum valid DN value}
 
-  \item{...}{additional arguments to pass to rasterEngine}
+  \item{...}{additional arguments to pass to
+  \code{rasterEngine}}
 }
 \description{
 R/C++ implementation of Xiaolin Zhu's CLOUD_REMOVE IDL

@@ -1,6 +1,6 @@
 \name{team_cloud_fill}
 \alias{team_cloud_fill}
-\title{Perform cloud fill for topographically corrected Landsat imagery}
+\title{Perform cloud fill for Landsat imagery}
 \usage{
 team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   base_date = NULL, fast = FALSE, n_cpus = 1, overwrite = FALSE,
@@ -51,6 +51,8 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
 }
 \description{
 Uses an R/C++ implementation of the NSPI algorithm from
-Xioalin Zhu. See \code{\link{cloud_remove}} for details.
+Xioalin Zhu. See \code{\link{cloud_remove}} for details. In
+hilly areas, cloud fill should be done after topographic
+correction.
 }
 

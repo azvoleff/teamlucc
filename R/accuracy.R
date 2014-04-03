@@ -118,8 +118,6 @@ function(x){
     adj_areas(pop, ct)
 })
 
-#' Show an error_adj_area object
-#'
 #' @export
 setMethod("show", signature(object="error_adj_area"),
 function(object) {
@@ -128,16 +126,14 @@ function(object) {
     print(object@adj_area_mat)
 })
 
-#' Plot an error_adj_area object
-#'
-#' @import ggplot2
-#' @param x an \code{error_adj_area} object
+
 #' @S3method plot error_adj_area
-plot.error_adj_area <- function(x) {
+plot.error_adj_area <- function(x, ...) {
     classes <- dimnames(x@adj_area_mat)[[1]]
     areas <- x@adj_area_mat[, 2]
     se <- x@adj_area_mat[, 3]
     plt_data <- data.frame(x=classes, y=areas, se=se)
+    y <- NULL # Fix for R CMD check
     ggplot(plt_data, aes(x, y)) + geom_bar(stat="identity") + 
         geom_errorbar(aes(ymin=y - 1.96 * se, ymax=y + 1.96 * se), width=.25) +
         xlab("Class") + ylab("Area")
@@ -249,25 +245,26 @@ plot.error_adj_area <- function(x) {
 #' @docType methods
 #' @rdname accuracy-methods
 #' @param x either a classification model with a \code{predict} method or a 
-#' matrix (see Details)
-#' predicted map (see Details).
+#' \code{RasterLayer} (see Details)
 #' @param test_data a \code{link{Training_data}} object, 
 #' \code{SpatialPolygonsDataFrame}, or NULL (see Details).
 #' @param pop A \code{RasterLayer}, \code{numeric} of length equal to the 
 #' number of clasess, or NULL (see Details).
-#' @param reclass_mat a reclassification matrix to be used in the case of a 
-#' model fit by \code{classify_image} with the \code{do_split} option selected
 #' @param class_col required if \code{test_data} is a 
 #' \code{SpatialPolygonsDataFrame}. Defines the name of the column containing 
 #' the observed cover class IDs
+#' @param reclass_mat a reclassification matrix to be used in the case of a 
+#' model fit by \code{classify_image} with the \code{do_split} option selected
 #' @return \code{\link{accuracy-class}} instance
 #' @references Pontius, R. G., and M. Millones. 2011. Death to Kappa: birth of 
 #' quantity disagreement and allocation disagreement for accuracy assessment.  
 #' International Journal of Remote Sensing 32:4407-4429.
+#'
 #' Olofsson, P., G. M. Foody, S. V. Stehman, and C. E. Woodcock.  2013. Making 
 #' better use of accuracy data in land change studies: Estimating accuracy and 
 #' area and quantifying uncertainty using stratified estimation.  Remote 
 #' Sensing of Environment 129:122-131.
+#'
 #' Foody, G.M., Stehman, S.V., 2009. Accuracy Assessment, in: Warner, T.A., 
 #' Nellis, M.D., Foody, G.M. (Eds.), The SAGE Handbook of Remote Sensing. SAGE.
 #' @examples
@@ -277,9 +274,7 @@ setGeneric("accuracy", function(x, test_data, pop, class_col, reclass_mat)
 
 #' @rdname accuracy-methods
 #' @aliases accuracy,train,ANY,ANY,missing,ANY-method
-setMethod("accuracy", signature(x="train", test_data="ANY", 
-                                pop="ANY", class_col="missing", 
-                                reclass_mat="ANY"),
+setMethod("accuracy", signature(x="train", test_data="ANY", pop="ANY", class_col="missing", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
         if (missing(test_data)) {
             test_data <- x$trainingData
@@ -305,9 +300,7 @@ setMethod("accuracy", signature(x="train", test_data="ANY",
 
 #' @rdname accuracy-methods
 #' @aliases accuracy,RasterLayer,Training_data,ANY,missing,ANY-method
-setMethod("accuracy", signature(x="RasterLayer", test_data="Training_data", 
-                                pop="ANY", class_col="missing",
-                                reclass_mat="ANY"),
+setMethod("accuracy", signature(x="RasterLayer", test_data="Training_data", pop="ANY", class_col="missing", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
         if (sum(test_data@training_flag == 1) == length(test_data@training_flag)) {
             stop('cannot conduct accuracy assessment without independent testing data')
@@ -320,10 +313,7 @@ setMethod("accuracy", signature(x="RasterLayer", test_data="Training_data",
 
 #' @rdname accuracy-methods
 #' @aliases accuracy,RasterLayer,SpatialPolygonsDataFrame,ANY,character,ANY-method
-setMethod("accuracy", signature(x="RasterLayer", 
-                                test_data="SpatialPolygonsDataFrame", 
-                                pop="ANY", class_col="character", 
-                                reclass_mat="ANY"),
+setMethod("accuracy", signature(x="RasterLayer", test_data="SpatialPolygonsDataFrame", pop="ANY", class_col="character", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
         ext <- extract_observed(x, test_data, class_col=class_col)
         # Since x is the predicted image, the output of extract_observed gives 

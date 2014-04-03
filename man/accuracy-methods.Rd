@@ -22,8 +22,8 @@ accuracy(x, test_data, pop, class_col, reclass_mat)
 }
 \arguments{
   \item{x}{either a classification model with a
-  \code{predict} method or a matrix (see Details) predicted
-  map (see Details).}
+  \code{predict} method or a \code{RasterLayer} (see
+  Details)}
 
   \item{test_data}{a \code{link{Training_data}} object,
   \code{SpatialPolygonsDataFrame}, or NULL (see Details).}
@@ -31,13 +31,13 @@ accuracy(x, test_data, pop, class_col, reclass_mat)
   \item{pop}{A \code{RasterLayer}, \code{numeric} of length
   equal to the number of clasess, or NULL (see Details).}
 
-  \item{reclass_mat}{a reclassification matrix to be used
-  in the case of a model fit by \code{classify_image} with
-  the \code{do_split} option selected}
-
   \item{class_col}{required if \code{test_data} is a
   \code{SpatialPolygonsDataFrame}. Defines the name of the
   column containing the observed cover class IDs}
+
+  \item{reclass_mat}{a reclassification matrix to be used
+  in the case of a model fit by \code{classify_image} with
+  the \code{do_split} option selected}
 }
 \value{
 \code{\link{accuracy-class}} instance
@@ -105,11 +105,14 @@ accuracy(classified_LT5SR_1986$model)
 Pontius, R. G., and M. Millones. 2011. Death to Kappa:
 birth of quantity disagreement and allocation disagreement
 for accuracy assessment. International Journal of Remote
-Sensing 32:4407-4429. Olofsson, P., G. M. Foody, S. V.
-Stehman, and C. E. Woodcock.  2013. Making better use of
-accuracy data in land change studies: Estimating accuracy
-and area and quantifying uncertainty using stratified
-estimation.  Remote Sensing of Environment 129:122-131.
+Sensing 32:4407-4429.
+
+Olofsson, P., G. M. Foody, S. V. Stehman, and C. E.
+Woodcock.  2013. Making better use of accuracy data in land
+change studies: Estimating accuracy and area and
+quantifying uncertainty using stratified estimation.
+Remote Sensing of Environment 129:122-131.
+
 Foody, G.M., Stehman, S.V., 2009. Accuracy Assessment, in:
 Warner, T.A., Nellis, M.D., Foody, G.M. (Eds.), The SAGE
 Handbook of Remote Sensing. SAGE.

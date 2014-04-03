@@ -3,7 +3,7 @@
 #' @export
 #' @import Rcpp
 #' @import RcppArmadillo
-#' @importFrom spatial.tools rasterEngine sfQuickInit sfQuickStop
+#' @importFrom spatial.tools rasterEngine
 #' @param cloudy the cloudy image (base image) as a \code{Raster*}
 #' @param clear the clear image as a \code{Raster*} to use for filling 
 #' \code{img_cloudy}
@@ -18,7 +18,7 @@
 #' @param cloud_nbh the range of cloud neighborhood (in pixels)
 #' @param DN_min the minimum valid DN value
 #' @param DN_max the maximum valid DN value
-#' @param ... additional arguments to pass to rasterEngine
+#' @param ... additional arguments to pass to \code{rasterEngine}
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
