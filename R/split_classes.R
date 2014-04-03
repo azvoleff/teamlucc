@@ -15,7 +15,7 @@
 #'
 #' @export
 #' @importFrom mclust Mclust
-#' @param train_data a \code{link{Training_data}} object
+#' @param train_data a \code{link{pixel_data}} object
 #' @param split_levels (optional) a list giving the names of the levels to 
 #' split. If missing, all levels will be split.
 #' @param verbose whether to report status while running

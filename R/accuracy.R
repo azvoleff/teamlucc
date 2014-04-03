@@ -1,7 +1,12 @@
-#' Class to represent map comparison or classification accuracy assessment
-#'
+#' A class for representing accuracy assessment results
+#' @slot ct a simple sample contingency table
+#' @slot pop_ct a population contingency table (if \code{pop} was provided - 
+#' see \code{\link{accuracy}}
+#' @slot Q quantity disagreement
+#' @slot A allocation disagreement
+#' @slot n_test the number of samples
+#' @slot pop the population of each class as a numeric
 #' @import methods
-#' @export
 #' @name accuracy-class
 setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric', 
                              A='numeric', n_test='numeric',
@@ -47,13 +52,12 @@ print.accuracy <- function(x, ...) {
     print(summary(x, ...))
 }
 
-#' Show an accuracy object
-#'
 #' @export
 setMethod("show", signature(object="accuracy"), function(object) print(object))
 
-#' Class to represent error-adjusted map areas
+#' A class for error adjusted class areas
 #'
+#' @seealso \code{\link{adj_areas}}.
 #' @import methods
 #' @export
 #' @name error_adj_area-class
@@ -70,7 +74,8 @@ setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
 #' (2013).
 #' @docType methods
 #' @rdname adj_areas-methods
-#' @param x an \code{accuracy} object or a list of populations a \code{numeric}
+#' @param x an \code{accuracy} object or a list of populations as a 
+#' \code{numeric}
 #' @param y missing, or a contingency table
 #' @references Olofsson, P., G. M. Foody, S. V. Stehman, and C. E. Woodcock.  
 #' 2013. Making better use of accuracy data in land change studies: Estimating 
@@ -202,7 +207,7 @@ plot.error_adj_area <- function(x, ...) {
 #' assessment using testing data from a simple random sample, 'pop' does not 
 #' need to be provided (see Details).
 #'
-#' \code{x} Can be one of:
+#' \code{x} can be one of:
 #' \enumerate{
 #'
 #'   \item A prediction model as output from one of the \code{teamlucc} 
@@ -212,8 +217,7 @@ plot.error_adj_area <- function(x, ...) {
 #'   be biased unless the testing data is from a simple random sample). If 
 #'   \code{x} is a \code{RasterLayer}, then \code{test_data} must be supplied.
 #'
-#'   \item A \code{RasterLayer} with a predicted map
-#'
+#'   \item A \code{RasterLayer} with a predicted map.
 #' }
 #'
 #' \code{test_data} can be one of:
@@ -223,20 +227,24 @@ plot.error_adj_area <- function(x, ...) {
 #'         is a model of class \code{train} from the \code{caret} package, and 
 #'         if the model was run using the one of the \code{teamlucc} 
 #'         \code{classify_image} functions.
+#'
 #'   \item A \code{SpatialPolygonsDataFrame} object, in which case \code{accuracy} 
 #'         will extract the predicted classes within each polygon from \code{x}.  
 #'         This will only work if \code{x} is a \code{RasterLayer}.
-#'   \item A \code{Training_data} object, in which case \code{accuracy} will use the 
+#'
+#'   \item A \code{pixel_data} object, in which case \code{accuracy} will use the 
 #'         included \code{training_flag} indicator to separate testing and 
 #'         training data.
 #' }
 #'
-#' \code{pop} Can be one of:
+#' \code{pop} can be one of:
 #' \enumerate{
 #'   \item NULL, in which case the sample frequencies will be used as estimates 
 #'         of the population frequencies of each class.
+#'
 #'   \item A list of length equal to the number of classes in the map giving 
 #'         the total number of pixels in the population for each class.
+#'
 #'   \item A predicted cover map from as a \code{RasterLayer}, from which the 
 #'         class frequencies will be tabulated and used as the population 
 #'         frequencies.
@@ -246,7 +254,7 @@ plot.error_adj_area <- function(x, ...) {
 #' @rdname accuracy-methods
 #' @param x either a classification model with a \code{predict} method or a 
 #' \code{RasterLayer} (see Details)
-#' @param test_data a \code{link{Training_data}} object, 
+#' @param test_data a \code{link{pixel_data}} object, 
 #' \code{SpatialPolygonsDataFrame}, or NULL (see Details).
 #' @param pop A \code{RasterLayer}, \code{numeric} of length equal to the 
 #' number of clasess, or NULL (see Details).
@@ -299,13 +307,13 @@ setMethod("accuracy", signature(x="train", test_data="ANY", pop="ANY", class_col
 )
 
 #' @rdname accuracy-methods
-#' @aliases accuracy,RasterLayer,Training_data,ANY,missing,ANY-method
-setMethod("accuracy", signature(x="RasterLayer", test_data="Training_data", pop="ANY", class_col="missing", reclass_mat="ANY"),
+#' @aliases accuracy,RasterLayer,pixel_data,ANY,missing,ANY-method
+setMethod("accuracy", signature(x="RasterLayer", test_data="pixel_data", pop="ANY", class_col="missing", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
         if (sum(test_data@training_flag == 1) == length(test_data@training_flag)) {
             stop('cannot conduct accuracy assessment without independent testing data')
         }
-        predicted <- extract_observed(x, test_data@polys[!test_data@training_flag, ])
+        predicted <- get_pixels(x, test_data@polys[!test_data@training_flag, ])
         observed <- test_data@y[!test_data@training_flag]
         calc_accuracy(predicted, observed, pop, reclass_mat)
     }
@@ -315,8 +323,8 @@ setMethod("accuracy", signature(x="RasterLayer", test_data="Training_data", pop=
 #' @aliases accuracy,RasterLayer,SpatialPolygonsDataFrame,ANY,character,ANY-method
 setMethod("accuracy", signature(x="RasterLayer", test_data="SpatialPolygonsDataFrame", pop="ANY", class_col="character", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
-        ext <- extract_observed(x, test_data, class_col=class_col)
-        # Since x is the predicted image, the output of extract_observed gives 
+        ext <- get_pixels(x, test_data, class_col=class_col)
+        # Since x is the predicted image, the output of get_pixels gives 
         # the predicted value in slot x, and the observed value in slot y.  
         # However x is converted to a numeric from a factor, so it needs to be 
         # converted back to a factor with the same levels as y.

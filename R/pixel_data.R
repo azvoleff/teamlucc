@@ -1,17 +1,30 @@
-#' Class to represent training data for training machine learning algorithms 
+#' A class for representing training or testing data
 #'
+#' Used to represent training data for a machine learning classifier for image 
+#' classificaion, or testing data used for testing a classification.
+#'
+#' @slot x a \code{data.frame} of independent variables (usually pixel values)
+#' @slot y a \code{data.frame} of the dependent variable (usually land cover 
+#' classes)
+#' @slot poly_ID a character vector used to link polygons each row in \code{x} 
+#' and \code{y} to an input polygon
+#' @slot training_flag a binary vector of length equal to \code{nrow(x)} 
+#' indicating each row in x should be used in training (TRUE) or in testing 
+#' (FALSE)
+#' @slot polys a \code{SpatialPolygonsDataFrame} of the polygons used to choose 
+#' the pixels in \code{x} and \code{y}.
 #' @import methods
 #' @importFrom sp SpatialPolygonsDataFrame
 #' @export
-#' @name Training_data-class
-setClass('Training_data', slots=c(x='data.frame', y='factor', 
-                                  poly_ID='character', training_flag='logical', 
-                                  polys='SpatialPolygonsDataFrame')
+#' @name pixel_data-class
+setClass('pixel_data', slots=c(x='data.frame', y='factor', 
+                               poly_ID='character', training_flag='logical', 
+                               polys='SpatialPolygonsDataFrame')
 )
 
 #' @importFrom plyr ddply summarize .
-#' @S3method summary Training_data
-summary.Training_data <- function(object, ...) {
+#' @S3method summary pixel_data
+summary.pixel_data <- function(object, ...) {
     obj = list()
     obj[['class']] <- class(object)
     obj[['n_classes']] <- nlevels(object)
@@ -26,12 +39,12 @@ summary.Training_data <- function(object, ...) {
                          train_frac=round(sum(training_flag) / length(training_flag), 2))
     obj[['class_stats']]  <- class_stats
     obj[['training_frac']] <- sum(object@training_flag==TRUE) / length(object@training_flag)
-    class(obj) <- 'summary.Training_data'
+    class(obj) <- 'summary.pixel_data'
     obj
 }
 
-#' @S3method print summary.Training_data
-print.summary.Training_data <- function(x, ...) {
+#' @S3method print summary.pixel_data
+print.summary.pixel_data <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
     cat('\n')
     cat(paste('Number of classes:\t', x[['n_classes']], '\n', sep=''))
@@ -45,20 +58,18 @@ print.summary.Training_data <- function(x, ...) {
     invisible(x)
 }
 
-#' @S3method levels Training_data
-levels.Training_data <- function(x) {
+#' @S3method levels pixel_data
+levels.pixel_data <- function(x) {
     return(levels(x@y))
 }
 
-#' @S3method print Training_data
-print.Training_data <- function(x, ...) {
+#' @S3method print pixel_data
+print.pixel_data <- function(x, ...) {
     print(summary(x, ...))
 }
 
-#' Show a Training_data object
-#'
 #' @export
-setMethod("show", signature(object="Training_data"), function(object) 
+setMethod("show", signature(object="pixel_data"), function(object) 
           print(object))
 
 #' Extract observed data for use in a classification (training or testing)
@@ -83,9 +94,9 @@ setMethod("show", signature(object="Training_data"), function(object)
 #' the raster stack.
 #' @examples
 #' set.seed(1)
-#' train_data <- extract_observed(L5TSR_1986, L5TSR_1986_2001_training, 
-#'                                "class_1986", training=.6)
-extract_observed <- function(x, polys, class_col, training=1) {
+#' train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
+#'                          training=.6)
+get_pixels <- function(x, polys, class_col, training=1) {
     if (projection(x) != projection(polys)) {
         stop('Coordinate systems do not match')
     }
@@ -137,7 +148,7 @@ extract_observed <- function(x, polys, class_col, training=1) {
     # variable names, the classification algorithm may throw an error
     y <- factor(make.names(polys@data[poly_pixel_match, class_colnum]))
 
-    return(new("Training_data", x=pixels, y=y, 
+    return(new("pixel_data", x=pixels, y=y, 
                poly_ID=polys@data[poly_pixel_match, ]$ID,
                training_flag=polys@data[poly_pixel_match, ]$training_flag,
                polys=polys))

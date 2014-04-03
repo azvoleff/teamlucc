@@ -1,4 +1,4 @@
-#' Runs an image classification
+#' Runs an image classification using an SVM classifier
 #'
 #' Currently only supports classification using a support vector machine (SVM).
 #'
@@ -6,7 +6,7 @@
 #' @import caret e1071 kernlab randomForest
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
-#' @param train_data a \code{link{Training_data}} object
+#' @param train_data a \code{link{pixel_data}} object
 #' @param class_probs whether to also calculate and return the probabilities of 
 #' membership for each class
 #' @param use_training_flag indicates whether to exclude data flagged as 
@@ -38,10 +38,8 @@
 #' \dontrun{
 #' # Don't run long example
 #' set.seed(0)
-#' train_data_1986 <- extract_observed(L5TSR_1986, 
-#'                                          polys=L5TSR_1986_2001_training,
-#'                                          class_col="class_1986", 
-#'                                          training=.7)
+#' train_data_1986 <- get_pixels(L5TSR_1986, polys=L5TSR_1986_2001_training,
+#'                               class_col="class_1986", training=.7)
 #' classified_LT5SR_1986 <- classify_image(L5TSR_1986, train_data_1986)
 #'
 #' classified_LT5SR_1986$model

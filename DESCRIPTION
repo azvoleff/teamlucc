@@ -1,7 +1,7 @@
 Package: teamlucc
 Version: 0.1
-Date: 2014-02-06
-Title: TEAM Remote Sensing Data Processing Toolkit
+Date: 2014-04-03
+Title: TEAM land use and cover change data processing toolkit
 Authors@R: c(person("Alex", "Zvoleff", email="azvoleff@conservation.org",
     role=c("aut", "cre")), person("Sarah", "Goslee", role = "ctb"),
     person("Xiaolin", "Zhu", role = "ctb"))
@@ -13,6 +13,7 @@ Depends:
     methods,
     raster (>= 2.2-6)
 Imports:
+    sp,
     glcm,
     wrspathrow,
     rgeos,
@@ -29,7 +30,6 @@ Imports:
     grid,
     spatial.tools,
     caret,
-    sp,
     maptools,
     mclust,
     lubridate,
@@ -44,12 +44,14 @@ Suggests:
     notifyR
 LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
-    Landsat scenes with heavy clouds using the \code{fill_gaps} or
-    \code{fill_clouds} functions requires an IDL installation and the GNSPI.pro
-    and CLOUD_REMOVE.pro scripts by Xiaolin Zhu at the Ohio State University.
-Description: Routines for processing imagery and other spatial data for the
-    Tropical Ecology Assessment and Monitoring (TEAM) Network.
+    Landsat scenes with heavy clouds using the "fill_gaps" or "fill_clouds"
+    functions by Xiaolin Zhu at the Ohio State University requires an IDL
+    installation.
+Description: teamlucc is a set of routines to support analyzing land use and
+    cover change (LUCC) in R. The package was designed to support analyzing
+    LUCC in the Zone of Interaction (ZOIs) of monitoring sites in the Tropical
+    Ecology Assessment and Monitoring (TEAM) Network.
 License: GPL (>= 3)
-URL: https://github.com/azvoleff/teamlucc
+URL: https://www.azvoleff.com/teamlucc
 BugReports: https://github.com/azvoleff/teamlucc/issues
 LazyData: true

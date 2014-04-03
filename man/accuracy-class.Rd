@@ -1,9 +1,24 @@
 \docType{class}
 \name{accuracy-class}
 \alias{accuracy-class}
-\title{Class to represent map comparison or classification accuracy assessment}
+\title{A class for representing accuracy assessment results}
 \description{
-Class to represent map comparison or classification
-accuracy assessment
+A class for representing accuracy assessment results
 }
+\section{Slots}{
+
+\describe{
+\item{\code{ct}}{a simple sample contingency table}
+
+\item{\code{pop_ct}}{a population contingency table (if \code{pop} was provided -
+see \code{\link{accuracy}}}
+
+\item{\code{Q}}{quantity disagreement}
+
+\item{\code{A}}{allocation disagreement}
+
+\item{\code{n_test}}{the number of samples}
+
+\item{\code{pop}}{the population of each class as a numeric}
+}}
 

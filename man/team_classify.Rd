@@ -12,7 +12,7 @@ team_classify(predictor_file, train_shp, output_path, class_col = "Poly_Type",
   \code{raster} package.}
 
   \item{train_shp}{a training dataset as output by
-  \code{extract_observed}}
+  \code{pixel_data}}
 
   \item{output_path}{the path to use for the output}
 

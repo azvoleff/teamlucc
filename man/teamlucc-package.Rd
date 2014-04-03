@@ -4,15 +4,14 @@
 \alias{teamlucc-package}
 \title{TEAM Remote Sensing Processing Tools}
 \description{
-TEAM Remote Sensing Processing Tools
+TEAM land use and cover change data processing toolkit
 }
 \details{
-A set of scripts for processing remote sensing data to
-support the work of the Tropical Ecology Assessment and
-Monitoring (TEAM) Network. Intended to be used in
-conjunction with the set of Python scripts available in the
-\href{https://github.com/azvoleff/teampy}{teampy
-repository} on github.
+teamlucc is a set of routines to support analyzing land use
+and cover change (LUCC) in R. The package was designed to
+support analyzing LUCC in the Zone of Interaction (ZOIs) of
+monitoring sites in the Tropical Ecology Assessment and
+Monitoring (TEAM) Network.
 }
 \author{
 Alex Zvoleff, \email{azvoleff@conservation.org}

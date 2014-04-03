@@ -1,6 +1,6 @@
 \name{classify_image_rf}
 \alias{classify_image_rf}
-\title{Runs an image classification}
+\title{Runs an image classification using a random forest classifier}
 \usage{
 classify_image_rf(x, train_data, class_probs = TRUE,
   use_training_flag = TRUE, train_control = NULL, tune_grid = NULL,
@@ -10,7 +10,7 @@ classify_image_rf(x, train_data, class_probs = TRUE,
   \item{x}{a \code{Raster*} image with the predictor
   layer(s) for the classification}
 
-  \item{train_data}{a \code{link{Training_data}} object}
+  \item{train_data}{a \code{link{pixel_data}} object}
 
   \item{class_probs}{whether to also calculate and return
   the probabilities of membership for each class}
@@ -61,10 +61,8 @@ finished, call \code{endCluster}.
 \dontrun{
 # Don't run long example
 set.seed(0)
-train_data_1986 <- extract_observed(L5TSR_1986,
-                                         polys=L5TSR_1986_2001_training,
-                                         class_col="class_1986",
-                                         training=.7)
+train_data_1986 <- get_pixels(L5TSR_1986, polys=L5TSR_1986_2001_training,
+                              class_col="class_1986", training=.7)
 classified_LT5SR_1986 <- classify_image_rf(L5TSR_1986, train_data_1986)
 
 classified_LT5SR_1986$model

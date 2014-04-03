@@ -3,8 +3,8 @@
 \alias{accuracy}
 \alias{accuracy,RasterLayer,SpatialPolygonsDataFrame,ANY,character,ANY-method}
 \alias{accuracy,RasterLayer,SpatialPolygonsDataFrame,ANY,character-method}
-\alias{accuracy,RasterLayer,Training_data,ANY,missing,ANY-method}
-\alias{accuracy,RasterLayer,Training_data,ANY,missing-method}
+\alias{accuracy,RasterLayer,pixel_data,ANY,missing,ANY-method}
+\alias{accuracy,RasterLayer,pixel_data,ANY,missing-method}
 \alias{accuracy,train,ANY,ANY,missing,ANY-method}
 \alias{accuracy,train,ANY,ANY,missing-method}
 \title{Calculate statistics summarizing classification accuracy}
@@ -14,7 +14,7 @@ accuracy(x, test_data, pop, class_col, reclass_mat)
 \S4method{accuracy}{train,ANY,ANY,missing}(x, test_data, pop, class_col,
   reclass_mat)
 
-\S4method{accuracy}{RasterLayer,Training_data,ANY,missing}(x, test_data, pop,
+\S4method{accuracy}{RasterLayer,pixel_data,ANY,missing}(x, test_data, pop,
   class_col, reclass_mat)
 
 \S4method{accuracy}{RasterLayer,SpatialPolygonsDataFrame,ANY,character}(x,
@@ -25,7 +25,7 @@ accuracy(x, test_data, pop, class_col, reclass_mat)
   \code{predict} method or a \code{RasterLayer} (see
   Details)}
 
-  \item{test_data}{a \code{link{Training_data}} object,
+  \item{test_data}{a \code{link{pixel_data}} object,
   \code{SpatialPolygonsDataFrame}, or NULL (see Details).}
 
   \item{pop}{A \code{RasterLayer}, \code{numeric} of length
@@ -60,7 +60,7 @@ from a simple random sample, 'pop' does not need to be
 provided (see Details).
 }
 \details{
-\code{x} Can be one of: \enumerate{
+\code{x} can be one of: \enumerate{
 
 \item A prediction model as output from one of the
 \code{teamlucc} \code{classify_image} functions. If
@@ -71,9 +71,7 @@ case be biased unless the testing data is from a simple
 random sample). If \code{x} is a \code{RasterLayer}, then
 \code{test_data} must be supplied.
 
-\item A \code{RasterLayer} with a predicted map
-
-}
+\item A \code{RasterLayer} with a predicted map. }
 
 \code{test_data} can be one of: \enumerate{ \item
 \code{NULL}. If test_data is \code{NULL}, \code{accuracy}
@@ -81,19 +79,25 @@ will try to use testing data included in \code{x}. This
 will only work if \code{x} is a model of class \code{train}
 from the \code{caret} package, and if the model was run
 using the one of the \code{teamlucc} \code{classify_image}
-functions.  \item A \code{SpatialPolygonsDataFrame} object,
-in which case \code{accuracy} will extract the predicted
-classes within each polygon from \code{x}.  This will only
-work if \code{x} is a \code{RasterLayer}.  \item A
-\code{Training_data} object, in which case \code{accuracy}
-will use the included \code{training_flag} indicator to
-separate testing and training data. }
+functions.
 
-\code{pop} Can be one of: \enumerate{ \item NULL, in which
+\item A \code{SpatialPolygonsDataFrame} object, in which
+case \code{accuracy} will extract the predicted classes
+within each polygon from \code{x}.  This will only work if
+\code{x} is a \code{RasterLayer}.
+
+\item A \code{pixel_data} object, in which case
+\code{accuracy} will use the included \code{training_flag}
+indicator to separate testing and training data. }
+
+\code{pop} can be one of: \enumerate{ \item NULL, in which
 case the sample frequencies will be used as estimates of
-the population frequencies of each class.  \item A list of
-length equal to the number of classes in the map giving the
-total number of pixels in the population for each class.
+the population frequencies of each class.
+
+\item A list of length equal to the number of classes in
+the map giving the total number of pixels in the population
+for each class.
+
 \item A predicted cover map from as a \code{RasterLayer},
 from which the class frequencies will be tabulated and used
 as the population frequencies. }

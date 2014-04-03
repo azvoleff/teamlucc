@@ -17,7 +17,7 @@ adj_areas(x, y)
 }
 \arguments{
   \item{x}{an \code{accuracy} object or a list of
-  populations a \code{numeric}}
+  populations as a \code{numeric}}
 
   \item{y}{missing, or a contingency table}
 }

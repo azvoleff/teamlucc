@@ -1,5 +1,7 @@
-#' Class to represent a tracking timer
-#'
+#' A class for tracking running time of individual sections of an R script
+#' @slot timers a \code{data.frame} tracking timer names and start times
+#' @slot notify function to use for outputting timers (defaults to 
+#' \code{\link{print}}
 #' @import methods
 #' @importFrom lubridate now
 #' @export
@@ -56,10 +58,7 @@ print.Track_time <- function(x, label, ...) {
     }
 }
 
-#' Show a Track_time object
-#'
 #' @export
-#' @param object a Track_time object
 setMethod("show", signature(object="Track_time"), function(object) print(object))
 
 #' @importFrom lubridate now as.duration

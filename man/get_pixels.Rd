@@ -1,8 +1,8 @@
-\name{extract_observed}
-\alias{extract_observed}
+\name{get_pixels}
+\alias{get_pixels}
 \title{Extract observed data for use in a classification (training or testing)}
 \usage{
-extract_observed(x, polys, class_col, training = 1)
+get_pixels(x, polys, class_col, training = 1)
 }
 \arguments{
   \item{x}{a \code{Raster*} object from which observed data
@@ -38,7 +38,7 @@ or testing)
 }
 \examples{
 set.seed(1)
-train_data <- extract_observed(L5TSR_1986, L5TSR_1986_2001_training,
-                               "class_1986", training=.6)
+train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",
+                         training=.6)
 }
 

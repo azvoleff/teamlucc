@@ -1,0 +1,28 @@
+\docType{class}
+\name{pixel_data-class}
+\alias{pixel_data-class}
+\title{A class for representing training or testing data}
+\description{
+Used to represent training data for a machine learning
+classifier for image classificaion, or testing data used
+for testing a classification.
+}
+\section{Slots}{
+
+\describe{
+\item{\code{x}}{a \code{data.frame} of independent variables (usually pixel values)}
+
+\item{\code{y}}{a \code{data.frame} of the dependent variable (usually land cover
+classes)}
+
+\item{\code{poly_ID}}{a character vector used to link polygons each row in \code{x}
+and \code{y} to an input polygon}
+
+\item{\code{training_flag}}{a binary vector of length equal to \code{nrow(x)}
+indicating each row in x should be used in training (TRUE) or in testing
+(FALSE)}
+
+\item{\code{polys}}{a \code{SpatialPolygonsDataFrame} of the polygons used to choose
+the pixels in \code{x} and \code{y}.}
+}}
+

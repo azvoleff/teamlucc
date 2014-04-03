@@ -17,7 +17,7 @@ class_statistics <- function(x, y, class_col) {
         stop('Coordinate systems do not match')
     }
     if (class(y) == "SpatialPolygonsDataFrame") {
-        pixels <- extract_observed(x, y, class_col)
+        pixels <- get_pixels(x, y, class_col)
     } else if (class(y) %in% c("RasterLayer", "RasterBrick", 
                                          "RasterStack")) {
         stop('class_statistics cannot yet handle Raster* objects')
