@@ -9,3 +9,5 @@
 *.rdx
 *.o
 *.dll
+src-i386
+src-x64
