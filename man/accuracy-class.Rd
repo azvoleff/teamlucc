@@ -11,7 +11,7 @@ A class for representing accuracy assessment results
 \item{\code{ct}}{a simple sample contingency table}
 
 \item{\code{pop_ct}}{a population contingency table (if \code{pop} was provided -
-see \code{\link{accuracy}}}
+see \code{\link{accuracy}})}
 
 \item{\code{Q}}{quantity disagreement}
 

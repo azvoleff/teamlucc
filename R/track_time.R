@@ -58,7 +58,6 @@ print.Track_time <- function(x, label, ...) {
     }
 }
 
-#' @export
 setMethod("show", signature(object="Track_time"), function(object) print(object))
 
 #' @importFrom lubridate now as.duration

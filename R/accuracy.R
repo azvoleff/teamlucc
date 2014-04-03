@@ -1,7 +1,7 @@
 #' A class for representing accuracy assessment results
 #' @slot ct a simple sample contingency table
 #' @slot pop_ct a population contingency table (if \code{pop} was provided - 
-#' see \code{\link{accuracy}}
+#' see \code{\link{accuracy}})
 #' @slot Q quantity disagreement
 #' @slot A allocation disagreement
 #' @slot n_test the number of samples
@@ -52,7 +52,6 @@ print.accuracy <- function(x, ...) {
     print(summary(x, ...))
 }
 
-#' @export
 setMethod("show", signature(object="accuracy"), function(object) print(object))
 
 #' A class for error adjusted class areas
@@ -123,7 +122,6 @@ function(x){
     adj_areas(pop, ct)
 })
 
-#' @export
 setMethod("show", signature(object="error_adj_area"),
 function(object) {
     cat('Object of class: error_adj_area\n')

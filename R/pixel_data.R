@@ -68,7 +68,6 @@ print.pixel_data <- function(x, ...) {
     print(summary(x, ...))
 }
 
-#' @export
 setMethod("show", signature(object="pixel_data"), function(object) 
           print(object))
 
