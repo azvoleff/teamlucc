@@ -68,10 +68,14 @@ test_that("accuracy calculations will run with model as first input", {
     expect_error(accuracy(test_model, pop=test_preds, class_col='asdf'))
 })
 
-training_data <- get_pixels(test_preds, L5TSR_1986_2001_training, class_col='class_1986')
+training_data <- get_pixels(test_preds, L5TSR_1986_2001_training, 
+                            class_col='class_1986')
+testing_data <- get_pixels(test_preds, L5TSR_1986_2001_training, 
+                           class_col='class_1986', training=0)
 test_that("accuracy calculations will run with RasterLayer as first input", {
     expect_warning(accuracy(test_preds, L5TSR_1986_2001_training, class_col="class_1986"))
     expect_error(accuracy(test_preds, L5TSR_1986_2001_training))
+    expect_output(accuracy(test_preds, testing_data))
     # Test an error is thrown if only data flagged as "training" is supplied
     expect_error(accuracy(test_preds, training_data))
 })

@@ -308,11 +308,16 @@ setMethod("accuracy", signature(x="train", test_data="ANY", pop="ANY", class_col
 #' @aliases accuracy,RasterLayer,pixel_data,ANY,missing,ANY-method
 setMethod("accuracy", signature(x="RasterLayer", test_data="pixel_data", pop="ANY", class_col="missing", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
-        if (sum(test_data@training_flag == 1) == length(test_data@training_flag)) {
+        if (all(test_data@training_flag == 1)) {
             stop('cannot conduct accuracy assessment without independent testing data')
+        } else if (all(test_data@training_flag == 0)) {
+            predicted <- extract(x, test_data@polys, small=TRUE, df=TRUE)$cover
+        } else {
+            predicted <- extract(x, test_data@polys[!test_data@training_flag], 
+                                 small=TRUE, df=TRUE)$cover
         }
-        predicted <- get_pixels(x, test_data@polys[!test_data@training_flag, ])
         observed <- test_data@y[!test_data@training_flag]
+        predicted <- factor(predicted, labels=levels(observed))
         calc_accuracy(predicted, observed, pop, reclass_mat)
     }
 )
