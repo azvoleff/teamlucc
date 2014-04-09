@@ -311,12 +311,15 @@ setMethod("accuracy", signature(x="RasterLayer", test_data="pixel_data", pop="AN
         if (all(test_data@training_flag == 1)) {
             stop('cannot conduct accuracy assessment without independent testing data')
         } else if (all(test_data@training_flag == 0)) {
+            # All the test_data is for testing
             predicted <- extract(x, test_data@polys, small=TRUE, df=TRUE)$cover
+            observed <- test_data@y
         } else {
+            # Mix of testing and validation data
             predicted <- extract(x, test_data@polys[!test_data@training_flag], 
                                  small=TRUE, df=TRUE)$cover
+            observed <- test_data@y[!test_data@training_flag]
         }
-        observed <- test_data@y[!test_data@training_flag]
         predicted <- factor(predicted, labels=levels(observed))
         calc_accuracy(predicted, observed, pop, reclass_mat)
     }
