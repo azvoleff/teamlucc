@@ -20,14 +20,13 @@
 #' @param fields a list of fields to include in the output 
 #' \code{SpatialPolygonsDataFrame} (such as a "class" field if you will be 
 #' digitizing classes).
-#' @param validate whether to check that all sample polygons lie within image 
-#' area (defined as having no NAs within the polygon)
-#' @param validate.layer the index within \code{x} of the layer that should be 
-#' used for validation
+#' @param na.rm whether to remove pixels with NA values from the sample
 #' @param exp multiplier used to draw larger initial sample to account for the 
-#' loss of sample polygons during validation. Increase this value if the final 
-#' sample have fewer sample polygons than desired \code{size}
-#' @return a \code{SpatialPolygonsDataFrame} with \code{n} polygons
+#' loss of sample polygons lost because they contain NAs, and, for stratified 
+#' sampling, to account for classes that occur very infrequently in the data.  
+#' Increase this value if the final sample has fewer sample polygons than 
+#' desire.
+#' @return a \code{SpatialPolygonsDataFrame}
 #' @examples
 #' \dontrun{
 #' set.seed(0)
@@ -38,10 +37,7 @@
 #' plot(training_polys, add=TRUE)
 #' }
 sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(), 
-                            validate=TRUE, validate.layer=1, exp=5) {
-    # Don't expand if no validation is being performed
-    if (!validate) {exp <- 1}
-
+                            na.rm=TRUE, exp=5) {
     if (!is.null(strata)) {
         stratified <- TRUE
         if (proj4string(strata) != proj4string(x)) {
@@ -53,12 +49,12 @@ sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(),
         if (!identical(res(strata), res(x))) {
             stop('x and strata must have the same resolution')
         }
-        strat_sample <- sampleStratified(strata, size, exp=exp)
+        strat_sample <- sampleStratified(strata, size, exp=exp, na.rm=na.rm)
         cell_nums <- strat_sample[, 1]
         strataids <- strat_sample[, 2]
     } else {
         stratified <- FALSE
-        cell_nums <- sampleInt(ncell(x), size * exp)
+        cell_nums <- sampleRandom(x, size, exp=exp, na.rm=na.rm)
     }
 
     xy <- xyFromCell(x, cell_nums)
@@ -81,7 +77,7 @@ sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(),
                       dim=c(nrow(xcoords), ncol(xcoords), 2))
 
     # TODO: Add check to ensure no polygons overlap, and warn if they fall 
-    # outside rater extent
+    # outside raster extent
 
     # Function to make individual polygons for each sample area
     make_Polygon <- function(slice) {
@@ -105,39 +101,8 @@ sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(),
     # Finally, convert to a SpatialPolygonsDataFrame
     polys <- SpatialPolygonsDataFrame(Sr, data=out_data)
 
-    if (validate) {
-        if (nlayers(x) > 1) {
-            have_NAs <- extract(raster(x, layer=validate.layer), polys,
-                                fun=function(windo, ...) any(is.na(windo)))
-        } else {
-            have_NAs <- extract(x, polys,
-                                fun=function(windo, ...) any(is.na(windo)))
-        }
-    
-        # Exclude polys with NAs (as they fall in no data areas)
-        polys <- polys[!(have_NAs), ]
-
-        # If there are too still too many polys remaining in the sample, cut sample 
-        # down to desired size,
-        if (stratified) {
-            freqs <- table(polys$strata)
-            for (n in 1:length(freqs)) {
-                if (freqs[n] > size) {
-                    this_class <- names(freqs)[n]
-                    these_polys <- which(polys$strata == this_class)
-                    drop_polys <- these_polys[sampleInt(length(these_polys), freqs[n] - size)]
-                    polys <- polys[-drop_polys, ]
-                }
-            }
-        } else {
-            if (length(polys) > size) {
-                polys <- polys[sampleInt(length(polys), size), ]
-            } else if (length(polys) < size) {
-                warning('length of polys < size. Try increasing exp.')
-            }
-        }
-        # Ensure IDs are stills sequential
-        polys$ID <- seq(1, length(polys))
+    if (nrow(polys) < size) {
+        warning('length of polys < size. Try increasing exp.')
     }
 
     return(polys)

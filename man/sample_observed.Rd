@@ -4,7 +4,7 @@
 stratification}
 \usage{
 sample_observed(x, size, strata = NULL, side = xres(x), fields = c(),
-  validate = TRUE, validate.layer = 1, exp = 5)
+  na.rm = TRUE, exp = 5)
 }
 \arguments{
   \item{x}{a \code{Raster*}}
@@ -21,20 +21,18 @@ sample_observed(x, size, strata = NULL, side = xres(x), fields = c(),
   \code{SpatialPolygonsDataFrame} (such as a "class" field
   if you will be digitizing classes).}
 
-  \item{validate}{whether to check that all sample polygons
-  lie within image area (defined as having no NAs within
-  the polygon)}
-
-  \item{validate.layer}{the index within \code{x} of the
-  layer that should be used for validation}
+  \item{na.rm}{whether to remove pixels with NA values from
+  the sample}
 
   \item{exp}{multiplier used to draw larger initial sample
-  to account for the loss of sample polygons during
-  validation. Increase this value if the final sample have
-  fewer sample polygons than desired \code{size}}
+  to account for the loss of sample polygons lost because
+  they contain NAs, and, for stratified sampling, to
+  account for classes that occur very infrequently in the
+  data. Increase this value if the final sample has fewer
+  sample polygons than desire.}
 }
 \value{
-a \code{SpatialPolygonsDataFrame} with \code{n} polygons
+a \code{SpatialPolygonsDataFrame}
 }
 \description{
 Useful for gathering training data for an image
