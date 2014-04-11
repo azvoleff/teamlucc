@@ -2,7 +2,7 @@
 \alias{cloud_remove}
 \title{Remove clouds using Xiaolin Zhu's NSPI algorithm}
 \usage{
-cloud_remove(cloudy, clear, cloud_mask, out_name, use_IDL = TRUE,
+cloud_remove(cloudy, clear, cloud_mask, out_name = NULL, use_IDL = TRUE,
   fast = TRUE, num_class = 1, min_pixel = 20, max_pixel = 1000,
   cloud_nbh = 1, DN_min = 0, DN_max = 255,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe")
@@ -63,7 +63,7 @@ Landsat image.
 This code can use either a Xiaolin Zhu's original IDL code,
 or an R/C++ implementation native to \code{teamlucc}. The
 \code{use_IDL} parameter (defaults to TRUE) decides whether
-to use Xiaolin's code \code{use_IDL=TRUE) or the or the R
+to use Xiaolin's code (\code{use_IDL=TRUE}) or the or the R
 and C++ implementation native to \code{teamlucc}
 (\code{use_IDL=FALSE}).
 

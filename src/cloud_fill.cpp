@@ -46,7 +46,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
     // Allow also treating cloud_mask as 2d matrix (row, cols)
     imat cloud_mask_mat(cloud_mask.begin(), dims(0), dims(1), false);
 
-    Rcpp::Rcout << cloud_codes.n_elem  << " cloud(s) to process" << std::endl;
+    Rcpp::Rcout << cloud_codes.n_elem  << " cloud(s) to fill" << std::endl;
 
     for(unsigned n=0; n < cloud_codes.n_elem; n++) {
         int cloud_code = cloud_codes(n);

@@ -45,7 +45,7 @@ Suggests:
 LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
     Landsat scenes with heavy clouds using the "fill_gaps" or "fill_clouds"
-    functions by Xiaolin Zhu at the Ohio State University requires an IDL
+    IDL code by Xiaolin Zhu at the Ohio State University requires an IDL
     installation.
 Description: teamlucc is a set of routines to support analyzing land use and
     cover change (LUCC) in R. The package was designed to support analyzing

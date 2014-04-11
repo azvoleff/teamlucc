@@ -34,7 +34,7 @@ prep_fmask <- function(image_dir) {
 cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              fast, num_class, min_pixel, max_pixel, 
                              cloud_nbh, DN_min, DN_max, 
-                             idl, patch_long=1000) {
+                             idl, patch_long=1000, ...) {
     if (fast) {
         script_path <- system.file("idl", "CLOUD_REMOVE_FAST.pro", 
                                    package="teamlucc")
@@ -47,21 +47,22 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
         stop('IDL not found - check "idl" parameter')
     }
 
-    # Write in-memory rasters to file to hand off to IDL.
-    def_format <- rasterOptions()$format
+    # Write in-memory rasters to files for hand off to IDL. The capture.output 
+    # line is used to avoid printing the rasterOptions to screen as they are 
+    # temporarily reset.
+    dummy <- capture.output(def_format <- rasterOptions()$format)
     rasterOptions(format='ENVI')
-    cloudy <- writeRaster(cloudy, rasterTmpFile(), datatype='INT2S')
-    clear <- writeRaster(clear, rasterTmpFile(), datatype='INT2S')
-    cloud_mask <- writeRaster(cloud_mask, rasterTmpFile(), datatype='INT2S')
+    cloudy <- writeRaster(cloudy, rasterTmpFile(), datatype=dataType(cloudy))
+    clear <- writeRaster(clear, rasterTmpFile(), datatype=dataType(clear))
+    cloud_mask <- writeRaster(cloud_mask, rasterTmpFile(), datatype=dataType(cloud_mask))
     cloudy_file <- filename(cloudy)
     clear_file <- filename(clear)
     cloud_mask_file <- filename(cloud_mask)
-    rasterOptions(format=def_format)
 
     if (is.null(out_name)) {
-        out_name <- paste0(file_path_sans_ext(filename(cloudy)), 
-                           '_cloud_remove.envi')
+        out_name <- paste0(rasterTmpFile())
     }
+    dummy <- capture.output(rasterOptions(format=def_format))
 
     param_names <- c("cloudy_file", "clear_file", "mask_file", "out_name", 
                      "num_class", "min_pixel", "extent1", "DN_min", "DN_max", 
@@ -116,6 +117,12 @@ cloud_fill_cpp_wrapper <- function(cloudy, clear, cloud_mask, num_class,
 cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast, 
                            num_class, min_pixel, max_pixel, cloud_nbh, DN_min, 
                            DN_max, ...) {
+    if (fast) {
+        stop("fast=TRUE not yet supported when use_IDL=TRUE")
+    }
+
+    warning("*** use_IDL=TRUE is still experimental - use results with caution ***")
+
     # bs <- blockSize(cloudy)
     # out <- brick(cloudy, values=FALSE)
     # out <- writeStart(out, rasterTmpFile())
@@ -138,12 +145,14 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 
     out <- rasterEngine(cloudy=cloudy, clear=clear, 
                         cloud_mask=cloud_mask,
-                        fun=cloud_fill_wrapper,
+                        fun=cloud_fill_cpp_wrapper,
                         args=list(num_class=num_class, min_pixel=min_pixel, 
                         max_pixel=max_pixel, cloud_nbh=cloud_nbh, 
                         DN_min=DN_min, DN_max=DN_max),
                         processing_unit='chunk',
-                        outbands=nlayers(cloudy), outfiles=1, ...)
+                        outbands=nlayers(cloudy), outfiles=1,
+                        setMinMax=TRUE,
+                        filename=out_name, ...)
 
     return(out)
 }
@@ -155,9 +164,9 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #'
 #' This code can use either a Xiaolin Zhu's original IDL code, or an R/C++ 
 #' implementation native to \code{teamlucc}. The \code{use_IDL} parameter 
-#' (defaults to TRUE) decides whether to use Xiaolin's code \code{use_IDL=TRUE) 
-#' or the  or the R and C++ implementation native to \code{teamlucc} 
-#' (\code{use_IDL=FALSE}).
+#' (defaults to TRUE) decides whether to use Xiaolin's code 
+#' (\code{use_IDL=TRUE}) or the  or the R and C++ implementation native to 
+#' \code{teamlucc} (\code{use_IDL=FALSE}).
 #'
 #' The results from running the two alternative versions of the cloud removal 
 #' algorithm should be identical. However, there is one important difference to 
@@ -191,17 +200,17 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
-cloud_remove <- function(cloudy, clear, cloud_mask, out_name, use_IDL=TRUE, 
-                         fast=TRUE, num_class=1, min_pixel=20, max_pixel=1000, 
-                         cloud_nbh=1, DN_min=0, DN_max=255, 
+cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL, 
+                         use_IDL=TRUE, fast=TRUE, num_class=1, min_pixel=20, 
+                         max_pixel=1000, cloud_nbh=1, DN_min=0, DN_max=255, 
                          idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
-    if (class(cloudy) %in% c("RasterLayer", "RasterStack", "RasterBrick")) {
+    if (!(class(cloudy) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
         stop('cloudy must be a Raster* object')
     }
-    if (class(clear) %in% c("RasterLayer", "RasterStack", "RasterBrick")) {
+    if (!(class(clear) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
         stop('clear must be a Raster* object')
     }
-    if (class(cloud_mask) %in% c("RasterLayer")) {
+    if (!(class(cloud_mask) %in% c("RasterLayer"))) {
         stop('clear must be a RasterLayer object')
     }
     compareRaster(cloudy, clear)
