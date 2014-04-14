@@ -32,7 +32,8 @@ using namespace arma;
 // [[Rcpp::export]]
 arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
         arma::ivec& cloud_mask, arma::ivec dims, int num_class,
-        int min_pixel, int max_pixel, int cloud_nbh, int DN_min, int DN_max) {
+        int min_pixel, int max_pixel, int cloud_nbh, int DN_min, int DN_max, 
+        bool verbose=false) {
 
     // Make a list of the cloud codes in this file - anything less than 1 is 
     // not a cloud code (0 is no clear, and -1 means no data in the clear 
@@ -46,11 +47,11 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
     // Allow also treating cloud_mask as 2d matrix (row, cols)
     imat cloud_mask_mat(cloud_mask.begin(), dims(0), dims(1), false);
 
-    Rcpp::Rcout << cloud_codes.n_elem  << " cloud(s) to fill" << std::endl;
+    if (verbose) Rcpp::Rcout << cloud_codes.n_elem  << " cloud(s) to fill" << std::endl;
 
     for(unsigned n=0; n < cloud_codes.n_elem; n++) {
         int cloud_code = cloud_codes(n);
-        Rcpp::Rcout << "Filling cloud " << cloud_code;
+        if (verbose) Rcpp::Rcout << "Filling cloud " << cloud_code;
 
         // These indices refer to the position of cloud pixels within the 
         // overall cloud_mask block
@@ -112,11 +113,20 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
         uvec sub_cloud_col_i = floor(sub_cloud_vec_i / sub_cloud_mask.n_rows);
         uvec sub_cloud_row_i = sub_cloud_vec_i - sub_cloud_col_i * sub_cloud_mask.n_rows;
 
-        Rcpp::Rcout << " (" << sub_cloud_vec_i.n_elem <<  " pixels)" << std::endl;
+        if (verbose) Rcpp::Rcout << " (" << sub_cloud_vec_i.n_elem <<  " pixels)" << std::endl;
         // ic is the current index within the sub_cloud_vec_i vector
         for(unsigned ic=0; ic < sub_cloud_vec_i.n_elem; ic++) {
-            if (ic % 100 == 0) {
+            if (verbose & (ic % 1000 == 0)) {
                 Rcpp::Rcout << ".";
+                if (ic != 0) {
+                    if (ic % 100000 == 0) {
+                        // two line breaks for 100,000
+                        Rcpp::Rcout << std::endl << std::endl;
+                    } else if (ic % 10000 == 0) {
+                        // one line break for 10,000
+                        Rcpp::Rcout << std::endl;
+                    }
+                }
             }
             // Calculate row and column location of target pixel
             int ri = sub_cloud_row_i(ic);
@@ -202,7 +212,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
                 cloudy_cube.tube(up_row + ri, left_col + ci) = sub_clear.row(sub_row) + mean_diff;
             }
         }
-        Rcpp::Rcout << std::endl;
+        if (verbose) Rcpp::Rcout << std::endl;
     }
     return(cloudy);
 }

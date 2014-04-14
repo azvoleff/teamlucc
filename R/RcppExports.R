@@ -27,7 +27,7 @@
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
-cloud_fill <- function(cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel, cloud_nbh, DN_min, DN_max) {
-    .Call('teamlucc_cloud_fill', PACKAGE = 'teamlucc', cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel, cloud_nbh, DN_min, DN_max)
+cloud_fill <- function(cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel, cloud_nbh, DN_min, DN_max, verbose = FALSE) {
+    .Call('teamlucc_cloud_fill', PACKAGE = 'teamlucc', cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel, cloud_nbh, DN_min, DN_max, verbose)
 }
 

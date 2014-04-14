@@ -34,7 +34,10 @@ prep_fmask <- function(image_dir) {
 cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              fast, num_class, min_pixel, max_pixel, 
                              cloud_nbh, DN_min, DN_max, 
-                             idl, patch_long=1000, ...) {
+                             verbose, idl, patch_long=1000, ...) {
+    if (verbose) {
+        stop("verbose=TRUE not supported when use_IDL=FALSE")
+    }
     if (fast) {
         script_path <- system.file("idl", "CLOUD_REMOVE_FAST.pro", 
                                    package="teamlucc")
@@ -99,7 +102,7 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
 #' @import RcppArmadillo
 cloud_fill_cpp_wrapper <- function(cloudy, clear, cloud_mask, num_class, 
                                    min_pixel, max_pixel, cloud_nbh, DN_min, 
-                                   DN_max, ...) {
+                                   DN_max, verbose, ...) {
     dims=dim(cloudy)
     # RcppArmadillo crashes when you pass it a cube, so resize and pass 
     # mats
@@ -107,7 +110,8 @@ cloud_fill_cpp_wrapper <- function(cloudy, clear, cloud_mask, num_class,
     clear <- array(clear, dim=c(dims[1] * dims[2], dims[3]))
     cloud_mask <- array(cloud_mask, dim=c(dims[1] * dims[2]))
     filled <- cloud_fill(cloudy, clear, cloud_mask, dims, num_class, 
-                         min_pixel, max_pixel, cloud_nbh, DN_min, DN_max)
+                         min_pixel, max_pixel, cloud_nbh, DN_min, DN_max, 
+                         verbose)
     # RcppArmadillo crashes when you return a cube, so resize the returned 
     # mat
     filled <- array(filled, dim=c(dims[1], dims[2], dims[3]))
@@ -116,7 +120,7 @@ cloud_fill_cpp_wrapper <- function(cloudy, clear, cloud_mask, num_class,
 #' @importFrom spatial.tools rasterEngine
 cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast, 
                            num_class, min_pixel, max_pixel, cloud_nbh, DN_min, 
-                           DN_max, ...) {
+                           DN_max, verbose, ...) {
     if (fast) {
         stop("fast=TRUE not yet supported when use_IDL=TRUE")
     }
@@ -148,7 +152,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
                         fun=cloud_fill_cpp_wrapper,
                         args=list(num_class=num_class, min_pixel=min_pixel, 
                         max_pixel=max_pixel, cloud_nbh=cloud_nbh, 
-                        DN_min=DN_min, DN_max=DN_max),
+                        DN_min=DN_min, DN_max=DN_max, verbose=verbose),
                         processing_unit='chunk',
                         outbands=nlayers(cloudy), outfiles=1,
                         setMinMax=TRUE,
@@ -195,6 +199,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' @param DN_max the maximum valid DN value
 #' @param idl path to the IDL binary on your machine (on Windows, the path to 
 #' idl.exe)
+#' @param verbose whether to print detailed status messages
 #' @param ... additional arguments to pass to \code{rasterEngine}
 #' @return \code{Raster*} with cloud-filled image
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
@@ -203,7 +208,8 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL, 
                          use_IDL=TRUE, fast=FALSE, num_class=1, min_pixel=20, 
                          max_pixel=1000, cloud_nbh=1, DN_min=0, DN_max=255, 
-                         idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
+                         idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
+                         verbose=FALSE) {
     if (!(class(cloudy) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
         stop('cloudy must be a Raster* object')
     }
@@ -224,11 +230,11 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
     if (use_IDL) {
         filled <- cloud_remove_IDL(cloudy, clear, cloud_mask, out_name,
                                    fast, num_class, min_pixel, max_pixel, 
-                                   cloud_nbh, DN_min, DN_max, idl)
+                                   cloud_nbh, DN_min, DN_max, verbose, idl)
     } else {
         filled <- cloud_remove_R(cloudy, clear, cloud_mask, out_name,
                                  fast, num_class, min_pixel, max_pixel, 
-                                 cloud_nbh, DN_min, DN_max)
+                                 cloud_nbh, DN_min, DN_max, verbose)
     }
 
     return(filled)

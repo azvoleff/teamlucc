@@ -3,7 +3,7 @@
 \title{Cloud fill using the algorithm developed by Xiaolin Zhu}
 \usage{
 cloud_fill(cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel,
-  cloud_nbh, DN_min, DN_max)
+  cloud_nbh, DN_min, DN_max, verbose = FALSE)
 }
 \arguments{
   \item{cloudy}{the cloudy image, with pixels in columns
