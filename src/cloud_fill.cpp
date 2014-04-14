@@ -115,6 +115,9 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
         Rcpp::Rcout << " (" << sub_cloud_vec_i.n_elem <<  " pixels)" << std::endl;
         // ic is the current index within the sub_cloud_vec_i vector
         for(unsigned ic=0; ic < sub_cloud_vec_i.n_elem; ic++) {
+            if (ic % 100 == 0) {
+                Rcpp::Rcout << ".";
+            }
             // Calculate row and column location of target pixel
             int ri = sub_cloud_row_i(ic);
             int ci = sub_cloud_col_i(ic);
@@ -199,6 +202,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
                 cloudy_cube.tube(up_row + ri, left_col + ci) = sub_clear.row(sub_row) + mean_diff;
             }
         }
+        Rcpp::Rcout << std::endl;
     }
     return(cloudy);
 }
