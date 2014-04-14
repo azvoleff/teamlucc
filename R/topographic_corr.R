@@ -11,7 +11,7 @@
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
 #' layers.  The first layer should be the slope, the second layer should be 
 #' the aspect. The slope and aspect are defined as in \code{terrain} in the 
-#' \code{raster} package.
+#' \code{raster} package, and both should be in radians.
 #' @param sunelev sun elevation in degrees
 #' @param sunazimuth sun azimuth in degrees
 #' @param method the topographic correction method to use. See the help for 
@@ -50,9 +50,10 @@
 #' plotRGB(L5TSR_1986, stretch='lin', r=3, g=2, b=1)
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 #' }
-topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
-                             sampleindices=NULL, scale_factor=1, 
-                             asinteger=FALSE, ...) {
+topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, 
+                             method='minnaert_full', sampleindices=NULL, 
+                             scale_factor=1, asinteger=FALSE, DN_min=NULL, 
+                             DN_max=NULL, ...) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')
     }
@@ -87,13 +88,15 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
                 minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
                                                sunelev=sunelev, 
                                                sunazimuth=sunazimuth, 
-                                               sampleindices=sampleindices, ...)
+                                               sampleindices=sampleindices, 
+                                               DN_min=DN_min, DN_max=DN_max, ...)
                 corr_layer <- minnaert_data$minnaert
             } else {
                 corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
                                             sunelev=sunelev, sunazimuth=sunazimuth, 
                                             method=method, 
-                                            sampleindices=sampleindices, ...)
+                                            sampleindices=sampleindices,
+                                            DN_min=DN_min, DN_max=DN_max, ...)
             }
         }
     } else {
@@ -109,6 +112,7 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
                                                sunelev=sunelev, 
                                                sunazimuth=sunazimuth, 
                                                sampleindices=sampleindices, 
+                                               DN_min=DN_min, DN_max=DN_max, 
                                                ...)
                 corr_layer <- minnaert_data$minnaert
             } else {
@@ -116,7 +120,8 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method,
                                             sunelev=sunelev, 
                                             sunazimuth=sunazimuth, 
                                             method=method, 
-                                            sampleindices=sampleindices, ...)
+                                            sampleindices=sampleindices,
+                                            DN_min=DN_min, DN_max=DN_max, ...)
             }
             corr_layers <- c(corr_layers, list(corr_layer))
         }

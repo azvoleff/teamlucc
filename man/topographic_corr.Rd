@@ -2,8 +2,9 @@
 \alias{topographic_corr}
 \title{Topographically correct a raster}
 \usage{
-topographic_corr(x, slopeaspect, sunelev, sunazimuth, method,
-  sampleindices = NULL, scale_factor = 1, asinteger = FALSE, ...)
+topographic_corr(x, slopeaspect, sunelev, sunazimuth,
+  method = "minnaert_full", sampleindices = NULL, scale_factor = 1,
+  asinteger = FALSE, DN_min = NULL, DN_max = NULL, ...)
 }
 \arguments{
   \item{x}{an image to correct}
@@ -12,7 +13,8 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth, method,
   \code{RasterStack} with two layers.  The first layer
   should be the slope, the second layer should be the
   aspect. The slope and aspect are defined as in
-  \code{terrain} in the \code{raster} package.}
+  \code{terrain} in the \code{raster} package, and both
+  should be in radians.}
 
   \item{sunelev}{sun elevation in degrees}
 

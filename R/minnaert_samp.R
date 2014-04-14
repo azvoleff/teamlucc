@@ -100,6 +100,10 @@ clean_intervals <- function(counts, lims, n) {
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
 #' the calculation of k values for the Minnaert correction. See
 #' \code{\link{gridsample}}.
+#' @param DN_min minimum allowable pixel value after correction (values less 
+#' than \code{DN_min} are set to NA)
+#' @param DN_max maximum allowable pixel value after correction (values less 
+#' than \code{DN_max} are set to NA)
 #' @return \code{RasterLayer} with topographically corrected data
 #' @author Sarah Goslee and Alex Zvoleff
 #' @references
@@ -108,16 +112,20 @@ clean_intervals <- function(counts, lims, n) {
 #' http://www.jstatsoft.org/v43/i04/
 minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
                           IL.epsilon=0.000001, slopeclass=NULL, 
-                          coverclass=NULL, sampleindices=NULL) {
+                          coverclass=NULL, sampleindices=NULL, DN_min=NULL, 
+                          DN_max=NULL) {
 
     if (is.null(slopeclass)) {
         # Have lims start above 1 degree of slope, so that no topographic
         # correction is performed for low slope areas.
         lims <- seq(1*pi/180, pi/2, length.out=30)
         if (is.null(sampleindices)) {
+            raster::cut(slope, lims, include.lowest=TRUE)
             counts <- raster::freq(raster::cut(slope, lims,
                                                include.lowest=TRUE), 
                                    useNA='no')[, 2]
+            # Eliminate empty bins:
+            lims <- lims[1:length(counts)]
         } else {
             counts <- as.numeric(table(cut(slope[sampleindices], lims, 
                                            include.lowest=TRUE), useNA='no'))
@@ -169,6 +177,14 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
                     })
     # Don't correct flat areas
     xout[K.all == 0 & !is.na(K.all)] <- x[K.all == 0 & !is.na(K.all)]
+
+    if ((!is.null(DN_min)) || (!is.null(DN_max))) {
+        xout <- calc(xout, fun=function(vals) {
+                        if (!is.null(DN_min)) vals[vals < DN_min] <- NA
+                        if (!is.null(DN_max)) vals[vals > DN_max] <- NA
+                        return(vals)
+                     })
+    }
 
     list(classcoef=k_table, model=k_model, minnaert=xout, sampleindices=sampleindices)
 }

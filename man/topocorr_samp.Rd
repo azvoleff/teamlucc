@@ -3,7 +3,8 @@
 \title{Topographic correction for satellite imagery}
 \usage{
 topocorr_samp(x, slope, aspect, sunelev, sunazimuth, method = "cosine",
-  na.value = NA, IL.epsilon = 1e-06, sampleindices = NULL)
+  na.value = NA, IL.epsilon = 1e-06, sampleindices = NULL,
+  DN_min = NULL, DN_max = NULL)
 }
 \arguments{
   \item{x}{image as a \code{RasterLayer}}
@@ -34,6 +35,14 @@ topocorr_samp(x, slope, aspect, sunelev, sunazimuth, method = "cosine",
   when handling very large images. See
   \code{\link{gridsample}} for one method of calculating
   these indices.}
+
+  \item{DN_min}{minimum allowable pixel value after
+  correction (values less than \code{DN_min} are set to
+  NA)}
+
+  \item{DN_max}{maximum allowable pixel value after
+  correction (values less than \code{DN_max} are set to
+  NA)}
 }
 \value{
 RasterBrick with two layers: 'slope' and 'aspect'

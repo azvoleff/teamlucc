@@ -3,7 +3,8 @@
 \title{Topographic correction for satellite imagery using Minnaert method}
 \usage{
 minnaert_samp(x, slope, aspect, sunelev, sunazimuth, IL.epsilon = 1e-06,
-  slopeclass = NULL, coverclass = NULL, sampleindices = NULL)
+  slopeclass = NULL, coverclass = NULL, sampleindices = NULL,
+  DN_min = NULL, DN_max = NULL)
 }
 \arguments{
   \item{x}{image as a \code{RasterLayer}}
@@ -32,6 +33,14 @@ minnaert_samp(x, slope, aspect, sunelev, sunazimuth, IL.epsilon = 1e-06,
   \item{sampleindices}{(optional) row-major indices of
   sample pixels to use in the calculation of k values for
   the Minnaert correction. See \code{\link{gridsample}}.}
+
+  \item{DN_min}{minimum allowable pixel value after
+  correction (values less than \code{DN_min} are set to
+  NA)}
+
+  \item{DN_max}{maximum allowable pixel value after
+  correction (values less than \code{DN_max} are set to
+  NA)}
 }
 \value{
 \code{RasterLayer} with topographically corrected data

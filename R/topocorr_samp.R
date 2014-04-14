@@ -40,6 +40,10 @@
 #' regression models used for some topographic correction methods (like 
 #' Minnaert). Useful when handling very large images. See
 #' \code{\link{gridsample}} for one method of calculating these indices.
+#' @param DN_min minimum allowable pixel value after correction (values less 
+#' than \code{DN_min} are set to NA)
+#' @param DN_max maximum allowable pixel value after correction (values less 
+#' than \code{DN_max} are set to NA)
 #' @return RasterBrick with two layers: 'slope' and 'aspect'
 #' @author Sarah Goslee and Alex Zvoleff
 #' @references
@@ -50,7 +54,7 @@
 #' #TODO: add examples
 topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine", 
                           na.value=NA, IL.epsilon=0.000001,
-                          sampleindices=NULL) {
+                          sampleindices=NULL, DN_min=NULL, DN_max=NULL) {
     # some inputs are in degrees, but we need radians
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
@@ -167,6 +171,13 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
     if(method != 8) 
         xout[slope == 0 & !is.na(slope)] <- x[slope == 0 & !is.na(slope)]
 
+    if ((!is.null(DN_min)) || (!is.null(DN_max))) {
+        xout <- calc(xout, fun=function(vals) {
+                        if (!is.null(DN_min)) vals[vals < DN_min] <- NA
+                        if (!is.null(DN_max)) vals[vals > DN_max] <- NA
+                        return(vals)
+                     })
+    }
     return(xout)
 }
 
