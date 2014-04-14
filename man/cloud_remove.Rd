@@ -49,8 +49,7 @@ cloud_remove(cloudy, clear, cloud_mask, out_name = NULL, use_IDL = TRUE,
   \item{idl}{path to the IDL binary on your machine (on
   Windows, the path to idl.exe)}
 
-  \item{verbose}{whether to print detailed status messages
-  as the cloud fill routing runs}
+  \item{verbose}{whether to print detailed status messages}
 
   \item{...}{additional arguments to pass to
   \code{rasterEngine}}
