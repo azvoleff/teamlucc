@@ -1,3 +1,7 @@
+pct_clouds <- function(cloud_mask) {
+    return(cellStats(cloud_mask == 1, stat='mean', na.rm=TRUE) * 100)
+}
+
 #' Perform cloud fill for Landsat imagery
 #'
 #' Uses an R/C++ implementation of the NSPI algorithm from Xioalin Zhu. See 
@@ -24,16 +28,21 @@
 #' \code{FALSE}, use the CLOUD_REMOVE.pro script.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
-#' @param overwrite whether to overwrite existing files (otherwise an error 
-#' will be raised)
-#' @param notify notifier to use (defaults to \code{print} function). See the 
-#' \code{notifyR} package for one way of sending notifications from R. The 
+#' @param threshold maximum percent cloud cover allowable in base image (cloud 
+#' fill iterate until percent cloud cover in base image is below this value) or 
+#' until more than \code{max_iter} iterations have been run
+#' @param max_iter maximum number of times to run cloud fill script
+#' @param notify notifier to use (defaults to \code{print} function).  See the 
+#' \code{notifyR} package for one way of sending notifications from R.  The 
 #' \code{notify} function should accept a string as the only argument.
-#' @param ... additional arguments passed to \code{\link{cloud_remove}}
+#' @param ... additional arguments passed to \code{\link{cloud_remove}}, such 
+#' as \code{DN_min}, \code{DN_max}, \code{use_IDL}, \code{fast},
+#' \code{verbose}, etc. See \code{\link{cloud_remove}}.
 #' @return \code{Raster*} object with cloud filled image.
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             base_date=NULL, fast=FALSE, n_cpus=1, 
-                            overwrite=FALSE, notify=print, ...) {
+                            notify=print, threshold=1, 
+                            max_iter=5, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
@@ -104,36 +113,49 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     base_mask <- masks[[base_img_index]]
     masks <- masks[-base_img_index]
 
-    # Calculate a raster indicating the pixels in each potential fill image 
-    # that are available for filling pixels of base_img that are missing due to 
-    # cloud contamination. Areas coded 1 are missing due to cloud or shadow in 
-    # the base image and are available in the merge image.
-    fill_areas <- list()
-    for (mask_img in masks) {
-        fill_areas <- c(fill_areas, list(base_mask == 1 & mask_img == 0))
+    # Save base_img in filled so it will be returned if base_img already has 
+    # pct_clouds below threshold
+    filled <- base_img
+    n <- 0
+    while ((pct_clouds(base_mask) > threshold) & (n < max_iter)) {
+        # Calculate a raster indicating the pixels in each potential fill image 
+        # that are available for filling pixels of base_img that are missing 
+        # due to cloud contamination. Areas coded 1 are missing due to cloud or 
+        # shadow in the base image and are available in the merge image.
+        fill_areas <- list()
+        for (mask_img in masks) {
+            fill_areas <- c(fill_areas, list(base_mask == 1 & mask_img == 0))
+        }
+        fill_areas_freq <- freq(stack(fill_areas), useNA='no', merge=TRUE)
+
+        # Select the fill image with the maximum number of available pixels 
+        # (counting only pixels in the fill image that are not ALSO clouded in the 
+        # fill image)
+        avail_fill_row <- which(fill_areas_freq$value == 1)
+        fill_img_index <- which(fill_areas_freq[avail_fill_row, -1] == 
+                                max(fill_areas_freq[avail_fill_row, -1]))
+        fill_img <- imgs[[fill_img_index]]
+        imgs <- imgs[-fill_img_index]
+        cloud_mask <- fill_areas[[fill_img_index]]
+        fill_img_mask <- masks[[fill_img_index]]
+        masks <- masks[-fill_img_index]
+
+        # Add numbered IDs to the cloud patches
+        coded_cloud_mask <- ConnCompLabel(cloud_mask)
+
+        # Mark areas of the cloud_mask where fill_img is blank (clouded) with -1
+        coded_cloud_mask[fill_img_mask] <- -1
+        NAvalue(coded_cloud_mask) <- -2
+
+        filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
+        #filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, 
+        #                       use_IDL=FALSE, verbose=TRUE)
+
+        # Revise base mask to account for newly filled pixels
+        base_mask[coded_cloud_mask >= 1] <- 0
+
+        max_iter <- max_iter + 1
     }
-    fill_areas_freq <- freq(stack(fill_areas), useNA='no', merge=TRUE)
-
-    # Select the fill image with the maximum number of available pixels 
-    # (counting only pixels in the fill image that are not ALSO clouded in the 
-    # fill image)
-    avail_fill_row <- which(fill_areas_freq$value == 1)
-    fill_img_index <- which(fill_areas_freq[avail_fill_row, -1] == 
-                            max(fill_areas_freq[avail_fill_row, -1]))
-    fill_img <- imgs[[fill_img_index]]
-    imgs <- imgs[-fill_img_index]
-    cloud_mask <- fill_areas[[fill_img_index]]
-    fill_img_mask <- masks[[fill_img_index]]
-    masks <- masks[-fill_img_index]
-
-    # Add numbered IDs to the cloud patches
-    coded_cloud_mask <- ConnCompLabel(cloud_mask)
-
-    # Mark areas of the cloud_mask where fill_img is blank (clouded) with -1
-    coded_cloud_mask[fill_img_mask] <- -1
-    NAvalue(coded_cloud_mask) <- -2
-
-    filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
 
     timer <- stop_timer(timer, label='Cloud fill')
 

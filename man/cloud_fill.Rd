@@ -37,6 +37,8 @@ cloud_fill(cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel,
   \item{DN_min}{the minimum valid DN value}
 
   \item{DN_max}{the maximum valid DN value}
+
+  \item{verbose}{whether to print detailed status messages}
 }
 \value{
 array with cloud filled image with dims: cols, rows, bands

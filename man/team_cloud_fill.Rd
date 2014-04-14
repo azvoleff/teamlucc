@@ -3,8 +3,8 @@
 \title{Perform cloud fill for Landsat imagery}
 \usage{
 team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
-  base_date = NULL, fast = FALSE, n_cpus = 1, overwrite = FALSE,
-  notify = print, ...)
+  base_date = NULL, fast = FALSE, n_cpus = 1, notify = print,
+  threshold = 1, max_iter = 5, ...)
 }
 \arguments{
   \item{data_dir}{folder where input images are located,
@@ -35,16 +35,23 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
 
-  \item{overwrite}{whether to overwrite existing files
-  (otherwise an error will be raised)}
+  \item{threshold}{maximum percent cloud cover allowable in
+  base image (cloud fill iterate until percent cloud cover
+  in base image is below this value) or until more than
+  \code{max_iter} iterations have been run}
+
+  \item{max_iter}{maximum number of times to run cloud fill
+  script}
 
   \item{notify}{notifier to use (defaults to \code{print}
-  function). See the \code{notifyR} package for one way of
-  sending notifications from R. The \code{notify} function
+  function).  See the \code{notifyR} package for one way of
+  sending notifications from R.  The \code{notify} function
   should accept a string as the only argument.}
 
   \item{...}{additional arguments passed to
-  \code{\link{cloud_remove}}}
+  \code{\link{cloud_remove}}, such as \code{DN_min},
+  \code{DN_max}, \code{use_IDL}, \code{fast},
+  \code{verbose}, etc. See \code{\link{cloud_remove}}.}
 }
 \value{
 \code{Raster*} object with cloud filled image.
