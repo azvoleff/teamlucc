@@ -24,6 +24,10 @@
 #' results to integers (see \code{asinteger} argument).
 #' @param asinteger whether to round results to nearest integer. Can be used to 
 #' save space by saving results as, for example, an 'INT2S' \code{raster}.
+#' @param DN_min minimum allowable pixel value after correction (values less 
+#' than \code{DN_min} are set to NA)
+#' @param DN_max maximum allowable pixel value after correction (values less 
+#' than \code{DN_max} are set to NA)
 #' @param ... additional arguments to pass to \code{minnaert_samp} or 
 #' \code{topocorr_samp}, depending on chosen topographic correction method
 #' @return The topographically corrected image as a \code{RasterLayer} or 
