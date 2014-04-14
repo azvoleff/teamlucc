@@ -2,7 +2,7 @@
 \alias{topographic_corr}
 \title{Topographically correct a raster}
 \usage{
-topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = "",
+topographic_corr(x, slopeaspect, sunelev, sunazimuth, method,
   sampleindices = NULL, scale_factor = 1, asinteger = FALSE, ...)
 }
 \arguments{
@@ -21,9 +21,6 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth, method, filename = "",
   \item{method}{the topographic correction method to use.
   See the help for \code{topocorr} for more guidance on
   this.}
-
-  \item{filename}{file on disk to save \code{Raster*} to
-  (optional)}
 
   \item{sampleindices}{(optional) row-major indices of
   sample pixels to use in regression models used for some

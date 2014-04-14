@@ -16,7 +16,6 @@
 #' @param sunazimuth sun azimuth in degrees
 #' @param method the topographic correction method to use. See the help for 
 #' \code{topocorr} for more guidance on this.
-#' @param filename file on disk to save \code{Raster*} to (optional)
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
 #' regression models used for some topographic correction methods (like 
 #' Minnaert). Useful when handling very large images. See
@@ -52,7 +51,7 @@
 #' plotRGB(L5TSR_1986_topocorr, stretch='lin', r=3, g=2, b=1)
 #' }
 topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth, method, 
-                             filename='', sampleindices=NULL, scale_factor=1, 
+                             sampleindices=NULL, scale_factor=1, 
                              asinteger=FALSE, ...) {
     if (!(class(x) %in% c('RasterLayer', 'RasterStack', 'RasterBrick'))) {
         stop('x must be a Raster* object')
