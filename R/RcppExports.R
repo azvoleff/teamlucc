@@ -22,6 +22,7 @@
 #' @param cloud_nbh the range of cloud neighborhood (in pixels)
 #' @param DN_min the minimum valid DN value
 #' @param DN_max the maximum valid DN value
+#' @param verbose whether to print detailed status messages
 #' @return array with cloud filled image with dims: cols, rows, bands
 #' parameter, containing the selected textures measures
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified

@@ -39,6 +39,14 @@ topographic_corr(x, slopeaspect, sunelev, sunazimuth,
   integer. Can be used to save space by saving results as,
   for example, an 'INT2S' \code{raster}.}
 
+  \item{DN_min}{minimum allowable pixel value after
+  correction (values less than \code{DN_min} are set to
+  NA)}
+
+  \item{DN_max}{maximum allowable pixel value after
+  correction (values less than \code{DN_max} are set to
+  NA)}
+
   \item{...}{additional arguments to pass to
   \code{minnaert_samp} or \code{topocorr_samp}, depending
   on chosen topographic correction method}

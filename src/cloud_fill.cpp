@@ -24,6 +24,7 @@ using namespace arma;
 //' @param cloud_nbh the range of cloud neighborhood (in pixels)
 //' @param DN_min the minimum valid DN value
 //' @param DN_max the maximum valid DN value
+//' @param verbose whether to print detailed status messages
 //' @return array with cloud filled image with dims: cols, rows, bands
 //' parameter, containing the selected textures measures
 //' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
@@ -116,16 +117,14 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
         if (verbose) Rcpp::Rcout << " (" << sub_cloud_vec_i.n_elem <<  " pixels)" << std::endl;
         // ic is the current index within the sub_cloud_vec_i vector
         for(unsigned ic=0; ic < sub_cloud_vec_i.n_elem; ic++) {
-            if (verbose & (ic % 1000 == 0)) {
+            if (verbose & (ic != 0) & (ic % 1000 == 0)) {
                 Rcpp::Rcout << ".";
-                if (ic != 0) {
-                    if (ic % 100000 == 0) {
-                        // two line breaks for 100,000
-                        Rcpp::Rcout << std::endl << std::endl;
-                    } else if (ic % 10000 == 0) {
-                        // one line break for 10,000
-                        Rcpp::Rcout << std::endl;
-                    }
+                if (ic % 100000 == 0) {
+                    // two line breaks for 100,000
+                    Rcpp::Rcout << std::endl << std::endl;
+                } else if (ic % 10000 == 0) {
+                    // one line break for 10,000
+                    Rcpp::Rcout << std::endl;
                 }
             }
             // Calculate row and column location of target pixel
