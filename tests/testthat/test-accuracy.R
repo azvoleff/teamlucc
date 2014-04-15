@@ -70,7 +70,7 @@ test_that("accuracy calculations will run with model as first input", {
 
 training_data <- get_pixels(test_preds, L5TSR_1986_2001_training, 
                             class_col='class_1986')
-testing_data <- get_pixels(test_preds, L5TSR_1986_2001_training, 
+testing_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, 
                            class_col='class_1986', training=0)
 test_that("accuracy calculations will run with RasterLayer as first input", {
     expect_warning(accuracy(test_preds, L5TSR_1986_2001_training, class_col="class_1986"))
