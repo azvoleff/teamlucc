@@ -2,9 +2,9 @@
 \alias{team_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-team_preprocess_landsat(image_dirs, dem_path, sitecode, output_path = NULL,
-  n_cpus = 1, cleartmp = FALSE, overwrite = FALSE, notify = print,
-  verbose = FALSE)
+team_preprocess_landsat(image_dirs, prefix, tc = FALSE, aoi = NULL,
+  dem_path = NULL, output_path = NULL, n_cpus = 1, cleartmp = FALSE,
+  overwrite = FALSE, notify = print, verbose = FALSE)
 }
 \arguments{
   \item{image_dirs}{list of paths to a set of Landsat CDR
@@ -13,11 +13,17 @@ team_preprocess_landsat(image_dirs, dem_path, sitecode, output_path = NULL,
 
   \item{output_path}{the path to use for the output}
 
-  \item{dem_path}{path to a set of DEMs as output by
-  \code{team_setup_dem}}
-
-  \item{sitecode}{code to use as a prefix for all
+  \item{prefix}{string to use as a prefix for all
   filenames}
+
+  \item{tc}{whether to topographically correct imagery}
+
+  \item{aoi}{area of interest (AOI), as a
+  \code{SpatialPolygonsDataFrame}, to use as as bounding
+  box when selecting DEMs}
+
+  \item{dem_path}{path to a set of DEMs as output by
+  \code{team_setup_dem} (only required if tc=TRUE)}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}

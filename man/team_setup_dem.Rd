@@ -2,22 +2,24 @@
 \alias{team_setup_dem}
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
-team_setup_dem(aoi_file, output_path, dem_extents, n_cpus = 1,
-  overwrite = FALSE, crop_to_aoi = FALSE, aoi_buffer = 0,
-  notify = print, verbose = FALSE)
+team_setup_dem(aoi, output_path, dem_extents, n_cpus = 1, overwrite = FALSE,
+  crop_to_aoi = FALSE, notify = print, verbose = FALSE)
 }
 \arguments{
-  \item{aoi_file}{area of interest (AOI) shapefile to use
-  as as bounding box when selecting DEMs, in a file format
-  readable by \code{readOGR}}
+  \item{aoi}{area of interest (AOI), as a
+  \code{SpatialPolygonsDataFrame}, to use as as bounding
+  box when selecting DEMs. Also used to crop and set
+  projection of the output DEM(s) if
+  \code{crop_to_aoi=TRUE}.}
 
   \item{output_path}{the path to use for the output}
 
   \item{dem_extents}{a \code{SpatialPolygonsDataFrame} of
   the extents and filenames for a set of locally available
-  DEM raster(s) that cover the AOI. See the
+  DEM raster(s) that cover the \code{aoi}. See the
   \code{\link{get_extent_polys}} function for one means of
-  generating this list.}
+  generating this list. \code{dem_extents} must have a
+  "filename" column.}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
@@ -28,10 +30,6 @@ team_setup_dem(aoi_file, output_path, dem_extents, n_cpus = 1,
   \item{crop_to_aoi}{whether to crop the dem to the
   supplied AOI, or to the Landsat path/row polygon for that
   particular path/row}
-
-  \item{aoi_buffer}{width in meters of buffer around AOI in
-  \code{aoi_file}. Only have an any effect if
-  \code{crop_to_aoi} is TRUE.}
 
   \item{notify}{notifier to use (defaults to \code{print}
   function). See the \code{notifyR} package for one way of

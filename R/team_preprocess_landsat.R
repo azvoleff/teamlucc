@@ -6,8 +6,12 @@
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
 #' @param output_path the path to use for the output
-#' @param dem_path path to a set of DEMs as output by \code{team_setup_dem}
-#' @param sitecode code to use as a prefix for all filenames
+#' @param prefix string to use as a prefix for all filenames
+#' @param tc whether to topographically correct imagery
+#' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to 
+#' use as as bounding box when selecting DEMs
+#' @param dem_path path to a set of DEMs as output by \code{team_setup_dem} 
+#' (only required if tc=TRUE)
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
@@ -26,11 +30,11 @@
 #' team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis', 'VB'
 #' 'H:/Data/TEAM/VB/LCLUC_Analysis', n_cpus=3)
 #' }
-team_preprocess_landsat <- function(image_dirs, dem_path, sitecode, 
-                                    output_path=NULL, n_cpus=1, cleartmp=FALSE,  
-                                    overwrite=FALSE, notify=print, 
-                                    verbose=FALSE) {
-    if (!file_test("-d", dem_path)) {
+team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
+                                    dem_path=NULL, output_path=NULL, n_cpus=1, 
+                                    cleartmp=FALSE,  overwrite=FALSE, 
+                                    notify=print, verbose=FALSE) {
+    if (tc && !file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
     }
     if (!is.null(output_path) && !file_test("-d", output_path)) {
@@ -123,26 +127,22 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
 
         timer <- start_timer(timer, label=paste('Preprocessing', image_basename))
 
-        ######################################################################
-        # Load dem, slope, and aspect
-        dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, '-', WRS_Row, 
-                                                   '.envi'))
-        dem <- raster(dem_filename)
-
-        slopeaspect_filename <- file.path(dem_path,
-                                          paste0('slopeaspect_', 
-                                                 WRS_Path, '-', WRS_Row, '.envi'))
-        slopeaspect <- brick(slopeaspect_filename)
-
         #######################################################################
         # Reproject images to match the projection being used for this image.  
-        # This has been determined in team_setup_dem - the images will be 
-        # reprojected to match the slopeaspect and dem projections and extents.
+        # This is either the projection of aoi (if aoi is supplied), or the UTM 
+        # zone of the centroid of this path and row.
         if (verbose) timer <- start_timer(timer,
                                           label=paste(image_basename, '- reproject'))
-        if (proj4string(image_stack) != proj4string(dem)) {
-            image_stack <- projectRaster(image_stack, dem)
-            mask_stack <- projectRaster(mask_stack, dem, method='ngb')
+        if (!is.null(aoi)) {
+            to_proj4string <- proj4string(aoi)
+        } else {
+            to_proj4string <- utm_zone(pathrow_poly(as.numeric(WRS_Path), 
+                                                    as.numeric(WRS_Row), 
+                                                    proj4string=TRUE))
+        }
+        if (to_proj4string != proj4string(image_stack)) {
+            image_stack <- projectRaster(image_stack, crs=CRS(to_proj4string))
+            mask_stack <- projectRaster(mask_stack, crs=CRS(to_proj4string), method='ngb')
         }
         if (verbose) timer <- stop_timer(timer,
                                          label=paste(image_basename, '- reproject'))
@@ -156,7 +156,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, while 
         # good pixels are coded as 1.
         image_stack_mask_path <- file.path(this_output_path,
-                                          paste(sitecode, image_basename, 
+                                          paste(prefix, image_basename, 
                                                 'mask.envi', sep='_'))
         # fmask_band key:
         # 	0 = clear
@@ -176,7 +176,7 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
         image_stack <- mask(image_stack, image_stack_mask, maskvalue=0)
 
         mask_stack_path <- file.path(this_output_path,
-                                     paste(sitecode, image_basename, 
+                                     paste(prefix, image_basename, 
                                            'masks.envi', sep='_'))
         mask_stack <- writeRaster(mask_stack, filename=mask_stack_path, 
                                   overwrite=overwrite, 
@@ -186,44 +186,64 @@ team_preprocess_landsat <- function(image_dirs, dem_path, sitecode,
 
         ######################################################################
         # Perform topographic correction
-        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
-                                                             '-', 'topocorr'))
-        if (ncell(image_stack) > 400000) {
-            # Draw a sample for the Minnaert k regression
-            horizcells <- 10
-            vertcells <- 10
-            nsamp <- 200000 / (horizcells * vertcells)
-            # Note that rowmajor indices are needed as raster layers are stored in 
-            # rowmajor order, unlike most R objects that are addressed in column 
-            # major order
-            sampleindices <- gridsample(image_stack, horizcells=10, vertcells=10, 
-                                        nsamp=nsamp, rowmajor=TRUE)
-        } else {
-            sampleindices <- NULL
+        if (tc) {
+            if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
+                                                                 '-', 'topocorr'))
+
+            ######################################################################
+            # Load dem, slope, and aspect
+            dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, '-', WRS_Row, 
+                                                       '.envi'))
+            dem <- raster(dem_filename)
+
+            slopeaspect_filename <- file.path(dem_path,
+                                              paste0('slopeaspect_', 
+                                                     WRS_Path, '-', WRS_Row, '.envi'))
+            slopeaspect <- brick(slopeaspect_filename)
+
+            if (proj4string(image_stack) != proj4string(slopeaspect)) {
+                stop(paste0('slopeaspect and image_stack projections do not match.\nslopeaspect proj4string: ', 
+                            proj4string(slopeaspect), '\nimage_stack proj4string: ',
+                            proj4string(image_stack)))
+            }
+
+            if (ncell(image_stack) > 400000) {
+                # Draw a sample for the Minnaert k regression
+                horizcells <- 10
+                vertcells <- 10
+                nsamp <- 200000 / (horizcells * vertcells)
+                # Note that rowmajor indices are needed as raster layers are stored in 
+                # rowmajor order, unlike most R objects that are addressed in column 
+                # major order
+                sampleindices <- gridsample(image_stack, horizcells=10, vertcells=10, 
+                                            nsamp=nsamp, rowmajor=TRUE)
+            } else {
+                sampleindices <- NULL
+            }
+            # Remember that slopeaspect layers are scaled to INT2S, but 
+            # topographic_corr expects them as floats, so apply the scale factors 
+            # used in team_setup_dem
+            slopeaspect_flt <- stack(raster(slopeaspect, layer=1) / 10000,
+                                     raster(slopeaspect, layer=2) / 1000)
+            sunelev <- 90 - as.numeric(get_metadata_item(band1_imagefile, 'SolarZenith'))
+            sunazimuth <- as.numeric(get_metadata_item(band1_imagefile, 'SolarAzimuth'))
+            topocorr_filename <- file.path(this_output_path,
+                                           paste(prefix, image_basename, 
+                                                 'tc.envi', sep='_'))
+            image_stack <- topographic_corr(image_stack, slopeaspect_flt, sunelev, 
+                                            sunazimuth, method='minnaert_full', 
+                                            asinteger=TRUE, 
+                                            sampleindices=sampleindices)
+            image_stack <- writeRaster(image_stack, filename=topocorr_filename, 
+                                       overwrite=overwrite, datatype='INT2S')
+            if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
+                                                                '-', 'topocorr'))
+
+            timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
+
+            if (cleartmp) removeTmpFiles(h=1)
+            if (n_cpus > 1) endCluster()
         }
-        # Remember that slopeaspect layers are scaled to INT2S, but 
-        # topographic_corr expects them as floats, so apply the scale factors 
-        # used in team_setup_dem
-        slopeaspect_flt <- stack(raster(slopeaspect, layer=1) / 10000,
-                                 raster(slopeaspect, layer=2) / 1000)
-        sunelev <- 90 - as.numeric(get_metadata_item(band1_imagefile, 'SolarZenith'))
-        sunazimuth <- as.numeric(get_metadata_item(band1_imagefile, 'SolarAzimuth'))
-        topocorr_filename <- file.path(this_output_path,
-                                       paste(sitecode, image_basename, 
-                                             'tc.envi', sep='_'))
-        image_stack <- topographic_corr(image_stack, slopeaspect_flt, sunelev, 
-                                        sunazimuth, method='minnaert_full', 
-                                        asinteger=TRUE, 
-                                        sampleindices=sampleindices)
-        image_stack <- writeRaster(image_stack, filename=topocorr_filename, 
-                                   overwrite=overwrite, datatype='INT2S')
-        if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
-                                                            '-', 'topocorr'))
-
-        timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
-
-        if (cleartmp) removeTmpFiles(h=1)
-        if (n_cpus > 1) endCluster()
     }
 
     timer <- stop_timer(timer, label='Preprocessing images')

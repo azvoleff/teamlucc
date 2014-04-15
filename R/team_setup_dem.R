@@ -6,21 +6,20 @@
 #' @importFrom sp spTransform
 #' @importFrom rgeos gBuffer gIntersects gUnaryUnion gIntersection
 #' @importFrom tools file_path_sans_ext
-#' @param aoi_file area of interest (AOI) shapefile to use as as bounding box 
-#' when selecting DEMs, in a file format readable by \code{readOGR}
+#' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to 
+#' use as as bounding box when selecting DEMs. Also used to crop and set 
+#' projection of the output DEM(s) if \code{crop_to_aoi=TRUE}.
 #' @param output_path the path to use for the output
 #' @param dem_extents a \code{SpatialPolygonsDataFrame} of the extents and 
-#' filenames for a set of locally available DEM raster(s) that cover the AOI.  
-#' See the \code{\link{get_extent_polys}} function for one means of generating 
-#' this list.
+#' filenames for a set of locally available DEM raster(s) that cover the 
+#' \code{aoi}. See the \code{\link{get_extent_polys}} function for one means of 
+#' generating this list. \code{dem_extents} must have a "filename" column.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
 #' @param crop_to_aoi whether to crop the dem to the supplied AOI, or to the
 #' Landsat path/row polygon for that particular path/row
-#' @param aoi_buffer width in meters of buffer around AOI in \code{aoi_file}.  
-#' Only have an any effect if \code{crop_to_aoi} is TRUE.
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
@@ -32,36 +31,33 @@
 #' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/', 
 #' list(c(15,53)))
 #' }
-team_setup_dem <- function(aoi_file, output_path, dem_extents, n_cpus=1, 
-                           overwrite=FALSE, crop_to_aoi=FALSE, aoi_buffer=0, 
-                           notify=print, verbose=FALSE) {
+team_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1, 
+                           overwrite=FALSE, crop_to_aoi=FALSE, notify=print, 
+                           verbose=FALSE) {
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
 
     timer <- Track_time(notify)
 
-    aoi <- readOGR(dirname(aoi_file), basename(file_path_sans_ext(aoi_file)))
-    aoi <- spTransform(aoi, CRS(utm_zone(aoi, proj4string=TRUE)))
-    if (aoi_buffer > 0) aoi <- gBuffer(aoi, width=aoi_buffer, byid=TRUE)
     pathrows <- pathrow_num(aoi, wrs_type=2, wrs_mode='D', as_polys=TRUE)
+    aoi_prproj <- spTransform(aoi, CRS(proj4string(pathrows)))
 
     timer <- start_timer(timer, label=paste('Processing DEMS for', nrow(pathrows), 
                                             'path/rows'))
 
-    writeOGR(pathrows, output_path, 
-             paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows'), 
-             driver='ESRI Shapefile', overwrite_layer=overwrite)
+    # writeOGR(pathrows, output_path, 
+    #          paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows'), 
+    #          driver='ESRI Shapefile', overwrite_layer=overwrite)
 
-    png(file.path(output_path, 
-        paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows.png')),
-        width=900, height=900)
-    plot(pathrows, lwd=2)
-    aoi_prproj <- spTransform(aoi, CRS(proj4string(pathrows)))
-    plot(aoi_prproj, add=TRUE, lty=2, col="#00ff0050", lwd=2)
-    text(coordinates(pathrows), labels=paste(pathrows$PATH, pathrows$ROW, 
-                                             sep=', '), cex=2)
-    dev.off()
+    # png(file.path(output_path, 
+    #     paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows.png')),
+    #     width=900, height=900)
+    # plot(pathrows, lwd=2)
+    # plot(aoi_prproj, add=TRUE, lty=2, col="#00ff0050", lwd=2)
+    # text(coordinates(pathrows), labels=paste(pathrows$PATH, pathrows$ROW, 
+    #                                          sep=', '), cex=2)
+    # dev.off()
 
     if (crop_to_aoi) {
         pathrows_cropped <- gIntersection(pathrows, aoi_prproj, byid=TRUE)
@@ -72,7 +68,7 @@ team_setup_dem <- function(aoi_file, output_path, dem_extents, n_cpus=1,
 
     # Add a 500 m buffer in UTM coordinate system, as 1) slope calculation 
     # requires a window of pixels, and 2) this buffer also helps avoid missing 
-    # pixels on the sides of the image due to slight misalignments from the 
+    # pixels on the sides of the DEM due to slight misalignments from the 
     # reprojection that will occur later. After buffering transform back to 
     # WGS84 to use for preliminary cropping of the dem mosaic. 
     pathrows_utm <- spTransform(pathrows,
@@ -125,13 +121,12 @@ team_setup_dem <- function(aoi_file, output_path, dem_extents, n_cpus=1,
 
         if (verbose) timer <- start_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
                                                 pathrow_label))
-        # The below lines construct to_ext as the extent the image will be 
+        # The below lines construct to_ext as the extent the DEM will be 
         # projected to. This extent must cover the same area as the 
         # dem_mosaic_crop, but must have the same resolution, CRS and origin as 
         # the pathrow
         if (crop_to_aoi) {
-            to_ext <- projectExtent(dem_mosaic_crop,
-                                    utm_zone(aoi, proj4string=TRUE))
+            to_ext <- projectExtent(dem_mosaic_crop, proj4string(aoi))
         } else {
             to_ext <- projectExtent(dem_mosaic_crop,
                                     utm_zone(pathrow, proj4string=TRUE))
