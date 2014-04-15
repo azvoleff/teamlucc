@@ -1,4 +1,4 @@
-context("raster scaling")
+context("raster_scaling")
 
 test_layer <- raster(L5TSR_1986, layer=1)
 test_stack <- stack(L5TSR_1986)

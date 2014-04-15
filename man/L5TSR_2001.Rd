@@ -5,7 +5,8 @@
 \description{
 Portion of Landsat 5 Surface Reflectance image from the
 Landsat Climate Data Record archive. This subset of the
-image includes only bands 1-4.
+image includes only bands 1-4, and pixel values have been
+scaled by 10000 and rounded off.
 }
 \seealso{
 L5TSR_1986

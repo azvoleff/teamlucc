@@ -16,7 +16,8 @@ NULL
 #' Landsat 5 Surface Reflectance Image from February 6, 1986 (path 15, row 53)
 #' 
 #' Portion of Landsat 5 Surface Reflectance image from the Landsat Climate Data 
-#' Record archive. This subset of the image includes only bands 1-4.
+#' Record archive. This subset of the image includes only bands 1-4, and pixel 
+#' values have been scaled by 10000 and rounded off.
 #'
 #' @docType data
 #' @name L5TSR_1986
@@ -25,7 +26,8 @@ NULL
 #' Landsat 5 Surface Reflectance Image from January 14, 2001 (path 15, row 53)
 #' 
 #' Portion of Landsat 5 Surface Reflectance image from the Landsat Climate Data 
-#' Record archive. This subset of the image includes only bands 1-4.
+#' Record archive. This subset of the image includes only bands 1-4, and pixel 
+#' values have been scaled by 10000 and rounded off.
 #'
 #' @docType data
 #' @name L5TSR_2001
