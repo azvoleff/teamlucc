@@ -5,7 +5,8 @@
 #' @importFrom tools file_path_sans_ext
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
-#' @param output_path the path to use for the output
+#' @param output_path the path to use for the output (optional - if NULL then 
+#' output images will be saved alongside the input images in the same folder).
 #' @param prefix string to use as a prefix for all filenames
 #' @param tc whether to topographically correct imagery
 #' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to 
@@ -137,8 +138,8 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
             to_proj4string <- proj4string(aoi)
         } else {
             to_proj4string <- utm_zone(pathrow_poly(as.numeric(WRS_Path), 
-                                                    as.numeric(WRS_Row), 
-                                                    proj4string=TRUE))
+                                                    as.numeric(WRS_Row)),
+                                                    proj4string=TRUE)
         }
         if (to_proj4string != proj4string(image_stack)) {
             image_stack <- projectRaster(image_stack, crs=CRS(to_proj4string))
