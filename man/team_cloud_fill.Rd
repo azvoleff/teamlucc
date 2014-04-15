@@ -3,8 +3,8 @@
 \title{Perform cloud fill for Landsat imagery}
 \usage{
 team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
-  base_date = NULL, fast = FALSE, n_cpus = 1, notify = print,
-  threshold = 1, max_iter = 5, ...)
+  base_date = NULL, fast = FALSE, tc = TRUE, threshold = 1,
+  max_iter = 5, n_cpus = 1, notify = print, ...)
 }
 \arguments{
   \item{data_dir}{folder where input images are located,
@@ -32,8 +32,13 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   script. If \code{FALSE}, use the CLOUD_REMOVE.pro
   script.}
 
-  \item{n_cpus}{the number of CPUs to use for processes
-  that can run in parallel}
+  \item{tc}{if \code{TRUE}, use topographically corrected
+  imagery as output by \code{team_preprocess_landsat}. IF
+  \code{FALSE} use bands 1-5 and 7 surface reflectance as
+  output by \code{unstack_ledaps} or
+  \code{team_preprocess_landsat} (if
+  \code{team_preprocess_landsat} was also run with
+  tc=FALSE).}
 
   \item{threshold}{maximum percent cloud cover allowable in
   base image (cloud fill iterate until percent cloud cover
@@ -42,6 +47,9 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
 
   \item{max_iter}{maximum number of times to run cloud fill
   script}
+
+  \item{n_cpus}{the number of CPUs to use for processes
+  that can run in parallel}
 
   \item{notify}{notifier to use (defaults to \code{print}
   function).  See the \code{notifyR} package for one way of

@@ -1,5 +1,7 @@
 pct_clouds <- function(cloud_mask) {
-    return(cellStats(cloud_mask == 1, stat='mean', na.rm=TRUE) * 100)
+    num_clouds <- cellStats(cloud_mask >= 1, stat='sum', na.rm=TRUE)
+    num_clear <- cellStats(cloud_mask == 0, stat='sum', na.rm=TRUE)
+    return((num_clouds / num_clear) * 100)
 }
 
 #' Perform cloud fill for Landsat imagery
@@ -26,12 +28,17 @@ pct_clouds <- function(cloud_mask) {
 #' then the base image will be the image with the lowest cloud cover.
 #' @param fast if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro script. If 
 #' \code{FALSE}, use the CLOUD_REMOVE.pro script.
-#' @param n_cpus the number of CPUs to use for processes that can run in 
-#' parallel
+#' @param tc if \code{TRUE}, use topographically corrected imagery as output by 
+#' \code{team_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface 
+#' reflectance as output by \code{unstack_ledaps} or 
+#' \code{team_preprocess_landsat} (if \code{team_preprocess_landsat} was also 
+#' run with tc=FALSE).
 #' @param threshold maximum percent cloud cover allowable in base image (cloud 
 #' fill iterate until percent cloud cover in base image is below this value) or 
 #' until more than \code{max_iter} iterations have been run
 #' @param max_iter maximum number of times to run cloud fill script
+#' @param n_cpus the number of CPUs to use for processes that can run in 
+#' parallel
 #' @param notify notifier to use (defaults to \code{print} function).  See the 
 #' \code{notifyR} package for one way of sending notifications from R.  The 
 #' \code{notify} function should accept a string as the only argument.
@@ -40,9 +47,9 @@ pct_clouds <- function(cloud_mask) {
 #' \code{verbose}, etc. See \code{\link{cloud_remove}}.
 #' @return \code{Raster*} object with cloud filled image.
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            base_date=NULL, fast=FALSE, n_cpus=1, 
-                            notify=print, threshold=1, 
-                            max_iter=5, ...) {
+                            base_date=NULL, fast=FALSE, tc=TRUE, threshold=1, 
+                            max_iter=5, n_cpus=1, notify=print, 
+                            ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
@@ -75,7 +82,11 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         masks_file <- dir(file.path(data_dir, img_dir), pattern='masks.envi$')
         this_mask <- raster(file.path(data_dir, img_dir, masks_file), band=2)
         masks <- c(masks, this_mask)
-        img_file <- dir(file.path(data_dir, img_dir), pattern='tc.envi$')
+        if (tc) {
+            img_file <- dir(file.path(data_dir, img_dir), pattern='tc.envi$')
+        } else {
+            img_file <- dir(file.path(data_dir, img_dir), pattern='_band[123457].envi$')
+        }
         this_img <- stack(file.path(data_dir, img_dir, img_file))
         imgs <- c(imgs, stack(this_img))
     }
@@ -147,9 +158,9 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         coded_cloud_mask[fill_img_mask] <- -1
         NAvalue(coded_cloud_mask) <- -2
 
-        filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
-        #filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, 
-        #                       use_IDL=FALSE, verbose=TRUE)
+        #filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
+        filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, 
+                               use_IDL=FALSE, verbose=TRUE)
 
         # Revise base mask to account for newly filled pixels
         base_mask[coded_cloud_mask >= 1] <- 0
