@@ -4,11 +4,30 @@ pct_clouds <- function(cloud_mask) {
     return((num_clouds / num_clear) * 100)
 }
 
-#' Perform cloud fill for Landsat imagery
+#' Automated removal of clouds using Xiaolin Zhu's NSPI algorithm
 #'
-#' Uses an R/C++ implementation of the NSPI algorithm from Xioalin Zhu. See 
-#' \code{\link{cloud_remove}} for details. In hilly areas, cloud fill should be 
-#' done after topographic correction.
+#' Uses the NSPI algorithm from Zhu et al. See \code{\link{cloud_remove}} for 
+#' details. In hilly areas, cloud fill should be done after topographic 
+#' correction.
+#'
+#' The \code{team_cloud_fill} function allows an analyst to automatically 
+#' construct a cloud-filled image after specifying: \code{data_dir} (a folder 
+#' of Landsat images), \code{wrspath} and \code{wrsrow\code{ (the WRS-2 
+#' path/row to use), and \code{start_date} and \code{end_date} (a start and end 
+#' date limiting the images to use in the algorithm).  The analyst can also 
+#' optionally specify a \code{base_date}, and the \code{team_cloud_fill} 
+#' function will automatically pick the image closest to that date to use as 
+#' the base image.
+#' 
+#' As the team_cloud_fill function automatically chooses images for inclusion 
+#' in the cloud fill process, it relies on having images stored on disk in a 
+#' particular way, and currently only supports cloud fill for Landsat CDR 
+#' surface reflectance images. To ensure that images are correctly stored on 
+#' your hard disk, use the \code{\link{team_preprocess_landsat}} function to 
+#' extract the original Landsat CDR hdf files from the USGS archive. The 
+#' \code{team_preprocess_landsat} function will ensure that images are 
+#' extracted and renamed properly so that they can be used with the 
+#' team_cloud_fill script.
 #'
 #' @export
 #' @importFrom spatial.tools sfQuickInit sfQuickStop
@@ -46,6 +65,11 @@ pct_clouds <- function(cloud_mask) {
 #' as \code{DN_min}, \code{DN_max}, \code{use_IDL}, \code{fast},
 #' \code{verbose}, etc. See \code{\link{cloud_remove}}.
 #' @return \code{Raster*} object with cloud filled image.
+#' @references
+#' Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified neighborhood similar 
+#' pixel interpolator approach for removing thick clouds in Landsat images.  
+#' Geoscience and Remote Sensing Letters, IEEE 9, 521--525. 
+#' doi:10.1109/LGRS.2011.2173290
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             base_date=NULL, fast=FALSE, tc=TRUE, threshold=1, 
                             max_iter=5, n_cpus=1, notify=print, 
