@@ -73,8 +73,8 @@ cloud fill should be done after topographic correction.
 The \code{team_cloud_fill} function allows an analyst to
 automatically construct a cloud-filled image after
 specifying: \code{data_dir} (a folder of Landsat images),
-\code{wrspath} and \code{wrsrow\code{ (the WRS-2 path/row
-to use), and \code{start_date} and \code{end_date} (a start
+\code{wrspath} and \code{wrsrow} (the WRS-2 path/row to
+use), and \code{start_date} and \code{end_date} (a start
 and end date limiting the images to use in the algorithm).
 The analyst can also optionally specify a \code{base_date},
 and the \code{team_cloud_fill} function will automatically
@@ -96,7 +96,7 @@ can be used with the team_cloud_fill script.
 \references{
 Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 neighborhood similar pixel interpolator approach for
-removing thick clouds in Landsat images. Geoscience and
+removing thick clouds in Landsat images.  Geoscience and
 Remote Sensing Letters, IEEE 9, 521--525.
 doi:10.1109/LGRS.2011.2173290
 }
