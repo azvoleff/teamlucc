@@ -11,7 +11,9 @@ team_preprocess_landsat(image_dirs, prefix, tc = FALSE, aoi = NULL,
   image files in ENVI format as output by the
   \code{unstack_ledapscdr} function.}
 
-  \item{output_path}{the path to use for the output}
+  \item{output_path}{the path to use for the output
+  (optional - if NULL then output images will be saved
+  alongside the input images in the same folder).}
 
   \item{prefix}{string to use as a prefix for all
   filenames}
