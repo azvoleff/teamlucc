@@ -22,7 +22,6 @@ espa_scenelist <- function(x, start_date, end_date, out_file, min_clear=.7,
     if (!class(end_date) == 'Date') {
         stop('end_date must be a "Date" object')
     }
-    x$Date.Acquired <- as.Date(as.character(x$Date.Acquired))
     if ((!missing(start_date) && missing(end_date)) ||
         (missing(start_date) && !missing(end_date))) {
         stop('both start_date and end_date must be provided')
@@ -33,9 +32,7 @@ espa_scenelist <- function(x, start_date, end_date, out_file, min_clear=.7,
     if (nrow(x) == 0) {
         stop('no data to plot - try different start/end dates')
     }
-    x$Sensor <- substr(x$Landsat.Scene.Identifier, 1, 3)
     x <- x[!(x$Sensor %in% exclude), ]
-    x$Frac_Clear <- (100 - x$Cloud.Cover) / 100
     x <- x[x$Frac_Clear >= min_clear, ]
     write.table(x$Landsat.Scene.Identifier, out_file, row.names=FALSE, 
                 col.names=FALSE, quote=FALSE, sep='\n')

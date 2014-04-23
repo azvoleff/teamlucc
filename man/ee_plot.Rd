@@ -22,8 +22,8 @@ ee_plot(x, start_date, end_date, min_clear = 0.7, exclude = list(),
   set \code{exclude=c('LE7', 'LT4')} to exclude Landsat 7
   ETM+ and Landsat 4 TM images.}
 
-  \item{normalize}{if \code{TRUE} plot as a normalized line
-  plot}
+  \item{normalize}{if \code{TRUE}, plot as a normalized
+  line plot}
 }
 \value{
 used for side effect of producing a plot

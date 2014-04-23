@@ -40,5 +40,9 @@ ee_read <- function(x) {
                     ' - is scenes an EarthExplorer CSV export?'))
     }
 
+    # Drop ENGINEERING, TEST, EXCHANGE, and VALIDATION data. See the Landsat 
+    # data dictionary at: https://lta.cr.usgs.gov/landsat_dictionary.html
+    scenes <- scenes[scenes$Data.Category == 'NOMINAL', ]
+
     return(scenes)
 }
