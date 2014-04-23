@@ -1,0 +1,22 @@
+\name{ee_read}
+\alias{ee_read}
+\title{Read EarthExplorer CSV format scene list}
+\usage{
+ee_read(x)
+}
+\arguments{
+  \item{x}{path to a CSV file with a list of Landsat scenes
+  as output from the save metadata function on
+  http://earthexplorer.usgs.gov}
+}
+\value{
+x a \code{data.frame} with a list of Landsat scenes and
+their associated metadata
+}
+\description{
+This function reads in a CSV file of Landsat CDR Surface
+Reflectance images as output from USGS EarthExplorer. param
+x a \code{data.frame} with a list of Landsat scenes as
+output from the save metadata function on
+}
+

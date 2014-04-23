@@ -1,13 +1,13 @@
 \name{ee_plot}
 \alias{ee_plot}
-\title{Plot EarthExplorer metadata file}
+\title{Plot EarthExplorer scene list}
 \usage{
-ee_plot(x, start_date, end_date, min_clear = 0.7, exclude = list())
+ee_plot(x, start_date, end_date, min_clear = 0.7, exclude = list(),
+  normalize = TRUE)
 }
 \arguments{
   \item{x}{a \code{data.frame} with a list of Landsat
-  scenes as output from the save metadata function on
-  http://earthexplorer.usgs.gov}
+  scenes as output by \code{\link{ee_read}}}
 
   \item{start_date}{starting date as a \code{Date} object}
 
@@ -29,6 +29,8 @@ ee_plot(x, start_date, end_date, min_clear = 0.7, exclude = list())
 used for side effect of producing a plot
 }
 \description{
-Plot EarthExplorer metadata file
+This function can produce two different types of plots from
+a USGS EarthExplorer Landsat CDR Surface Reflectance scene
+list.
 }
 

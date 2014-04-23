@@ -1,11 +1,14 @@
-#' Plot EarthExplorer metadata file
+#' Plot EarthExplorer scene list
+#'
+#' This function can produce two different types of plots from a USGS 
+#' EarthExplorer Landsat CDR Surface Reflectance scene list.
 #'
 #' @export
 #' @import ggplot2
 #' @importFrom plyr ddply .
 #' @importFrom lubridate new_interval %within%
-#' @param x a \code{data.frame} with a list of Landsat scenes as output from 
-#' the save metadata function on http://earthexplorer.usgs.gov
+#' @param x a \code{data.frame} with a list of Landsat scenes as output by
+#' \code{\link{ee_read}}
 #' @param start_date starting date as a \code{Date} object
 #' @param end_date end date as a \code{Date} object
 #' @param min_clear the minimum percent clear to plot (calculated as 1 - 
@@ -16,34 +19,17 @@
 #' images.
 #' @param normalize if \code{TRUE} plot as a normalized line plot
 #' @return used for side effect of producing a plot
-ee_plot <- function(x, start_date, end_date, min_clear=.7, exclude=list()) {
+ee_plot <- function(x, start_date, end_date, min_clear=.7, exclude=list(), 
+                    normalize=TRUE) {
     if (!class(start_date) == 'Date') {
         stop('start_date must be a "Date" object')
     }
     if (!class(end_date) == 'Date') {
         stop('end_date must be a "Date" object')
     }
-    x$Sensor <- substr(x$Landsat.Scene.Identifier, 1, 3)
     x <- x[!(x$Sensor %in% exclude), ]
     x$Sensor <- factor(x$Sensor)
 
-    # Dates are formatted as either: 1999/12/31 or 12/31/1999
-    yr_first <- grepl('^[0-9]{4}/', x$Date.Acquired)
-    yr_last <- grepl('/[0-9]{4}$', x$Date.Acquired)
-    if ((sum(yr_first) + sum(yr_last)) < nrow(x)) {
-        stop('unrecognized date format in Date.Acquired column')
-    }
-    acq_date <- as.Date(x$Date.Acquired)
-    acq_date[yr_first] <- as.Date(x$Date.Acquired[yr_first], '%Y/%m/%d')
-    acq_date[yr_last] <- as.Date(x$Date.Acquired[yr_last], '%m/%d/%Y')
-    x$Date.Acquired <- acq_date
-
-    x$Year <- as.numeric(format(x$Date.Acquired, '%Y'))
-    x$Month <- as.numeric(format(x$Date.Acquired, '%m')) - .5
-    x$MonthFactor <- factor(format(x$Date.Acquired, '%m'))
-    x$Path_Row <- factor(paste(x$WRS.Path, x$WRS.Row, sep='/'))
-    x$YearMonth <- paste(x$Year, x$MonthFactor, sep='/')
-    x$Frac_Clear <- (100 - x$Cloud.Cover) / 100
     x <- x[order(x$WRS.Path, x$WRS.Row), ]
     x <- x[x$Frac_Clear >= min_clear, ]
 
