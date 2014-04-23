@@ -3,7 +3,7 @@
 \title{Plot EarthExplorer scene list}
 \usage{
 ee_plot(x, start_date, end_date, min_clear = 0.7, exclude = list(),
-  normalize = TRUE)
+  normalize = FALSE)
 }
 \arguments{
   \item{x}{a \code{data.frame} with a list of Landsat

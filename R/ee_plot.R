@@ -17,10 +17,10 @@
 #' @param exclude a list of sensors to exclude (for example, set 
 #' \code{exclude=c('LE7', 'LT4')} to exclude Landsat 7 ETM+ and Landsat 4 TM 
 #' images.
-#' @param normalize if \code{TRUE} plot as a normalized line plot
+#' @param normalize if \code{TRUE}, plot as a normalized line plot
 #' @return used for side effect of producing a plot
 ee_plot <- function(x, start_date, end_date, min_clear=.7, exclude=list(), 
-                    normalize=TRUE) {
+                    normalize=FALSE) {
     if (!class(start_date) == 'Date') {
         stop('start_date must be a "Date" object')
     }
