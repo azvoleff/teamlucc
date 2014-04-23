@@ -99,7 +99,6 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
 # Wrapper around C++ cloud fill function, to enable calling the function with 
 # rasterEngine
 #' @import Rcpp
-#' @import RcppArmadillo
 cloud_fill_cpp_wrapper <- function(cloudy, clear, cloud_mask, num_class, 
                                    min_pixel, max_pixel, cloud_nbh, DN_min, 
                                    DN_max, verbose, ...) {
