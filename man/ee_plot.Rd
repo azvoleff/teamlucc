@@ -3,7 +3,7 @@
 \title{Plot EarthExplorer scene list}
 \usage{
 ee_plot(x, start_date, end_date, min_clear = 0.7, exclude = list(),
-  normalize = FALSE)
+  normalize = FALSE, title = NULL)
 }
 \arguments{
   \item{x}{a \code{data.frame} with a list of Landsat
@@ -24,6 +24,9 @@ ee_plot(x, start_date, end_date, min_clear = 0.7, exclude = list(),
 
   \item{normalize}{if \code{TRUE}, plot as a normalized
   line plot}
+
+  \item{title}{title for plot (or \code{NULL} for no
+  title)}
 }
 \value{
 used for side effect of producing a plot

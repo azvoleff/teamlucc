@@ -18,9 +18,10 @@
 #' \code{exclude=c('LE7', 'LT4')} to exclude Landsat 7 ETM+ and Landsat 4 TM 
 #' images.
 #' @param normalize if \code{TRUE}, plot as a normalized line plot
+#' @param title title for plot (or \code{NULL} for no title)
 #' @return used for side effect of producing a plot
 ee_plot <- function(x, start_date, end_date, min_clear=.7, exclude=list(), 
-                    normalize=FALSE) {
+                    normalize=FALSE, title=NULL) {
     if (!class(start_date) == 'Date') {
         stop('start_date must be a "Date" object')
     }
@@ -92,6 +93,10 @@ ee_plot <- function(x, start_date, end_date, min_clear=.7, exclude=list(),
             theme(axis.ticks.y=element_blank(),
                   axis.text.y=element_blank()) +
             geom_hline(yintercept=seq(1,length(unique(x$Path_Row))), colour='white', linetype='dashed')
+    }
+
+    if (!is.null(title)) {
+        p <- p + ggtitle(title)
     }
 
     return(p)
