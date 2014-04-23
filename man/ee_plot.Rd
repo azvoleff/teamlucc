@@ -1,8 +1,8 @@
-\name{plot_ee_norm}
-\alias{plot_ee_norm}
-\title{Plot EarthExplorer metadata file as a line plot}
+\name{ee_plot}
+\alias{ee_plot}
+\title{Plot EarthExplorer metadata file}
 \usage{
-plot_ee_norm(x, start_date, end_date, min_clear = 0.7, exclude = list())
+ee_plot(x, start_date, end_date, min_clear = 0.7, exclude = list())
 }
 \arguments{
   \item{x}{a \code{data.frame} with a list of Landsat
@@ -21,11 +21,14 @@ plot_ee_norm(x, start_date, end_date, min_clear = 0.7, exclude = list())
   \item{exclude}{a list of sensors to exclude (for example,
   set \code{exclude=c('LE7', 'LT4')} to exclude Landsat 7
   ETM+ and Landsat 4 TM images.}
+
+  \item{normalize}{if \code{TRUE} plot as a normalized line
+  plot}
 }
 \value{
 used for side effect of producing a plot
 }
 \description{
-Plot EarthExplorer metadata file as a line plot
+Plot EarthExplorer metadata file
 }
 
