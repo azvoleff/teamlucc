@@ -132,8 +132,6 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
         # Reproject images to match the projection being used for this image.  
         # This is either the projection of aoi (if aoi is supplied), or the UTM 
         # zone of the centroid of this path and row.
-        if (verbose) timer <- start_timer(timer,
-                                          label=paste(image_basename, '- reproject'))
         if (!is.null(aoi)) {
             to_proj4string <- proj4string(aoi)
         } else {
@@ -141,12 +139,16 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
                                                     as.numeric(WRS_Row)),
                                                     proj4string=TRUE)
         }
-        if (to_proj4string != proj4string(image_stack)) {
+        if (!proj4comp(to_proj4string, proj4string(image_stack))) {
+            if (verbose) timer <- start_timer(timer,
+                                              label=paste(image_basename, '- reproject'))
             image_stack <- projectRaster(image_stack, crs=CRS(to_proj4string))
             mask_stack <- projectRaster(mask_stack, crs=CRS(to_proj4string), method='ngb')
+            if (verbose) timer <- stop_timer(timer,
+                                             label=paste(image_basename, '- reproject'))
+        } else {
+            proj4string(image_stack) <- to_proj4string
         }
-        if (verbose) timer <- stop_timer(timer,
-                                         label=paste(image_basename, '- reproject'))
 
         ######################################################################
         # Mask out clouds and missing values
@@ -186,7 +188,7 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
                                                             '-', 'masking'))
 
         ######################################################################
-        # Perform topographic correction
+        # Perform topographic correction if tc=TRUE
         if (tc) {
             if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
                                                                  '-', 'topocorr'))
@@ -228,23 +230,30 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
                                      raster(slopeaspect, layer=2) / 1000)
             sunelev <- 90 - as.numeric(get_metadata_item(band1_imagefile, 'SolarZenith'))
             sunazimuth <- as.numeric(get_metadata_item(band1_imagefile, 'SolarAzimuth'))
-            topocorr_filename <- file.path(this_output_path,
-                                           paste(prefix, image_basename, 
-                                                 'tc.envi', sep='_'))
+            output_filename <- file.path(this_output_path,
+                                         paste(prefix, image_basename, 
+                                               'tc.envi', sep='_'))
             image_stack <- topographic_corr(image_stack, slopeaspect_flt, sunelev, 
                                             sunazimuth, method='minnaert_full', 
                                             asinteger=TRUE, 
                                             sampleindices=sampleindices)
-            image_stack <- writeRaster(image_stack, filename=topocorr_filename, 
-                                       overwrite=overwrite, datatype='INT2S')
             if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                                 '-', 'topocorr'))
 
-            timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
-
-            if (cleartmp) removeTmpFiles(h=1)
-            if (n_cpus > 1) endCluster()
+        } else {
+            # Skip topographic correction, so don't append _tc to filename
+            output_filename <- file.path(this_output_path,
+                                         paste0(prefix, '_', image_basename, 
+                                                '.envi'))
         }
+
+        image_stack <- writeRaster(image_stack, filename=output_filename, 
+                                   overwrite=overwrite, datatype='INT2S')
+
+        timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
+
+        if (cleartmp) removeTmpFiles(h=1)
+        if (n_cpus > 1) endCluster()
     }
 
     timer <- stop_timer(timer, label='Preprocessing images')
