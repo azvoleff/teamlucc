@@ -65,10 +65,22 @@ espa_download <- function(email, order_ID, output_folder) {
         stop(paste(email, 'does not appear to be a valid email address'))
     }
     # Below is for old format ESPA order IDs (through end of 2013)
-    #if (!grepl('^[0-9]{13}$', order_ID)) {
-    if (!grepl('^[0-9]{6}-[0-9]{5,6}$', order_ID)) {
+    # ESPA generates order IDs with below Python code:
+    #    d = datetime.datetime.now()
+    #    return '%s-%s%s%s-%s%s%s' % (email,d.month,d.day,d.year,d.hour,d.minute,d.second)
+    # Note that the above does not guarantee unique ESPA order IDs. See
+    # https://code.google.com/p/espa/issues/detail?id=123 for details.
+    mth_re <- '([1-9]|(1[0-2]))'
+    day_re <- '([1-9]|([1-2][0-9])|(3[0-1]))'
+    yr_re  <- '20[0-9][0-9]'
+    hr_re  <- '([0-9]|(1[0-9])|(2[0-3]))'
+    min_re <- '([0-9]|([1-5][0-9]))'
+    sec_re <- '([0-9]|([1-5][0-9]))'
+    order_id_re <- paste0('^', mth_re, day_re, yr_re, '-',  hr_re, min_re, sec_re, '$')
+    if (!grepl(order_id_re, order_ID)) {
         stop(paste(order_ID, 'does not appear to be a valid ESPA order ID'))
     }
+    
     if (!file_test('-d', output_folder)) {
         stop(paste(output_folder, 'does not appear to be a valid directory'))
     }
