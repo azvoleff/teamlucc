@@ -1,4 +1,4 @@
-# teamlucc (used to be named "teamr")
+# teamlucc
 
 [![Build Status](https://travis-ci.org/azvoleff/teamlucc.png)](https://travis-ci.org/azvoleff/teamlucc)
 
@@ -78,7 +78,7 @@ install an updated version of the package.
 
 *NOTE:* If you are installing on Windows, you will first need to install the 
 appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
-for your version of R (as `teamr` contains C++ code).
+for your version of R (as `teamlucc` contains C++ code).
 
 ### (optional) Install IDL
 [IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) is required for 
