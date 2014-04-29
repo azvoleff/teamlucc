@@ -45,8 +45,6 @@ pct_clouds <- function(cloud_mask) {
 #' @param base_date ideal date for base image (base image will be chosen as the 
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
-#' @param fast if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro script. If 
-#' \code{FALSE}, use the CLOUD_REMOVE.pro script.
 #' @param tc if \code{TRUE}, use topographically corrected imagery as output by 
 #' \code{team_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface 
 #' reflectance as output by \code{unstack_ledaps} or 
@@ -71,9 +69,8 @@ pct_clouds <- function(cloud_mask) {
 #' in Landsat images.  Geoscience and Remote Sensing Letters, IEEE 9, 521--525.  
 #' doi:10.1109/LGRS.2011.2173290
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            base_date=NULL, fast=FALSE, tc=TRUE, threshold=1, 
-                            max_iter=5, n_cpus=1, notify=print, verbose=TRUE,
-                            ...) {
+                            base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
+                            n_cpus=1, notify=print, verbose=TRUE, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
@@ -100,7 +97,7 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                            (img_dates < end_date)]
 
     if (length(img_dates) == 0) {
-        stop('No images found - date_dir, check wrspath, wrsrow, start_date, and end_date')
+        stop('no images found - check date_dir, check wrspath, wrsrow, start_date, and end_date')
     } else if (length(img_dates) <= 2) {
         stop(paste('Only', length(img_dates),
                    'image(s) found. Need at least two images to perform cloud fill'))
@@ -124,6 +121,9 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             img_file <- dir(file.path(data_dir, img_dir), pattern='tc.envi$')
         } else {
             img_file <- dir(file.path(data_dir, img_dir), pattern='((L[45]T)|(L[78]E))SR.envi$')
+        }
+        if (length(img_file) == 0) {
+            stop(paste('no image file found in', file.path(data_dir, img_dir)))
         }
         this_img <- stack(file.path(data_dir, img_dir, img_file))
         imgs <- c(imgs, stack(this_img))

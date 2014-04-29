@@ -41,9 +41,11 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     if (fast) {
         script_path <- system.file("idl", "CLOUD_REMOVE_FAST.pro", 
                                    package="teamlucc")
+        function_name <- 'CLOUD_REMOVE_FAST'
     } else {
         script_path <- system.file("idl", "CLOUD_REMOVE.pro", 
                                    package="teamlucc")
+        function_name <- 'CLOUD_REMOVE'
     }
     
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
@@ -78,7 +80,7 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
 
     script_dir <- dirname(script_path)
     idl_script <- tempfile(fileext='.pro')
-    idl_cmd <- paste0('CD, "', script_dir, '"\n', idl_params, 'CLOUD_REMOVE,', 
+    idl_cmd <- paste0('CD, "', script_dir, '"\n', idl_params, function_name, ',', 
                       paste(param_names, collapse=','), '\nexit')
 
     f <- file(idl_script, 'wt')
