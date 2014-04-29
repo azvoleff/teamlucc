@@ -4,7 +4,7 @@
 \usage{
 team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   base_date = NULL, fast = FALSE, tc = TRUE, threshold = 1,
-  max_iter = 5, n_cpus = 1, notify = print, ...)
+  max_iter = 5, n_cpus = 1, notify = print, verbose = TRUE, ...)
 }
 \arguments{
   \item{data_dir}{folder where input images are located,
@@ -55,6 +55,8 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   function).  See the \code{notifyR} package for one way of
   sending notifications from R.  The \code{notify} function
   should accept a string as the only argument.}
+
+  \item{verbose}{whether to print detailed status messages}
 
   \item{...}{additional arguments passed to
   \code{\link{cloud_remove}}, such as \code{DN_min},

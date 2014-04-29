@@ -61,6 +61,7 @@ pct_clouds <- function(cloud_mask) {
 #' @param notify notifier to use (defaults to \code{print} function).  See the 
 #' \code{notifyR} package for one way of sending notifications from R.  The 
 #' \code{notify} function should accept a string as the only argument.
+#' @param verbose whether to print detailed status messages
 #' @param ... additional arguments passed to \code{\link{cloud_remove}}, such 
 #' as \code{DN_min}, \code{DN_max}, \code{use_IDL}, \code{fast},
 #' \code{verbose}, etc. See \code{\link{cloud_remove}}.
@@ -71,7 +72,7 @@ pct_clouds <- function(cloud_mask) {
 #' doi:10.1109/LGRS.2011.2173290
 team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             base_date=NULL, fast=FALSE, tc=TRUE, threshold=1, 
-                            max_iter=5, n_cpus=1, notify=print, 
+                            max_iter=5, n_cpus=1, notify=print, verbose=TRUE,
                             ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
@@ -98,6 +99,20 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     img_dates <- img_dates[(img_dates >= start_date) &
                            (img_dates < end_date)]
 
+    if (length(img_dates) == 0) {
+        stop('No images found - date_dir, check wrspath, wrsrow, start_date, and end_date')
+    } else if (length(img_dates) <= 2) {
+        stop(paste('Only', length(img_dates),
+                   'image(s) found. Need at least two images to perform cloud fill'))
+    }
+
+    if (verbose) {
+        notify(paste('Found', length(img_dates), 'image(s)'))
+    }
+
+    if (verbose) {
+        timer <- start_timer(timer, label='Analyzing cloud cover in input images')
+    }
     # Run QA stats
     masks <- list()
     imgs <- list()
@@ -116,6 +131,10 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     freq_table <- freq(stack(masks), useNA='no', merge=TRUE)
     # Convert frequency table to fractions
     freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
+
+    if (verbose) {
+        timer <- stop_timer(timer, label='Analyzing cloud cover in input images')
+    }
 
     # Find image that is either closest to base date, or has the maximum 
     # percent clear
@@ -147,11 +166,22 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     base_mask <- masks[[base_img_index]]
     masks <- masks[-base_img_index]
 
+    base_img_date <- img_dates[base_img_index]
+    img_dates <- img_dates[-base_img_index]
+
     # Save base_img in filled so it will be returned if base_img already has 
     # pct_clouds below threshold
     filled <- base_img
     n <- 0
-    while ((pct_clouds(base_mask) > threshold) & (n < max_iter)) {
+    cur_pct_clouds <- pct_clouds(base_mask)
+    if (verbose) {
+        notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover before fill'))
+    }
+    while ((cur_pct_clouds > threshold) & (n < max_iter)) {
+        if (verbose) {
+            timer <- start_timer(timer, label=paste('Fill iteration', n))
+        }
+
         # Calculate a raster indicating the pixels in each potential fill image 
         # that are available for filling pixels of base_img that are missing 
         # due to cloud contamination. Areas coded 1 are missing due to cloud or 
@@ -174,6 +204,9 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         fill_img_mask <- masks[[fill_img_index]]
         masks <- masks[-fill_img_index]
 
+        fill_img_date <- img_dates[fill_img_index]
+        img_dates <- img_dates[-fill_img_index]
+
         # Add numbered IDs to the cloud patches
         coded_cloud_mask <- ConnCompLabel(cloud_mask)
 
@@ -181,14 +214,28 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         coded_cloud_mask[fill_img_mask] <- -1
         NAvalue(coded_cloud_mask) <- -2
 
+        if (verbose) {
+            notify(paste0('Filling image from ', base_img_date,
+                          ' with image from ', fill_img_date, '...'))
+        }
         #filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
         filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, 
-                               use_IDL=FALSE, verbose=TRUE)
+                               verbose=verbose, ...)
+        if (verbose) {
+            notify('Fill complete.')
+        }
 
         # Revise base mask to account for newly filled pixels
         base_mask[coded_cloud_mask >= 1] <- 0
 
         max_iter <- max_iter + 1
+
+        cur_pct_clouds <- pct_clouds(base_mask)
+
+        if (verbose) {
+            notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover remaining'))
+            timer <- stop_timer(timer, label=paste('Fill iteration', n))
+        }
     }
 
     timer <- stop_timer(timer, label='Cloud fill')

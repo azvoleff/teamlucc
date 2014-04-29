@@ -5,9 +5,9 @@
 proj4comp(x, y)
 }
 \arguments{
-  \item{x}{}
+  \item{x}{a proj4string to compare with \code{y}}
 
-  \item{y}{}
+  \item{y}{a proj4string to compare with \code{x}}
 }
 \value{
 TRUE or FALSE depending on if the projections match

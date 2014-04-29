@@ -36,7 +36,7 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              cloud_nbh, DN_min, DN_max, 
                              verbose, idl, patch_long=1000, ...) {
     if (verbose) {
-        stop("verbose=TRUE not supported when use_IDL=FALSE")
+        warning("verbose=TRUE not supported when use_IDL=TRUE")
     }
     if (fast) {
         script_path <- system.file("idl", "CLOUD_REMOVE_FAST.pro", 
@@ -55,9 +55,9 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     # temporarily reset.
     dummy <- capture.output(def_format <- rasterOptions()$format)
     rasterOptions(format='ENVI')
-    cloudy <- writeRaster(cloudy, rasterTmpFile(), datatype=dataType(cloudy))
-    clear <- writeRaster(clear, rasterTmpFile(), datatype=dataType(clear))
-    cloud_mask <- writeRaster(cloud_mask, rasterTmpFile(), datatype=dataType(cloud_mask))
+    cloudy <- writeRaster(cloudy, rasterTmpFile(), datatype=dataType(cloudy)[1])
+    clear <- writeRaster(clear, rasterTmpFile(), datatype=dataType(clear)[1])
+    cloud_mask <- writeRaster(cloud_mask, rasterTmpFile(), datatype=dataType(cloud_mask)[1])
     cloudy_file <- filename(cloudy)
     clear_file <- filename(clear)
     cloud_mask_file <- filename(cloud_mask)
@@ -121,10 +121,10 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
                            num_class, min_pixel, max_pixel, cloud_nbh, DN_min, 
                            DN_max, verbose, ...) {
     if (fast) {
-        stop("fast=TRUE not yet supported when use_IDL=TRUE")
+        stop("fast=TRUE not yet supported when use_IDL=FALSE")
     }
 
-    warning("*** use_IDL=TRUE is still experimental - use results with caution ***")
+    warning("*** use_IDL=FALSE is still experimental - use results with caution ***")
 
     # bs <- blockSize(cloudy)
     # out <- brick(cloudy, values=FALSE)

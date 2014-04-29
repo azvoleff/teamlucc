@@ -7,8 +7,8 @@
 #'
 #' @export
 #' @importFrom stringr str_extract
-#' @param x
-#' @param y
+#' @param x a proj4string to compare with \code{y}
+#' @param y a proj4string to compare with \code{x}
 #' @return TRUE or FALSE depending on if the projections match
 proj4comp <- function(x, y) {
     if (grepl('+init=', x)) {
