@@ -123,7 +123,7 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         if (tc) {
             img_file <- dir(file.path(data_dir, img_dir), pattern='tc.envi$')
         } else {
-            img_file <- dir(file.path(data_dir, img_dir), pattern='_band[123457].envi$')
+            img_file <- dir(file.path(data_dir, img_dir), pattern='((L[45]T)|(L[78]E))SR.envi$')
         }
         this_img <- stack(file.path(data_dir, img_dir, img_file))
         imgs <- c(imgs, stack(this_img))
