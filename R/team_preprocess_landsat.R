@@ -1,6 +1,7 @@
 #' Preprocess surface reflectance imagery from the Landsat CDR archive
 #'
 #' @export
+#' @importFrom rgeos gIntersection
 #' @importFrom wrspathrow pathrow_poly
 #' @importFrom tools file_path_sans_ext
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
@@ -132,12 +133,12 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
         # Reproject images to match the projection being used for this image.  
         # This is either the projection of aoi (if aoi is supplied), or the UTM 
         # zone of the centroid of this path and row.
+        this_pathrow_poly <- pathrow_poly(as.numeric(WRS_Path), 
+                                          as.numeric(WRS_Row))
         if (!is.null(aoi)) {
             to_proj4string <- proj4string(aoi)
         } else {
-            to_proj4string <- utm_zone(pathrow_poly(as.numeric(WRS_Path), 
-                                                    as.numeric(WRS_Row)),
-                                                    proj4string=TRUE)
+            to_proj4string <- utm_zone(this_pathrow_poly, proj4string=TRUE)
         }
         if (!proj4comp(to_proj4string, proj4string(image_stack))) {
             if (verbose) timer <- start_timer(timer,
@@ -148,7 +149,34 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
                                              label=paste(image_basename, '- reproject'))
         } else {
             proj4string(image_stack) <- to_proj4string
+            proj4string(mask_stack) <- to_proj4string
         }
+
+        ######################################################################
+        # Crop image as necessary
+        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
+                                                            '-', 'cropping'))
+        # Note that the image_stack may have been reprojected to match the 
+        # projection system of the AOI. Ensure the pathrow_poly projection 
+        # system still matches:
+        this_pathrow_poly <- spTransform(this_pathrow_poly, 
+                                         CRS(proj4string(image_stack)))
+
+        if (!is.null(aoi)) {
+            # If an aoi IS supplied, match the image extent to that of the AOI 
+            # cropped to the appropriate Landsat path/row polygon.
+            crop_area <- gIntersection(this_pathrow_poly, aoi, byid=TRUE)
+        } else {
+            # If an aoi IS NOT supplied, match the image extent to the 
+            # appropriate Landsat path/row polygon.
+            crop_area <- this_pathrow_poly
+        }
+        image_stack <- crop(image_stack, crop_area)
+        image_stack <- extend(image_stack, crop_area)
+        mask_stack <- crop(mask_stack, crop_area)
+        mask_stack <- extend(mask_stack, crop_area)
+        if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
+                                                            '-', 'cropping'))
 
         ######################################################################
         # Mask out clouds and missing values
@@ -175,7 +203,6 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
             fun=function(fmask, fill) {
                 ((fmask == 0) | (fmask == 1)) & (fill == 0)
                 })
-
         image_stack <- mask(image_stack, image_stack_mask, maskvalue=0)
 
         mask_stack_path <- file.path(this_output_path,
