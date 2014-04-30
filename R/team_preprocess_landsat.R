@@ -196,8 +196,8 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
         # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, while 
         # good pixels are coded as 1.
         image_stack_mask_path <- file.path(this_output_path,
-                                          paste(prefix, image_basename, 
-                                                'mask.envi', sep='_'))
+                                           paste(prefix, image_basename, 
+                                                 'mask.envi', sep='_'))
         # fmask_band key:
         # 	0 = clear
         # 	1 = water
