@@ -3,12 +3,12 @@ citHeader("To cite teamlucc in publications use:")
 citEntry(entry = "Manual",
   title        = "Tropical Ecology Assessment and Monitoring Team {R} Analysis Toolkit: The {teamlucc} Package",
   author       = personList(as.person("Alex Zvoleff")),
-  year         = "2013",
+  year         = "2014",
   url          = "http://github.com/azvoleff/teamlucc/",
 
   textVersion  =
   paste("Alex Zvoleff (2013).",
-        "Tropical Ecology Assessment and Monitoring Network {R} Analysis Toolkit: The {teamlucc} Package.",
+        "Tropical Ecology Assessment and Monitoring Network Land Use and Cover Change Analysis Toolkit: The {teamlucc} Package.",
         "URL http://github.com/azvoleff/teamlucc/.")
 )
 
