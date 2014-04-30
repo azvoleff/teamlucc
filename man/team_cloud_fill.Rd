@@ -3,8 +3,8 @@
 \title{Automated removal of clouds using Xiaolin Zhu's NSPI algorithm}
 \usage{
 team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
-  base_date = NULL, fast = FALSE, tc = TRUE, threshold = 1,
-  max_iter = 5, n_cpus = 1, notify = print, verbose = TRUE, ...)
+  base_date = NULL, tc = TRUE, threshold = 1, max_iter = 5,
+  n_cpus = 1, notify = print, verbose = TRUE, ...)
 }
 \arguments{
   \item{data_dir}{folder where input images are located,
@@ -27,10 +27,6 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   will be chosen as the image among the available images
   that is closest to this date). If NULL, then the base
   image will be the image with the lowest cloud cover.}
-
-  \item{fast}{if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro
-  script. If \code{FALSE}, use the CLOUD_REMOVE.pro
-  script.}
 
   \item{tc}{if \code{TRUE}, use topographically corrected
   imagery as output by \code{team_preprocess_landsat}. IF
