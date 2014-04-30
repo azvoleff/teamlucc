@@ -35,7 +35,9 @@ pct_clouds <- function(cloud_mask) {
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
 #' @param data_dir folder where input images are located, with filenames as 
-#' output by the \code{\link{team_preprocess_landsat}} function
+#' output by the \code{\link{team_preprocess_landsat}} function. This folder 
+#' will be searched recursively for images (taking the below path/row, date, 
+#' and topographic correction options into account).
 #' @param wrspath World Reference System (WRS) path
 #' @param wrsrow World Reference System (WRS) row
 #' @param start_date start date of period from which images will be chosen to 
@@ -82,56 +84,53 @@ team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     wrspath <- sprintf('%03i', wrspath)
     wrsrow <- sprintf('%03i', wrsrow)
 
-    # Find image folders based on start and end dates
-    date_regex <- '[12][8901][0-9]{2}-[123]?[0-9]{2}'
-    img_dirs <- dir(data_dir,
-                    pattern=paste0('^', wrspath, '-', wrsrow, '_', date_regex, 
-                                   '_((LT[45])|(LE[78]))'))
+    # Find image files based on start and end dates
+    prefix_re <- "^([a-zA-Z]*_)?"
+    #pathrow_re <-"[012][0-9]{2}-[012][0-9]{2}"
+    pathrow_re <- paste(wrspath, wrsrow, sep='-')
+    date_re <-"((19)|(2[01]))[0-9]{2}-[0123][0-9]{2}"
+    sensor_re <-"((L[45]T)|(L[78]E))SR"
+    if (tc) {
+        suffix_re <- '_tc.envi$'
+    } else {
+        suffix_re <- '.envi$'
+    }
+    file_re <- paste0(prefix_re, paste(pathrow_re, date_re, sensor_re, 
+                                       sep='_'), suffix_re)
+    img_files <- dir(data_dir, pattern=file_re, recursive=TRUE)
 
-    img_dates <- str_extract(img_dirs, date_regex)
+    img_dates <- str_extract(basename(img_files), date_re)
     img_dates <- as.Date(img_dates, '%Y-%j')
 
-    img_dirs <- img_dirs[(img_dates >= start_date) &
-                             (img_dates < end_date)]
-    img_dates <- img_dates[(img_dates >= start_date) &
-                           (img_dates < end_date)]
+    which_files <- which((img_dates >= start_date) &
+                          (img_dates < end_date))
+    img_dates <- img_dates[which_files]
+    img_files <- file.path(data_dir, img_files[which_files])
 
-    if (length(img_dates) == 0) {
+    if (length(img_files) == 0) {
         stop('no images found - check date_dir, check wrspath, wrsrow, start_date, and end_date')
-    } else if (length(img_dates) <= 2) {
-        stop(paste('Only', length(img_dates),
+    } else if (length(img_files) <= 2) {
+        stop(paste('Only', length(img_files),
                    'image(s) found. Need at least two images to perform cloud fill'))
     }
 
     if (verbose) {
-        notify(paste('Found', length(img_dates), 'image(s)'))
-    }
-
-    if (verbose) {
+        notify(paste('Found', length(img_files), 'image(s)'))
         timer <- start_timer(timer, label='Analyzing cloud cover in input images')
     }
     # Run QA stats
     masks <- list()
     imgs <- list()
-    for (img_dir in img_dirs) {
-        masks_file <- dir(file.path(data_dir, img_dir), pattern='masks.envi$')
-        this_mask <- raster(file.path(data_dir, img_dir, masks_file), band=2)
+    for (img_file in img_files) {
+        masks_file <- gsub(suffix_re, '_masks.envi', img_file)
+        this_mask <- raster(masks_file, band=2)
         masks <- c(masks, this_mask)
-        if (tc) {
-            img_file <- dir(file.path(data_dir, img_dir), pattern='tc.envi$')
-        } else {
-            img_file <- dir(file.path(data_dir, img_dir), pattern='((L[45]T)|(L[78]E))SR.envi$')
-        }
-        if (length(img_file) == 0) {
-            stop(paste('no image file found in', file.path(data_dir, img_dir)))
-        }
-        this_img <- stack(file.path(data_dir, img_dir, img_file))
+        this_img <- stack(img_file)
         imgs <- c(imgs, stack(this_img))
     }
     freq_table <- freq(stack(masks), useNA='no', merge=TRUE)
     # Convert frequency table to fractions
     freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
-
     if (verbose) {
         timer <- stop_timer(timer, label='Analyzing cloud cover in input images')
     }

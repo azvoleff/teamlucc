@@ -9,7 +9,10 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
 \arguments{
   \item{data_dir}{folder where input images are located,
   with filenames as output by the
-  \code{\link{team_preprocess_landsat}} function}
+  \code{\link{team_preprocess_landsat}} function. This
+  folder will be searched recursively for images (taking
+  the below path/row, date, and topographic correction
+  options into account).}
 
   \item{wrspath}{World Reference System (WRS) path}
 
