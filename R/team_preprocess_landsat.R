@@ -1,19 +1,20 @@
 #' Preprocess surface reflectance imagery from the Landsat CDR archive
 #'
 #' This function preprocesses surface reflectance imagery from the Landsat 
-#' Climate Data Record (CDR) archive. This function can reproject CDR tiles to 
-#' match the projection of a given \code{aoi}, crop the tiles to match the 
-#' \code{aoi} or a common WRS-2 path/row polygon, mask missing data and clouds 
-#' out of the CDR tiles, and perform topographic correction.
+#' Climate Data Record (CDR) archive. \code{team_preprocess_landsat} can 
+#' reproject CDR tiles to match the projection of a given \code{aoi}, crop the 
+#' tiles to match the \code{aoi} or a common WRS-2 path/row polygon, mask 
+#' missing data and clouds out of the CDR tiles, and perform topographic 
+#' correction.
 #'
 #' Prior to running \code{team_preprocess_landsat}, the 
-#' \code{\link{pespa_extract}} and should be used to extract the original 
-#' zipfiles supplied by USGS.  The \code{\link{unstack_ledapscdr}} function 
-#' should then be used to unstack the HDF format files and convert them into 
-#' ENVI binary format. To perform topographic correction with 
-#' \code{team_preprocess_landsat}, first run the \code{\link{team_setup_dem}} 
-#' function to preprocess a set of DEM tiles. Then run 
-#' \code{team_preprocess_landsat} with the \code{tc=TRUE} option.
+#' \code{\link{espa_extract}} and should be used to extract the original 
+#' zipfiles supplied by USGS.  \code{\link{unstack_ledapscdr}} should then be 
+#' used to unstack the HDF format files and convert them into ENVI binary 
+#' format. To perform topographic correction with 
+#' \code{team_preprocess_landsat}, first run \code{\link{team_setup_dem}} to 
+#' preprocess a set of DEM tiles. Then run \code{team_preprocess_landsat} with 
+#' the \code{tc=TRUE} option.
 #' @export
 #' @importFrom rgeos gIntersection
 #' @importFrom wrspathrow pathrow_poly
@@ -38,7 +39,7 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages and timing 
 #' information
-#' @seealso \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}, 
+#' @seealso \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}}, 
 #' \code{\link{team_setup_dem}}
 team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
                                     dem_path=NULL, output_path=NULL, n_cpus=1, 
