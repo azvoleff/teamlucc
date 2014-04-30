@@ -153,9 +153,10 @@ team_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         dem_mosaic_filename <- file.path(output_path,
                                          paste0('dem_', pathrow_label, 
                                                 '.envi'))
-        dem_mosaic_crop <- crop(dem_mosaic_crop, crop_area,
-                                filename=dem_mosaic_filename, 
-                                overwrite=overwrite, datatype='INT2S')
+        dem_mosaic_crop <- crop(dem_mosaic_crop, crop_area, datatype='INT2S')
+        dem_mosaic_crop <- extend(dem_mosaic_crop, crop_area,
+                                  filename=dem_mosaic_filename, 
+                                  overwrite=overwrite, datatype='INT2S')
         if (verbose) timer <- stop_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
                                                pathrow_label))
 
