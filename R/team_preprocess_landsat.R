@@ -231,19 +231,19 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
 
             ######################################################################
             # Load dem, slope, and aspect
-            dem_filename <- file.path(dem_path, paste0('dem_', WRS_Path, '-', WRS_Row, 
-                                                       '.envi'))
-            dem <- raster(dem_filename)
-
             slopeaspect_filename <- file.path(dem_path,
                                               paste0('slopeaspect_', 
                                                      WRS_Path, '-', WRS_Row, '.envi'))
             slopeaspect <- brick(slopeaspect_filename)
 
-            if (proj4string(image_stack) != proj4string(slopeaspect)) {
+            if (!proj4comp(proj4string(image_stack), proj4string(slopeaspect))) {
                 stop(paste0('slopeaspect and image_stack projections do not match.\nslopeaspect proj4string: ', 
                             proj4string(slopeaspect), '\nimage_stack proj4string: ',
                             proj4string(image_stack)))
+            } else {
+                # Projection strings are functionally identical - so make sure 
+                # their textual representations are the same.
+                proj4string(slopeaspect) <- proj4string(image_stack)
             }
 
             if (ncell(image_stack) > 400000) {
