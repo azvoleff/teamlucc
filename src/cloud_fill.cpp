@@ -116,7 +116,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
 
         if (verbose) Rcpp::Rcout << " (" << sub_cloud_vec_i.n_elem <<  " pixels)" << std::endl;
         // ic is the current index within the sub_cloud_vec_i vector
-        for(unsigned ic=0; ic < sub_cloud_vec_i.n_elem; ic++) {
+        for (unsigned ic=0; ic < sub_cloud_vec_i.n_elem; ic++) {
             if (verbose & (ic != 0) & (ic % 1000 == 0)) {
                 Rcpp::Rcout << ".";
                 if (ic % 100000 == 0) {
