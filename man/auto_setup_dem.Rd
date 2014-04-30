@@ -1,8 +1,8 @@
-\name{team_setup_dem}
-\alias{team_setup_dem}
+\name{auto_setup_dem}
+\alias{auto_setup_dem}
 \title{Setup the DEM mosaic for a particular TEAM site}
 \usage{
-team_setup_dem(aoi, output_path, dem_extents, n_cpus = 1, overwrite = FALSE,
+auto_setup_dem(aoi, output_path, dem_extents, n_cpus = 1, overwrite = FALSE,
   crop_to_aoi = FALSE, notify = print, verbose = FALSE)
 }
 \arguments{

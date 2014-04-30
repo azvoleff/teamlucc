@@ -25,7 +25,7 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages and timing 
 #' information
-team_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1, 
+auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1, 
                            overwrite=FALSE, crop_to_aoi=FALSE, notify=print, 
                            verbose=FALSE) {
     if (!file_test("-d", output_path)) {

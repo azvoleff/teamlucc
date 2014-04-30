@@ -1,6 +1,6 @@
 #' Classify a preprocessed surface reflectance image
 #'
-#' First the image should be preprocesed using the \code{team_preprocess} 
+#' First the image should be preprocesed using the \code{auto_preprocess} 
 #' function.
 #'
 #' @export
@@ -8,7 +8,7 @@
 #' @importFrom sp spTransform
 #' @importFrom tools file_path_sans_ext
 #' @param predictor_file a \code{Raster*} of predictor layers output by the 
-#' \code{team_preprocess} function or path to an image stack in a format 
+#' \code{auto_preprocess} function or path to an image stack in a format 
 #' readable by the \code{raster} package.
 #' @param train_shp a training dataset as output by 
 #' \code{pixel_data}
@@ -30,7 +30,7 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @examples
 #' #TODO: Add example
-team_classify <- function(predictor_file, train_shp, output_path, 
+auto_classify <- function(predictor_file, train_shp, output_path, 
                           class_col="Poly_Type", training=.6, n_cpus=1, 
                           overwrite=FALSE, notify=print) {
     if (!file_test("-f", train_shp)) {
@@ -46,7 +46,7 @@ team_classify <- function(predictor_file, train_shp, output_path,
     if (n_cpus > 1) beginCluster(n_cpus)
 
     timer <- Track_time(notify)
-    timer <- start_timer(timer, label='Running team_classify')
+    timer <- start_timer(timer, label='Running auto_classify')
 
     predictors <- brick(predictor_file)
     pred_rast_basename <- basename(file_path_sans_ext(predictor_file))
@@ -89,5 +89,5 @@ team_classify <- function(predictor_file, train_shp, output_path,
 
     if (n_cpus > 1) endCluster()
 
-    timer <- stop_timer(timer, label='Running team_classify')
+    timer <- stop_timer(timer, label='Running auto_classify')
 }

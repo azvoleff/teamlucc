@@ -10,24 +10,24 @@ pct_clouds <- function(cloud_mask) {
 #' details. In hilly areas, cloud fill should be done after topographic 
 #' correction.
 #'
-#' The \code{team_cloud_fill} function allows an analyst to automatically 
+#' The \code{auto_cloud_fill} function allows an analyst to automatically 
 #' construct a cloud-filled image after specifying: \code{data_dir} (a folder 
 #' of Landsat images), \code{wrspath} and \code{wrsrow} (the WRS-2 path/row to 
 #' use), and \code{start_date} and \code{end_date} (a start and end date 
 #' limiting the images to use in the algorithm).  The analyst can also 
-#' optionally specify a \code{base_date}, and the \code{team_cloud_fill} 
+#' optionally specify a \code{base_date}, and the \code{auto_cloud_fill} 
 #' function will automatically pick the image closest to that date to use as 
 #' the base image.
 #' 
-#' As the team_cloud_fill function automatically chooses images for inclusion 
+#' As the auto_cloud_fill function automatically chooses images for inclusion 
 #' in the cloud fill process, it relies on having images stored on disk in a 
 #' particular way, and currently only supports cloud fill for Landsat CDR 
 #' surface reflectance images. To ensure that images are correctly stored on 
-#' your hard disk, use the \code{\link{team_preprocess_landsat}} function to 
+#' your hard disk, use the \code{\link{auto_preprocess_landsat}} function to 
 #' extract the original Landsat CDR hdf files from the USGS archive. The 
-#' \code{team_preprocess_landsat} function will ensure that images are 
+#' \code{auto_preprocess_landsat} function will ensure that images are 
 #' extracted and renamed properly so that they can be used with the 
-#' team_cloud_fill script.
+#' auto_cloud_fill script.
 #'
 #' @export
 #' @importFrom spatial.tools sfQuickInit sfQuickStop
@@ -35,7 +35,7 @@ pct_clouds <- function(cloud_mask) {
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
 #' @param data_dir folder where input images are located, with filenames as 
-#' output by the \code{\link{team_preprocess_landsat}} function. This folder 
+#' output by the \code{\link{auto_preprocess_landsat}} function. This folder 
 #' will be searched recursively for images (taking the below path/row, date, 
 #' and topographic correction options into account).
 #' @param wrspath World Reference System (WRS) path
@@ -48,9 +48,9 @@ pct_clouds <- function(cloud_mask) {
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
 #' @param tc if \code{TRUE}, use topographically corrected imagery as output by 
-#' \code{team_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface 
+#' \code{auto_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface 
 #' reflectance as output by \code{unstack_ledaps} or 
-#' \code{team_preprocess_landsat} (if \code{team_preprocess_landsat} was also 
+#' \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also 
 #' run with tc=FALSE).
 #' @param threshold maximum percent cloud cover allowable in base image (cloud 
 #' fill iterate until percent cloud cover in base image is below this value) or 
@@ -70,7 +70,7 @@ pct_clouds <- function(cloud_mask) {
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images.  Geoscience and Remote Sensing Letters, IEEE 9, 521--525.  
 #' doi:10.1109/LGRS.2011.2173290
-team_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
+auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
                             n_cpus=1, notify=print, verbose=TRUE, ...) {
     if (!file_test('-d', data_dir)) {

@@ -1,13 +1,13 @@
-\name{team_classify}
-\alias{team_classify}
+\name{auto_classify}
+\alias{auto_classify}
 \title{Classify a preprocessed surface reflectance image}
 \usage{
-team_classify(predictor_file, train_shp, output_path, class_col = "Poly_Type",
+auto_classify(predictor_file, train_shp, output_path, class_col = "Poly_Type",
   training = 0.6, n_cpus = 1, overwrite = FALSE, notify = print)
 }
 \arguments{
   \item{predictor_file}{a \code{Raster*} of predictor
-  layers output by the \code{team_preprocess} function or
+  layers output by the \code{auto_preprocess} function or
   path to an image stack in a format readable by the
   \code{raster} package.}
 
@@ -42,7 +42,7 @@ team_classify(predictor_file, train_shp, output_path, class_col = "Poly_Type",
 }
 \description{
 First the image should be preprocesed using the
-\code{team_preprocess} function.
+\code{auto_preprocess} function.
 }
 \examples{
 #TODO: Add example

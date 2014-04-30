@@ -1,18 +1,18 @@
 #' Perform change detection for two Landsat CDR surface reflectance images
 #'
-#' First the images should be classified using the \code{team_classify} 
+#' First the images should be classified using the \code{auto_classify} 
 #' function.
 #'
 #' @export
-#' @param t1_classes cover classes as output from \code{team_classify_image} 
+#' @param t1_classes cover classes as output from \code{auto_classify_image} 
 #' for time 1 image
 #' @param t1_probs per class probabilities as output from 
-#' \code{team_classify_image} for time 1 image
+#' \code{auto_classify_image} for time 1 image
 #' @param t2_probs per class probabilities as output from 
-#' \code{team_classify_image} for time 2 image
+#' \code{auto_classify_image} for time 2 image
 #' @param output_path the path to use for the output
 #' @param output_basename the base filename for output files from 
-#' \code{team_chg_detect} (without an extension)
+#' \code{auto_chg_detect} (without an extension)
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -20,7 +20,7 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
-team_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename, 
+auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename, 
                             output_path, n_cpus=1, overwrite=FALSE, 
                             notify=print) {
     if (!file_test("-d", output_path)) {

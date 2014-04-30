@@ -17,6 +17,6 @@ extent is derived.
 \description{
 Also includes the filename associated with each raster
 object. Useful for providing the \code{dem_extents}
-argument to the \code{\link{team_setup_dem}} function.
+argument to the \code{\link{auto_setup_dem}} function.
 }
 

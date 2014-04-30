@@ -3,8 +3,8 @@
 #' @export
 #' @importFrom glcm glcm
 #' @param image_dirs list of paths to a set of Landsat images that have been 
-#' preprocessed by the \code{team_preprocess_landsat} function.
-#' @param dem_path path to a set of DEMs as output by \code{team_setup_dem}
+#' preprocessed by the \code{auto_preprocess_landsat} function.
+#' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem}
 #' @param output_path the path to use for the output
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
@@ -14,7 +14,7 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
-team_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1, 
+auto_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1, 
                                  cleartmp=FALSE, overwrite=FALSE,
                                  notify=print) {
     if (!file_test("-d", dem_path)) {

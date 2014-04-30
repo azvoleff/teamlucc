@@ -1,19 +1,19 @@
 #' Preprocess surface reflectance imagery from the Landsat CDR archive
 #'
 #' This function preprocesses surface reflectance imagery from the Landsat 
-#' Climate Data Record (CDR) archive. \code{team_preprocess_landsat} can 
+#' Climate Data Record (CDR) archive. \code{auto_preprocess_landsat} can 
 #' reproject CDR tiles to match the projection of a given \code{aoi}, crop the 
 #' tiles to match the \code{aoi} or a common WRS-2 path/row polygon, mask 
 #' missing data and clouds out of the CDR tiles, and perform topographic 
 #' correction.
 #'
-#' Prior to running \code{team_preprocess_landsat}, the 
+#' Prior to running \code{auto_preprocess_landsat}, the 
 #' \code{\link{espa_extract}} and should be used to extract the original 
 #' zipfiles supplied by USGS.  \code{\link{unstack_ledapscdr}} should then be 
 #' used to unstack the HDF format files and convert them into ENVI binary 
 #' format. To perform topographic correction with 
-#' \code{team_preprocess_landsat}, first run \code{\link{team_setup_dem}} to 
-#' preprocess a set of DEM tiles. Then run \code{team_preprocess_landsat} with 
+#' \code{auto_preprocess_landsat}, first run \code{\link{auto_setup_dem}} to 
+#' preprocess a set of DEM tiles. Then run \code{auto_preprocess_landsat} with 
 #' the \code{tc=TRUE} option.
 #' @export
 #' @importFrom rgeos gIntersection
@@ -27,7 +27,7 @@
 #' @param tc whether to topographically correct imagery
 #' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to 
 #' use as as bounding box when selecting DEMs
-#' @param dem_path path to a set of DEMs as output by \code{team_setup_dem} 
+#' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem} 
 #' (only required if tc=TRUE)
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
@@ -40,8 +40,8 @@
 #' @param verbose whether to print detailed status messages and timing 
 #' information
 #' @seealso \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}}, 
-#' \code{\link{team_setup_dem}}
-team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
+#' \code{\link{auto_setup_dem}}
+auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
                                     dem_path=NULL, output_path=NULL, n_cpus=1, 
                                     cleartmp=FALSE,  overwrite=FALSE, 
                                     notify=print, verbose=FALSE) {
@@ -261,7 +261,7 @@ team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
             }
             # Remember that slopeaspect layers are scaled to INT2S, but 
             # topographic_corr expects them as floats, so apply the scale factors 
-            # used in team_setup_dem
+            # used in auto_setup_dem
             slopeaspect_flt <- stack(raster(slopeaspect, layer=1) / 10000,
                                      raster(slopeaspect, layer=2) / 1000)
             sunelev <- 90 - as.numeric(get_metadata_item(band1_imagefile, 'SolarZenith'))

@@ -1,8 +1,8 @@
-\name{team_QA_stats}
-\alias{team_QA_stats}
+\name{auto_QA_stats}
+\alias{auto_QA_stats}
 \title{Calculate statistics on imagery within an AOI}
 \usage{
-team_QA_stats(image_dirs, aoi)
+auto_QA_stats(image_dirs, aoi)
 }
 \arguments{
   \item{image_dirs}{list of paths to a set of Landsat CDR

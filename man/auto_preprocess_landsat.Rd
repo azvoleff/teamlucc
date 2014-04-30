@@ -1,8 +1,8 @@
-\name{team_preprocess_landsat}
-\alias{team_preprocess_landsat}
+\name{auto_preprocess_landsat}
+\alias{auto_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-team_preprocess_landsat(image_dirs, prefix, tc = FALSE, aoi = NULL,
+auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, aoi = NULL,
   dem_path = NULL, output_path = NULL, n_cpus = 1, cleartmp = FALSE,
   overwrite = FALSE, notify = print, verbose = FALSE)
 }
@@ -25,7 +25,7 @@ team_preprocess_landsat(image_dirs, prefix, tc = FALSE, aoi = NULL,
   box when selecting DEMs}
 
   \item{dem_path}{path to a set of DEMs as output by
-  \code{team_setup_dem} (only required if tc=TRUE)}
+  \code{auto_setup_dem} (only required if tc=TRUE)}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}
@@ -47,27 +47,27 @@ team_preprocess_landsat(image_dirs, prefix, tc = FALSE, aoi = NULL,
 \description{
 This function preprocesses surface reflectance imagery from
 the Landsat Climate Data Record (CDR) archive.
-\code{team_preprocess_landsat} can reproject CDR tiles to
+\code{auto_preprocess_landsat} can reproject CDR tiles to
 match the projection of a given \code{aoi}, crop the tiles
 to match the \code{aoi} or a common WRS-2 path/row polygon,
 mask missing data and clouds out of the CDR tiles, and
 perform topographic correction.
 }
 \details{
-Prior to running \code{team_preprocess_landsat}, the
+Prior to running \code{auto_preprocess_landsat}, the
 \code{\link{espa_extract}} and should be used to extract
 the original zipfiles supplied by USGS.
 \code{\link{unstack_ledapscdr}} should then be used to
 unstack the HDF format files and convert them into ENVI
 binary format. To perform topographic correction with
-\code{team_preprocess_landsat}, first run
-\code{\link{team_setup_dem}} to preprocess a set of DEM
-tiles. Then run \code{team_preprocess_landsat} with the
+\code{auto_preprocess_landsat}, first run
+\code{\link{auto_setup_dem}} to preprocess a set of DEM
+tiles. Then run \code{auto_preprocess_landsat} with the
 \code{tc=TRUE} option.
 }
 \seealso{
 \code{\link{espa_extract}},
 \code{\link{unstack_ledapscdr}},
-\code{\link{team_setup_dem}}
+\code{\link{auto_setup_dem}}
 }
 

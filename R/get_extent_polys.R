@@ -2,7 +2,7 @@
 #'
 #' Also includes the filename associated with each raster object. Useful for 
 #' providing the \code{dem_extents} argument to the 
-#' \code{\link{team_setup_dem}} function.
+#' \code{\link{auto_setup_dem}} function.
 #'
 #' @export
 #' @importFrom maptools spRbind

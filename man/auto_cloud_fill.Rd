@@ -1,15 +1,15 @@
-\name{team_cloud_fill}
-\alias{team_cloud_fill}
+\name{auto_cloud_fill}
+\alias{auto_cloud_fill}
 \title{Automated removal of clouds using Xiaolin Zhu's NSPI algorithm}
 \usage{
-team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
+auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   base_date = NULL, tc = TRUE, threshold = 1, max_iter = 5,
   n_cpus = 1, notify = print, verbose = TRUE, ...)
 }
 \arguments{
   \item{data_dir}{folder where input images are located,
   with filenames as output by the
-  \code{\link{team_preprocess_landsat}} function. This
+  \code{\link{auto_preprocess_landsat}} function. This
   folder will be searched recursively for images (taking
   the below path/row, date, and topographic correction
   options into account).}
@@ -32,11 +32,11 @@ team_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   image will be the image with the lowest cloud cover.}
 
   \item{tc}{if \code{TRUE}, use topographically corrected
-  imagery as output by \code{team_preprocess_landsat}. IF
+  imagery as output by \code{auto_preprocess_landsat}. IF
   \code{FALSE} use bands 1-5 and 7 surface reflectance as
   output by \code{unstack_ledaps} or
-  \code{team_preprocess_landsat} (if
-  \code{team_preprocess_landsat} was also run with
+  \code{auto_preprocess_landsat} (if
+  \code{auto_preprocess_landsat} was also run with
   tc=FALSE).}
 
   \item{threshold}{maximum percent cloud cover allowable in
@@ -71,28 +71,28 @@ Uses the NSPI algorithm from Zhu et al. See
 cloud fill should be done after topographic correction.
 }
 \details{
-The \code{team_cloud_fill} function allows an analyst to
+The \code{auto_cloud_fill} function allows an analyst to
 automatically construct a cloud-filled image after
 specifying: \code{data_dir} (a folder of Landsat images),
 \code{wrspath} and \code{wrsrow} (the WRS-2 path/row to
 use), and \code{start_date} and \code{end_date} (a start
 and end date limiting the images to use in the algorithm).
 The analyst can also optionally specify a \code{base_date},
-and the \code{team_cloud_fill} function will automatically
+and the \code{auto_cloud_fill} function will automatically
 pick the image closest to that date to use as the base
 image.
 
-As the team_cloud_fill function automatically chooses
+As the auto_cloud_fill function automatically chooses
 images for inclusion in the cloud fill process, it relies
 on having images stored on disk in a particular way, and
 currently only supports cloud fill for Landsat CDR surface
 reflectance images. To ensure that images are correctly
 stored on your hard disk, use the
-\code{\link{team_preprocess_landsat}} function to extract
+\code{\link{auto_preprocess_landsat}} function to extract
 the original Landsat CDR hdf files from the USGS archive.
-The \code{team_preprocess_landsat} function will ensure
+The \code{auto_preprocess_landsat} function will ensure
 that images are extracted and renamed properly so that they
-can be used with the team_cloud_fill script.
+can be used with the auto_cloud_fill script.
 }
 \references{
 Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
