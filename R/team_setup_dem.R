@@ -25,12 +25,6 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages and timing 
 #' information
-#' @examples
-#' \dontrun{
-#' #TODO: Fix example for latest code.
-#' team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/', 
-#' list(c(15,53)))
-#' }
 team_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1, 
                            overwrite=FALSE, crop_to_aoi=FALSE, notify=print, 
                            verbose=FALSE) {

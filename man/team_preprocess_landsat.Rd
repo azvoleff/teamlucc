@@ -65,15 +65,6 @@ ENVI binary format. To perform topographic correction with
 of DEM tiles. Then run \code{team_preprocess_landsat} with
 the \code{tc=TRUE} option.
 }
-\examples{
-\dontrun{
-image_dirs <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc',
-                'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
-                'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
-team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis', 'VB'
-'H:/Data/TEAM/VB/LCLUC_Analysis', n_cpus=3)
-}
-}
 \seealso{
 \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr},
 \code{\link{team_setup_dem}}

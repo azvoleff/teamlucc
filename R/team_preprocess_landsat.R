@@ -40,14 +40,6 @@
 #' information
 #' @seealso \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}, 
 #' \code{\link{team_setup_dem}}
-#' @examples
-#' \dontrun{
-#' image_dirs <- c('H:/Data/TEAM/VB/Rasters/Landsat/1986_037_LT5/proc',
-#'                 'H:/Data/TEAM/VB/Rasters/Landsat/2001_014_LT5/proc',
-#'                 'H:/Data/TEAM/VB/Rasters/Landsat/2012_021_LE7/proc')
-#' team_preprocess(image_dirs, 'H:/Data/TEAM/VB/LCLUC_Analysis', 'VB'
-#' 'H:/Data/TEAM/VB/LCLUC_Analysis', n_cpus=3)
-#' }
 team_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
                                     dem_path=NULL, output_path=NULL, n_cpus=1, 
                                     cleartmp=FALSE,  overwrite=FALSE, 

@@ -42,11 +42,4 @@ team_setup_dem(aoi, output_path, dem_extents, n_cpus = 1, overwrite = FALSE,
 \description{
 Setup the DEM mosaic for a particular TEAM site
 }
-\examples{
-\dontrun{
-#TODO: Fix example for latest code.
-team_setup_dem(dem_path, "VB", 'H:/Data/TEAM/VB/LCLUC_Analysis/',
-list(c(15,53)))
-}
-}
 
