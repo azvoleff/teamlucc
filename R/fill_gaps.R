@@ -59,7 +59,7 @@ fill_gaps <- function(slc_off, fill, timeseries, out_base=NULL, use_IDL=TRUE,
                                 out_base, sample_size, size_wind, class_num, 
                                 DN_min, DN_max, patch_long, idl, verbose)
     } else {
-        filled <- fill_gaps_r(slc_off, fill, timeseries, 
+        filled <- fill_gaps_R(slc_off, fill, timeseries, 
                                 out_base, sample_size, size_wind, class_num, 
                                 DN_min, DN_max, patch_long, idl, verbose)
     }
@@ -129,7 +129,5 @@ fill_gaps_idl <- function(slc_off, fill, timeseries, out_base,
 fill_gaps_R <- function(slc_off, fill, timeseries, out_base, 
                           sample_size, size_wind, class_num, DN_min, DN_max, 
                           patch_long, idl, verbose) {
-    if (fast) {
-        stop("use_IDL=FALSE not yet supported")
-    }
+    stop("use_IDL=FALSE not yet supported")
 }
