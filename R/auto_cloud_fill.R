@@ -19,15 +19,15 @@ pct_clouds <- function(cloud_mask) {
 #' function will automatically pick the image closest to that date to use as 
 #' the base image.
 #' 
-#' As the auto_cloud_fill function automatically chooses images for inclusion 
-#' in the cloud fill process, it relies on having images stored on disk in a 
-#' particular way, and currently only supports cloud fill for Landsat CDR 
-#' surface reflectance images. To ensure that images are correctly stored on 
-#' your hard disk, use the \code{\link{auto_preprocess_landsat}} function to 
+#' As the \code{auto_cloud_fill} function automatically chooses images for 
+#' inclusion in the cloud fill process, it relies on having images stored on 
+#' disk in a particular way, and currently only supports cloud fill for Landsat 
+#' CDR surface reflectance images. To ensure that images are correctly stored 
+#' on your hard disk, use the \code{\link{auto_preprocess_landsat}} function to 
 #' extract the original Landsat CDR hdf files from the USGS archive. The 
 #' \code{auto_preprocess_landsat} function will ensure that images are 
 #' extracted and renamed properly so that they can be used with the 
-#' auto_cloud_fill script.
+#' \code{auto_cloud_fill} script.
 #'
 #' @export
 #' @importFrom spatial.tools sfQuickInit sfQuickStop
