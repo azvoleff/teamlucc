@@ -2,20 +2,21 @@
 \alias{fill_gaps}
 \title{Perform SLC-off gap fill of Landsat 7 ETM+ image}
 \usage{
-fill_gaps(slc_off_file, input_file, timeseries_files, out_base = NULL,
-  sample_size = 20, size_wind = 12, class_num = 4, DN_min = 0,
-  DN_max = 1, patch_long = 1000,
-  idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe")
+fill_gaps(slc_off, fill, timeseries, out_base = NULL, sample_size = 20,
+  size_wind = 12, class_num = 4, DN_min = 0, DN_max = 1,
+  patch_long = 1000,
+  idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
+  verbose = FALSE)
 }
 \arguments{
-  \item{slc_off_file}{the SLC-off Landsat 7 file to gap
-  fill}
+  \item{slc_off}{the SLC-off Landsat 7 file to gap fill, as
+  a \code{Raster*}}
 
-  \item{input_file}{the first file to use to fill in the
-  gaps}
+  \item{fill}{the first file to use to fill in the gaps, as
+  a \code{Raster*}}
 
-  \item{timeseries_files}{a timeseries of files to use as
-  additional inputs to the gap fill algorithm}
+  \item{timeseries}{a timeseries of \code{Raster*} objects
+  to use as additional inputs to the gap fill algorithm}
 
   \item{out_base}{path and base filename for the output
   file. The script will save the output files by appending
@@ -36,6 +37,8 @@ fill_gaps(slc_off_file, input_file, timeseries_files, out_base = NULL,
   scene, set to 1000}
 
   \item{idl}{path to the IDL binary}
+
+  \item{verbose}{whether to print detailed status messages}
 }
 \description{
 Calls GNSPI.pro IDL script by Xiaolin Zhu to fill gaps in
@@ -44,6 +47,6 @@ SLC-off Landsat 7 ETM+ image.
 \references{
 Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical
 approach for filling gaps in Landsat ETM+ SLC-off images.
-Remote Sensing of Environment 124, 49-60.
+Remote Sensing of Environment 124, 49--60.
 }
 

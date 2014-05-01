@@ -4,13 +4,16 @@
 #' ETM+ image.
 #'
 #' @importFrom tools file_path_sans_ext
-#' @param slc_off_file the SLC-off Landsat 7 file to gap fill
-#' @param input_file the first file to use to fill in the gaps
-#' @param timeseries_files a timeseries of files to use as additional inputs to 
-#' the gap fill algorithm
+#' @param slc_off the SLC-off Landsat 7 file to gap fill, as a \code{Raster*}
+#' @param fill the first file to use to fill in the gaps, as a \code{Raster*}
+#' @param timeseries a timeseries of \code{Raster*} objects to use as 
+#' additional inputs to the gap fill algorithm
 #' @param out_base path and base filename for the output file. The script will 
 #' save the output files by appending "_GNSPI.envi" and 
 #' "_GNSPI_uncertainty.envi" to this base filename.
+#' @param use_IDL whether to use Xiaolin Zhu's original IDL scripts 
+#' (\code{use_IDL=TRUE}) or the C++ implementation native to \code{teamlucc} 
+#' (\code{use_IDL=FALSE})
 #' @param sample_size the sample size of sample pixels
 #' @param size_wind the maximum window size
 #' @param class_num the estimated number of classes
@@ -18,38 +21,83 @@
 #' @param DN_max the maximum DN value of the image
 #' @param patch_long the size of block, to process whole ETM scene, set to 1000
 #' @param idl path to the IDL binary
+#' @param verbose whether to print detailed status messages
 #' @export
 #' @references Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical approach 
 #' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 
-#' Environment 124, 49-60.
-fill_gaps <- function(slc_off_file, input_file, timeseries_files, 
-                      out_base=NULL, sample_size=20, size_wind=12, class_num=4, 
-                      DN_min=0.0, DN_max=1.0, patch_long=1000,
-                      idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe") {
-    script_path <- system.file("idl", "GNSPI.pro", package="teamlucc")
+#' Environment 124, 49--60.
+fill_gaps <- function(slc_off, fill, timeseries, out_base=NULL, use_IDL=TRUE, 
+                      sample_size=20, size_wind=12, class_num=4, DN_min=0.0, 
+                      DN_max=1.0, patch_long=1000,
+                      idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
+                      verbose=FALSE) {
+    if (!(class(slc_off) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
+        stop('slc_off must be a Raster* object')
+    }
+    if (!(class(fill) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
+        stop('fill must be a Raster* object')
+    }
+    if (nlayers(slc_off) != nlayers(fill)) {
+        stop('number of layers in slc_off must match number of layers in fill')
+    }
+    compareRaster(slc_off, fill)
+    for (timeseries_img in timeseries) {
+        if (!(class(timeseries_img) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
+            stop('clear must be a Raster* object')
+        }
+        if (nlayers(slc_off) != nlayers(timeseries_img)) {
+            stop('number of layers in slc_off must match number of layers of each image in timeseries')
+        }
+        compareRaster(slc_off, timeseries_img)
+    }
+    if (is.null(out_base)) {
+        out_base <- paste0(file_path_sans_ext(filename(slc_off)))
+    }
 
+    if (use_IDL) {
+        filled <- fill_gaps_idl(slc_off, fill, timeseries, 
+                                out_base, sample_size, size_wind, class_num, 
+                                DN_min, DN_max, patch_long, idl, verbose)
+    } else {
+        filled <- fill_gaps_r(slc_off, fill, timeseries, 
+                                out_base, sample_size, size_wind, class_num, 
+                                DN_min, DN_max, patch_long, idl, verbose)
+    }
+
+    return(filled)
+}
+
+fill_gaps_idl <- function(slc_off, fill, timeseries, out_base, 
+                          sample_size, size_wind, class_num, DN_min, DN_max, 
+                          patch_long, idl, verbose) {
+    if (verbose) {
+        warning("verbose=TRUE not supported when use_IDL=TRUE")
+    }
+
+    script_path <- system.file("idl", "GNSPI.pro", package="teamlucc")
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
         stop('IDL not found - check "idl" parameter')
     }
-    if (!(file_test('-f', slc_off_file))) {
-        stop('SLC-off file not found- check slc_off_file parameter')
-    }
-    if (!(file_test('-f', input_file))) {
-        stop('input file for gap fill not found- check input_file parameter')
-    }
-    for (n in 1:length(timeseries_files)) {
-        if (!(file_test('-f', timeseries_files[[n]]))) {
-            stop(paste0('timeseries file "', timeseries_files[[n]], '" not found'))
-        }
-    }
 
-    if (is.null(out_base)) {
-        out_base <- paste0(file_path_sans_ext(slc_off_file))
+    # Write in-memory rasters to files for hand off to IDL. The capture.output 
+    # line is used to avoid printing the rasterOptions to screen as they are 
+    # temporarily reset.
+    dummy <- capture.output(def_format <- rasterOptions()$format)
+    rasterOptions(format='ENVI')
+    slc_off <- writeRaster(slc_off, rasterTmpFile(), datatype=dataType(slc_off)[1])
+    slc_off_file <- filename(slc_off)
+    fill <- writeRaster(fill, rasterTmpFile(), datatype=dataType(fill)[1])
+    fill_file <- filename(fill)
+    timeseries_files <- c()
+    for (n in 1:length(timeseries)) {
+        timeseries_img <- timeseries[[n]]
+        timeseries_img <- writeRaster(fill, rasterTmpFile(), datatype=dataType(fill)[1])
+        timeseries_files <- c(timeseries_files, filename(timeseries_img))
     }
-
     temp_dir <- tempdir()
+    dummy <- capture.output(rasterOptions(format=def_format))
 
-    param_vals <- list(slc_off_file, input_file, timeseries_files,
+    param_vals <- list(slc_off_file, fill_file, timeseries_files,
                        out_base, sample_size, size_wind, class_num,
                        DN_min, DN_max, patch_long, temp_dir)
     param_names <- list('slc_off_file', 'input_file', 'timeseries_files', 
@@ -76,4 +124,12 @@ fill_gaps <- function(slc_off_file, input_file, timeseries_files,
     close(f)
 
     return(brick(paste0(out_base, '_GNSPI.envi')))
+}
+
+fill_gaps_R <- function(slc_off, fill, timeseries, out_base, 
+                          sample_size, size_wind, class_num, DN_min, DN_max, 
+                          patch_long, idl, verbose) {
+    if (fast) {
+        stop("use_IDL=FALSE not yet supported")
+    }
 }
