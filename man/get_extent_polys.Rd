@@ -2,10 +2,10 @@
 \alias{get_extent_polys}
 \title{Generate a SpatialPolygonDataFrame of raster extents}
 \usage{
-get_extent_polys(x)
+get_extent_polys(rast_list)
 }
 \arguments{
-  \item{x}{a \code{Raster*} object, or \code{list}
+  \item{rast_list}{a \code{Raster*} object, or \code{list}
   of\code{Raster*} objects}
 }
 \value{

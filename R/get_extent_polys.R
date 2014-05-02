@@ -6,12 +6,12 @@
 #'
 #' @export
 #' @importFrom maptools spRbind
-#' @param x a \code{Raster*} object, or \code{list} of\code{Raster*} objects
+#' @param rast_list a \code{Raster*} object, or \code{list} of\code{Raster*} objects
 #' @return \code{SpatialPolygonDataFrame} with the extent of each raster object 
 #' as a polygon, with a "filename" attribute giving the filename for the raster 
 #' object from with each extent is derived.
-get_extent_polys <- function(x) {
-    if (!is.list(x)) rast_list <- list(x)
+get_extent_polys <- function(rast_list) {
+    if (!is.list(rast_list)) rast_list <- list(rast_list)
 
     proj4strings <- lapply(rast_list, function(x) proj4string(x))
     if (!all(proj4strings == proj4strings[[1]])) {
