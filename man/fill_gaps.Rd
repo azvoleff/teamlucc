@@ -2,9 +2,9 @@
 \alias{fill_gaps}
 \title{Perform SLC-off gap fill of Landsat 7 ETM+ image}
 \usage{
-fill_gaps(slc_off, fill, timeseries, out_base = NULL, sample_size = 20,
-  size_wind = 12, class_num = 4, DN_min = 0, DN_max = 1,
-  patch_long = 1000,
+fill_gaps(slc_off, fill, timeseries, out_base = NULL, use_IDL = TRUE,
+  sample_size = 20, size_wind = 12, class_num = 4, DN_min = 0,
+  DN_max = 1, patch_long = 1000,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
   verbose = FALSE)
 }
@@ -22,6 +22,10 @@ fill_gaps(slc_off, fill, timeseries, out_base = NULL, sample_size = 20,
   file. The script will save the output files by appending
   "_GNSPI.envi" and "_GNSPI_uncertainty.envi" to this base
   filename.}
+
+  \item{use_IDL}{whether to use Xiaolin Zhu's original IDL
+  scripts (\code{use_IDL=TRUE}) or the C++ implementation
+  native to \code{teamlucc} (\code{use_IDL=FALSE})}
 
   \item{sample_size}{the sample size of sample pixels}
 

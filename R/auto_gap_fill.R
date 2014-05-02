@@ -1,33 +1,33 @@
-pct_clouds <- function(cloud_mask) {
-    num_clouds <- cellStats(cloud_mask >= 1, stat='sum', na.rm=TRUE)
-    num_clear <- cellStats(cloud_mask == 0, stat='sum', na.rm=TRUE)
-    return((num_clouds / num_clear) * 100)
+pct_gap <- function(fill_QA) {
+    # Gaps are fill_QA equal to 255
+    num_gap <- cellStats(fill_QA >= 1, stat='sum', na.rm=TRUE)
+    num_clear <- cellStats(fill_QA == 0, stat='sum', na.rm=TRUE)
+    return((num_gap / num_clear) * 100)
 }
 
-#' Automated removal of clouds using Xiaolin Zhu's NSPI algorithm
+#' Automated removal of gaps in SLC-off images using GNSPI
 #'
-#' Uses the NSPI algorithm from Zhu et al. See \code{\link{cloud_remove}} for 
-#' details. In hilly areas, cloud fill should be done after topographic 
+#' Uses the GNSPI algorithm from Zhu et al. See \code{\link{fill_gaps}} for 
+#' details.  In hilly areas, gap fill should be done after topographic 
 #' correction.
 #'
-#' The \code{auto_cloud_fill} function allows an analyst to automatically 
-#' construct a cloud-filled image after specifying: \code{data_dir} (a folder 
-#' of Landsat images), \code{wrspath} and \code{wrsrow} (the WRS-2 path/row to 
+#' The \code{auto_gap_fill} function allows an analyst to automatically 
+#' construct a gap-filled image after specifying: \code{data_dir} (a folder of 
+#' Landsat images), \code{wrspath} and \code{wrsrow} (the WRS-2 path/row to 
 #' use), and \code{start_date} and \code{end_date} (a start and end date 
 #' limiting the images to use in the algorithm).  The analyst can also 
-#' optionally specify a \code{base_date}, and the \code{auto_cloud_fill} 
-#' function will automatically pick the image closest to that date to use as 
-#' the base image.
+#' optionally specify a \code{base_date}, and the \code{auto_gap_fill} function 
+#' will automatically pick the image closest to that date to use as the base 
+#' image.
 #' 
-#' As the \code{auto_cloud_fill} function automatically chooses images for 
-#' inclusion in the cloud fill process, it relies on having images stored on 
-#' disk in a particular way, and currently only supports cloud fill for Landsat 
-#' CDR surface reflectance images. To ensure that images are correctly stored 
-#' on your hard disk, use the \code{\link{auto_preprocess_landsat}} function to 
-#' extract the original Landsat CDR hdf files from the USGS archive. The 
+#' As the \code{auto_gap_fill} function automatically chooses images for 
+#' inclusion in the gap fill process, it relies on having images stored on disk 
+#' in a particular way. To ensure that images are correctly stored on your hard 
+#' disk, use the \code{\link{auto_preprocess_landsat}} function to extract the 
+#' original Landsat CDR hdf files from the USGS archive. The 
 #' \code{auto_preprocess_landsat} function will ensure that images are 
 #' extracted and renamed properly so that they can be used with the 
-#' \code{auto_cloud_fill} script.
+#' \code{auto_gap_fill} script.
 #'
 #' @export
 #' @importFrom spatial.tools sfQuickInit sfQuickStop
@@ -52,32 +52,31 @@ pct_clouds <- function(cloud_mask) {
 #' reflectance as output by \code{unstack_ledaps} or 
 #' \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also 
 #' run with tc=FALSE).
-#' @param threshold maximum percent cloud cover allowable in base image. Cloud 
-#' fill iterate until percent cloud cover in base image is below this value, or 
-#' until \code{max_iter} iterations have been run
-#' @param max_iter maximum number of times to run cloud fill script
+#' @param threshold maximum percent gap allowable in base image. Gap fill will 
+#' iterate until percent gap in base image is below this value or until 
+#' \code{max_iter} iterations have been run
+#' @param max_iter maximum number of times to run gap fill script
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param notify notifier to use (defaults to \code{print} function).  See the 
 #' \code{notifyR} package for one way of sending notifications from R.  The 
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages
-#' @param ... additional arguments passed to \code{\link{cloud_remove}}, such 
-#' as \code{DN_min}, \code{DN_max}, \code{use_IDL}, \code{fast},
-#' \code{verbose}, etc. See \code{\link{cloud_remove}}.
-#' @return \code{Raster*} object with cloud filled image.
-#' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified 
-#' neighborhood similar pixel interpolator approach for removing thick clouds 
-#' in Landsat images.  Geoscience and Remote Sensing Letters, IEEE 9, 521--525.  
-#' doi:10.1109/LGRS.2011.2173290
-auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
+#' @param ... additional arguments passed to \code{\link{fill_gaps}}, such as 
+#' \code{DN_min}, \code{DN_max}, \code{use_IDL}, \code{verbose}, etc. See 
+#' \code{\link{fill_gaps}}.
+#' @return \code{Raster*} object with gap filled image.
+#' @references Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical approach 
+#' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 
+#' Environment 124, 49--60.
+auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
                             n_cpus=1, notify=print, verbose=TRUE, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
     timer <- Track_time(notify)
-    timer <- start_timer(timer, label='Cloud fill')
+    timer <- start_timer(timer, label='Gap fill')
 
     if (n_cpus > 1) sfQuickInit(n_cpus)
 
@@ -111,28 +110,29 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         stop('no images found - check date_dir, check wrspath, wrsrow, start_date, and end_date')
     } else if (length(img_files) <= 2) {
         stop(paste('Only', length(img_files),
-                   'image(s) found. Need at least two images to perform cloud fill'))
+                   'image(s) found. Need at least two images to perform gap fill'))
     }
 
     if (verbose) {
         notify(paste('Found', length(img_files), 'image(s)'))
-        timer <- start_timer(timer, label='Analyzing cloud cover in input images')
+        timer <- start_timer(timer, label='Analyzing cloud cover and gaps in input images')
     }
     # Run QA stats
     masks <- list()
     imgs <- list()
     for (img_file in img_files) {
         masks_file <- gsub(suffix_re, '_masks.envi', img_file)
-        this_mask <- raster(masks_file, band=2)
+        this_mask <- raster(masks_file, band=1)
         masks <- c(masks, this_mask)
         this_img <- stack(img_file)
         imgs <- c(imgs, stack(this_img))
     }
-    freq_table <- freq(stack(masks), useNA='no', merge=TRUE)
+    #freq_table <- freq(stack(masks), useNA='no', merge=TRUE)
+    freq_table <- freq(stack(masks), merge=TRUE)
     # Convert frequency table to fractions
     freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
     if (verbose) {
-        timer <- stop_timer(timer, label='Analyzing cloud cover in input images')
+        timer <- stop_timer(timer, label='Analyzing cloud cover and gaps in input images')
     }
 
     # Find image that is either closest to base date, or has the maximum 
@@ -148,15 +148,18 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         base_img_index <- which(base_date_diff == min(base_date_diff))
     }
 
-    # Convert masks to binary indicating: 0 = other; 1 = cloud or shadow
+    # Convert masks to binary indicating: 0 = other; 1 = gap
     #
-    #   fmask_band key:
+    #   band1: fmask_band
     #       0 = clear
     #       1 = water
     #       2 = cloud_shadow
     #       3 = snow
     #       4 = cloud
     #       255 = fill value
+    #   band 2: fill_QA
+    #      	0 = not fill
+    #    	255 = fill
     for (n in 1:length(masks)) {
         masks[n] <- (masks[[n]] == 2) | (masks[[n]] == 4)
     }
@@ -169,22 +172,23 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     img_dates <- img_dates[-base_img_index]
 
     # Save base_img in filled so it will be returned if base_img already has 
-    # pct_clouds below threshold
+    # pct_gap below threshold
     filled <- base_img
     n <- 0
-    cur_pct_clouds <- pct_clouds(base_mask)
+    cur_pct_gap <- pct_gap(base_mask)
     if (verbose) {
-        notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover before fill'))
+        notify(paste0('Base image has ', round(cur_pct_gap, 2), '% gap before fill'))
     }
-    while ((cur_pct_clouds > threshold) & (n < max_iter)) {
+    while ((cur_pct_gap > threshold) & (n < max_iter)) {
         if (verbose) {
             timer <- start_timer(timer, label=paste('Fill iteration', n))
         }
 
         # Calculate a raster indicating the pixels in each potential fill image 
         # that are available for filling pixels of base_img that are missing 
-        # due to cloud contamination. Areas coded 1 are missing due to cloud or 
-        # shadow in the base image and are available in the merge image.
+        # due to SLC-off gaps. Areas coded 1 are missing due to gaps in the 
+        # base image and are available (i.e. are not gaps or clouds) in the 
+        # merge image.
         fill_areas <- list()
         for (mask_img in masks) {
             fill_areas <- c(fill_areas, list(base_mask == 1 & mask_img == 0))
@@ -192,8 +196,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         fill_areas_freq <- freq(stack(fill_areas), useNA='no', merge=TRUE)
 
         # Select the fill image with the maximum number of available pixels 
-        # (counting only pixels in the fill image that are not ALSO clouded in the 
-        # fill image)
+        # (counting only pixels in the fill image that are not ALSO in gps or 
+        # clouded in the fill image)
         avail_fill_row <- which(fill_areas_freq$value == 1)
         fill_img_index <- which(fill_areas_freq[avail_fill_row, -1] == 
                                 max(fill_areas_freq[avail_fill_row, -1]))
@@ -206,10 +210,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         fill_img_date <- img_dates[fill_img_index]
         img_dates <- img_dates[-fill_img_index]
 
-        # Add numbered IDs to the cloud patches
-        coded_cloud_mask <- ConnCompLabel(cloud_mask)
-
-        # Mark areas of the cloud_mask where fill_img is blank (clouded) with -1
+        # Mark areas of the cloud_mask where fill_img is blank (clouded) with 
+        # -1
         coded_cloud_mask[fill_img_mask] <- -1
         NAvalue(coded_cloud_mask) <- -2
 
@@ -229,15 +231,15 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
         max_iter <- max_iter + 1
 
-        cur_pct_clouds <- pct_clouds(base_mask)
+        cur_pct_gap <- pct_gap(base_mask)
 
         if (verbose) {
-            notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover remaining'))
+            notify(paste0('Base image has ', round(cur_pct_gap, 2), '% gap remaining'))
             timer <- stop_timer(timer, label=paste('Fill iteration', n))
         }
     }
 
-    timer <- stop_timer(timer, label='Cloud fill')
+    timer <- stop_timer(timer, label='Gap fill')
 
     if (n_cpus > 1) sfQuickStop(n_cpus)
 
