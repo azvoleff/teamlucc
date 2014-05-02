@@ -39,12 +39,12 @@ auto_gap_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   \code{auto_preprocess_landsat} was also run with
   tc=FALSE).}
 
-  \item{threshold}{maximum percent cloud cover allowable in
-  base image (cloud fill iterate until percent cloud cover
-  in base image is below this value) or until more than
-  \code{max_iter} iterations have been run}
+  \item{threshold}{maximum percent gap allowable in base
+  image. Gap fill will iterate until percent gap in base
+  image is below this value or until \code{max_iter}
+  iterations have been run}
 
-  \item{max_iter}{maximum number of times to run cloud fill
+  \item{max_iter}{maximum number of times to run gap fill
   script}
 
   \item{n_cpus}{the number of CPUs to use for processes
@@ -58,9 +58,9 @@ auto_gap_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   \item{verbose}{whether to print detailed status messages}
 
   \item{...}{additional arguments passed to
-  \code{\link{cloud_remove}}, such as \code{DN_min},
-  \code{DN_max}, \code{use_IDL}, \code{fast},
-  \code{verbose}, etc. See \code{\link{cloud_remove}}.}
+  \code{\link{fill_gaps}}, such as \code{DN_min},
+  \code{DN_max}, \code{use_IDL}, \code{verbose}, etc. See
+  \code{\link{fill_gaps}}.}
 }
 \value{
 \code{Raster*} object with gap filled image.

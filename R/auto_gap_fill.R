@@ -1,7 +1,6 @@
-pct_gap <- function(fill_QA) {
-    # Gaps are fill_QA equal to 255
-    num_gap <- cellStats(fill_QA >= 1, stat='sum', na.rm=TRUE)
-    num_clear <- cellStats(fill_QA == 0, stat='sum', na.rm=TRUE)
+pct_gap <- function(gap_mask) {
+    num_gap <- cellStats(gap_mask == 1, stat='sum', na.rm=TRUE)
+    num_clear <- cellStats(gap_mask == 0, stat='sum', na.rm=TRUE)
     return((num_gap / num_clear) * 100)
 }
 
@@ -70,8 +69,11 @@ pct_gap <- function(fill_QA) {
 #' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 
 #' Environment 124, 49--60.
 auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
-                            n_cpus=1, notify=print, verbose=TRUE, ...) {
+                          base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
+                          n_cpus=1, notify=print, verbose=TRUE, ...) {
+
+    stop('auto_gap_fill not yet supported')
+
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
@@ -117,17 +119,16 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         notify(paste('Found', length(img_files), 'image(s)'))
         timer <- start_timer(timer, label='Analyzing cloud cover and gaps in input images')
     }
-    # Run QA stats
+    # Run QA stats - remember band 1 is fmask band, and band 2 is fill_QA
     masks <- list()
     imgs <- list()
     for (img_file in img_files) {
         masks_file <- gsub(suffix_re, '_masks.envi', img_file)
-        this_mask <- raster(masks_file, band=1)
+        this_mask <- raster(masks_file, band=2)
         masks <- c(masks, this_mask)
         this_img <- stack(img_file)
         imgs <- c(imgs, stack(this_img))
     }
-    #freq_table <- freq(stack(masks), useNA='no', merge=TRUE)
     freq_table <- freq(stack(masks), merge=TRUE)
     # Convert frequency table to fractions
     freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
@@ -136,9 +137,9 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     }
 
     # Find image that is either closest to base date, or has the maximum 
-    # percent clear
+    # percent not in cloud or gap
     if (is.null(base_date)) {
-        clear_row <- which(freq_table$value == 0)
+        clear_row <- which(is.na(freq_table$value))
         base_img_index <- which(freq_table[clear_row, -1] == 
                                 max(freq_table[clear_row, -1]))
     } else {
@@ -148,7 +149,8 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         base_img_index <- which(base_date_diff == min(base_date_diff))
     }
 
-    # Convert masks to binary indicating: 0 = other; 1 = gap
+    # Convert masks to binary indicating: 0=other; 1=gap, shadow, or cloud.  
+    # Note that gaps are coded as NAs in the fmask band.
     #
     #   band1: fmask_band
     #       0 = clear
@@ -156,13 +158,18 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #       2 = cloud_shadow
     #       3 = snow
     #       4 = cloud
-    #       255 = fill value
+    #       NA = gap or background
     #   band 2: fill_QA
     #      	0 = not fill
     #    	255 = fill
     for (n in 1:length(masks)) {
-        masks[n] <- (masks[[n]] == 2) | (masks[[n]] == 4)
+        masks[n] <- (is.na(masks[[n]])) | (masks[[n]] == 2) | (masks[[n]] == 4)
     }
+    # Code areas of imgs that are background, gap, cloud, or shadow as 0
+    for (n in 1:length(imgs)) {
+        imgs[n][masks[[1]] == 1] <- 0
+    }
+
     base_img <- imgs[[base_img_index]]
     imgs <- imgs[-base_img_index]
     base_mask <- masks[[base_img_index]]
@@ -196,7 +203,7 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         fill_areas_freq <- freq(stack(fill_areas), useNA='no', merge=TRUE)
 
         # Select the fill image with the maximum number of available pixels 
-        # (counting only pixels in the fill image that are not ALSO in gps or 
+        # (counting only pixels in the fill image that are not ALSO in gaps or 
         # clouded in the fill image)
         avail_fill_row <- which(fill_areas_freq$value == 1)
         fill_img_index <- which(fill_areas_freq[avail_fill_row, -1] == 
@@ -219,9 +226,8 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             notify(paste0('Filling image from ', base_img_date,
                           ' with image from ', fill_img_date, '...'))
         }
-        #filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
-        filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, 
-                               verbose=verbose, ...)
+        filled <- fill_gaps(base_img, fill_img, coded_cloud_mask, 
+                            verbose=verbose, ...)
         if (verbose) {
             notify('Fill complete.')
         }
