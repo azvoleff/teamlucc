@@ -3,6 +3,10 @@
 #' Calls GNSPI.pro IDL script by Xiaolin Zhu to fill gaps in SLC-off Landsat 7 
 #' ETM+ image.
 #'
+#' Pixels in gaps, background, and/or clouds in \code{slc_off}, 
+#' \code{input_image}, and the images in \code{timeseries} should be coded as 
+#' 0.
+#'
 #' @importFrom tools file_path_sans_ext
 #' @param slc_off the SLC-off Landsat 7 file to gap fill, as a \code{Raster*}
 #' @param fill the first file to use to fill in the gaps, as a \code{Raster*}

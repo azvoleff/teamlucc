@@ -48,6 +48,11 @@ fill_gaps(slc_off, fill, timeseries, out_base = NULL, use_IDL = TRUE,
 Calls GNSPI.pro IDL script by Xiaolin Zhu to fill gaps in
 SLC-off Landsat 7 ETM+ image.
 }
+\details{
+Pixels in gaps, background, and/or clouds in
+\code{slc_off}, \code{input_image}, and the images in
+\code{timeseries} should be coded as 0.
+}
 \references{
 Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical
 approach for filling gaps in Landsat ETM+ SLC-off images.

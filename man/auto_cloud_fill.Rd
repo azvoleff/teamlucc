@@ -40,8 +40,8 @@ auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   tc=FALSE).}
 
   \item{threshold}{maximum percent cloud cover allowable in
-  base image (cloud fill iterate until percent cloud cover
-  in base image is below this value) or until more than
+  base image. Cloud fill will iterate until percent cloud
+  cover in base image is below this value, or until
   \code{max_iter} iterations have been run}
 
   \item{max_iter}{maximum number of times to run cloud fill

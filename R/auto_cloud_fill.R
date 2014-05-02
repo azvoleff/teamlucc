@@ -53,8 +53,8 @@ pct_clouds <- function(cloud_mask) {
 #' \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also 
 #' run with tc=FALSE).
 #' @param threshold maximum percent cloud cover allowable in base image. Cloud 
-#' fill iterate until percent cloud cover in base image is below this value, or 
-#' until \code{max_iter} iterations have been run
+#' fill will iterate until percent cloud cover in base image is below this 
+#' value, or until \code{max_iter} iterations have been run
 #' @param max_iter maximum number of times to run cloud fill script
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
