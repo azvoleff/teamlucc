@@ -52,9 +52,7 @@ pct_gap <- function(gap_mask) {
 #' \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also 
 #' run with tc=FALSE).
 #' @param threshold maximum percent gap allowable in base image. Gap fill will 
-#' iterate until percent gap in base image is below this value or until 
-#' \code{max_iter} iterations have been run
-#' @param max_iter maximum number of times to run gap fill script
+#' not occur unless percent gap in base image is greater than this value.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param notify notifier to use (defaults to \code{print} function).  See the 
@@ -69,8 +67,8 @@ pct_gap <- function(gap_mask) {
 #' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 
 #' Environment 124, 49--60.
 auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                          base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
-                          n_cpus=1, notify=print, verbose=TRUE, ...) {
+                          base_date=NULL, tc=TRUE, threshold=1, n_cpus=1, 
+                          notify=print, verbose=TRUE, ...) {
 
     stop('auto_gap_fill not yet supported')
 
@@ -180,15 +178,14 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
     # Save base_img in filled so it will be returned if base_img already has 
     # pct_gap below threshold
-    filled <- base_img
-    n <- 0
-    cur_pct_gap <- pct_gap(base_mask)
+    start_pct_gap <- pct_gap(base_mask)
     if (verbose) {
-        notify(paste0('Base image has ', round(cur_pct_gap, 2), '% gap before fill'))
+        notify(paste0('Base image has ', round(start_pct_gap, 2), '% gap before fill'))
     }
-    while ((cur_pct_gap > threshold) & (n < max_iter)) {
+
+    if (start_pct_gap > threshold) {
         if (verbose) {
-            timer <- start_timer(timer, label=paste('Fill iteration', n))
+            timer <- start_timer(timer, label='Performing gap fill')
         }
 
         # Calculate a raster indicating the pixels in each potential fill image 
@@ -224,25 +221,26 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
         if (verbose) {
             notify(paste0('Filling image from ', base_img_date,
-                          ' with image from ', fill_img_date, '...'))
+                          ' with image from ', fill_img_date, 'as input image...'))
         }
-        filled <- fill_gaps(base_img, fill_img, coded_cloud_mask, 
-                            verbose=verbose, ...)
+        filled <- fill_gaps(base_img, fill_img, imgs, verbose=verbose, ...)
         if (verbose) {
             notify('Fill complete.')
         }
 
         # Revise base mask to account for newly filled pixels
+        # TODO: Fix this
         base_mask[coded_cloud_mask >= 1] <- 0
 
         max_iter <- max_iter + 1
 
-        cur_pct_gap <- pct_gap(base_mask)
-
         if (verbose) {
-            notify(paste0('Base image has ', round(cur_pct_gap, 2), '% gap remaining'))
-            timer <- stop_timer(timer, label=paste('Fill iteration', n))
+            final_pct_gap <- pct_gap(base_mask)
+            notify(paste0('Base image has ', round(final_pct_gap, 2), '% gap remaining'))
+            timer <- stop_timer(timer, label='Performing gap fill')
         }
+    } else {
+        notify('Percent gap < threshold. Skipping gap fill.')
     }
 
     timer <- stop_timer(timer, label='Gap fill')

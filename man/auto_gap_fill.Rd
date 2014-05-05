@@ -3,8 +3,8 @@
 \title{Automated removal of gaps in SLC-off images using GNSPI}
 \usage{
 auto_gap_fill(data_dir, wrspath, wrsrow, start_date, end_date,
-  base_date = NULL, tc = TRUE, threshold = 1, max_iter = 5,
-  n_cpus = 1, notify = print, verbose = TRUE, ...)
+  base_date = NULL, tc = TRUE, threshold = 1, n_cpus = 1,
+  notify = print, verbose = TRUE, ...)
 }
 \arguments{
   \item{data_dir}{folder where input images are located,
@@ -40,12 +40,8 @@ auto_gap_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   tc=FALSE).}
 
   \item{threshold}{maximum percent gap allowable in base
-  image. Gap fill will iterate until percent gap in base
-  image is below this value or until \code{max_iter}
-  iterations have been run}
-
-  \item{max_iter}{maximum number of times to run gap fill
-  script}
+  image. Gap fill will not occur unless percent gap in base
+  image is greater than this value.}
 
   \item{n_cpus}{the number of CPUs to use for processes
   that can run in parallel}

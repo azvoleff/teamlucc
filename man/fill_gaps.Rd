@@ -12,11 +12,12 @@ fill_gaps(slc_off, fill, timeseries, out_base = NULL, use_IDL = TRUE,
   \item{slc_off}{the SLC-off Landsat 7 file to gap fill, as
   a \code{Raster*}}
 
-  \item{fill}{the first file to use to fill in the gaps, as
-  a \code{Raster*}}
+  \item{fill}{the first TM image to use to fill in the
+  gaps, as a \code{Raster*}}
 
-  \item{timeseries}{a timeseries of \code{Raster*} objects
-  to use as additional inputs to the gap fill algorithm}
+  \item{timeseries}{a timeseries of TM images as
+  \code{Raster*} objects to use as additional inputs to the
+  gap fill algorithm}
 
   \item{out_base}{path and base filename for the output
   file. The script will save the output files by appending
@@ -46,7 +47,10 @@ fill_gaps(slc_off, fill, timeseries, out_base = NULL, use_IDL = TRUE,
 }
 \description{
 Calls GNSPI.pro IDL script by Xiaolin Zhu to fill gaps in
-SLC-off Landsat 7 ETM+ image.
+SLC-off Landsat 7 ETM+ image. The script requires
+\code{fill} to be a TM (Landsat 5) image. \code{slc_off}
+must be a Landsat 7 SLC-off image. \code{timeseries} should
+be a list of TM images (at least one image is required).
 }
 \details{
 Pixels in gaps, background, and/or clouds in
