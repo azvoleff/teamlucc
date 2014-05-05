@@ -25,8 +25,9 @@
 #' output images will be saved alongside the input images in the same folder).
 #' @param prefix string to use as a prefix for all filenames
 #' @param tc whether to topographically correct imagery
-#' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to 
-#' use as as bounding box when selecting DEMs
+#' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}.  If 
+#' supplied, this aoi is used to crop and set the projection system of the 
+#' output.
 #' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem} 
 #' (only required if tc=TRUE)
 #' @param n_cpus the number of CPUs to use for processes that can run in 
