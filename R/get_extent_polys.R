@@ -40,5 +40,7 @@ get_extent_polys <- function(rast_list) {
                                              data=data.frame(filename=unlist(filenames)))
     proj4string(extent_polys) <- proj4strings[[1]]
 
+    extent_polys$filename <- as.character(extent_polys$filename)
+
     return(extent_polys)
 }
