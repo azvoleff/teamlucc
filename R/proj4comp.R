@@ -6,6 +6,7 @@
 #' strings.
 #'
 #' @export
+#' @importFrom rgdal CRSargs
 #' @importFrom stringr str_extract
 #' @param x a proj4string to compare with \code{y}
 #' @param y a proj4string to compare with \code{x}
@@ -44,6 +45,16 @@ proj4comp <- function(x, y) {
             stop('utm zone must be specified for utm projections')
         } else if (x_zone != y_zone) {
             return(FALSE)
+        }
+        x_south <- str_extract(tolower(x), '+south')
+        y_south <- str_extract(tolower(y), '+south')
+        if (!is.na(x_south) || !is.na(y_south)) {
+            # Get here if one or more of x_south and y_south is not NA
+            if (xor(is.na(x_south), is.na(y_south)) || (x_south != y_south)) {
+                # Get here if ONLY one of x_south and y_south is NA, or, if 
+                # x_south and y_south are both not NA and are both not equal
+                return(FALSE)
+            }
         }
     }
 
