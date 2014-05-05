@@ -218,7 +218,7 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
         stop('clear must be a Raster* object')
     }
     if (!(class(cloud_mask) %in% c("RasterLayer"))) {
-        stop('clear must be a RasterLayer object')
+        stop('cloud_mask must be a RasterLayer object')
     }
     compareRaster(cloudy, clear)
     if (nlayers(cloudy) != nlayers(clear)) {
