@@ -30,7 +30,7 @@ espa_scenelist <- function(x, start_date, end_date, out_file, min_clear=.7,
         x <- x[x$Date.Acquired %within% sel_interval, ]
     }
     if (nrow(x) == 0) {
-        stop('no data to plot - try different start/end dates')
+        stop('no data to download - try different start/end dates')
     }
     x <- x[!(x$Sensor %in% exclude), ]
     x <- x[x$Frac_Clear >= min_clear, ]
