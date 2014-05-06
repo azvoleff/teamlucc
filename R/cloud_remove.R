@@ -4,14 +4,16 @@ format_IDL_param <- function(varname, varvalue) {
         param <- paste0(varname, '="', varvalue, '"\n')
     } else if (is.list(varvalue)) {
         param <- paste0(varname, '=[')
-        for (n in 1:length(varvalue)) {
-            if (is.numeric(varvalue[n])) {
-                param <- paste0(param, varvalue[n])
-            } else {
-                param <- paste0(param, '"', varvalue[n], '"')
-            }
-            if (n != length(varvalue)) {
-                param <- paste0(param, ', ')
+        if (length(varvalue) > 0) {
+            for (n in 1:length(varvalue)) {
+                if (is.numeric(varvalue[n])) {
+                    param <- paste0(param, varvalue[n])
+                } else {
+                    param <- paste0(param, '"', varvalue[n], '"')
+                }
+                if (n != length(varvalue)) {
+                    param <- paste0(param, ', ')
+                }
             }
         }
         param <- paste0(param, ']\n')
