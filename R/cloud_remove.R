@@ -64,7 +64,9 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     clear_file <- filename(clear)
     cloud_mask_file <- filename(cloud_mask)
     if (is.null(out_name)) {
-        out_name <- paste0(rasterTmpFile())
+        out_name <- rasterTmpFile()
+    } else {
+        out_name <- normalizePath(out_name, mustWork=FALSE)
     }
     dummy <- capture.output(rasterOptions(format=def_format))
 
@@ -146,6 +148,10 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
     #     out <- writeValues(out, filled, bs$row[block_num])
     # }
     # out <- writeStop(out)
+    
+    if (!is.null(out_name)) {
+        out_name <- normalizePath(out_name, mustWork=FALSE)
+    }
 
     out <- rasterEngine(cloudy=cloudy, clear=clear, 
                         cloud_mask=cloud_mask,
@@ -206,7 +212,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
 cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL, 
-                         use_IDL=TRUE, fast=FALSE, num_class=1, min_pixel=20, 
+                         use_IDL=TRUE, fast=FALSE, num_class=4, min_pixel=20, 
                          max_pixel=1000, cloud_nbh=1, DN_min=0, DN_max=255, 
                          idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
                          verbose=FALSE) {
