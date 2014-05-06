@@ -4,7 +4,8 @@
 #' ETM+ image. The script requires \code{fill} to be a TM (Landsat 5) image.  
 #' \code{slc_off} must be a Landsat 7 SLC-off image.
 #'
-#' If supplied, \code{timeseries} should be a list of TM images.
+#' If supplied, \code{timeseries} should be a list of TM images.  Performing 
+#' gap fill using SLC-Off ETM+ images as the input is not yet supported.
 #' 
 #' Pixels in gaps, background, and/or clouds in \code{slc_off}, 
 #' \code{input_image}, and the images in \code{timeseries} should be coded as 
@@ -73,7 +74,7 @@ fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, use_IDL=TRUE
     }
 
     if (is.null(out_base)) {
-        out_base <- paste0(file_path_sans_ext(filename(slc_off)))
+        out_base <- file_path_sans_ext(rasterTmpFile())
     } else {
         out_base <- normalizePath(out_base, mustWork=FALSE)
     }

@@ -57,7 +57,8 @@ must be a Landsat 7 SLC-off image.
 }
 \details{
 If supplied, \code{timeseries} should be a list of TM
-images.
+images.  Performing gap fill using SLC-Off ETM+ images as
+the input is not yet supported.
 
 Pixels in gaps, background, and/or clouds in
 \code{slc_off}, \code{input_image}, and the images in
