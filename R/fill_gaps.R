@@ -30,6 +30,8 @@
 #' @param patch_long the size of block, to process whole ETM scene, set to 1000
 #' @param idl path to the IDL binary
 #' @param verbose whether to print detailed status messages
+#' @return a list of two rasters: 1) the gap filled image, and 2) the 
+#' uncertainty image.
 #' @export
 #' @references Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical approach 
 #' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 
@@ -52,7 +54,7 @@ fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, use_IDL=TRUE
 
     for (timeseries_img in timeseries) {
         if (!(class(timeseries_img) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
-            stop('clear must be a Raster* object')
+            stop('each timeseries image be a Raster* object')
         }
         if (nlayers(slc_off) != nlayers(timeseries_img)) {
             stop('number of layers in slc_off must match number of layers of each image in timeseries')
@@ -67,13 +69,13 @@ fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, use_IDL=TRUE
     }
     
     if (use_IDL) {
-        filled <- fill_gaps_idl(slc_off, fill, timeseries, 
-                                out_base, sample_size, size_wind, class_num, 
-                                DN_min, DN_max, patch_long, idl, verbose)
+        filled <- fill_gaps_idl(slc_off, fill, timeseries, out_base, 
+                                sample_size, size_wind, class_num, DN_min, 
+                                DN_max, patch_long, idl, verbose)
     } else {
-        filled <- fill_gaps_R(slc_off, fill, timeseries, 
-                                out_base, sample_size, size_wind, class_num, 
-                                DN_min, DN_max, patch_long, idl, verbose)
+        filled <- fill_gaps_R(slc_off, fill, timeseries, out_base, sample_size, 
+                              size_wind, class_num, DN_min, DN_max, patch_long, 
+                              idl, verbose)
     }
 
     return(filled)
@@ -102,8 +104,8 @@ fill_gaps_idl <- function(slc_off, fill, timeseries, out_base,
     fill_file <- filename(fill)
     timeseries_files <- c()
     if (length(timeseries) == 0) {
-        # Make timeseries_files equal to an empty matrix, in IDL format
-        timeseries_files <- "[]"
+        # Ensure timeseries_files equals an empty matrix, in IDL format
+        timeseries_files <- list()
     } else {
         for (timeseries_img in timeseries) {
             timeseries_img <- writeRaster(timeseries_img, rasterTmpFile(), datatype=dataType(fill)[1])
@@ -139,7 +141,8 @@ fill_gaps_idl <- function(slc_off, fill, timeseries, out_base,
     writeLines(idl_out, f) 
     close(f)
 
-    return(brick(paste0(out_base, '_GNSPI.envi')))
+    return(list(filled=brick(paste0(out_base, '_GNSPI.envi')),
+                uncertainty=brick(paste0(out_base, '_GNSPI_uncertainty.envi'))))
 }
 
 fill_gaps_R <- function(slc_off, fill, timeseries, out_base, sample_size, 

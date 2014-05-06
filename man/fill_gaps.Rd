@@ -45,6 +45,10 @@ fill_gaps(slc_off, fill, timeseries = c(), out_base = NULL,
 
   \item{verbose}{whether to print detailed status messages}
 }
+\value{
+a list of two rasters: 1) the gap filled image, and 2) the
+uncertainty image.
+}
 \description{
 Calls GNSPI.pro IDL script by Xiaolin Zhu to fill gaps in
 SLC-off Landsat 7 ETM+ image. The script requires
