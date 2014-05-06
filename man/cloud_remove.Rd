@@ -82,7 +82,7 @@ cloudy <- raster(system.file('tests', 'testthat_idl', 'cloud_remove',
 'L20080724_cloudy', package='teamlucc'))
 clear <- raster(system.file('tests', 'testthat_idl', 'cloud_remove',
 'L20080606', package='teamlucc'))
-clear <- raster(system.file('tests', 'testthat_idl', 'cloud_remove',
+cloud_mask <- raster(system.file('tests', 'testthat_idl', 'cloud_remove',
 'cloud_mask', package='teamlucc'))
 filled <- cloud_remove(cloudy, clear, cloud_mask, fast=TRUE)
 }

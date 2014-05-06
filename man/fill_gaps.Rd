@@ -69,7 +69,7 @@ slc_off <- brick(system.file('tests', 'testthat_idl', 'fill_gaps',
 'TM20100429_toaR_gap', package='teamlucc'))
 fill <- brick(system.file('tests', 'testthat_idl', 'fill_gaps',
 'TM20100515_toaR', package='teamlucc'))
-timeseries <- c(raster(system.file('tests', 'testthat_idl', 'fill_gaps',
+timeseries <- c(brick(system.file('tests', 'testthat_idl', 'fill_gaps',
 'TM20100208_toaR', package='teamlucc')))
 filled <- fill_gaps(slc_off, fill, timeseries)
 }
