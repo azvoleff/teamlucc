@@ -63,7 +63,6 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     cloudy_file <- filename(cloudy)
     clear_file <- filename(clear)
     cloud_mask_file <- filename(cloud_mask)
-
     if (is.null(out_name)) {
         out_name <- paste0(rasterTmpFile())
     }
