@@ -30,8 +30,8 @@
 #' @param patch_long the size of block, to process whole ETM scene, set to 1000
 #' @param idl path to the IDL binary
 #' @param verbose whether to print detailed status messages
-#' @return a list of two rasters: 1) the gap filled image, and 2) the 
-#' uncertainty image.
+#' @return a list of two rasters: 1) "filled", the gap filled image, and 2) 
+#' "uncertainty", the uncertainty image.
 #' @export
 #' @references Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical approach 
 #' for filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of 

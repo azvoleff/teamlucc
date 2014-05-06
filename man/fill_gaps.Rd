@@ -46,8 +46,8 @@ fill_gaps(slc_off, fill, timeseries = c(), out_base = NULL,
   \item{verbose}{whether to print detailed status messages}
 }
 \value{
-a list of two rasters: 1) the gap filled image, and 2) the
-uncertainty image.
+a list of two rasters: 1) "filled", the gap filled image,
+and 2) "uncertainty", the uncertainty image.
 }
 \description{
 Calls GNSPI.pro IDL script by Xiaolin Zhu to fill gaps in
