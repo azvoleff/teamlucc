@@ -62,6 +62,8 @@ fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, use_IDL=TRUE
 
     if (is.null(out_base)) {
         out_base <- paste0(file_path_sans_ext(filename(slc_off)))
+    } else {
+        out_base <- normalizePath(out_base, mustWork=FALSE)
     }
     
     if (use_IDL) {
