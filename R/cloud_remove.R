@@ -213,6 +213,16 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
+#' @examples
+#' \dontrun{
+#' cloudy <- raster(system.file('tests', 'testthat_idl', 'cloud_remove', 
+#' 'L20080724_cloudy', package='teamlucc'))
+#' clear <- raster(system.file('tests', 'testthat_idl', 'cloud_remove', 
+#' 'L20080606', package='teamlucc'))
+#' clear <- raster(system.file('tests', 'testthat_idl', 'cloud_remove', 
+#' 'cloud_mask', package='teamlucc'))
+#' filled <- cloud_remove(cloudy, clear, cloud_mask, fast=TRUE)
+#' }
 cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL, 
                          use_IDL=TRUE, fast=FALSE, num_class=4, min_pixel=20, 
                          max_pixel=1000, cloud_nbh=1, DN_min=0, DN_max=255, 

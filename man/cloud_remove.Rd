@@ -76,6 +76,17 @@ there is one important difference to note: the R/C++
 implementation of cloud removal does not currently
 implement the \code{fast=TRUE} option.
 }
+\examples{
+\dontrun{
+cloudy <- raster(system.file('tests', 'testthat_idl', 'cloud_remove',
+'L20080724_cloudy', package='teamlucc'))
+clear <- raster(system.file('tests', 'testthat_idl', 'cloud_remove',
+'L20080606', package='teamlucc'))
+clear <- raster(system.file('tests', 'testthat_idl', 'cloud_remove',
+'cloud_mask', package='teamlucc'))
+filled <- cloud_remove(cloudy, clear, cloud_mask, fast=TRUE)
+}
+}
 \references{
 Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 neighborhood similar pixel interpolator approach for

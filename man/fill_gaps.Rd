@@ -63,6 +63,17 @@ Pixels in gaps, background, and/or clouds in
 \code{slc_off}, \code{input_image}, and the images in
 \code{timeseries} should be coded as 0.
 }
+\examples{
+\dontrun{
+slc_off <- brick(system.file('tests', 'testthat_idl', 'fill_gaps',
+'TM20100429_toaR_gap', package='teamlucc'))
+fill <- brick(system.file('tests', 'testthat_idl', 'fill_gaps',
+'TM20100515_toaR', package='teamlucc'))
+timeseries <- c(raster(system.file('tests', 'testthat_idl', 'fill_gaps',
+'TM20100208_toaR', package='teamlucc')))
+filled <- fill_gaps(slc_off, fill, timeseries)
+}
+}
 \references{
 Zhu, X., Liu, D., Chen, J., 2012. A new geostatistical
 approach for filling gaps in Landsat ETM+ SLC-off images.
