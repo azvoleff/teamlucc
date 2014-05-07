@@ -1,0 +1,3 @@
+[submodule "tests/testthat_idl"]
+	path = tests/testthat_idl
+	url = git@github.com:azvoleff/teamlucc_testthat_idl.git
