@@ -131,9 +131,10 @@ pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
     ;-------------------------------------------------------------------
     tempoutname=temp_file+'_temp_filled'
 
-    print,'there are total',n_ns*n_nl,'patches'
+    print,'there are total',n_ns*n_nl,'blocks'
 
     for isub=0,n_ns*n_nl-1,1 do begin
+        print,'processing block ',isub
 
         ;open each block
 
@@ -157,6 +158,7 @@ pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
             num_cloud_path=max(cloud[cloud_posite])
             ;
             for icloud=1,num_cloud_path,1 do begin       ; remove each cloud patches
+                print,'processing cloud',icloud
                 cloud_area=where(cloud eq icloud,num_cloud1)
 
                 if (num_cloud1 gt 0) then begin
@@ -210,6 +212,12 @@ pro CLOUD_REMOVE, cloudy_file, clear_file, mask_file, out_name, num_class, $
 
                     ind_cloud=where(sub_cloud eq icloud,num_cloud)
                     ind_clear=where(sub_cloud eq 0,num_clear)
+
+                    if (num_clear eq 0) then begin
+                        print,"No clear neighbors in cloudy image. Skipping fill."
+                        continue
+                    endif
+
                     xy_clear=fltarr(2,num_clear)                    ;the location of each clear pixel
                     xy_clear[1,*]=fix(ind_clear/(a_region))
                     xy_clear[0,*]=ind_clear-(a_region)*xy_clear[1,*]
