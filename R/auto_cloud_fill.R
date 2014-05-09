@@ -212,7 +212,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                                 max(fill_areas_freq[avail_fill_row, -1]))
         fill_img <- imgs[[fill_img_index]]
         imgs <- imgs[-fill_img_index]
-        cloud_mask <- fill_areas[[fill_img_index]]
+        base_img_mask <- fill_areas[[fill_img_index]]
         fill_img_mask <- masks[[fill_img_index]]
         masks <- masks[-fill_img_index]
 
@@ -224,20 +224,20 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         fill_img[fill_img_mask] <- 0
 
         # Mark areas where fill_img_mask is blank (clouded) with NA
-        cloud_mask[fill_img_mask] <- NA
+        base_img_mask[fill_img_mask] <- NA
         # Mark areas where fill_img_mask is NA with NA
-        cloud_mask[is.na(fill_img_mask)] <- NA
+        base_img_mask[is.na(fill_img_mask)] <- NA
         # Add numbered IDs to the cloud patches
-        coded_cloud_mask <- ConnCompLabel(cloud_mask)
+        coded_base_img_mask <- ConnCompLabel(base_img_mask)
 
         # Ensure dataType is properly set prior to handing off to IDL
-        dataType(coded_cloud_mask) <- 'INT2S'
+        dataType(coded_base_img_mask) <- 'INT2S'
 
         if (verbose) {
             notify(paste0('Filling image from ', base_img_date,
                           ' with image from ', fill_img_date, '...'))
         }
-        filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, 
+        filled <- cloud_remove(base_img, fill_img, coded_base_img_mask, 
                                verbose=verbose, ...)
         if (verbose) {
             notify('Fill complete.')
