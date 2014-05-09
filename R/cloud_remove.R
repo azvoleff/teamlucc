@@ -225,7 +225,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' }
 cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL, 
                          use_IDL=TRUE, fast=FALSE, num_class=4, min_pixel=20, 
-                         max_pixel=1000, cloud_nbh=1, DN_min=0, DN_max=255, 
+                         max_pixel=1000, cloud_nbh=10, DN_min=0, DN_max=255, 
                          idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
                          verbose=FALSE) {
     if (!(class(cloudy) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {

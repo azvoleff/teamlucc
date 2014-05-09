@@ -50,7 +50,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
 
     if (verbose) Rcpp::Rcout << cloud_codes.n_elem  << " cloud(s) to fill" << std::endl;
 
-    for(unsigned n=0; n < cloud_codes.n_elem; n++) {
+    for (unsigned n=0; n < cloud_codes.n_elem; n++) {
         int cloud_code = cloud_codes(n);
         if (verbose) Rcpp::Rcout << "Filling cloud " << cloud_code;
 
@@ -92,12 +92,23 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
 
         imat sub_cloud_mask = cloud_mask_mat.submat(up_row, left_col, down_row, right_col);
 
-        // Compute the threshold for what is a "similar" pixel
-        rowvec similar_th_band = stddev(sub_clear, 0, 0) * 2 / num_class;
+        // These indices refer to the position of pixels of this cloud
+        // within the cloud neighborhood of this cloud (a subset of cloud_mask 
+        // block)
+        uvec sub_cloud_vec_i = find(sub_cloud_mask == cloud_code);
+        uvec sub_cloud_col_i = floor(sub_cloud_vec_i / sub_cloud_mask.n_rows);
+        uvec sub_cloud_row_i = sub_cloud_vec_i - sub_cloud_col_i * sub_cloud_mask.n_rows;
 
+        if (verbose) Rcpp::Rcout << " (" << sub_cloud_vec_i.n_elem <<  " pixels)" << std::endl;
+
+        // ic is the current index within the sub_cloud_vec_i vector
         // These indices refer to the position of clear pixels within the cloud 
         // neighborhood of this cloud (a subset of clear block)
         uvec sub_clear_vec_i = find(sub_cloud_mask == 0);
+        if (sub_clear_vec_i.n_elem == 0) {
+            if (verbose) Rcpp::Rcout << "No clear neighbors in cloudy image. Skipping fill." << std::endl;
+            continue;
+        }
         uvec sub_clear_col_i = floor(sub_clear_vec_i / sub_cloud_mask.n_rows);
         uvec sub_clear_row_i = sub_clear_vec_i - sub_clear_col_i * sub_cloud_mask.n_rows;
 
@@ -107,15 +118,10 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
         // Below is used when there are NO similar pixels
         rowvec mean_diff = mean(sub_cloudy_clear - sub_clear_clear, 0);
 
-        // These indices refer to the position of pixels of this cloud
-        // within the cloud neighborhood of this cloud (a subset of cloud_mask 
-        // block)
-        uvec sub_cloud_vec_i = find(sub_cloud_mask == cloud_code);
-        uvec sub_cloud_col_i = floor(sub_cloud_vec_i / sub_cloud_mask.n_rows);
-        uvec sub_cloud_row_i = sub_cloud_vec_i - sub_cloud_col_i * sub_cloud_mask.n_rows;
+        // Compute the threshold for what is a "similar" pixel - ensure that 
+        // only clear pixels sub_clear are used
+        rowvec similar_th_band = stddev(sub_clear_clear, 0) * 2 / num_class;
 
-        if (verbose) Rcpp::Rcout << " (" << sub_cloud_vec_i.n_elem <<  " pixels)" << std::endl;
-        // ic is the current index within the sub_cloud_vec_i vector
         for (unsigned ic=0; ic < sub_cloud_vec_i.n_elem; ic++) {
             if (verbose & (ic != 0) & (ic % 1000 == 0)) {
                 Rcpp::Rcout << ".";
@@ -197,6 +203,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
                 mat predict_2 = cloudy_similar - clear_similar;
                 predict_2.each_col() %= weight;
                 predict_2 = sub_clear.row(sub_row) + sum(predict_2, 0);
+
                 for(int iband=0; iband < dims(2); iband++) {
                     if (predict_2(iband) > DN_min && predict_2(iband) < DN_max) {
                         cloudy_cube(up_row + ri, left_col + ci, iband) = W_T1 * predict_1(iband) + W_T2 * predict_2(iband);
