@@ -157,9 +157,21 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #       3 = snow
     #       4 = cloud
     #       255 = fill value
-    for (n in 1:length(masks)) {
-        masks[n] <- (masks[[n]] == 2) | (masks[[n]] == 4)
+    calc_cloud_mask <- function(fmask, img) {
+        ret <- (fmask == 2) | (fmask == 4)
+        ret[fmask == 255] <- NA
+        # The (ret != 1) test is necessary in case clouded areas in img are 
+        # mistakely coded NA (they should not be) - this test ensures that only 
+        # NAs that are NOT in clouds will be copied to the mask images (the 
+        # assumption being that NAs in clouds should be marked as cloud and 
+        # fill should be attempted).
+        ret[(ret != 1) & is.na(img)] <- NA
+        return(ret)
     }
+    for (n in 1:length(masks)) {
+        masks[n] <- overlay(masks[[n]], imgs[[n]][[1]], fun=calc_cloud_mask)
+    }
+
     base_img <- imgs[[base_img_index]]
     imgs <- imgs[-base_img_index]
     base_mask <- masks[[base_img_index]]
@@ -195,6 +207,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # (counting only pixels in the fill image that are not ALSO clouded in the 
         # fill image)
         avail_fill_row <- which(fill_areas_freq$value == 1)
+        # The -1 below fremoves the unncessary "value" column
         fill_img_index <- which(fill_areas_freq[avail_fill_row, -1] == 
                                 max(fill_areas_freq[avail_fill_row, -1]))
         fill_img <- imgs[[fill_img_index]]
@@ -206,18 +219,24 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         fill_img_date <- img_dates[fill_img_index]
         img_dates <- img_dates[-fill_img_index]
 
+        # Mask out clouds in the fill and base images
+        base_img[base_img_mask] <- 0
+        fill_img[fill_img_mask] <- 0
+
+        # Mark areas where fill_img_mask is blank (clouded) with NA
+        cloud_mask[fill_img_mask] <- NA
+        # Mark areas where fill_img_mask is NA with NA
+        cloud_mask[is.na(fill_img_mask)] <- NA
         # Add numbered IDs to the cloud patches
         coded_cloud_mask <- ConnCompLabel(cloud_mask)
 
-        # Mark areas of the cloud_mask where fill_img is blank (clouded) with -1
-        coded_cloud_mask[fill_img_mask] <- -1
-        NAvalue(coded_cloud_mask) <- -2
+        # Ensure dataType is properly set prior to handing off to IDL
+        dataType(coded_cloud_mask) <- 'INT2S'
 
         if (verbose) {
             notify(paste0('Filling image from ', base_img_date,
                           ' with image from ', fill_img_date, '...'))
         }
-        #filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, ...)
         filled <- cloud_remove(base_img, fill_img, coded_cloud_mask, 
                                verbose=verbose, ...)
         if (verbose) {
@@ -225,7 +244,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
 
         # Revise base mask to account for newly filled pixels
-        base_mask[coded_cloud_mask >= 1] <- 0
+        base_mask <- filled == 0
 
         max_iter <- max_iter + 1
 
