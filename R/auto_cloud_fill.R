@@ -190,7 +190,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     }
     while ((cur_pct_clouds > threshold) & (n < max_iter)) {
         if (verbose) {
-            timer <- start_timer(timer, label=paste('Fill iteration', n))
+            timer <- start_timer(timer, label=paste('Fill iteration', n + 1))
         }
 
         # Calculate a raster indicating the pixels in each potential fill image 
@@ -244,7 +244,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
 
         # Revise base mask to account for newly filled pixels
-        base_mask <- filled == 0
+        base_mask <- filled[[1]] == 0
 
         max_iter <- max_iter + 1
 
@@ -252,8 +252,10 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
         if (verbose) {
             notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover remaining'))
-            timer <- stop_timer(timer, label=paste('Fill iteration', n))
+            timer <- stop_timer(timer, label=paste('Fill iteration', n + 1))
         }
+
+        n <- n + 1
     }
 
     timer <- stop_timer(timer, label='Cloud fill')
