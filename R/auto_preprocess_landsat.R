@@ -211,9 +211,11 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
         # 	255 = fill
         image_stack_mask <- overlay(mask_stack$fmask_band, mask_stack$fill_QA,
             fun=function(fmask, fill) {
-                ((fmask == 0) | (fmask == 1)) & (fill == 0)
+                ret <- ((fmask == 0) | (fmask == 1) | (fmask == 3))
+                ret[fill == 255] <- NA
+                return(ret)
                 })
-        image_stack <- mask(image_stack, image_stack_mask, maskvalue=0)
+        image_stack <- image_stack * image_stack_mask
 
         mask_stack_path <- file.path(this_output_path,
                                      paste(prefix, image_basename, 
