@@ -163,7 +163,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
             vec dis_similar(min_pixel); // Based on spatial distance
             while ((num_similar <= (min_pixel-1)) && (iclear <= 
                         (order_clear.n_elem - 1)) && (iclear <= max_pixel)) {
-                int indicate_similar = sum((sub_clear_clear.row(order_clear(iclear)) - sub_clear.row(sub_row)) <= similar_th_band);
+                int indicate_similar = sum(abs(sub_clear_clear.row(order_clear(iclear)) - sub_clear.row(sub_row)) <= similar_th_band);
                 // Below only runs if there are similar pixels in all bands
                 if (indicate_similar == dims(2)) {
                     cloudy_similar.row(num_similar) = sub_cloudy_clear.row(order_clear(iclear));
@@ -177,7 +177,7 @@ arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear,
             }
 
             // Perform cloud fill
-            if (num_similar > 1) {
+            if (num_similar >= 1) {
                 // Need to filter out blank rows if less than min_pixel similar 
                 // pixels were found
                 if (num_similar < min_pixel) {
