@@ -98,7 +98,11 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     writeLines(idl_out, f) 
     close(f)
 
-    return(brick(out_name))
+    filled <- brick(out_name)
+
+    filled[filled < DN_min] <- NA
+
+    return(filled)
 }
 
 # Wrapper around C++ cloud fill function, to enable calling the function with 
