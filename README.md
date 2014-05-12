@@ -29,7 +29,6 @@ imagery with TEAM monitoring data, including:
     * Topographic correction using parallel processing (Goslee, 2011)[^1]
 
 [^1]:
-
     Goslee, S.C., 2011. Analyzing remote sensing data in R: the landsat 
     package.  Journal of Statistical Software 43, 1--25.
 
@@ -39,13 +38,11 @@ imagery with TEAM monitoring data, including:
       al. (2012a, 2012b)[^2][^3]
 
 [^2]:
-
     Zhu, X., Gao, F., Liu, D., Chen, J., 2012a. A modified neighborhood similar 
     pixel interpolator approach for removing thick clouds in Landsat images.  
     Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
 
 [^3]:
-
     Zhu, X., Liu, D., Chen, J., 2012b. A new geostatistical approach for 
     filling gaps in Landsat ETM+ SLC-off images. Remote Sensing of Environment 
     124, 49--60.
@@ -60,9 +57,8 @@ imagery with TEAM monitoring data, including:
   algorithms (Chen et al. 2011)[^4]
 
 [^4]:
-
     Chen, J., Chen, X., Cui, X., Chen, J., 2011. Change vector analysis in 
-    posterior probability space: a new method for land cover change detection. 
+    posterior probability space: a new method for land cover change detection.  
     IEEE Geoscience and Remote Sensing Letters 8, 317--321.
 
 
@@ -70,9 +66,8 @@ imagery with TEAM monitoring data, including:
   Millones, 2011)[^5]
 
 [^5]:
-
     Pontius, R.G., Millones, M., 2011. Death to Kappa: birth of quantity 
-    disagreement and allocation disagreement for accuracy assessment. 
+    disagreement and allocation disagreement for accuracy assessment.  
     International Journal of Remote Sensing 32, 4407--4429.
 
 The toolkit is still under active development. Follow the [TEAM 
