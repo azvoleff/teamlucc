@@ -60,7 +60,8 @@ auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
   \item{...}{additional arguments passed to
   \code{\link{cloud_remove}}, such as \code{DN_min},
   \code{DN_max}, \code{use_IDL}, \code{fast},
-  \code{verbose}, etc. See \code{\link{cloud_remove}}.}
+  \code{byblock}, \code{verbose}, etc. See
+  \code{\link{cloud_remove}} for details}
 }
 \value{
 \code{Raster*} object with cloud filled image.

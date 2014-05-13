@@ -63,8 +63,9 @@ pct_clouds <- function(cloud_mask) {
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages
 #' @param ... additional arguments passed to \code{\link{cloud_remove}}, such 
-#' as \code{DN_min}, \code{DN_max}, \code{use_IDL}, \code{fast},
-#' \code{verbose}, etc. See \code{\link{cloud_remove}}.
+#' as \code{DN_min}, \code{DN_max}, \code{use_IDL}, \code{fast}, 
+#' \code{byblock}, \code{verbose}, etc. See \code{\link{cloud_remove}} for 
+#' details
 #' @return \code{Raster*} object with cloud filled image.
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified 
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
