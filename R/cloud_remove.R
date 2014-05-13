@@ -36,7 +36,7 @@ prep_fmask <- function(image_dir) {
 cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              fast, num_class, min_pixel, max_pixel, 
                              cloud_nbh, DN_min, DN_max, 
-                             verbose, idl, patch_long=1000, ...) {
+                             verbose, idl, byblock, patch_long=1000) {
     if (verbose) {
         warning("verbose=TRUE not supported when use_IDL=TRUE")
     }
@@ -54,6 +54,10 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
         stop('IDL not found - check "idl" parameter')
     }
 
+    if (!byblock) {
+        patch_long <- max(dim(cloudy)) + 1
+    }
+
     # Write in-memory rasters to files for hand off to IDL. The capture.output 
     # line is used to avoid printing the rasterOptions to screen as they are 
     # temporarily reset.
@@ -65,11 +69,6 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     cloudy_file <- filename(cloudy)
     clear_file <- filename(clear)
     cloud_mask_file <- filename(cloud_mask)
-    if (is.null(out_name)) {
-        out_name <- rasterTmpFile()
-    } else {
-        out_name <- normalizePath(out_name, mustWork=FALSE)
-    }
     dummy <- capture.output(rasterOptions(format=def_format))
 
     param_names <- c("cloudy_file", "clear_file", "mask_file", "out_name", 
@@ -128,7 +127,7 @@ cloud_fill_cpp_wrapper <- function(cloudy, clear, cloud_mask, num_class,
 #' @importFrom spatial.tools rasterEngine
 cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast, 
                            num_class, min_pixel, max_pixel, cloud_nbh, DN_min, 
-                           DN_max, verbose, ...) {
+                           DN_max, verbose, byblock) {
     if (fast) {
         stop("fast=TRUE not yet supported when use_IDL=FALSE")
     }
@@ -155,20 +154,34 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
     # }
     # out <- writeStop(out)
     
-    if (!is.null(out_name)) {
-        out_name <- normalizePath(out_name, mustWork=FALSE)
+    if (byblock) {
+        out <- rasterEngine(cloudy=cloudy, clear=clear, 
+                            cloud_mask=cloud_mask,
+                            fun=cloud_fill_cpp_wrapper,
+                            args=list(num_class=num_class, min_pixel=min_pixel, 
+                            max_pixel=max_pixel, cloud_nbh=cloud_nbh, 
+                            DN_min=DN_min, DN_max=DN_max, verbose=verbose),
+                            processing_unit='chunk',
+                            outbands=nlayers(cloudy), outfiles=1,
+                            setMinMax=TRUE,
+                            filename=out_name)
+    } else {
+        dims <- dim(cloudy)
+        out <- brick(cloudy, values=FALSE, filename=out_name)
+        # RcppArmadillo crashes when you pass it a cube, so resize and pass 
+        # mats
+        cloudy <- array(getValues(cloudy), dim=c(dims[1] * dims[2], dims[3]))
+        clear <- array(getValues(clear), dim=c(dims[1] * dims[2], dims[3]))
+        cloud_mask <- array(getValues(cloud_mask), dim=c(dims[1] * dims[2]))
+        filled <- cloud_fill(cloudy, clear, cloud_mask, dims, num_class, 
+                             min_pixel, max_pixel, cloud_nbh, DN_min, DN_max, 
+                             verbose)
+        # RcppArmadillo crashes when you return a cube, so resize the returned 
+        # mat
+        filled <- array(filled, dim=c(dims[1], dims[2], dims[3]))
+        out <- setValues(out, filled)
+        out <- writeRaster(out, out_name)
     }
-
-    out <- rasterEngine(cloudy=cloudy, clear=clear, 
-                        cloud_mask=cloud_mask,
-                        fun=cloud_fill_cpp_wrapper,
-                        args=list(num_class=num_class, min_pixel=min_pixel, 
-                        max_pixel=max_pixel, cloud_nbh=cloud_nbh, 
-                        DN_min=DN_min, DN_max=DN_max, verbose=verbose),
-                        processing_unit='chunk',
-                        outbands=nlayers(cloudy), outfiles=1,
-                        setMinMax=TRUE,
-                        filename=out_name, ...)
 
     return(out)
 }
@@ -212,7 +225,10 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' @param idl path to the IDL binary on your machine (on Windows, the path to 
 #' idl.exe)
 #' @param verbose whether to print detailed status messages
-#' @param ... additional arguments to pass to \code{rasterEngine}
+#' @param byblock whether to process images block by block 
+#' (\code{byblock=TRUE}) or all at once (\code{byblock=FALSE}). Use 
+#' \code{byblock=FALSE} with caution, as this option will cause the cloud fill 
+#' routine to consume a large amount of memory.
 #' @return \code{Raster*} with cloud-filled image
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
@@ -231,7 +247,7 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
                          use_IDL=TRUE, fast=FALSE, num_class=4, min_pixel=20, 
                          max_pixel=1000, cloud_nbh=10, DN_min=0, DN_max=255, 
                          idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
-                         verbose=FALSE) {
+                         verbose=FALSE, byblock=TRUE) {
     if (!(class(cloudy) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
         stop('cloudy must be a Raster* object')
     }
@@ -248,16 +264,24 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
     if (nlayers(cloud_mask) != 1) {
         stop('cloud_mask should have only one layer')
     }
+
+    if (is.null(out_name)) {
+        out_name <- rasterTmpFile()
+    } else {
+        out_name <- normalizePath(out_name, mustWork=FALSE)
+    }
     
     if (use_IDL) {
         filled <- cloud_remove_IDL(cloudy, clear, cloud_mask, out_name,
                                    fast, num_class, min_pixel, max_pixel, 
-                                   cloud_nbh, DN_min, DN_max, verbose, idl)
+                                   cloud_nbh, DN_min, DN_max, verbose, idl, 
+                                   byblock)
     } else {
         filled <- cloud_remove_R(cloudy, clear, cloud_mask, out_name,
                                  fast, num_class, min_pixel, max_pixel, 
-                                 cloud_nbh, DN_min, DN_max, verbose)
+                                 cloud_nbh, DN_min, DN_max, verbose, byblock)
     }
 
+    names(filled) <- names(cloudy)
     return(filled)
 }

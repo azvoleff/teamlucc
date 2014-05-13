@@ -6,7 +6,7 @@ cloud_remove(cloudy, clear, cloud_mask, out_name = NULL, use_IDL = TRUE,
   fast = FALSE, num_class = 4, min_pixel = 20, max_pixel = 1000,
   cloud_nbh = 10, DN_min = 0, DN_max = 255,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
-  verbose = FALSE)
+  verbose = FALSE, byblock = TRUE)
 }
 \arguments{
   \item{cloudy}{the cloudy image (base image) as a
@@ -51,8 +51,11 @@ cloud_remove(cloudy, clear, cloud_mask, out_name = NULL, use_IDL = TRUE,
 
   \item{verbose}{whether to print detailed status messages}
 
-  \item{...}{additional arguments to pass to
-  \code{rasterEngine}}
+  \item{byblock}{whether to process images block by block
+  (\code{byblock=TRUE}) or all at once
+  (\code{byblock=FALSE}). Use \code{byblock=FALSE} with
+  caution, as this option will cause the cloud fill routine
+  to consume a large amount of memory.}
 }
 \value{
 \code{Raster*} with cloud-filled image
