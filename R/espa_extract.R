@@ -7,57 +7,116 @@
 #' "LT50150531986037-SC20130816144215.tar.gz" would be extracted into a 
 #' subfolder named "1986_037_LT5', for 1986, Julian day 37, and Landsat 5 TM.
 #'
+#' Zip files for images from sensors not included in \code{sensors}, from 
+#' path/rows not included in \code{pathrows} or with acquisition dates
+#' outside of the period defined by \code{start_date} and \code{end_date} will 
+#' be ignored.
+#'
 #' @export
 #' @importFrom stringr str_extract
 #' @param in_folder Path to a folder of .tar.gz Landsat surface reflectance 
 #' images
 #' @param out_folder output folder
-#' @return used for side effect of unzipping Landsat tarballs
-espa_extract <- function(in_folder, out_folder) {
+#' @param pathrows a list of paths/rows to include. Each path/row should be 
+#' specified as a six digit string. For example, path 231, row 62 would be 
+#' specified as "231062".
+#' @param start_date start date of period from which images will be extracted
+#' to (as \code{Date} object).
+#' @param end_date end date of period from which images will be extracted
+#' to (as \code{Date} object)
+#' @param sensors a list of the sensors to include (can be any of "LT4", "LT5", 
+#' "LE7", or "LE8")
+#' @return nothing (used for side effect of unzipping Landsat CDR tarballs)
+#' @examples
+#' \dontrun{
+#' # Don't filter:
+#' espa_extract('D:/Landsat_Originals', 'D:/Landsat_Out')
+#'
+#' # Filter by start and end date:
+#' start_date <- as.Date('2010/1/1')
+#' end_date <- as.Date('2010/12/31')
+#' espa_extract('D:/Landsat_Originals', 'D:/Landsat_Out',
+#'              start_date=start_date, end_date=end_date)
+#'
+#' # Filter by start and end date, sensor, and pathrow:
+#' espa_extract('D:/Landsat_Originals', 'D:/Landsat_Out', 
+#'              start_date=start_date, end_date=end_date, sensors='LE7',
+#'              pathrows='231062')
+#' }
+espa_extract <- function(in_folder, out_folder, pathrows=NULL, start_date=NULL, 
+                         end_date=NULL, sensors=NULL) {
     if (!file_test('-d', in_folder)) {
         stop(paste(in_folder, 'does not exist'))
     }
     if (!file_test('-d', out_folder)) {
         stop(paste(out_folder, 'does not exist'))
     }
-    for (zipfile in dir(in_folder, pattern='^.*.tar.gz(ip)?$')) {
-        zipfile_path <- file.path(in_folder, zipfile)
-        if (!file_test('-f', zipfile_path)) {
-            message(paste('Skipping', zipfile, '- not a valid file type.'))
-            next
-        }
+
+    zipfiles <- dir(in_folder, pattern='^.*.tar.gz(ip)?$')
+
+    # Filter by date
+    img_dates <- as.Date(gsub('-', '', str_extract(zipfiles, '[0-9]{7}-')), '%Y%j')
+    if (!is.null(start_date)) {
+        stopifnot(class(start_date) == 'Date')
+        inc_dates <- which(img_dates >= start_date)
+        zipfiles <- zipfiles[inc_dates]
+        img_dates <- img_dates[inc_dates]
+    }
+    if (!is.null(end_date)) {
+        stopifnot(class(end_date) == 'Date')
+        inc_dates <- which(img_dates < end_date)
+        zipfiles <- zipfiles[inc_dates]
+        img_dates <- img_dates[inc_dates]
+    }
+
+    # Filter by pathrow
+    img_pathrows <- gsub('(LT[45])|(LE[78])', '', str_extract(zipfiles, '((LT[45])|(LE[78]))[0-9]{6}'))
+    if (!is.null(pathrows)) {
+        stopifnot(!is.na(str_extract(pathrows, '[0-9]{6}')))
+        inc_pathrows <- img_pathrows %in% pathrows
+        zipfiles <- zipfiles[inc_pathrows]
+        img_pathrows <- img_pathrows[inc_pathrows]
+        img_dates <- img_dates[inc_pathrows]
+    }
+
+    # Filter by sensor
+    img_sensors <- str_extract(zipfiles, '^((LT[45])|(LE)[78])')
+    if (!is.null(sensors)) {
+        stopifnot(!is.na(str_extract(sensors, '^((LT[45])|(LE)[78])$')))
+        inc_sensors <- img_sensors %in% sensors
+        zipfiles <- zipfiles[inc_sensors]
+        img_pathrows <- img_pathrows[inc_sensors]
+        img_sensors <- img_sensors[inc_sensors]
+        img_dates <- img_dates[inc_sensors]
+    }
+
+    img_paths <- str_extract(img_pathrows, '^[0-9]{3}')
+    img_rows <- str_extract(img_pathrows, '[0-9]{3}$')
+
+    if (length(zipfiles) == 0) {
+        stop('No images found')
+    }
+
+    for (n in 1:length(zipfiles)) {
+        zipfile_path <- file.path(in_folder, zipfiles[n])
         # Figure out which satellite the image is from
-        if (grepl('^LT4', zipfile)) {
-            sensor <- 'LT4'
-        } else if (grepl('^LT5', zipfile)) {
-            sensor <- 'LT5'
-        } else if (grepl('^LE7', zipfile)) {
-            sensor <- 'LE7'
-        } else {
-            message(paste('Skipping', zipfile,
-                          '- cannot determine sensor from filename.'))
-            next
-        }
-        metadata_string <- str_extract(zipfile, '^((LT4)|(LT5)|(LE7))[0-9]{13}')
-        year <- substr(metadata_string, 10, 13)
-        julian_day <- substr(metadata_string, 14, 16)
-        img_path <- substr(metadata_string, 4, 6)
-        img_row <- substr(metadata_string, 7, 9)
+        year <- format(img_dates[n], '%Y')
+        julian_day <- format(img_dates[n], '%j')
         this_out_folder <- file.path(out_folder,
-                                     paste0(img_path,'-', img_row, '_', year, 
-                                            '-', julian_day, '_', sensor))
+                                     paste0(img_paths[n],'-', img_rows[n], '_', year, 
+                                            '-', julian_day, '_', img_sensors[n]))
         if (!file_test('-d', this_out_folder)) {
             dir.create(this_out_folder)
         } else {
-            message(paste('Skipping', zipfile, '- output dir', 
+            message(paste('Skipping', zipfiles[n], '- output dir', 
                           this_out_folder, 'already exists.'))
             next
         }
-        message(paste('***********\nExtracting:\n\t', zipfile, '\nto:\n\t', 
-                      this_out_folder))
+        message(paste0(n, ' of ', length(zipfiles), '. Extracting ', zipfiles[n], ' to ', this_out_folder))
         ret_code <- untar(zipfile_path, exdir=file.path(this_out_folder))
         if (ret_code != 0) {
-            message(paste('WARNING: error extracting', zipfile, '- return code', ret_code))
+            message(paste('WARNING: error extracting', zipfiles[n], '- return 
+                          code', ret_code))
         }
     }
 }

@@ -2,16 +2,32 @@
 \alias{espa_extract}
 \title{Extract a set of Landsat tarballs into a folder tree organized by image date}
 \usage{
-espa_extract(in_folder, out_folder)
+espa_extract(in_folder, out_folder, pathrows = NULL, start_date = NULL,
+  end_date = NULL, sensors = NULL)
 }
 \arguments{
   \item{in_folder}{Path to a folder of .tar.gz Landsat
   surface reflectance images}
 
   \item{out_folder}{output folder}
+
+  \item{pathrows}{a list of paths/rows to include. Each
+  path/row should be specified as a six digit string. For
+  example, path 231, row 62 would be specified as
+  "231062".}
+
+  \item{start_date}{start date of period from which images
+  will be extracted to (as \code{Date} object).}
+
+  \item{end_date}{end date of period from which images will
+  be extracted to (as \code{Date} object)}
+
+  \item{sensors}{a list of the sensors to include (can be
+  any of "LT4", "LT5", "LE7", or "LE8")}
 }
 \value{
-used for side effect of unzipping Landsat tarballs
+nothing (used for side effect of unzipping Landsat CDR
+tarballs)
 }
 \description{
 Each image .tar.gz file will be extracted into a subfolder
@@ -22,5 +38,29 @@ TM, and Landsat 7 ETM+ respectively). For example,
 "LT50150531986037-SC20130816144215.tar.gz" would be
 extracted into a subfolder named "1986_037_LT5', for 1986,
 Julian day 37, and Landsat 5 TM.
+}
+\details{
+Zip files for images from sensors not included in
+\code{sensors}, from path/rows not included in
+\code{pathrows} or with acquisition dates outside of the
+period defined by \code{start_date} and \code{end_date}
+will be ignored.
+}
+\examples{
+\dontrun{
+# Don't filter:
+espa_extract('D:/Landsat_Originals', 'D:/Landsat_Out')
+
+# Filter by start and end date:
+start_date <- as.Date('2010/1/1')
+end_date <- as.Date('2010/12/31')
+espa_extract('D:/Landsat_Originals', 'D:/Landsat_Out',
+             start_date=start_date, end_date=end_date)
+
+# Filter by start and end date, sensor, and pathrow:
+espa_extract('D:/Landsat_Originals', 'D:/Landsat_Out',
+             start_date=start_date, end_date=end_date, sensors='LE7',
+             pathrows='231062')
+}
 }
 
