@@ -127,14 +127,15 @@ For more information on using `teamlucc`, see the online help in R, and the
 examples of a number of specific applications of `teamlucc`, including:
 
 * [Filtering and downloading Landsat 
-  scenes](/articles/filtering-landsat-with-teamlucc)
+  scenes](http://www.azvoleff.com/articles/filtering-landsat-with-teamlucc)
 
 * [Preprocessing imagery and 
-  DEMS](/articles/preprocessing-imagery-with-teamlucc)
+  DEMS](http://www.azvoleff.com/articles/preprocessing-imagery-with-teamlucc)
 
-* [Cloud removal](/articles/cloud-removal-with-teamlucc)
+* [Cloud removal](http://www.azvoleff.com/articles/cloud-removal-with-teamlucc)
 
-* [Image classification](/articles/image-classification-with-teamlucc)
+* [Image 
+  classification](http://www.azvoleff.com/articles/image-classification-with-teamlucc)
 
 ## Author Contact Information
 
