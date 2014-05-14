@@ -80,6 +80,9 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Cloud fill')
 
+    stopifnot(class(start_date) == 'Date')
+    stopifnot(class(end_date) == 'Date')
+
     if (n_cpus > 1) sfQuickInit(n_cpus)
 
     wrspath <- sprintf('%03i', wrspath)
