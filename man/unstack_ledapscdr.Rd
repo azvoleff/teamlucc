@@ -2,14 +2,19 @@
 \alias{unstack_ledapscdr}
 \title{Convert LEDAPS CDR Landsat format images from HDF4 to ENVI format}
 \usage{
-unstack_ledapscdr(x, out, overwrite = FALSE)
+unstack_ledapscdr(x, output_folder = NULL, overwrite = FALSE,
+  rmhdf = FALSE)
 }
 \arguments{
   \item{x}{input HDF4 file}
 
-  \item{out}{output folder}
+  \item{out_folder}{output folder (if \code{NULL}, defaults
+  to input folder)}
 
   \item{overwrite}{whether to overwrite existing files}
+
+  \item{rmhdf}{whether to remove hdf files after unstacking
+  them}
 }
 \description{
 This function converts a Landsat surface reflectance (SR)
