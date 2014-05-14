@@ -1,6 +1,6 @@
 \name{unstack_ledapscdr}
 \alias{unstack_ledapscdr}
-\title{Convert LEDAPS CDR Landsat format images from HDF4 to ENVI format}
+\title{Convert Landsat CDR images from HDF4 to ENVI format}
 \usage{
 unstack_ledapscdr(x, output_folder = NULL, overwrite = FALSE,
   rmhdf = FALSE)
@@ -16,6 +16,10 @@ unstack_ledapscdr(x, output_folder = NULL, overwrite = FALSE,
   \item{rmhdf}{whether to remove hdf files after unstacking
   them}
 }
+\value{
+nothing (used for side effect of converting Landsat CDR HDF
+files)
+}
 \description{
 This function converts a Landsat surface reflectance (SR)
 image from the Landsat Climate Data Record (CDR) archive
@@ -26,5 +30,16 @@ Note that this function requires a local GDAL installation.
 See http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries
 or http://trac.osgeo.org/osgeo4w/ to download the
 appropriate installer for your operating system.
+}
+\examples{
+\dontrun{
+# Unstack files downloaded from CDR:
+unstack_ledapscdr('lndsr.LT50150531986021XXX03.hdf')
+
+# Unstack files downloaded from CDR, overwriting any existing files, and
+# deleting original HDF files after unstacking:
+unstack_ledapscdr('lndsr.LT50150531986021XXX03.hdf', overwrite=TRUE,
+                  rmhdf=TRUE)
+}
 }
 
