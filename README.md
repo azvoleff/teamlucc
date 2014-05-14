@@ -120,6 +120,22 @@ At a shell prompt, type:
 sudo apt-get install gdal-bin libgdal-dev
 ```
 
+## Using teamlucc
+
+For more information on using `teamlucc`, see the online help in R, and the 
+[`teamlucc` webpage](http://www.azvoleff.com/teamlucc). The webpage includes 
+examples of a number of specific applications of `teamlucc`, including:
+
+* [Filtering and downloading Landsat 
+  scenes](/articles/filtering-landsat-with-teamlucc)
+
+* [Preprocessing imagery and 
+  DEMS](/articles/preprocessing-imagery-with-teamlucc)
+
+* [Cloud removal](/articles/cloud-removal-with-teamlucc)
+
+* [Image classification](/articles/image-classification-with-teamlucc)
+
 ## Author Contact Information
 
 [Alex Zvoleff](mailto:azvoleff@conservation.org)  
