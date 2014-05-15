@@ -198,9 +198,6 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
         filled <- call_cpp_cloud_fill(cloudy, clear, cloud_mask, algorithm, 
                                       dims, num_class, min_pixel, max_pixel, 
                                       cloud_nbh, DN_min, DN_max, verbose)
-        # RcppArmadillo crashes when you return a cube, so resize the returned 
-        # mat
-        filled <- array(filled, dim=c(dims[1], dims[2], dims[3]))
         out <- setValues(out, filled)
         out <- writeRaster(out, out_name)
     }

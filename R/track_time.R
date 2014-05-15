@@ -81,8 +81,6 @@ setMethod("show", signature(object="Track_time"), function(object) print(object)
 #' "Default") will be used.
 #'
 #' @export
-#' @docType methods
-#' @rdname start_timer-methods
 #' @param x a \code{Track_time} object
 #' @param label an optional label used to maintain multiple tracking timers
 #' @return Track_time object
@@ -102,13 +100,11 @@ setGeneric("start_timer", function(x, label) {
     standardGeneric("start_timer")
 })
 
-#' @rdname start_timer-methods
 #' @aliases start_timer,Track_time-method
 setMethod("start_timer", signature(x="Track_time"),
     function(x) .start_timer(x)
 )
 
-#' @rdname start_timer-methods
 #' @aliases start_timer,Track_time,character-method
 setMethod("start_timer", signature(x="Track_time", label="character"),
     function(x, label) .start_timer(x, label)
@@ -136,8 +132,6 @@ setMethod("start_timer", signature(x="Track_time", label="character"),
 #' 'Default' will be used.
 #'
 #' @export
-#' @docType methods
-#' @rdname stop_timer-methods
 #' @param x a \code{Track_time} object
 #' @param label an optional label used to maintain multiple tracking timers
 #' @seealso \code{\link{start_timer}}
@@ -157,13 +151,11 @@ setGeneric("stop_timer", function(x, label='Default') {
     standardGeneric("stop_timer")
 })
 
-#' @rdname stop_timer-methods
 #' @aliases stop_timer,Track_time-method
 setMethod("stop_timer", signature(x="Track_time"),
     function(x) .stop_timer(x)
 )
 
-#' @rdname stop_timer-methods
 #' @aliases stop_timer,Track_time,character-method
 setMethod("stop_timer", signature(x="Track_time", label="character"),
     function(x, label) .stop_timer(x, label)
