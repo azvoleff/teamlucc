@@ -23,7 +23,7 @@ setClass('pixel_data', slots=c(x='data.frame', y='factor',
 )
 
 #' @importFrom plyr ddply summarize .
-#' @S3method summary pixel_data
+#' @export
 summary.pixel_data <- function(object, ...) {
     obj = list()
     obj[['class']] <- class(object)
@@ -43,7 +43,7 @@ summary.pixel_data <- function(object, ...) {
     obj
 }
 
-#' @S3method print summary.pixel_data
+#' @export
 print.summary.pixel_data <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
     cat('\n')
@@ -58,12 +58,12 @@ print.summary.pixel_data <- function(x, ...) {
     invisible(x)
 }
 
-#' @S3method levels pixel_data
+#' @export
 levels.pixel_data <- function(x) {
     return(levels(x@y))
 }
 
-#' @S3method print pixel_data
+#' @export
 print.pixel_data <- function(x, ...) {
     print(summary(x, ...))
 }

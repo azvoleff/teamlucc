@@ -32,3 +32,32 @@ cloud_fill <- function(cloudy, clear, cloud_mask, dims, num_class, min_pixel, ma
     .Call('teamlucc_cloud_fill', PACKAGE = 'teamlucc', cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel, cloud_nbh, DN_min, DN_max, verbose)
 }
 
+#' Cloud fill using the algorithm developed by Xiaolin Zhu
+#'
+#' This function is called by the \code{\link{cloud_remove}} function. It is
+#' not intended to be used directly.
+#'
+#' @param cloudy the cloudy image, with pixels in columns (in column-major 
+#' order) and with number of columns equal to number of bands
+#' @param clear the clear image, with pixels in columns (in column-major 
+#' order) and with number of columns equal to number of bands
+#' @param cloud_mask the cloud mask image as a vector (in column-major order), 
+#' with clouds coded with unique integer codes starting at 1, and with areas 
+#' that are clear in both images  coded as 0. Areas that are missing in the 
+#' clear image, should be coded as -1.
+#' @param dims the dimensions of the cloudy image as a length 3 vector: (rows, 
+#' columns, bands)
+#' @param num_class set the estimated number of classes in image
+#' @param cloud_nbh the range of cloud neighborhood (in pixels)
+#' @param DN_min the minimum valid DN value
+#' @param DN_max the maximum valid DN value
+#' @param verbose whether to print detailed status messages
+#' @return array with cloud filled image with dims: cols, rows, bands
+#' parameter, containing the selected textures measures
+#' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
+#' neighborhood similar pixel interpolator approach for removing thick clouds 
+#' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
+cloud_fill_simple <- function(cloudy, clear, cloud_mask, dims, num_class, cloud_nbh, DN_min, DN_max, verbose = FALSE) {
+    .Call('teamlucc_cloud_fill_simple', PACKAGE = 'teamlucc', cloudy, clear, cloud_mask, dims, num_class, cloud_nbh, DN_min, DN_max, verbose)
+}
+

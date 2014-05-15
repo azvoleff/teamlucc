@@ -34,20 +34,22 @@ prep_fmask <- function(image_dir) {
 
 #' @importFrom tools file_path_sans_ext
 cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
-                             fast, num_class, min_pixel, max_pixel, 
+                             algorithm, num_class, min_pixel, max_pixel, 
                              cloud_nbh, DN_min, DN_max, 
                              verbose, idl, byblock, patch_long=1000) {
     if (verbose) {
-        warning("verbose=TRUE not supported when use_IDL=TRUE")
+        warning("verbose=TRUE not supported with CLOUD_REMOVE and CLOUD_REMOVE_FAST algorithms")
     }
-    if (fast) {
+    if (algorithm == 'CLOUD_REMOVE_FAST') {
         script_path <- system.file("idl", "CLOUD_REMOVE_FAST.pro", 
                                    package="teamlucc")
         function_name <- 'CLOUD_REMOVE_FAST'
-    } else {
+    } else if (algorithm == 'CLOUD_REMOVE') {
         script_path <- system.file("idl", "CLOUD_REMOVE.pro", 
                                    package="teamlucc")
         function_name <- 'CLOUD_REMOVE'
+    } else {
+        stop(paste0('unrecognized cloud fill algorithm "', algorithm, '"'))
     }
     
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
@@ -107,32 +109,48 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
 # Wrapper around C++ cloud fill function, to enable calling the function with 
 # rasterEngine
 #' @import Rcpp
-cloud_fill_cpp_wrapper <- function(cloudy, clear, cloud_mask, num_class, 
-                                   min_pixel, max_pixel, cloud_nbh, DN_min, 
-                                   DN_max, verbose, ...) {
+cloud_fill_rasterengine <- function(cloudy, clear, cloud_mask, algorithm, 
+                                    num_class, min_pixel, max_pixel, cloud_nbh, 
+                                    DN_min, DN_max, verbose, ...) {
     dims=dim(cloudy)
     # RcppArmadillo crashes when you pass it a cube, so resize and pass 
     # mats
     cloudy <- array(cloudy, dim=c(dims[1] * dims[2], dims[3]))
     clear <- array(clear, dim=c(dims[1] * dims[2], dims[3]))
     cloud_mask <- array(cloud_mask, dim=c(dims[1] * dims[2]))
-    filled <- cloud_fill(cloudy, clear, cloud_mask, dims, num_class, 
-                         min_pixel, max_pixel, cloud_nbh, DN_min, DN_max, 
-                         verbose)
+    filled <- call_cpp_cloud_fill(cloudy, clear, cloud_mask, algorithm, dims, 
+                                  num_class,  min_pixel, max_pixel, cloud_nbh, 
+                                  DN_min, DN_max, verbose)
     # RcppArmadillo crashes when you return a cube, so resize the returned 
     # mat
     filled <- array(filled, dim=c(dims[1], dims[2], dims[3]))
+    return(filled)
+}
+
+# This function decides which RcppArmadillo exported function to call: 
+# cloud_fill, or cloud_fill_simple
+call_cpp_cloud_fill <- function(cloudy, clear, cloud_mask, algorithm, dims, 
+                                num_class, min_pixel, max_pixel, cloud_nbh, 
+                                DN_min, DN_max, verbose, ...) {
+    if (algorithm == "teamlucc") {
+        filled <- cloud_fill(cloudy, clear, cloud_mask, dims, num_class, 
+                             min_pixel, max_pixel, cloud_nbh, DN_min, DN_max, 
+                             verbose)
+    } else if (algorithm == "simple") {
+        filled <- cloud_fill_simple(cloudy, clear, cloud_mask, dims, num_class, 
+                                    cloud_nbh, DN_min, DN_max, verbose)
+    } else {
+        stop(paste0('unrecognized cloud fill algorithm "', algorithm, '"'))
+    }
+    return(filled)
 }
 
 #' @importFrom spatial.tools rasterEngine
-cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast, 
+cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm, 
                            num_class, min_pixel, max_pixel, cloud_nbh, DN_min, 
                            DN_max, verbose, byblock) {
-    if (fast) {
-        stop("fast=TRUE not yet supported when use_IDL=FALSE")
-    }
 
-    warning("*** use_IDL=FALSE is still experimental - use results with caution ***")
+    warning('*** "teamlucc" cloud fill algorithm is still experimental - use results with caution ***')
 
     # bs <- blockSize(cloudy)
     # out <- brick(cloudy, values=FALSE)
@@ -154,13 +172,17 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
     # }
     # out <- writeStop(out)
     
+    # Note that call_cpp_cloud_fill uses the algorithm to decide whether to 
+    # call cloud_fill or cloud_fill_simple (and call_cpp_cloud_fill is called 
+    # by cloud_fill_rasterengine)
     if (byblock) {
         out <- rasterEngine(cloudy=cloudy, clear=clear, 
                             cloud_mask=cloud_mask,
-                            fun=cloud_fill_cpp_wrapper,
-                            args=list(num_class=num_class, min_pixel=min_pixel, 
-                            max_pixel=max_pixel, cloud_nbh=cloud_nbh, 
-                            DN_min=DN_min, DN_max=DN_max, verbose=verbose),
+                            fun=cloud_fill_rasterengine,
+                            args=list(algorithm=algorithm, num_class=num_class, 
+                                      min_pixel=min_pixel, max_pixel=max_pixel, 
+                                      cloud_nbh=cloud_nbh, DN_min=DN_min, 
+                                      DN_max=DN_max, verbose=verbose),
                             processing_unit='chunk',
                             outbands=nlayers(cloudy), outfiles=1,
                             setMinMax=TRUE,
@@ -173,9 +195,9 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
         cloudy <- array(getValues(cloudy), dim=c(dims[1] * dims[2], dims[3]))
         clear <- array(getValues(clear), dim=c(dims[1] * dims[2], dims[3]))
         cloud_mask <- array(getValues(cloud_mask), dim=c(dims[1] * dims[2]))
-        filled <- cloud_fill(cloudy, clear, cloud_mask, dims, num_class, 
-                             min_pixel, max_pixel, cloud_nbh, DN_min, DN_max, 
-                             verbose)
+        filled <- call_cpp_cloud_fill(cloudy, clear, cloud_mask, algorithm, 
+                                      dims, num_class, min_pixel, max_pixel, 
+                                      cloud_nbh, DN_min, DN_max, verbose)
         # RcppArmadillo crashes when you return a cube, so resize the returned 
         # mat
         filled <- array(filled, dim=c(dims[1], dims[2], dims[3]))
@@ -191,16 +213,19 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' This code uses the Neighborhood Similar Pixel Interpolator (NSPI) algorithm 
 #' by Xiaolin Zhu to fill heavy clouds in a Landsat image.
 #'
-#' This code can use either a Xiaolin Zhu's original IDL code, or an R/C++ 
-#' implementation native to \code{teamlucc}. The \code{use_IDL} parameter 
-#' (defaults to TRUE) decides whether to use Xiaolin's code 
-#' (\code{use_IDL=TRUE}) or the  or the R and C++ implementation native to 
-#' \code{teamlucc} (\code{use_IDL=FALSE}).
-#'
-#' The results from running the two alternative versions of the cloud removal 
-#' algorithm should be identical. However, there is one important difference to 
-#' note: the R/C++ implementation of cloud removal does not currently implement 
-#' the \code{fast=TRUE} option.
+#' The \code{algorithm} parameter determines what algorithm is used for the 
+#' cloud fill. \code{algorithm} must be one of: "CLOUD_REMOVE", 
+#' "CLOUD_REMOVE_FAST", "teamlucc", or "simple". If set to "CLOUD_REMOVE" the 
+#' script uses a (slightly modified to be called from R) version of  Xiaolin 
+#' Zhu's NSPI IDL code. If set to "CLOUD_REMOVE_FAST", the algorithm uses the 
+#' "fast" version of Xiaolin's code. Both of these two algorithms require an 
+#' IDL license to run (and therefore \code{idl_path} must be set). The 
+#' "teamlucc" algorithm uses a version of the NSPI algorithm (based on the 
+#' CLOUD_REMOVE code) that is coded in C++ and  can be run from R without an 
+#' IDL license. The "simple" algorithm uses a cloud fill model that is based on 
+#' fitting a linear model to the surface reflectance from the clear image in a 
+#' window around each cloud, and using this linear model to predict 
+#' reflectance in unobserved (cloudy) areas.
 #'
 #' @export
 #' @param cloudy the cloudy image (base image) as a \code{Raster*}
@@ -211,14 +236,13 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' \code{cloudy_rast} and \code{clear_rast} should be coded 0, while areas that 
 #' are clouded in \code{clear_rast} should be coded -1.
 #' @param out_name filename for cloud filled image
-#' @param use_IDL whether to use Xiaolin Zhu's original IDL scripts 
-#' (\code{use_IDL=TRUE}) or the C++ implementation native to \code{teamlucc} 
-#' (\code{use_IDL=FALSE})
-#' @param fast if \code{TRUE}, use the CLOUD_REMOVE_FAST.pro script. If 
-#' \code{FALSE}, use the CLOUD_REMOVE.pro script.
+#' @param algorithm must be one of: "CLOUD_REMOVE", "CLOUD_REMOVE_FAST", 
+#' "teamlucc", or "simple". See Details.
 #' @param num_class set the estimated number of classes in image
-#' @param min_pixel the sample size of similar pixels
-#' @param max_pixel the maximum sample size to search for similar pixels
+#' @param min_pixel the sample size of similar pixels (ignored when 
+#' \code{algorithm==TRUE})
+#' @param max_pixel the maximum sample size to search for similar pixels 
+#' (ignored when \code{algorithm==TRUE})
 #' @param cloud_nbh the range of cloud neighborhood (in pixels)
 #' @param DN_min the minimum valid DN value
 #' @param DN_max the maximum valid DN value
@@ -244,10 +268,15 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, fast,
 #' filled <- cloud_remove(cloudy, clear, cloud_mask, fast=TRUE)
 #' }
 cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL, 
-                         use_IDL=TRUE, fast=FALSE, num_class=4, min_pixel=20, 
-                         max_pixel=1000, cloud_nbh=10, DN_min=0, DN_max=255, 
+                         algorithm='CLOUD_REMOVE',
+                         num_class=4, min_pixel=20, max_pixel=1000, 
+                         cloud_nbh=10, DN_min=0, DN_max=255, 
                          idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
                          verbose=FALSE, byblock=TRUE) {
+    if (!(algorithm %in% c('CLOUD_REMOVE', 'CLOUD_REMOVE_FAST', 'teamlucc', 
+                           'simple'))) {
+        stop('algorithm must be one of "CLOUD_REMOVE", "CLOUD_REMOVE_FAST", "teamlucc", or "simple"')
+    }
     if (!(class(cloudy) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
         stop('cloudy must be a Raster* object')
     }
@@ -271,15 +300,17 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
         out_name <- normalizePath(out_name, mustWork=FALSE)
     }
     
-    if (use_IDL) {
+    if (algorithm %in% c('CLOUD_REMOVE', 'CLOUD_REMOVE_FAST')) {
         filled <- cloud_remove_IDL(cloudy, clear, cloud_mask, out_name,
-                                   fast, num_class, min_pixel, max_pixel, 
+                                   algorithm, num_class, min_pixel, max_pixel, 
                                    cloud_nbh, DN_min, DN_max, verbose, idl, 
                                    byblock)
-    } else {
-        filled <- cloud_remove_R(cloudy, clear, cloud_mask, out_name,
-                                 fast, num_class, min_pixel, max_pixel, 
+    } else if (algorithm %in% c('teamlucc', 'simple')) {
+        filled <- cloud_remove_R(cloudy, clear, cloud_mask, out_name, 
+                                 algorithm, num_class, min_pixel, max_pixel, 
                                  cloud_nbh, DN_min, DN_max, verbose, byblock)
+    } else {
+        stop(paste0('unrecognized cloud fill algorithm "', algorithm, '"'))
     }
 
     names(filled) <- names(cloudy)

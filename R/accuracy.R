@@ -13,7 +13,7 @@ setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric',
                              pop='numeric')
 )
 
-#' @S3method summary accuracy
+#' @export
 summary.accuracy <- function(object, ...) {
     obj = list()
     obj[['class']] <- class(object)
@@ -28,7 +28,7 @@ summary.accuracy <- function(object, ...) {
     obj
 }
 
-#' @S3method print summary.accuracy
+#' @export
 print.summary.accuracy <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
     cat('\n')
@@ -47,7 +47,7 @@ print.summary.accuracy <- function(x, ...) {
     invisible(x)
 }
 
-#' @S3method print accuracy
+#' @export
 print.accuracy <- function(x, ...) {
     print(summary(x, ...))
 }
@@ -130,7 +130,6 @@ function(object) {
 })
 
 
-#' @S3method plot error_adj_area
 plot.error_adj_area <- function(x, ...) {
     classes <- dimnames(x@adj_area_mat)[[1]]
     areas <- x@adj_area_mat[, 2]

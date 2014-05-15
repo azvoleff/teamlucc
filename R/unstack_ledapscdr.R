@@ -12,7 +12,7 @@
 #' @export
 #' @importFrom tools file_path_sans_ext
 #' @param x input HDF4 file
-#' @param out_folder output folder (if \code{NULL}, defaults to input folder)
+#' @param output_folder output folder (if \code{NULL}, defaults to input folder)
 #' @param overwrite whether to overwrite existing files
 #' @param rmhdf whether to remove hdf files after unstacking them
 #' @return nothing (used for side effect of converting Landsat CDR HDF files)
