@@ -2,7 +2,7 @@
 #'
 #' Calculates the NDVI, defined as: (nir - red) / (nir + red).
 #'
-#' @export
+#' @export NDVI
 #' @param red red
 #' @param nir near-infrared
 #' @param ... additional arguments as for \code{\link{writeRaster}}
@@ -50,7 +50,7 @@ setMethod("NDVI", signature(red="RasterLayer", nir="RasterLayer"),
 
 #' Calculates the Enhanced Vegetation Index (EVI)
 #'
-#' @export
+#' @export EVI
 #' @importFrom raster overlay
 #' @param blue blue
 #' @param red red
@@ -109,7 +109,7 @@ setMethod("EVI", signature(blue="RasterLayer", red="RasterLayer",
 #' Note that this avoids the need for calculating L by using the equation for 
 #' MSAVI2 from Qi et al. (1994).
 #'
-#' @export
+#' @export MSAVI
 #' @importFrom raster overlay
 #' @param red red
 #' @param nir near-infrared
@@ -161,7 +161,7 @@ setMethod("MSAVI2", signature(red="RasterLayer", nir="RasterLayer"),
 
 #' Calculates the Atmospherically Resistant Vegetation Index (ARVI)
 #'
-#' @export
+#' @export ARVI
 #' @importFrom raster overlay
 #' @param blue blue
 #' @param red red

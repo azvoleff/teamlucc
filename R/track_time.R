@@ -4,7 +4,7 @@
 #' \code{\link{print}}
 #' @import methods
 #' @importFrom lubridate now
-#' @export
+#' @export Track_time
 #' @name Track_time-class
 setClass('Track_time', slots=c(timers='data.frame', notify="function"),
     prototype=list(timers=data.frame(label='Default', starttime=now()), 
@@ -16,7 +16,7 @@ setClass('Track_time', slots=c(timers='data.frame', notify="function"),
 #' Creates a new Track_time object for use in tracking and printing status the 
 #' running time of processes in an R script.
 #'
-#' @export
+#' @export Track_time
 #' @import methods
 #' @importFrom lubridate now
 #' @param notify a function to handle the string output from Track_time.  This 
@@ -80,7 +80,7 @@ setMethod("show", signature(object="Track_time"), function(object) print(object)
 #' The \code{label} is optional. If not supplied the default timer (labelled 
 #' "Default") will be used.
 #'
-#' @export
+#' @export start_timer
 #' @param x a \code{Track_time} object
 #' @param label an optional label used to maintain multiple tracking timers
 #' @return Track_time object
@@ -131,7 +131,7 @@ setMethod("start_timer", signature(x="Track_time", label="character"),
 #' The \code{label} is optional. If not supplied, the default timer, labelled 
 #' 'Default' will be used.
 #'
-#' @export
+#' @export stop_timer
 #' @param x a \code{Track_time} object
 #' @param label an optional label used to maintain multiple tracking timers
 #' @seealso \code{\link{start_timer}}

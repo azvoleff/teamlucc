@@ -58,7 +58,7 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #'
 #' @seealso \code{\link{adj_areas}}.
 #' @import methods
-#' @export
+#' @export error_adj_area
 #' @name error_adj_area-class
 setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
 
@@ -72,7 +72,7 @@ setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
 #' Standard errors for the adjusted areas are calculated as in Olofsson et al.  
 #' (2013).
 #' @docType methods
-#' @rdname adj_areas-methods
+#' @rdname adj_areas
 #' @param x an \code{accuracy} object or a list of populations as a 
 #' \code{numeric}
 #' @param y missing, or a contingency table
@@ -83,7 +83,7 @@ setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
 #' @export
 setGeneric("adj_areas", function(x, y) standardGeneric("adj_areas"))
 
-#' @rdname adj_areas-methods
+#' @rdname adj_areas
 #' @aliases adj_areas,numeric,table-method
 setMethod("adj_areas", signature(x="numeric", y="table"),
 function(x, y) {
@@ -105,7 +105,7 @@ function(x, y) {
     return(new('error_adj_area', adj_area_mat=adj_area_mat))
 })
 
-#' @rdname adj_areas-methods
+#' @rdname adj_areas
 #' @aliases adj_areas,numeric,matrix-method
 setMethod("adj_areas", signature(x="numeric", y="matrix"),
 function(x, y) {
@@ -113,7 +113,7 @@ function(x, y) {
     adj_areas(x, y)
 })
 
-#' @rdname adj_areas-methods
+#' @rdname adj_areas
 #' @aliases adj_areas,numeric,missing-method
 setMethod("adj_areas", signature(x="accuracy", y='missing'),
 function(x){
@@ -248,7 +248,7 @@ plot.error_adj_area <- function(x, ...) {
 #' }
 #' @export
 #' @docType methods
-#' @rdname accuracy-methods
+#' @rdname accuracy
 #' @param x either a classification model with a \code{predict} method or a 
 #' \code{RasterLayer} (see Details)
 #' @param test_data a \code{link{pixel_data}} object, 
@@ -277,7 +277,7 @@ plot.error_adj_area <- function(x, ...) {
 setGeneric("accuracy", function(x, test_data, pop, class_col, reclass_mat) 
            standardGeneric("accuracy"))
 
-#' @rdname accuracy-methods
+#' @rdname accuracy
 #' @aliases accuracy,train,ANY,ANY,missing,ANY-method
 setMethod("accuracy", signature(x="train", test_data="ANY", pop="ANY", class_col="missing", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
@@ -303,7 +303,7 @@ setMethod("accuracy", signature(x="train", test_data="ANY", pop="ANY", class_col
     }
 )
 
-#' @rdname accuracy-methods
+#' @rdname accuracy
 #' @aliases accuracy,RasterLayer,pixel_data,ANY,missing,ANY-method
 setMethod("accuracy", signature(x="RasterLayer", test_data="pixel_data", pop="ANY", class_col="missing", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
@@ -324,7 +324,7 @@ setMethod("accuracy", signature(x="RasterLayer", test_data="pixel_data", pop="AN
     }
 )
 
-#' @rdname accuracy-methods
+#' @rdname accuracy
 #' @aliases accuracy,RasterLayer,SpatialPolygonsDataFrame,ANY,character,ANY-method
 setMethod("accuracy", signature(x="RasterLayer", test_data="SpatialPolygonsDataFrame", pop="ANY", class_col="character", reclass_mat="ANY"),
     function(x, test_data, pop, class_col, reclass_mat) {
