@@ -245,7 +245,7 @@ plot.error_adj_area <- function(x, ...) {
 #'         class frequencies will be tabulated and used as the population 
 #'         frequencies.
 #' }
-#' @export
+#' @export accuracy
 #' @docType methods
 #' @rdname accuracy
 #' @param x either a classification model with a \code{predict} method or a 
