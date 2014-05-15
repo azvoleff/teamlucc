@@ -7,7 +7,7 @@
 #' @slot n_test the number of samples
 #' @slot pop the population of each class as a numeric
 #' @import methods
-#' @name accuracy-class
+#' @export
 setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric', 
                              A='numeric', n_test='numeric',
                              pop='numeric')
@@ -58,8 +58,7 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #'
 #' @seealso \code{\link{adj_areas}}.
 #' @import methods
-#' @export error_adj_area
-#' @name error_adj_area-class
+#' @export
 setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
 
 #' Calculated adjusted class areas for an image classification

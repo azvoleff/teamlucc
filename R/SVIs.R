@@ -109,7 +109,7 @@ setMethod("EVI", signature(blue="RasterLayer", red="RasterLayer",
 #' Note that this avoids the need for calculating L by using the equation for 
 #' MSAVI2 from Qi et al. (1994).
 #'
-#' @export MSAVI
+#' @export MSAVI2
 #' @importFrom raster overlay
 #' @param red red
 #' @param nir near-infrared
