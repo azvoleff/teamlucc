@@ -200,11 +200,12 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # that are available for filling pixels of base_img that are missing 
         # due to cloud contamination. Areas coded 1 are missing due to cloud or 
         # shadow in the base image and are available in the merge image.
-        fill_areas <- list()
-        for (mask_img in masks) {
-            fill_areas <- c(fill_areas, list(base_mask == 1 & mask_img == 0))
-        }
-        fill_areas_freq <- freq(stack(fill_areas), useNA='no', merge=TRUE)
+        fill_areas <- overlay(base_mask, stack(masks), fun=function(base_vals, mask_vals) {
+                # This will return a stack with number of layers equal to 
+                # number of masks.
+                return((base_vals == 1) & (mask_vals == 0))
+            })
+        fill_areas_freq <- freq(fill_areas, useNA='no', merge=TRUE)
 
         # Select the fill image with the maximum number of available pixels 
         # (counting only pixels in the fill image that are not ALSO clouded in the 
@@ -226,21 +227,26 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         base_img[base_img_mask] <- 0
         fill_img[fill_img_mask] <- 0
 
-        # Mark areas where fill_img_mask is blank (clouded) with NA
-        base_img_mask[fill_img_mask] <- NA
-        # Mark areas where fill_img_mask is NA with NA
-        base_img_mask[is.na(fill_img_mask)] <- NA
+        base_img_mask <- overlay(base_img_mask, fill_img_mask,
+            fun=function(base_vals, fill_vals) {
+                # Mark areas where fill_img_mask is blank (clouded) with NA
+                base_vals[fill_vals] <- NA
+                # Mark areas where fill_vals is NA with NA
+                base_vals[is.na(fill_vals)] <- NA
+                return(base_vals)
+            })
+
         # Add numbered IDs to the cloud patches
-        coded_base_img_mask <- ConnCompLabel(base_img_mask)
+        base_img_mask <- ConnCompLabel(base_img_mask)
 
         # Ensure dataType is properly set prior to handing off to IDL
-        dataType(coded_base_img_mask) <- 'INT2S'
+        dataType(base_img_mask) <- 'INT2S'
 
         if (verbose) {
             notify(paste0('Filling image from ', base_img_date,
                           ' with image from ', fill_img_date, '...'))
         }
-        filled <- cloud_remove(base_img, fill_img, coded_base_img_mask, 
+        filled <- cloud_remove(base_img, fill_img, base_img_mask, 
                                verbose=verbose, ...)
         if (verbose) {
             notify('Fill complete.')
