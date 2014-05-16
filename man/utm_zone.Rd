@@ -2,17 +2,9 @@
 \docType{methods}
 \name{utm_zone}
 \alias{utm_zone}
-\alias{utm_zone,Spatial,missing,logical-method}
-\alias{utm_zone,Spatial,missing-method}
-\alias{utm_zone,numeric,numeric,logical-method}
-\alias{utm_zone,numeric,numeric-method}
 \title{Given a spatial object, calculate the UTM zone of the centroid}
 \usage{
 utm_zone(x, y, proj4string = FALSE)
-
-\S4method{utm_zone}{numeric,numeric}(x, y, proj4string = FALSE)
-
-\S4method{utm_zone}{Spatial,missing}(x, proj4string)
 }
 \arguments{
 \item{x}{a longitude (with western hemisphere longitudes negative), or a
