@@ -3,6 +3,7 @@
 #' Used to represent training data for a machine learning classifier for image 
 #' classificaion, or testing data used for testing a classification.
 #'
+#' @exportClass pixel_data
 #' @slot x a \code{data.frame} of independent variables (usually pixel values)
 #' @slot y a \code{data.frame} of the dependent variable (usually land cover 
 #' classes)
@@ -15,14 +16,12 @@
 #' the pixels in \code{x} and \code{y}.
 #' @import methods
 #' @importFrom sp SpatialPolygonsDataFrame
-#' @export
-#' @name pixel_data-class
 setClass('pixel_data', slots=c(x='data.frame', y='factor', 
                                poly_ID='character', training_flag='logical', 
                                polys='SpatialPolygonsDataFrame')
 )
 
-#' @rdname pixel_data
+#' @rdname pixel_data-class
 #' @importFrom plyr ddply summarize .
 #' @export
 summary.pixel_data <- function(object, ...) {
@@ -44,7 +43,7 @@ summary.pixel_data <- function(object, ...) {
     obj
 }
 
-#' @rdname pixel_data
+#' @rdname pixel_data-class
 #' @export
 print.summary.pixel_data <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
@@ -60,13 +59,13 @@ print.summary.pixel_data <- function(x, ...) {
     invisible(x)
 }
 
-#' @rdname pixel_data
+#' @rdname pixel_data-class
 #' @export
 levels.pixel_data <- function(x) {
     return(levels(x@y))
 }
 
-#' @rdname pixel_data
+#' @rdname pixel_data-class
 #' @export
 print.pixel_data <- function(x, ...) {
     print(summary(x, ...))
