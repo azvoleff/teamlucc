@@ -5,10 +5,8 @@
 #' so that a layer can be saved as an integer datatype such as "INT1U", 
 #' "INT1S", "INT2" or "INT2S".
 #'
-#' @export
-#' @docType methods
+#' @export scale_raster
 #' @import methods
-#' @rdname scale_raster-methods
 #' @seealso \code{\link{dataType}}
 #' @param x a \code{Raster*} object
 #' @param power_of raster will be scaled using the highest possible power of 
@@ -46,7 +44,6 @@ scale_layer <- function(x, power_of, max_out, round_output, do_scaling) {
     }
 }
 
-#' @rdname scale_raster-methods
 #' @aliases scale_raster,RasterLayer,ANY-method
 setMethod("scale_raster", signature(x="RasterLayer"),
     function(x, power_of, max_out, round_output, do_scaling) {
@@ -106,7 +103,6 @@ scale_stack_or_brick <- function(x, power_of, max_out, round_output, do_scaling)
     return(scale_outputs)
 }
 
-#' @rdname scale_raster-methods
 #' @aliases scale_raster,RasterStack,ANY-method
 setMethod("scale_raster", signature(x="RasterStack"),
     function(x, power_of, max_out, round_output, do_scaling) {
@@ -116,7 +112,6 @@ setMethod("scale_raster", signature(x="RasterStack"),
     }
 )
 
-#' @rdname scale_raster-methods
 #' @aliases scale_raster,RasterBrick,ANY-method
 setMethod("scale_raster", signature(x="RasterBrick"),
     function(x, power_of, max_out, round_output, do_scaling) {

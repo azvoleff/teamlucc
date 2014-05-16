@@ -6,7 +6,6 @@
 #' Based on the code on gis.stackexchange.com at http://bit.ly/17SdcuN.
 #'
 #' @export utm_zone
-#' @docType methods
 #' @import methods
 #' @param x a longitude (with western hemisphere longitudes negative), or a 
 #' \code{Spatial} object

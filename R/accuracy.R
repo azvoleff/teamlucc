@@ -1,4 +1,6 @@
 #' A class for representing accuracy assessment results
+#' @exportClass accuracy
+#' @rdname accuracy-class
 #' @slot ct a simple sample contingency table
 #' @slot pop_ct a population contingency table (if \code{pop} was provided - 
 #' see \code{\link{accuracy}})
@@ -7,7 +9,6 @@
 #' @slot n_test the number of samples
 #' @slot pop the population of each class as a numeric
 #' @import methods
-#' @export
 setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric', 
                              A='numeric', n_test='numeric',
                              pop='numeric')
@@ -58,7 +59,7 @@ setMethod("show", signature(object="accuracy"), function(object) print(object))
 #'
 #' @seealso \code{\link{adj_areas}}.
 #' @import methods
-#' @export
+#' @exportClass error_adj_area
 setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
 
 #' Calculated adjusted class areas for an image classification
@@ -70,8 +71,7 @@ setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
 #'
 #' Standard errors for the adjusted areas are calculated as in Olofsson et al.  
 #' (2013).
-#' @docType methods
-#' @rdname adj_areas
+#' @export adj_areas
 #' @param x an \code{accuracy} object or a list of populations as a 
 #' \code{numeric}
 #' @param y missing, or a contingency table
@@ -79,7 +79,6 @@ setClass('error_adj_area', slots=c(adj_area_mat='matrix'))
 #' 2013. Making better use of accuracy data in land change studies: Estimating 
 #' accuracy and area and quantifying uncertainty using stratified estimation.  
 #' Remote Sensing of Environment 129:122-131.
-#' @export
 setGeneric("adj_areas", function(x, y) standardGeneric("adj_areas"))
 
 #' @rdname adj_areas
@@ -246,8 +245,6 @@ plot.error_adj_area <- function(x, ...) {
 #'         frequencies.
 #' }
 #' @export accuracy
-#' @docType methods
-#' @rdname accuracy
 #' @param x either a classification model with a \code{predict} method or a 
 #' \code{RasterLayer} (see Details)
 #' @param test_data a \code{link{pixel_data}} object, 

@@ -49,9 +49,9 @@ simplify_polygon <- function(poly_obj, max_vertices, maxit=100,
     }
     n_parts <- sapply(poly_obj@polygons, function(x) length(x))
     if (length(n_parts) > 1)
-        stop('ZOI shapefile contains more than one polygon')
+        stop('poly_obj contains more than one polygon')
     else if (n_parts > 1)
-        stop('ZOI polygon is a multipart polygon')
+        stop('poly_obj polygon is a multipart polygon')
 
     if (initial_tolerance == 'dynamic') {
         # Set the initial tolerance as the extent / 100
