@@ -32,6 +32,11 @@ arma::mat cloud_fill_simple(arma::mat cloudy, arma::mat& clear,
         arma::ivec& cloud_mask, arma::ivec dims, int num_class,
         int cloud_nbh, int DN_min, int DN_max, bool verbose=false) {
 
+    if (verbose) Rcpp::Rcout << "dims: " << dims(0) << ", " << dims(1) << ", " 
+        << dims(2) << std::endl;
+    if (verbose) Rcpp::Rcout << "cloudy dims: " << cloudy.n_rows << ", " << 
+        cloudy.n_cols << std::endl;
+
     // Make a list of the cloud codes in this file - anything less than 1 is 
     // not a cloud code (0 is no clear, and -1 means no data in the clear 
     // image)
