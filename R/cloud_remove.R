@@ -149,44 +149,44 @@ call_cpp_cloud_fill <- function(cloudy, clear, cloud_mask, algorithm, dims,
 cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm, 
                            num_class, min_pixel, max_pixel, cloud_nbh, DN_min, 
                            DN_max, verbose, byblock) {
-
-    warning('*** "teamlucc" cloud fill algorithm is still experimental - use results with caution ***')
-
-    # bs <- blockSize(cloudy)
-    # out <- brick(cloudy, values=FALSE)
-    # out <- writeStart(out, rasterTmpFile())
-    # message(paste0("**", bs$n, " blocks to process**"))
-    # for (block_num in 1:bs$n) {
-    #     message("Processing block ", block_num, " - ", appendLF=FALSE)
-    #     cloudy_bl <- getValuesBlock(cloudy, row=bs$row[block_num], nrows=bs$nrows[block_num])
-    #     clear_bl <- getValuesBlock(clear, row=bs$row[block_num], nrows=bs$nrows[block_num])
-    #     cloud_mask_bl <- getValuesBlock(cloud_mask, row=bs$row[block_num], nrows=bs$nrows[block_num])
-
-    #     dims <- c(bs$nrows[block_num], ncol(cloudy), nlayers(cloudy))
-
-    #     filled <- cloud_fill(cloudy_bl, clear_bl, cloud_mask_bl, dims, 
-    #                          num_class, min_pixel, max_pixel, cloud_nbh, 
-    #                          DN_min, DN_max)
-
-    #     out <- writeValues(out, filled, bs$row[block_num])
-    # }
-    # out <- writeStop(out)
-    
     # Note that call_cpp_cloud_fill uses the algorithm to decide whether to 
     # call cloud_fill or cloud_fill_simple (and call_cpp_cloud_fill is called 
     # by cloud_fill_rasterengine)
     if (byblock) {
-        out <- rasterEngine(cloudy=cloudy, clear=clear, 
-                            cloud_mask=cloud_mask,
-                            fun=cloud_fill_rasterengine,
-                            args=list(algorithm=algorithm, num_class=num_class, 
-                                      min_pixel=min_pixel, max_pixel=max_pixel, 
-                                      cloud_nbh=cloud_nbh, DN_min=DN_min, 
-                                      DN_max=DN_max, verbose=verbose),
-                            processing_unit='chunk',
-                            outbands=nlayers(cloudy), outfiles=1,
-                            setMinMax=TRUE,
-                            filename=out_name)
+        bs <- blockSize(cloudy)
+        out <- brick(cloudy, values=FALSE)
+        out <- writeStart(out, out_name)
+        for (block_num in 1:bs$n) {
+            message("Processing block ", block_num, " of ", bs$n, "...")
+            dims <- c(bs$nrows[block_num], ncol(cloudy), nlayers(cloudy))
+            cloudy_bl <- array(getValuesBlock(cloudy, row=bs$row[block_num],
+                                              nrows=bs$nrows[block_num]),
+                               dim=c(dims[1] * dims[2], dims[3]))
+            clear_bl <- array(getValuesBlock(clear, row=bs$row[block_num],
+                                            nrows=bs$nrows[block_num]),
+                            dim=c(dims[1] * dims[2], dims[3]))
+            cloud_mask_bl <- array(getValuesBlock(cloud_mask, 
+                                                  row=bs$row[block_num], 
+                                                  nrows=bs$nrows[block_num]), 
+                                   dim=c(dims[1] * dims[2]))
+            filled <- call_cpp_cloud_fill(cloudy_bl, clear_bl, cloud_mask_bl, 
+                                          algorithm, dims, num_class, 
+                                          min_pixel, max_pixel, cloud_nbh, 
+                                          DN_min, DN_max, verbose)
+            out <- writeValues(out, filled, bs$row[block_num])
+        }
+        out <- writeStop(out)
+        # out <- rasterEngine(cloudy=cloudy, clear=clear, 
+        # cloud_mask=cloud_mask,
+        #                     fun=cloud_fill_rasterengine,
+        #                     args=list(algorithm=algorithm, num_class=num_class, 
+        #                               min_pixel=min_pixel, max_pixel=max_pixel, 
+        #                               cloud_nbh=cloud_nbh, DN_min=DN_min, 
+        #                               DN_max=DN_max, verbose=verbose),
+        #                     processing_unit='chunk',
+        #                     outbands=nlayers(cloudy), outfiles=1,
+        #                     verbose=verbose,
+        #                     filename=out_name)
     } else {
         dims <- dim(cloudy)
         out <- brick(cloudy, values=FALSE, filename=out_name)
