@@ -14,6 +14,7 @@ setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric',
                              pop='numeric')
 )
 
+#' @rdname accuracy
 #' @export
 summary.accuracy <- function(object, ...) {
     obj = list()
@@ -29,6 +30,7 @@ summary.accuracy <- function(object, ...) {
     obj
 }
 
+#' @rdname accuracy
 #' @export
 print.summary.accuracy <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
@@ -48,6 +50,7 @@ print.summary.accuracy <- function(x, ...) {
     invisible(x)
 }
 
+#' @rdname accuracy
 #' @export
 print.accuracy <- function(x, ...) {
     print(summary(x, ...))

@@ -36,7 +36,6 @@ Track_time <- function(notify=print) {
 #' Print a Track_time object
 #'
 #' @export
-#' @method print Track_time
 #' @import methods
 #' @param x a Track_time object
 #' @param label (optional) selects a specific tracking timer to print
@@ -100,11 +99,13 @@ setGeneric("start_timer", function(x, label) {
     standardGeneric("start_timer")
 })
 
+#' @rdname start_timer
 #' @aliases start_timer,Track_time-method
 setMethod("start_timer", signature(x="Track_time"),
     function(x) .start_timer(x)
 )
 
+#' @rdname start_timer
 #' @aliases start_timer,Track_time,character-method
 setMethod("start_timer", signature(x="Track_time", label="character"),
     function(x, label) .start_timer(x, label)
@@ -151,11 +152,13 @@ setGeneric("stop_timer", function(x, label='Default') {
     standardGeneric("stop_timer")
 })
 
+#' @rdname stop_timer
 #' @aliases stop_timer,Track_time-method
 setMethod("stop_timer", signature(x="Track_time"),
     function(x) .stop_timer(x)
 )
 
+#' @rdname stop_timer
 #' @aliases stop_timer,Track_time,character-method
 setMethod("stop_timer", signature(x="Track_time", label="character"),
     function(x, label) .stop_timer(x, label)

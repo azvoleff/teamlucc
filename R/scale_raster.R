@@ -44,6 +44,7 @@ scale_layer <- function(x, power_of, max_out, round_output, do_scaling) {
     }
 }
 
+#' @rdname scale_raster
 #' @aliases scale_raster,RasterLayer,ANY-method
 setMethod("scale_raster", signature(x="RasterLayer"),
     function(x, power_of, max_out, round_output, do_scaling) {
@@ -103,6 +104,7 @@ scale_stack_or_brick <- function(x, power_of, max_out, round_output, do_scaling)
     return(scale_outputs)
 }
 
+#' @rdname scale_raster
 #' @aliases scale_raster,RasterStack,ANY-method
 setMethod("scale_raster", signature(x="RasterStack"),
     function(x, power_of, max_out, round_output, do_scaling) {
@@ -112,6 +114,7 @@ setMethod("scale_raster", signature(x="RasterStack"),
     }
 )
 
+#' @rdname scale_raster
 #' @aliases scale_raster,RasterBrick,ANY-method
 setMethod("scale_raster", signature(x="RasterBrick"),
     function(x, power_of, max_out, round_output, do_scaling) {
