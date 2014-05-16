@@ -113,7 +113,17 @@ arma::mat cloud_fill_simple(arma::mat cloudy, arma::mat& clear,
         // http://bit.ly/1oTa60F
         for(int iband=0; iband < dims(2); iband++) {
             mat X_param = join_rows(sub_clear_clear.col(iband), ones(sub_clear_clear.n_rows));
-            colvec coef = solve(X_param, sub_cloudy_clear.col(iband)); // fit model y ~ X + 1
+            colvec coef;
+            try {
+                coef = solve(X_param, sub_cloudy_clear.col(iband)); // fit model y ~ X + 1
+            } catch(std::exception &ex) {	
+                // cannot solve (singular), so assume slope 1, intercept 0
+                if (verbose) Rcpp::Rcout << "solve() failed - assuming slope 1, intercept 0." << std::endl;
+                coef << 1 << endr << 0 << endr;
+            } catch(...) { 
+                ::Rf_error("c++ exception (unknown reason)"); 
+            }
+
             mat X_pred = join_rows(sub_clear_cloudy.col(iband), ones(sub_clear_cloudy.n_rows));
             colvec preds = X_pred * coef; // make predictions
 
