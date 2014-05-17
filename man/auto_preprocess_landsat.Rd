@@ -49,14 +49,13 @@ missing data and clouds out of the CDR tiles, and perform topographic
 correction.
 }
 \details{
-Prior to running \code{auto_preprocess_landsat}, the
-\code{\link{espa_extract}} and should be used to extract the original
-zipfiles supplied by USGS.  \code{\link{unstack_ledapscdr}} should then be
-used to unstack the HDF format files and convert them into ENVI binary
-format. To perform topographic correction with
-\code{auto_preprocess_landsat}, first run \code{\link{auto_setup_dem}} to
-preprocess a set of DEM tiles. Then run \code{auto_preprocess_landsat} with
-the \code{tc=TRUE} option.
+Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}}
+should be used to extract the original zipfiles supplied by USGS.
+\code{\link{unstack_ledapscdr}} should then be used to unstack the HDF
+format files and convert them into ENVI binary format. To perform
+topographic correction with \code{auto_preprocess_landsat}, first run
+\code{\link{auto_setup_dem}} to preprocess a set of DEM tiles. Then run
+\code{auto_preprocess_landsat} with the \code{tc=TRUE} option.
 }
 \seealso{
 \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}},
