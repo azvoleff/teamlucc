@@ -189,6 +189,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
         #                     filename=out_name)
     } else {
         dims <- dim(cloudy)
+        out_datatype <- dataType(cloudy)[1]
         out <- brick(cloudy, values=FALSE, filename=out_name)
         # RcppArmadillo crashes when you pass it a cube, so resize and pass 
         # mats
@@ -199,7 +200,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
                                       dims, num_class, min_pixel, max_pixel, 
                                       cloud_nbh, DN_min, DN_max, verbose)
         out <- setValues(out, filled)
-        out <- writeRaster(out, out_name, datatype=dataType(cloudy)[1])
+        out <- writeRaster(out, out_name, datatype=out_datatype)
     }
 
     return(out)
