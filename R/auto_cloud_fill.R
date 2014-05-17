@@ -213,14 +213,21 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                 return((base_vals == 1) & (mask_vals == 0))
             }, datatype=dataType(base_mask))
         fill_areas_freq <- freq(fill_areas, useNA='no', merge=TRUE)
-
+        # Below is necessary as for some reason when fill_areas is of length 
+        # one, freq returns a matrix rather than a data.frame
+        fill_areas_freq <- as.data.frame(fill_areas_freq)
         # Select the fill image with the maximum number of available pixels 
-        # (counting only pixels in the fill image that are not ALSO clouded in the 
-        # fill image)
+        # (counting only pixels in the fill image that are not ALSO clouded in 
+        # the fill image)
         avail_fill_row <- which(fill_areas_freq$value == 1)
-        # The -1 below fremoves the unncessary "value" column
-        fill_img_index <- which(fill_areas_freq[avail_fill_row, -1] == 
-                                max(fill_areas_freq[avail_fill_row, -1]))
+        # Remove the now unnecessary "value" column
+        fill_areas_freq <- fill_areas_freq[!(names(fill_areas_freq) == 'value')]
+        fill_img_index <- which(fill_areas_freq[avail_fill_row, ] == 
+                                max(fill_areas_freq[avail_fill_row, ]))
+        if (fill_areas_freq[avail_fill_row, fill_img_index] == 0) {
+            notify(paste('No fill pixels available. Stopping fill.'))
+            break
+        }
         fill_img <- imgs[[fill_img_index]]
         imgs <- imgs[-fill_img_index]
         base_img_mask <- fill_areas[[fill_img_index]]
