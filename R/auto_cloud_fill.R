@@ -82,7 +82,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     stopifnot(class(start_date) == 'Date')
     stopifnot(class(end_date) == 'Date')
 
-    if (n_cpus > 1) sfQuickInit(n_cpus)
+    #if (n_cpus > 1) sfQuickInit(n_cpus)
+    if (n_cpus > 1) beginCluster(n_cpus)
 
     wrspath <- sprintf('%03i', wrspath)
     wrsrow <- sprintf('%03i', wrsrow)
@@ -112,7 +113,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
     if (length(img_files) == 0) {
         stop('no images found - check date_dir, check wrspath, wrsrow, start_date, and end_date')
-    } else if (length(img_files) <= 2) {
+    } else if (length(img_files) < 2) {
         stop(paste('Only', length(img_files),
                    'image(s) found. Need at least two images to perform cloud fill'))
     }
@@ -149,6 +150,11 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                                  as.duration(new_interval(x, base_date)))
         base_date_diff <- abs(unlist(base_date_diff))
         base_img_index <- which(base_date_diff == min(base_date_diff))
+        # Handle ties - two images that are the same distance from base date.  
+        # Default to earlier image.
+        if (length(base_img_index) > 1) {
+            base_img_index <- base_img_index[1]
+        }
     }
 
     # Convert masks to binary indicating: 0 = other; 1 = cloud or shadow
@@ -164,15 +170,16 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         ret <- (fmask == 2) | (fmask == 4)
         ret[fmask == 255] <- NA
         # The (ret != 1) test is necessary in case clouded areas in img are 
-        # mistakely coded NA (they should not be) - this test ensures that only 
-        # NAs that are NOT in clouds will be copied to the mask images (the 
-        # assumption being that NAs in clouds should be marked as cloud and 
-        # fill should be attempted).
+        # mistakenly coded NA (they should not be) - this test ensures that 
+        # only NAs that are NOT in clouds will be copied to the mask images 
+        # (the assumption being that NAs in clouds should be marked as cloud 
+        # and fill should be attempted).
         ret[(ret != 1) & is.na(img)] <- NA
         return(ret)
     }
     for (n in 1:length(masks)) {
-        masks[n] <- overlay(masks[[n]], imgs[[n]][[1]], fun=calc_cloud_mask)
+        masks[n] <- overlay(masks[[n]], imgs[[n]][[1]], fun=calc_cloud_mask, 
+                            datatype=dataType(masks[[n]]))
     }
 
     base_img <- imgs[[base_img_index]]
@@ -191,7 +198,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     if (verbose) {
         notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover before fill'))
     }
-    while ((cur_pct_clouds > threshold) & (n < max_iter)) {
+    while ((cur_pct_clouds > threshold) & (n < max_iter) & (length(imgs) >= 1)) {
         if (verbose) {
             timer <- start_timer(timer, label=paste('Fill iteration', n + 1))
         }
@@ -204,7 +211,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                 # This will return a stack with number of layers equal to 
                 # number of masks.
                 return((base_vals == 1) & (mask_vals == 0))
-            })
+            }, datatype=dataType(base_mask))
         fill_areas_freq <- freq(fill_areas, useNA='no', merge=TRUE)
 
         # Select the fill image with the maximum number of available pixels 
@@ -227,6 +234,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         base_img[base_img_mask] <- 0
         fill_img[fill_img_mask] <- 0
 
+        # The below is necessary to avoid having cloud codes assigned to NA 
+        # values in base and mask image
         base_img_mask <- overlay(base_img_mask, fill_img_mask,
             fun=function(base_vals, fill_vals) {
                 # Mark areas where fill_img_mask is blank (clouded) with NA
@@ -234,7 +243,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                 # Mark areas where fill_vals is NA with NA
                 base_vals[is.na(fill_vals)] <- NA
                 return(base_vals)
-            })
+            }, datatype=dataType(base_img_mask))
 
         # Add numbered IDs to the cloud patches
         base_img_mask <- ConnCompLabel(base_img_mask)
@@ -249,7 +258,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         filled <- cloud_remove(base_img, fill_img, base_img_mask, 
                                verbose=verbose, ...)
         if (verbose) {
-            notify('Fill complete.')
+            notify('Fill complete - recalculating base mask.')
         }
 
         # Revise base mask to account for newly filled pixels
@@ -269,7 +278,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
     timer <- stop_timer(timer, label='Cloud fill')
 
-    if (n_cpus > 1) sfQuickStop(n_cpus)
+    #if (n_cpus > 1) sfQuickStop(n_cpus)
+    if (n_cpus > 1) endCluster(n_cpus)
 
     return(filled)
 }
