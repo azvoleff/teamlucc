@@ -120,7 +120,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                    'image(s) found. Need at least two images to perform cloud fill'))
     }
 
-    if (verbose) {
+    if (verbose > 0) {
         notify(paste('Found', length(img_files), 'image(s)'))
         timer <- start_timer(timer, label='Analyzing cloud cover in input images')
     }
@@ -137,10 +137,10 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     freq_table <- freq(stack(masks), useNA='no', merge=TRUE)
     # Convert frequency table to fractions
     freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
-    if (verbose) {
+    if (verbose > 0) {
         timer <- stop_timer(timer, label='Analyzing cloud cover in input images')
     }
-    if (verbose) {
+    if (verbose > 0) {
         timer <- start_timer(timer, label='Calculating cloud masks')
     }
 
@@ -198,10 +198,10 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     base_img_date <- img_dates[base_img_index]
     img_dates <- img_dates[-base_img_index]
 
-    if (verbose) {
+    if (verbose > 0) {
         timer <- stop_timer(timer, label='Calculating cloud masks')
     }
-    if (verbose) {
+    if (verbose > 0) {
         timer <- start_timer(timer, label='Masking base image')
     }
     # Mask out clouds in base image:
@@ -215,16 +215,16 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             return(base_vals)
         })
 
-    if (verbose) {
+    if (verbose > 0) {
         timer <- stop_timer(timer, label='Masking base image')
     }
     n <- 0
     cur_pct_clouds <- pct_clouds(base_mask)
-    if (verbose) {
+    if (verbose > 0) {
         notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover before fill'))
     }
     while ((cur_pct_clouds > threshold) & (n < max_iter) & (length(imgs) >= 1)) {
-        if (verbose) {
+        if (verbose > 0) {
             timer <- start_timer(timer, label=paste('Fill iteration', n + 1))
         }
         # Calculate a raster indicating the pixels in each potential fill image 
@@ -276,17 +276,15 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # Ensure dataType is properly set prior to handing off to IDL
         dataType(base_img_mask) <- 'INT2S'
 
-        if (verbose) {
+        if (verbose > 0) {
             notify(paste0('Filling image from ', base_img_date,
                           ' with image from ', fill_img_date, '.'))
             timer <- start_timer(timer, label="Performing fill")
         }
+        # Only activate verbose in cloud_remove if verbose is greater than 1
         base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
-                                 verbose=verbose, ...)
-        # base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
-        #                        verbose=verbose, algorithm=algorithm, 
-        #                        DN_min=DN_min, DN_max=DN_max, byblock=byblock)
-        if (verbose) {
+                                 verbose=verbose>1, ...)
+        if (verbose > 0) {
             timer <- stop_timer(timer, label="Performing fill")
         }
 
@@ -297,7 +295,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                 return(mask_vals)
             })
         cur_pct_clouds <- pct_clouds(base_mask)
-        if (verbose) {
+        if (verbose > 0) {
             notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover remaining'))
             timer <- stop_timer(timer, label=paste('Fill iteration', n + 1))
         }
