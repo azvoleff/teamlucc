@@ -1,5 +1,5 @@
 pct_clouds <- function(cloud_mask) {
-    num_clouds <- cellStats(cloud_mask >= 1, stat='sum', na.rm=TRUE)
+    num_clouds <- cellStats(cloud_mask == 1, stat='sum', na.rm=TRUE)
     num_clear <- cellStats(cloud_mask == 0, stat='sum', na.rm=TRUE)
     return((num_clouds / num_clear) * 100)
 }
@@ -61,8 +61,10 @@ pct_clouds <- function(cloud_mask) {
 #' @param notify notifier to use (defaults to \code{print} function).  See the 
 #' \code{notifyR} package for one way of sending notifications from R.  The 
 #' \code{notify} function should accept a string as the only argument.
-#' @param verbose whether to print detailed status messages
-#' @param ... additional arguments passed to \code{\link{cloud_remove}}, such 
+#' @param verbose whether to print detailed status messages. Set to FALSE or 0 
+#' for no status messages. Set to 1 for basic status messages. Set to 2 for 
+#' detailed status messages.
+#' @param ...  additional arguments passed to \code{\link{cloud_remove}}, such 
 #' as \code{DN_min}, \code{DN_max}, \code{algorithm}, \code{byblock}, 
 #' \code{verbose}, etc. See \code{\link{cloud_remove}} for details
 #' @return \code{Raster*} object with cloud filled image.
@@ -72,7 +74,7 @@ pct_clouds <- function(cloud_mask) {
 #' doi:10.1109/LGRS.2011.2173290
 auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
-                            n_cpus=1, notify=print, verbose=TRUE, ...) {
+                            n_cpus=1, notify=print, verbose=1, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
@@ -180,7 +182,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # clouds should be marked as cloud and fill should be attempted).  This 
         # is necessary in case clouded areas in img are mistakenly coded NA 
         # (they should not be).
-        ret[(ret != 1) & is.na(img)] <- NA
+        ret[(ret != 1) & (ret != 2) & is.na(img)] <- NA
         return(ret)
     }
     for (n in 1:length(masks)) {
@@ -204,23 +206,18 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     }
     # Mask out clouds in base image:
     base_img <- overlay(base_img, base_mask, fun=function(base_vals, mask_vals) {
-            # Mask out clouds/shadows
+            # Set clouds/shadows to 0
             base_vals[mask_vals == 1] <- 0
-            # Mask out fill
-            base_vals[mask_vals == 2] <- 0
             # Allow fill to be attempted in NA areas
             base_vals[is.na(base_vals)] <- 0
-            # Set true NAs (SLC-off gaps, areas outside scene) to NA
-            base_vals[is.na(mask_vals)] <- NA
+            # Set slc-off gaps and areas outside scene to NA
+            base_vals[mask_vals == 2] <- NA
             return(base_vals)
         })
 
     if (verbose) {
         timer <- stop_timer(timer, label='Masking base image')
     }
-    # Save base_img in filled so it will be returned if base_img already has 
-    # pct_clouds below threshold
-    filled <- base_img
     n <- 0
     cur_pct_clouds <- pct_clouds(base_mask)
     if (verbose) {
@@ -235,11 +232,18 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # due to cloud contamination. Areas coded 1 are missing due to cloud or 
         # shadow in the base image and are available in the merge image. This 
         # will return a stack with number of layers equal to number of masks.
-        fill_areas <- overlay(base_mask, stack(masks), fun=function(base_vals, mask_vals) {
+        fill_areas <- overlay(base_mask, stack(masks), fun=function(base_mask_vals, fill_mask_vals) {
+                ret <- rep(NA, length(base_mask_vals))
                 # Code cloudy in base, clear in fill as 1
-                ret <- (base_vals == 1) & (mask_vals == 0)
-                # Code NA in base, clear in fill as 1
-                ret[is.na(base_vals) & (mask_vals == 0)] <- 1
+                ret[(base_mask_vals == 1) & (fill_mask_vals == 0)] <- 1
+                # Code clear in base, clear in fill as 0
+                ret[(base_mask_vals == 0) & (fill_mask_vals == 0)] <- 0
+                # Code NA in base, clear in fill as clouded, so these NAs will 
+                # be filled if possible.
+                ret[is.na(base_mask_vals) & (fill_mask_vals == 0)] <- 1
+                # Ensure SLC-off gaps and background areas in each image are 
+                # not filled:
+                ret[(base_mask_vals == 2) | (fill_mask_vals == 2)] <- NA
                 return(ret)
             }, datatype=dataType(base_mask))
         fill_areas_freq <- freq(fill_areas, useNA='no', merge=TRUE)
@@ -262,28 +266,12 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         fill_img <- imgs[[fill_img_index]]
         imgs <- imgs[-fill_img_index]
         base_img_mask <- fill_areas[[fill_img_index]]
-        fill_img_mask <- masks[[fill_img_index]]
         masks <- masks[-fill_img_index]
-
         fill_img_date <- img_dates[fill_img_index]
         img_dates <- img_dates[-fill_img_index]
 
-        # # The below is necessary to avoid having cloud codes assigned to fill 
-        # # and NA areas in base and mask image
-        # base_img_mask <- overlay(base_img_mask, fill_img_mask,
-        #     fun=function(base_vals, fill_vals) {
-        #         # Mark areas where fill_img_mask is blank (clouded) with NA
-        #         base_vals[fill_vals] <- NA
-        #         # Mark areas where fill_vals is NA with NA
-        #         base_vals[is.na(fill_vals)] <- NA
-        #         return(base_vals)
-        #     }, datatype=dataType(base_img_mask))
-
         # Add numbered IDs to the cloud patches
         base_img_mask <- ConnCompLabel(base_img_mask)
-
-        # Code any clouds in the fill image as missing (-1)
-        base_img_mask[fill_img_mask == 1] <- -1
 
         # Ensure dataType is properly set prior to handing off to IDL
         dataType(base_img_mask) <- 'INT2S'
@@ -293,9 +281,9 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                           ' with image from ', fill_img_date, '.'))
             timer <- start_timer(timer, label="Performing fill")
         }
-        filled <- cloud_remove(base_img, fill_img, base_img_mask, 
-                                verbose=verbose, ...)
-        # filled <- cloud_remove(base_img, fill_img, base_img_mask, 
+        base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
+                                 verbose=verbose, ...)
+        # base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
         #                        verbose=verbose, algorithm=algorithm, 
         #                        DN_min=DN_min, DN_max=DN_max, byblock=byblock)
         if (verbose) {
@@ -303,7 +291,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
 
         # Revise base mask to account for newly filled pixels
-        base_mask <- overlay(filled[[1]], base_mask,
+        base_mask <- overlay(base_img[[1]], base_mask,
                                  fun=function(filled_vals, mask_vals) {
                 mask_vals[(mask_vals == 1) & (filled_vals != 0)] <- 0
                 return(mask_vals)
@@ -323,5 +311,5 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #if (n_cpus > 1) sfQuickStop(n_cpus)
     if (n_cpus > 1) endCluster(n_cpus)
 
-    return(filled)
+    return(base_img)
 }
