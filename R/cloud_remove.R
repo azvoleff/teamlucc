@@ -248,7 +248,9 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
 #' @param DN_max the maximum valid DN value
 #' @param idl path to the IDL binary on your machine (on Windows, the path to 
 #' idl.exe)
-#' @param verbose whether to print detailed status messages
+#' @param verbose whether to print detailed status messages. Set to FALSE or 0 
+#' for no status messages. Set to 1 for basic status messages. Set to 2 for 
+#' detailed status messages.
 #' @param byblock whether to process images block by block 
 #' (\code{byblock=TRUE}) or all at once (\code{byblock=FALSE}). Use 
 #' \code{byblock=FALSE} with caution, as this option will cause the cloud fill 

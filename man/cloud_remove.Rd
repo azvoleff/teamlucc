@@ -42,7 +42,9 @@ are clouded in \code{clear_rast} should be coded -1.}
 \item{idl}{path to the IDL binary on your machine (on Windows, the path to
 idl.exe)}
 
-\item{verbose}{whether to print detailed status messages}
+\item{verbose}{whether to print detailed status messages. Set to FALSE or 0
+for no status messages. Set to 1 for basic status messages. Set to 2 for
+detailed status messages.}
 
 \item{byblock}{whether to process images block by block
 (\code{byblock=TRUE}) or all at once (\code{byblock=FALSE}). Use
