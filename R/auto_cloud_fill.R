@@ -205,7 +205,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         timer <- start_timer(timer, label='Masking base image')
     }
     # Mask out clouds in base image:
-    base_img <- overlay(base_img, base_mask, fun=function(base_vals, mask_vals) {
+    base_img <- overlay(base_img, base_mask,
+        fun=function(base_vals, mask_vals) {
             # Set clouds/shadows to 0
             base_vals[mask_vals == 1] <- 0
             # Allow fill to be attempted in NA areas
@@ -213,7 +214,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             # Set slc-off gaps and areas outside scene to NA
             base_vals[mask_vals == 2] <- NA
             return(base_vals)
-        })
+        }, datatype=dataType(base_img[[1]]))
 
     if (verbose > 0) {
         timer <- stop_timer(timer, label='Masking base image')
@@ -232,7 +233,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # due to cloud contamination. Areas coded 1 are missing due to cloud or 
         # shadow in the base image and are available in the merge image. This 
         # will return a stack with number of layers equal to number of masks.
-        fill_areas <- overlay(base_mask, stack(masks), fun=function(base_mask_vals, fill_mask_vals) {
+        fill_areas <- overlay(base_mask, stack(masks),
+            fun=function(base_mask_vals, fill_mask_vals) {
                 ret <- rep(NA, length(base_mask_vals))
                 # Code cloudy in base, clear in fill as 1
                 ret[(base_mask_vals == 1) & (fill_mask_vals == 0)] <- 1
@@ -289,11 +291,11 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
 
         # Revise base mask to account for newly filled pixels
-        base_mask <- overlay(base_img[[1]], base_mask,
-                                 fun=function(filled_vals, mask_vals) {
+        base_mask <- overlay(base_mask, base_img[[1]],
+            fun=function(mask_vals, filled_vals) {
                 mask_vals[(mask_vals == 1) & (filled_vals != 0)] <- 0
                 return(mask_vals)
-            })
+            }, datatype=dataType(base_mask))
         cur_pct_clouds <- pct_clouds(base_mask)
         if (verbose > 0) {
             notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover remaining'))
