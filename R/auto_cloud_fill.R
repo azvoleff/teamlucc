@@ -283,7 +283,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
         # Only activate verbose in cloud_remove if verbose is greater than 1
         base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
-                                 verbose=verbose>1, ...)
+                                 verbose=verbose, ...)
         if (verbose > 0) {
             timer <- stop_timer(timer, label="Performing fill")
         }
