@@ -37,8 +37,8 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              algorithm, num_class, min_pixel, max_pixel, 
                              cloud_nbh, DN_min, DN_max, 
                              verbose, idl, byblock, patch_long=1000) {
-    if (verbose) {
-        warning("verbose=TRUE not supported with CLOUD_REMOVE and CLOUD_REMOVE_FAST algorithms")
+    if (verbose > 0) {
+        warning("verbose not supported with CLOUD_REMOVE and CLOUD_REMOVE_FAST algorithms")
     }
     if (algorithm == 'CLOUD_REMOVE_FAST') {
         script_path <- system.file("idl", "CLOUD_REMOVE_FAST.pro", 
@@ -157,7 +157,9 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
         out <- brick(cloudy, values=FALSE)
         out <- writeStart(out, out_name)
         for (block_num in 1:bs$n) {
-            message("Processing block ", block_num, " of ", bs$n, "...")
+            if (verbose > 0) {
+                message("Processing block ", block_num, " of ", bs$n, "...")
+            }
             dims <- c(bs$nrows[block_num], ncol(cloudy), nlayers(cloudy))
             cloudy_bl <- array(getValuesBlock(cloudy, row=bs$row[block_num],
                                               nrows=bs$nrows[block_num]),
@@ -172,7 +174,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
             filled <- call_cpp_cloud_fill(cloudy_bl, clear_bl, cloud_mask_bl, 
                                           algorithm, dims, num_class, 
                                           min_pixel, max_pixel, cloud_nbh, 
-                                          DN_min, DN_max, verbose)
+                                          DN_min, DN_max, verbose>1)
             out <- writeValues(out, filled, bs$row[block_num])
         }
         out <- writeStop(out)
@@ -198,7 +200,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
         cloud_mask <- array(getValues(cloud_mask), dim=c(dims[1] * dims[2]))
         filled <- call_cpp_cloud_fill(cloudy, clear, cloud_mask, algorithm, 
                                       dims, num_class, min_pixel, max_pixel, 
-                                      cloud_nbh, DN_min, DN_max, verbose)
+                                      cloud_nbh, DN_min, DN_max, verbose>1)
         out <- setValues(out, filled)
         out <- writeRaster(out, out_name, datatype=out_datatype)
     }
