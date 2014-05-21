@@ -23,6 +23,8 @@
 auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename, 
                             output_path, n_cpus=1, overwrite=FALSE, 
                             notify=print) {
+    stop('auto_chg_detect not yet fully implemented')
+
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }

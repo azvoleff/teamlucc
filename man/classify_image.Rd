@@ -50,8 +50,8 @@ a list with 3 elements: the trained classifier, the predicted classes
 Currently only supports classification using a support vector machine (SVM).
 }
 \details{
-Processing can be done in parallel using all using the cluster
-facilities in the \code{spatial.tools} package. To enable clustering, call
+Processing can be done in parallel using all using the cluster facilities in
+the \code{spatial.tools} package. To enable clustering, call
 \code{beginCluster} before running \code{classify_image}.  To stop the
 cluster when finished, call \code{endCluster}.
 }

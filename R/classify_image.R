@@ -2,6 +2,11 @@
 #'
 #' Currently only supports classification using a support vector machine (SVM).
 #'
+#' Processing can be done in parallel using all using the cluster facilities in 
+#' the \code{spatial.tools} package. To enable clustering, call 
+#' \code{beginCluster} before running \code{classify_image}.  To stop the 
+#' cluster when finished, call \code{endCluster}.
+#'
 #' @export
 #' @import caret e1071 kernlab randomForest
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
@@ -30,10 +35,6 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @return a list with 3 elements: the trained classifier, the predicted classes 
 #' \code{RasterLayer} and the class probabilities \code{RasterBrick}
-#' @details Processing can be done in parallel using all using the cluster 
-#' facilities in the \code{spatial.tools} package. To enable clustering, call 
-#' \code{beginCluster} before running \code{classify_image}.  To stop the 
-#' cluster when finished, call \code{endCluster}.
 #' @examples
 #' \dontrun{
 #' # Don't run long example

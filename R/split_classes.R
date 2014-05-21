@@ -3,15 +3,13 @@
 #' This function can be used to aid in classifying spectrally diverse classes 
 #' by splitting the input classes into subclasses using a clustering algorithm.  
 #' After classification, these subclasses are merged back into their original 
-#' parent classes.
-#'
-#' For example, the training data for an agriculture class might have both 
-#' fallow and planted fields in the training data, or fields planted with 
-#' different crops that are spectrally dissimilar.  This function can be used 
-#' to automatically split the agriculture class into a number of subclasses.  
-#' The classifier is then run on this larger set of classes, and following 
-#' classification, these subclasses can all be merged together into a single 
-#' overall agriculture class.
+#' parent classes. For example, the training data for an agriculture class 
+#' might have both fallow and planted fields in the training data, or fields 
+#' planted with different crops that are spectrally dissimilar.  This function 
+#' can be used to automatically split the agriculture class into a number of 
+#' subclasses.  The classifier is then run on this larger set of classes, and 
+#' following classification, these subclasses can all be merged together into a 
+#' single overall agriculture class.
 #'
 #' @export
 #' @importFrom mclust Mclust
