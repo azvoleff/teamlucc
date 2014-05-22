@@ -61,7 +61,8 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
     lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
 
     image_bands <- c('band1', 'band2', 'band3', 'band4', 'band5', 'band7')
-    mask_bands <- c('fill_QA', 'fmask_band')
+    mask_bands <- c('fill_QA', 'fmask_band', 'cloud_QA', 'cloud_shadow_QA', 
+                    'adjacent_cloud_QA')
     image_files <- c()
     image_stacks <- c()
     mask_stacks <- c()
@@ -192,12 +193,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
         if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
                                                              '-', 'masking'))
 
-        # The combined cloud mask includes the cloud_QA, cloud_shadow_QA, and 
-        # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, while 
-        # good pixels are coded as 1.
-        image_stack_mask_path <- file.path(this_output_path,
-                                           paste(prefix, image_basename, 
-                                                 'mask.envi', sep='_'))
         # fmask_band key:
         # 	0 = clear
         # 	1 = water
@@ -216,12 +211,24 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
                 })
         image_stack <- image_stack * image_stack_mask
 
+        # The cloud_comb cloud mask includes the cloud_QA, cloud_shadow_QA, and 
+        # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, 
+        # while good pixels are coded as 1.
+        cloud_comb <- overlay(mask_stack$cloud_QA, mask_stack$cloud_shadow_QA, 
+                              mask_stack$adjacent_cloud_QA,
+            fun=function(clo, sha, adj) {
+                return((clo == 255) | (sha == 255) | (adj == 255))
+            }, datatype='INT2S')
+        
+
         mask_stack_path <- file.path(this_output_path,
                                      paste(prefix, image_basename, 
                                            'masks.envi', sep='_'))
-        mask_stack <- writeRaster(mask_stack, filename=mask_stack_path, 
-                                  overwrite=overwrite, 
-                                  datatype='INT2S')
+        mask_stack <- writeRaster(stack(mask_stack$fill_QA,
+                                        mask_stack$fmask_band, 
+                                        cloud_comb), 
+                                  filename=mask_stack_path, 
+                                  overwrite=overwrite, datatype='INT2S')
         if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                             '-', 'masking'))
 
