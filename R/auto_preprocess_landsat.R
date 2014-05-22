@@ -184,8 +184,8 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         }
         image_stack <- crop(image_stack, crop_area)
         image_stack <- extend(image_stack, crop_area)
-        mask_stack <- crop(mask_stack, crop_area)
-        mask_stack <- extend(mask_stack, crop_area)
+        mask_stack <- crop(mask_stack, crop_area, datatype='INT2S')
+        mask_stack <- extend(mask_stack, crop_area, datatype='INT2S')
         if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                             '-', 'cropping'))
 
