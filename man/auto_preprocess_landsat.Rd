@@ -3,27 +3,28 @@
 \alias{auto_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, aoi = NULL,
-  dem_path = NULL, output_path = NULL, n_cpus = 1, cleartmp = FALSE,
+auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, dem_path = NULL,
+  aoi = NULL, output_path = NULL, n_cpus = 1, cleartmp = FALSE,
   overwrite = FALSE, notify = print, verbose = FALSE)
 }
 \arguments{
 \item{image_dirs}{list of paths to a set of Landsat CDR image files in ENVI
 format as output by the \code{unstack_ledapscdr} function.}
 
-\item{output_path}{the path to use for the output (optional - if NULL then
-output images will be saved alongside the input images in the same folder).}
-
 \item{prefix}{string to use as a prefix for all filenames}
 
-\item{tc}{whether to topographically correct imagery}
+\item{tc}{whether to topographically correct imagery (if \code{TRUE}, then
+\code{dem_path} must be specified)}
+
+\item{dem_path}{path to a set of DEMs as output by \code{auto_setup_dem}
+(only required if tc=TRUE)}
 
 \item{aoi}{area of interest (AOI), as a \code{SpatialPolygonsDataFrame}.  If
 supplied, this aoi is used to crop and set the projection system of the
 output.}
 
-\item{dem_path}{path to a set of DEMs as output by \code{auto_setup_dem}
-(only required if tc=TRUE)}
+\item{output_path}{the path to use for the output (optional - if NULL then
+output images will be saved alongside the input images in the same folder).}
 
 \item{n_cpus}{the number of CPUs to use for processes that can run in
 parallel}

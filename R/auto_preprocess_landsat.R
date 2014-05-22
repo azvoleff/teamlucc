@@ -20,15 +20,16 @@
 #' @importFrom tools file_path_sans_ext
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
-#' @param output_path the path to use for the output (optional - if NULL then 
-#' output images will be saved alongside the input images in the same folder).
 #' @param prefix string to use as a prefix for all filenames
-#' @param tc whether to topographically correct imagery
+#' @param tc whether to topographically correct imagery (if \code{TRUE}, then 
+#' \code{dem_path} must be specified)
+#' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem} 
+#' (only required if tc=TRUE)
 #' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}.  If 
 #' supplied, this aoi is used to crop and set the projection system of the 
 #' output.
-#' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem} 
-#' (only required if tc=TRUE)
+#' @param output_path the path to use for the output (optional - if NULL then 
+#' output images will be saved alongside the input images in the same folder).
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
@@ -41,9 +42,9 @@
 #' information
 #' @seealso \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}}, 
 #' \code{\link{auto_setup_dem}}
-auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE, aoi=NULL,
-                                    dem_path=NULL, output_path=NULL, n_cpus=1, 
-                                    cleartmp=FALSE,  overwrite=FALSE, 
+auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
+                                    dem_path=NULL, aoi=NULL, output_path=NULL, 
+                                    n_cpus=1, cleartmp=FALSE,  overwrite=FALSE, 
                                     notify=print, verbose=FALSE) {
     if (tc && !file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
