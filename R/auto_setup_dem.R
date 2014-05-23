@@ -115,7 +115,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
 
         if (verbose) timer <- start_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
                                                 pathrow_label))
-        # The below lines construct to_ext as the extent the DEM will be 
+        # The below lines constructs to_ext as the extent the DEM will be 
         # projected to. This extent must cover the same area as the 
         # dem_mosaic_crop, but must have the same resolution, CRS and origin as 
         # the pathrow
