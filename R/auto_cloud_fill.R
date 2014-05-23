@@ -309,7 +309,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     timer <- stop_timer(timer, label='Cloud fill')
 
     #if (n_cpus > 1) sfQuickStop(n_cpus)
-    if (n_cpus > 1) endCluster(n_cpus)
+    if (n_cpus > 1) endCluster()
 
     return(base_img)
 }
