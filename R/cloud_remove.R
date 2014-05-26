@@ -290,6 +290,11 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
                            'simple'))) {
         stop('algorithm must be one of "CLOUD_REMOVE", "CLOUD_REMOVE_FAST", "teamlucc", or "simple"')
     }
+
+    if (verbose > 0) {
+        message('Using "', algorithm, '" algorithm.')
+    }
+    
     if (!(class(cloudy) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
         stop('cloudy must be a Raster* object')
     }
