@@ -65,10 +65,12 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
     # dev.off()
 
     if (crop_to_aoi) {
+        # Do a rough crop of the pathrows to the AOI in the pathrow CRS 
+        # (pathrow will later be cropped in the AOI CRS).
         pathrows_cropped <- gIntersection(pathrows, aoi_prproj, byid=TRUE)
         row.names(pathrows_cropped) <- row.names(pathrows)
-        pathrows <- SpatialPolygonsDataFrame(pathrows_cropped, 
-                                             data=pathrows@data)
+        pathrows_cropped <- SpatialPolygonsDataFrame(pathrows_cropped, 
+                                                     data=pathrows@data)
     }
 
     # Add a 500 m buffer in UTM coordinate system, as 1) slope calculation 
@@ -76,8 +78,8 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
     # pixels on the sides of the DEM due to slight misalignments from the 
     # reprojection that will occur later. After buffering transform back to 
     # WGS84 to use for preliminary cropping of the dem mosaic. 
-    pathrows_utm <- spTransform(pathrows,
-                                CRS(utm_zone(pathrows, proj4string=TRUE)))
+    pathrows_utm <- spTransform(pathrows_cropped,
+                                CRS(utm_zone(pathrows_cropped, proj4string=TRUE)))
     pathrows_buffered <- spTransform(gBuffer(pathrows_utm, width=500, byid=TRUE), 
                                  CRS(proj4string(dem_extents)))
     intersecting <- as.logical(gIntersects(dem_extents, 
@@ -101,7 +103,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
 
         ######################################################################
         # Mosaic DEMs
-        if (verbose) timer <- start_timer(timer, label='Mosaicing DEMs')
+        if (verbose) timer <- start_timer(timer, label='Mosaicking DEMs')
         mosaic_file <- extension(rasterTmpFile(), '.envi')
         # Calculate minimum bounding box coordinates:
         mosaic_te <- as.numeric(bbox(pathrows_buffered))
@@ -109,7 +111,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of="ENVI", 
                        overwrite=overwrite)
         dem_mosaic <- raster(mosaic_file)
-        if (verbose) timer <- stop_timer(timer, label='Mosaicing DEMs')
+        if (verbose) timer <- stop_timer(timer, label='Mosaicking DEMs')
     } else {
         dem_mosaic <- dem_rasts[[1]]
         mosaic_file <- filename(dem_mosaic)
@@ -128,12 +130,13 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                           pathrow_label))
         if (crop_to_aoi) {
             to_srs <- proj4string(aoi)
-            dem_te <- as.numeric(bbox(aoi))
+            pathrow_tosrs <- spTransform(pathrow, CRS(to_srs))
+            to_ext <- extent(gIntersection(pathrow_tosrs, aoi, byid=TRUE))
         } else {
             to_srs <- utm_zone(pathrow, proj4string=TRUE)
             to_ext <- projectExtent(pathrow, to_srs)
-            dem_te <- as.numeric(bbox(to_ext))
         }
+        dem_te <- as.numeric(bbox(to_ext))
         to_res <- c(30, 30)
         # Calculate minimum bounding box coordinates:
         dem_mosaic_crop_filename <- file.path(output_path,
@@ -144,7 +147,6 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                     te=dem_te, t_srs=to_srs, tr=to_res, 
                                     r='cubicspline', output_Raster=TRUE, 
                                     of="ENVI", overwrite=overwrite)
-
         if (verbose) timer <- stop_timer(timer,
                                          label=paste('Cropping/reprojecting DEM mosaic crop for', 
                                          pathrow_label))
