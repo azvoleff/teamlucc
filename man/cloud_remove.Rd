@@ -4,8 +4,8 @@
 \title{Remove clouds using Xiaolin Zhu's NSPI algorithm}
 \usage{
 cloud_remove(cloudy, clear, cloud_mask, out_name = NULL,
-  algorithm = "CLOUD_REMOVE", num_class = 4, min_pixel = 20,
-  max_pixel = 1000, cloud_nbh = 10, DN_min = 0, DN_max = 255,
+  algorithm = "simple", num_class = 4, min_pixel = 20, max_pixel = 1000,
+  cloud_nbh = 10, DN_min = 0, DN_max = 255,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
   verbose = FALSE, byblock = TRUE)
 }
@@ -23,7 +23,7 @@ are clouded in \code{clear_rast} should be coded -1.}
 \item{out_name}{filename for cloud filled image}
 
 \item{algorithm}{must be one of: "CLOUD_REMOVE", "CLOUD_REMOVE_FAST",
-"teamlucc", or "simple". See Details.}
+"teamlucc", or "simple". Default is "simple". See Details.}
 
 \item{num_class}{set the estimated number of classes in image}
 
@@ -61,16 +61,16 @@ by Xiaolin Zhu to fill heavy clouds in a Landsat image.
 \details{
 The \code{algorithm} parameter determines what algorithm is used for the
 cloud fill. \code{algorithm} must be one of: "CLOUD_REMOVE",
-"CLOUD_REMOVE_FAST", "teamlucc", or "simple". If set to "CLOUD_REMOVE" the
-script uses a (slightly modified to be called from R) version of  Xiaolin
-Zhu's NSPI IDL code. If set to "CLOUD_REMOVE_FAST", the algorithm uses the
-"fast" version of Xiaolin's code. Both of these two algorithms require an
-IDL license to run (and therefore \code{idl_path} must be set). The
-"teamlucc" algorithm uses a version of the NSPI algorithm (based on the
-CLOUD_REMOVE code) that is coded in C++ and  can be run from R without an
-IDL license. The "simple" algorithm uses a cloud fill model that is based on
-fitting a linear model to the surface reflectance from the clear image in a
-window around each cloud, and using this linear model to predict
+"CLOUD_REMOVE_FAST", "teamlucc", or "simple" (the default). If set to
+"CLOUD_REMOVE" the script uses a (slightly modified to be called from R)
+version of  Xiaolin Zhu's NSPI IDL code. If set to "CLOUD_REMOVE_FAST", the
+algorithm uses the "fast" version of Xiaolin's code. Both of these two
+algorithms require an IDL license to run (and therefore \code{idl_path} must
+be set).  The "teamlucc" algorithm uses a version of the NSPI algorithm
+(based on the CLOUD_REMOVE code) that is coded in C++ and  can be run from R
+without an IDL license. The "simple" algorithm uses a cloud fill model that
+is based on fitting a linear model to the surface reflectance from the clear
+image in a window around each cloud, and using this linear model to predict
 reflectance in unobserved (cloudy) areas.
 }
 \examples{
