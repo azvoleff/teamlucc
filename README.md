@@ -80,19 +80,11 @@ install an updated version of the package.
 appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
 for your version of R (as `teamlucc` contains C++ code).
 
-### (optional) Install IDL
-[IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) is required for 
-running the cloud fill and Landsat 7 SLC-off gap fill routines in `teamlucc`. If 
-you do not have an IDL license, you can also use the (free) IDL virtual 
-machine (VM). See [this 
-page](http://www.exelisvis.com/Support/HelpArticlesDetail/TabId/219/ArtMID/900/ArticleID/12395/The-IDL-Virtual-Machine.aspx) 
-for details on the IDL VM.
+### Install GDAL
 
-### (optional) Install GDAL
-
-This step is only required if you want to use the `unstack_ledapscdr` 
-function in `teamlucc`. All the other functions in `teamlucc` will work without 
-installing GDAL.
+`teamlucc` uses the `gdalUtils` package to facilitate fast image reprojection 
+and mosaicking. `gdalUtils` requires having a local GDAL installation. Follow 
+the below steps to install GDAL on your system:
 
 #### Windows:
 
@@ -119,6 +111,12 @@ At a shell prompt, type:
 ``` sh
 sudo apt-get install gdal-bin libgdal-dev
 ```
+
+### (optional) Install IDL
+[IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) is required for 
+running the IDL cloud fill and Landsat 7 SLC-off gap fill routines in 
+`teamlucc`. There are two native R cloud fill routines that can be used without 
+an IDL license.
 
 ## Using teamlucc
 
