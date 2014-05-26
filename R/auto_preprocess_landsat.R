@@ -18,6 +18,7 @@
 #' @importFrom rgeos gIntersection
 #' @importFrom wrspathrow pathrow_poly
 #' @importFrom tools file_path_sans_ext
+#' @importFrom gdalUtils gdalwarp
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
 #' @param prefix string to use as a prefix for all filenames
@@ -141,38 +142,22 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         timer <- start_timer(timer, label=paste('Preprocessing', image_basename))
 
         #######################################################################
-        # Reproject images to match the projection being used for this image.  
-        # This is either the projection of aoi (if aoi is supplied), or the UTM 
-        # zone of the centroid of this path and row.
+        # Crop and reproject images to match the projection being used for this 
+        # image.  This is either the projection of the aoi (if aoi is 
+        # supplied), or the UTM zone of the centroid of this path and row.
+        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
+                                                             '-', 'cropping and reprojecting'))
+
         this_pathrow_poly <- pathrow_poly(as.numeric(WRS_Path), 
                                           as.numeric(WRS_Row))
         if (!is.null(aoi)) {
-            to_proj4string <- proj4string(aoi)
+            to_srs <- proj4string(aoi)
         } else {
-            to_proj4string <- utm_zone(this_pathrow_poly, proj4string=TRUE)
-        }
-        if (!proj4comp(to_proj4string, proj4string(image_stack))) {
-            if (verbose) timer <- start_timer(timer,
-                                              label=paste(image_basename, '- reproject'))
-            image_stack <- projectRaster(image_stack, crs=CRS(to_proj4string))
-            mask_stack <- projectRaster(mask_stack, crs=CRS(to_proj4string), method='ngb')
-            if (verbose) timer <- stop_timer(timer,
-                                             label=paste(image_basename, '- reproject'))
-        } else {
-            proj4string(image_stack) <- to_proj4string
-            proj4string(mask_stack) <- to_proj4string
+            to_srs <- utm_zone(this_pathrow_poly, proj4string=TRUE)
         }
 
-        ######################################################################
-        # Crop image as necessary
-        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
-                                                            '-', 'cropping'))
-        # Note that the image_stack may have been reprojected to match the 
-        # projection system of the AOI. Ensure the pathrow_poly projection 
-        # system still matches:
-        this_pathrow_poly <- spTransform(this_pathrow_poly, 
-                                         CRS(proj4string(image_stack)))
-
+        # Calculate minimum bounding box coordinates:
+        this_pathrow_poly <- spTransform(this_pathrow_poly, CRS(to_srs))
         if (!is.null(aoi)) {
             # If an aoi IS supplied, match the image extent to that of the AOI 
             # cropped to the appropriate Landsat path/row polygon.
@@ -182,18 +167,38 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             # appropriate Landsat path/row polygon.
             crop_area <- this_pathrow_poly
         }
-        image_stack <- crop(image_stack, crop_area)
-        image_stack <- extend(image_stack, crop_area)
-        mask_stack <- crop(mask_stack, crop_area, datatype='INT2S')
-        mask_stack <- extend(mask_stack, crop_area, datatype='INT2S')
+        out_te <- as.numeric(bbox(crop_area))
+
+        to_res <- c(30, 30)
+        image_stack_temp_file <- extension(rasterTmpFile(), '.envi')
+        # Ensure image layers are written to desk in a single raster file
+        image_stack <- writeRaster(image_stack, filename=image_stack_temp_file,
+                                   datatype='INT2S')
+        image_stack_reproj_file <- extension(rasterTmpFile(), '.envi')
+        image_stack <- gdalwarp(image_stack_temp_file,
+                                dstfile=image_stack_reproj_file,
+                                te=out_te, t_srs=to_srs, tr=to_res, 
+                                r='cubicspline', output_Raster=TRUE, of="ENVI", 
+                                overwrite=overwrite)
+        names(image_stack) <- image_bands
+        # Ensure mask layers are written to desk in a single raster file
+        mask_stack_temp_file <- extension(rasterTmpFile(), '.envi')
+        mask_stack <- writeRaster(mask_stack, filename=mask_stack_temp_file,
+                                  datatype='INT2S')
+        mask_stack_reproj_file <- extension(rasterTmpFile(), '.envi')
+        mask_stack <- gdalwarp(mask_stack_temp_file,
+                               dstfile=mask_stack_reproj_file,
+                               te=out_te, t_srs=to_srs, tr=to_res, 
+                               r='cubicspline', output_Raster=TRUE, of="ENVI", 
+                               overwrite=overwrite)
+        names(mask_stack) <- mask_bands
         if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
-                                                            '-', 'cropping'))
+                                                            '-', 'cropping and reprojecting'))
 
         ######################################################################
         # Mask out clouds and missing values
         if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
                                                              '-', 'masking'))
-
         # fmask_band key:
         # 	0 = clear
         # 	1 = water
