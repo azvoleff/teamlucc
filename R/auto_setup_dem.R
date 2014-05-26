@@ -106,7 +106,8 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         # Calculate minimum bounding box coordinates:
         mosaic_te <- as.numeric(bbox(pathrows_buffered))
         # Use mosaic_rasters from gdalUtils for speed:
-        mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of="ENVI")
+        mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of="ENVI", 
+                       overwrite=overwrite)
         dem_mosaic <- raster(mosaic_file)
         if (verbose) timer <- stop_timer(timer, label='Mosaicing DEMs')
     } else {
@@ -129,7 +130,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
             to_srs <- proj4string(aoi)
             dem_te <- as.numeric(bbox(aoi))
         } else {
-            to_srs <- proj4string(utm_zone(pathrow, proj4string=TRUE))
+            to_srs <- utm_zone(pathrow, proj4string=TRUE)
             to_ext <- projectExtent(pathrow, to_srs)
             dem_te <- as.numeric(bbox(to_ext))
         }
@@ -142,7 +143,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                     dstfile=dem_mosaic_crop_filename,
                                     te=dem_te, t_srs=to_srs, tr=to_res, 
                                     r='cubicspline', output_Raster=TRUE, 
-                                    of="ENVI")
+                                    of="ENVI", overwrite=overwrite)
 
         if (verbose) timer <- stop_timer(timer,
                                          label=paste('Cropping/reprojecting DEM mosaic crop for', 

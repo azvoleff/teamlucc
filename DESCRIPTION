@@ -28,6 +28,7 @@ Imports:
     SDMTools,
     grid,
     spatial.tools,
+    gdalUtils,
     caret,
     maptools,
     mclust,
@@ -35,7 +36,6 @@ Imports:
     XML
 Suggests:
     itertools,
-    gdalUtils,
     testthat,
     landsat,
     foreach,
