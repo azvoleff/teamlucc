@@ -4,12 +4,14 @@
 #' Landsat Climate Data Record (CDR) archive into a series of single band 
 #' images in ENVI format.
 #'
-#' Note that this function requires a local GDAL installation. See 
-#' http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries or 
-#' http://trac.osgeo.org/osgeo4w/ to download the appropriate installer for 
+#' This function uses \code{gdalUtils}, which requires a local GDAL 
+#' installation.  See http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries 
+#' or http://trac.osgeo.org/osgeo4w/ to download the appropriate installer for 
 #' your operating system.
 #'
+#'
 #' @export
+#' @importFrom gdalUtils gdal_translate
 #' @importFrom tools file_path_sans_ext
 #' @param x input HDF4 file
 #' @param output_folder output folder (if \code{NULL}, defaults to input folder)
@@ -28,10 +30,6 @@
 #' }
 unstack_ledapscdr <- function(x, output_folder=NULL, overwrite=FALSE, 
                               rmhdf=FALSE) {
-    if (!require(gdalUtils)) {
-        stop('unstack_ledapscdr requires the "gdalUtils" package')
-    }
-
     if (is.null(output_folder)) {
         output_folder <- dirname(x)
     }

@@ -24,9 +24,9 @@ Landsat Climate Data Record (CDR) archive into a series of single band
 images in ENVI format.
 }
 \details{
-Note that this function requires a local GDAL installation. See
-http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries or
-http://trac.osgeo.org/osgeo4w/ to download the appropriate installer for
+This function uses \code{gdalUtils}, which requires a local GDAL
+installation.  See http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries
+or http://trac.osgeo.org/osgeo4w/ to download the appropriate installer for
 your operating system.
 }
 \examples{
