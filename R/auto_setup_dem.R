@@ -1,4 +1,14 @@
-#' Setup the DEM mosaic for a particular TEAM site
+#' Setup the DEM mosaic for a given AOI
+#'
+#' This function will setup a set of DEM tiles for each the Landsat path/row 
+#' needed to cover a given AOI. The tiles can optionally be cropped to cover 
+#' only the portion of each path/row that is included in the AOI, or can cover 
+#' the full scene for each path/row needed to cover the AOI.
+#'
+#' This function uses \code{gdalUtils}, which requires a local GDAL 
+#' installation.  See http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries 
+#' or http://trac.osgeo.org/osgeo4w/ to download the appropriate installer for 
+#' your operating system.
 #'
 #' @export
 #' @importFrom wrspathrow pathrow_num
@@ -6,6 +16,7 @@
 #' @importFrom sp spTransform
 #' @importFrom rgeos gBuffer gIntersects gUnaryUnion gIntersection
 #' @importFrom tools file_path_sans_ext
+#' @importFrom gdalUtils mosaic_rasters gdalwarp
 #' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to 
 #' use as as bounding box when selecting DEMs. Also used to crop and set 
 #' projection of the output DEM(s) if \code{crop_to_aoi=TRUE}.
@@ -91,75 +102,51 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         ######################################################################
         # Mosaic DEMs
         if (verbose) timer <- start_timer(timer, label='Mosaicing DEMs')
-        # See http://bit.ly/1dJPIeF re issue in raster that necessitates below 
-        # workaround
-        # TODO: Contact Hijmans re possible fix
-        mosaicargs <- dem_rasts
-        mosaicargs$fun <- mean
-        dem_mosaic <- do.call(mosaic, mosaicargs)
+        mosaic_file <- extension(rasterTmpFile(), '.envi')
+        # Calculate minimum bounding box coordinates:
+        mosaic_te <- as.numeric(bbox(pathrows_buffered))
+        # Use mosaic_rasters from gdalUtils for speed:
+        mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of="ENVI")
+        dem_mosaic <- raster(mosaic_file)
         if (verbose) timer <- stop_timer(timer, label='Mosaicing DEMs')
     } else {
         dem_mosaic <- dem_rasts[[1]]
+        mosaic_file <- filename(dem_mosaic)
     }
 
     for (n in 1:length(pathrows)) {
         pathrow <- pathrows[n, ]
-        pathrow_buffered <- pathrows_buffered[n, ]
         pathrow_label <- paste(sprintf('%03i', pathrow@data$PATH), 
                                sprintf('%03i', pathrow@data$ROW), sep='-')
-        timer <- start_timer(timer, label=paste('Processing', pathrow_label))
+        timer <- start_timer(timer, label=paste0('Processing ', n, ' of ', 
+                                                 nrow(pathrows), ': ', 
+                                                 pathrow_label))
 
-        pathrow_buffered_demproj <- spTransform(pathrow_buffered, 
-                                                CRS(proj4string(dem_mosaic)))
-        dem_mosaic_crop <- crop(dem_mosaic, pathrow_buffered_demproj)
-
-        if (verbose) timer <- start_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
-                                                pathrow_label))
-        # The below lines constructs to_ext as the extent the DEM will be 
-        # projected to. This extent must cover the same area as the 
-        # dem_mosaic_crop, but must have the same resolution, CRS and origin as 
-        # the pathrow
+        if (verbose) timer <- start_timer(timer,
+                                          label=paste('Cropping/reprojecting DEM mosaic crop for', 
+                                          pathrow_label))
         if (crop_to_aoi) {
-            to_ext <- projectExtent(dem_mosaic_crop, proj4string(aoi))
+            to_srs <- proj4string(aoi)
+            dem_te <- as.numeric(bbox(aoi))
         } else {
-            to_ext <- projectExtent(dem_mosaic_crop,
-                                    utm_zone(pathrow, proj4string=TRUE))
+            to_srs <- proj4string(utm_zone(pathrow, proj4string=TRUE))
+            to_ext <- projectExtent(pathrow, to_srs)
+            dem_te <- as.numeric(bbox(to_ext))
         }
         to_res <- c(30, 30)
-        xmin(to_ext) <- floor(xmin(to_ext) / to_res[1]) * to_res[1]
-        xmax(to_ext) <- ceiling(xmax(to_ext) / to_res[1]) * to_res[1]
-        ymin(to_ext) <- floor(ymin(to_ext) / to_res[2]) * to_res[2]
-        ymax(to_ext) <- ceiling(ymax(to_ext) / to_res[2]) * to_res[2]
-        # The below two lines shift the origin to 15, 15 for consistency with 
-        # the LEDAPS CDR images.
-        xmin(to_ext) <- xmin(to_ext) + to_res[1]/2
-        ymax(to_ext) <- ymax(to_ext) + to_res[2]/2
-        res(to_ext) <- to_res
-        dem_mosaic_crop <- projectRaster(dem_mosaic_crop, to_ext,
-                                         method='bilinear')
-        dem_mosaic_crop <- round(dem_mosaic_crop)
-
-        #######################################################################
-        # Calculate the final area to crop from each image, after intersecting 
-        # landsat path/row with the AOI (if cropping to AOI is desired)
-        aoi_prmos <- spTransform(aoi, CRS(proj4string(dem_mosaic_crop)))
-        pathrow_prmos <- spTransform(pathrow, CRS(proj4string(dem_mosaic_crop)))
-        if (crop_to_aoi) {
-            crop_area <- gIntersection(pathrow_prmos, aoi_prmos, byid=TRUE)
-        } else {
-            crop_area <- pathrow_prmos
-        }
-
-        dem_mosaic_filename <- file.path(output_path,
+        # Calculate minimum bounding box coordinates:
+        dem_mosaic_crop_filename <- file.path(output_path,
                                          paste0('dem_', pathrow_label, 
                                                 '.envi'))
-        dem_mosaic_crop <- crop(dem_mosaic_crop, crop_area, datatype='INT2S')
-        dem_mosaic_crop <- extend(dem_mosaic_crop, crop_area, datatype='INT2S')
-        dem_mosaic_crop <- writeRaster(dem_mosaic_crop, 
-                                       filename=dem_mosaic_filename, 
-                                       overwrite=overwrite, datatype='INT2S')
-        if (verbose) timer <- stop_timer(timer, label=paste('Reprojecting DEM mosaic crop for', 
-                                               pathrow_label))
+        dem_mosaic_crop <- gdalwarp(mosaic_file, 
+                                    dstfile=dem_mosaic_crop_filename,
+                                    te=dem_te, t_srs=to_srs, tr=to_res, 
+                                    r='cubicspline', output_Raster=TRUE, 
+                                    of="ENVI")
+
+        if (verbose) timer <- stop_timer(timer,
+                                         label=paste('Cropping/reprojecting DEM mosaic crop for', 
+                                         pathrow_label))
 
         if (verbose) timer <- start_timer(timer, label=paste('Calculating slope/aspect for', 
                                                 pathrow_label))
@@ -180,7 +167,9 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                    overwrite=overwrite, datatype='INT2S')
         if (verbose) timer <- stop_timer(timer, label=paste('Calculating slope/aspect for', 
                                                 pathrow_label))
-        timer <- stop_timer(timer, label=paste('Processing', pathrow_label))
+        timer <- stop_timer(timer, label=paste0('Processing ', n, ' of ', 
+                                                nrow(pathrows), ': ', 
+                                                pathrow_label))
     }
 
     if (n_cpus > 1) endCluster()
