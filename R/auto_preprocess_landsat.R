@@ -57,7 +57,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
     timer <- Track_time(notify)
 
     timer <- start_timer(timer, label='Preprocessing images')
-    if (n_cpus > 1) beginCluster(n_cpus)
 
     # Setup a regex to identify Landsat CDR images
     lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
@@ -116,7 +115,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         }
     }
 
-    if (n_cpus > 1) endCluster()
     for (n in 1:length(image_stacks)) {
         if (n_cpus > 1) beginCluster(n_cpus)
         image_stack <- image_stacks[[n]]
