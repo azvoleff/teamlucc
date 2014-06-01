@@ -21,9 +21,10 @@ minnaert_samp(x, slope, aspect, sunelev, sunazimuth, IL.epsilon = 1e-06,
 \item{IL.epsilon}{a small amount to add to calculated illumination values
 that are equal to zero to avoid division by zero resulting in Inf values}
 
-\item{slopeclass}{the slope classes to calculate k for (in degrees), or
+\item{slopeclass}{the slope classes to calculate k for (in radians), or
 NULL, in which case an algorithm will be used to choose reasonable defaults
-for the given image}
+for the given image. If provided, \code{slopeclass} should be a list of
+slope class limits. For example: c(1, 5, 10, 15, 20, 25, 30, 45) * (pi/180)}
 
 \item{coverclass}{used to calculate k for specific cover class (optional)
 as \code{RasterLayer}}

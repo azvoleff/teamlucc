@@ -56,6 +56,8 @@ topocorr_samp <- function(x, slope, aspect, sunelev, sunazimuth, method="cosine"
                           na.value=NA, IL.epsilon=0.000001,
                           sampleindices=NULL, DN_min=NULL, DN_max=NULL) {
     # some inputs are in degrees, but we need radians
+    stopifnot((sunelev >= 0) & (sunelev <= 90))
+    stopifnot((sunazimuth >= 0) & (sunazimuth <= 360))
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
 

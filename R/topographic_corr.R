@@ -7,6 +7,7 @@
 #' topographic correction in parallel using \code{foreach}.
 #'
 #' @export
+#' @import foreach
 #' @param x an image to correct
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
 #' layers.  The first layer should be the slope, the second layer should be 
@@ -64,77 +65,35 @@ topographic_corr <- function(x, slopeaspect, sunelev, sunazimuth,
     if (!(class(slopeaspect) %in% c('RasterBrick', 'RasterStack'))) {
         stop('slopeaspect must be a RasterBrick or RasterStack object')
     }
-    # Need to convert slope and aspect to SpatialGridDataFrame objects for 
-    # topocorr. TODO: rewrite topocorr to handle RasterLayers
     slope <- raster(slopeaspect, layer=1)
     aspect <- raster(slopeaspect, layer=2)
+    stopifnot((sunelev >= 0) & (sunelev <= 90))
+    stopifnot((sunazimuth >= 0) & (sunazimuth <= 360))
 
-    cl <- options('rasterClusterObject')[[1]]
-    inparallel <- FALSE
-    if ((!is.null(cl)) && (nlayers(x) > 1)) {
-        if (!require(foreach)) {
-            warning('Cluster object found, but "foreach" is required to run topographic correction in parallel. Running sequentially.')
-        } else if (!require(doSNOW)) {
-            warning('Cluster object found, but "doSNOW" is required to run topographic correction in parallel. Running sequentially.')
+    # Set uncorr_layer to NULL to pass R CMD CHECK without notes
+    uncorr_layer=NULL
+    was_rasterlayer <- class(x) == "RasterLayer"
+    # Convert x to stack so foreach will run
+    x <- stack(x)
+    corr_img <- foreach(uncorr_layer=unstack(x), .combine='addLayer', 
+                        .multicombine=TRUE, .init=raster(), 
+                        .packages=c('teamlucc', 'rgdal')) %dopar% {
+        if (method == 'minnaert_full') {
+            minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
+                                           sunelev=sunelev, 
+                                           sunazimuth=sunazimuth, 
+                                           sampleindices=sampleindices, 
+                                           DN_min=DN_min, DN_max=DN_max, ...)
+            corr_layer <- minnaert_data$minnaert
         } else {
-            inparallel <- TRUE
-            registerDoSNOW(cl)
+            corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
+                                        sunelev=sunelev, sunazimuth=sunazimuth, 
+                                        method=method, 
+                                        sampleindices=sampleindices,
+                                        DN_min=DN_min, DN_max=DN_max, ...)
         }
     }
-
-    if (inparallel) {
-        # Set uncorr_layer to NULL to pass R CMD CHECK without notes
-        uncorr_layer=NULL
-        corr_img <- foreach(uncorr_layer=unstack(x), .combine='addLayer', 
-                            .multicombine=TRUE, .init=raster(), 
-                            .packages=c('raster', 'teamlucc', 'rgdal')) %dopar% {
-            if (method == 'minnaert_full') {
-                minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
-                                               sunelev=sunelev, 
-                                               sunazimuth=sunazimuth, 
-                                               sampleindices=sampleindices, 
-                                               DN_min=DN_min, DN_max=DN_max, ...)
-                corr_layer <- minnaert_data$minnaert
-            } else {
-                corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
-                                            sunelev=sunelev, sunazimuth=sunazimuth, 
-                                            method=method, 
-                                            sampleindices=sampleindices,
-                                            DN_min=DN_min, DN_max=DN_max, ...)
-            }
-        }
-    } else {
-        corr_layers <- c()
-        for (layer_num in 1:nlayers(x)) {
-            if (nlayers(x) > 1) {
-                uncorr_layer <- raster(x, layer=layer_num)
-            } else {
-                uncorr_layer <- x
-            }
-            if (method == 'minnaert_full') {
-                minnaert_data <- minnaert_samp(uncorr_layer, slope, aspect, 
-                                               sunelev=sunelev, 
-                                               sunazimuth=sunazimuth, 
-                                               sampleindices=sampleindices, 
-                                               DN_min=DN_min, DN_max=DN_max, 
-                                               ...)
-                corr_layer <- minnaert_data$minnaert
-            } else {
-                corr_layer <- topocorr_samp(uncorr_layer, slope, aspect, 
-                                            sunelev=sunelev, 
-                                            sunazimuth=sunazimuth, 
-                                            method=method, 
-                                            sampleindices=sampleindices,
-                                            DN_min=DN_min, DN_max=DN_max, ...)
-            }
-            corr_layers <- c(corr_layers, list(corr_layer))
-        }
-        if (nlayers(x) > 1) {
-            corr_img <- stack(corr_layers)
-        } else {
-            corr_img <- corr_layers[[1]]
-        }
-    }
+    if (was_rasterlayer) corr_img <- corr_img[[1]]
     names(corr_img) <- paste0(names(x), 'tc')
     if (scale_factor != 1) {
         corr_img <- corr_img * scale_factor

@@ -92,9 +92,10 @@ clean_intervals <- function(counts, lims, n) {
 #' @param sunazimuth sun azimuth in degrees
 #' @param IL.epsilon a small amount to add to calculated illumination values 
 #' that are equal to zero to avoid division by zero resulting in Inf values
-#' @param slopeclass the slope classes to calculate k for (in degrees), or 
+#' @param slopeclass the slope classes to calculate k for (in radians), or 
 #' NULL, in which case an algorithm will be used to choose reasonable defaults 
-#' for the given image
+#' for the given image. If provided, \code{slopeclass} should be a list of 
+#' slope class limits. For example: c(1, 5, 10, 15, 20, 25, 30, 45) * (pi/180)
 #' @param coverclass used to calculate k for specific cover class (optional)
 #' as \code{RasterLayer}
 #' @param sampleindices (optional) row-major indices of sample pixels to use in 
@@ -116,28 +117,32 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
                           DN_max=NULL) {
 
     if (is.null(slopeclass)) {
-        # Have lims start above 1 degree of slope, so that no topographic
-        # correction is performed for low slope areas.
-        lims <- seq(1*pi/180, pi/2, length.out=30)
-        if (is.null(sampleindices)) {
-            raster::cut(slope, lims, include.lowest=TRUE)
-            counts <- raster::freq(raster::cut(slope, lims,
-                                               include.lowest=TRUE), 
-                                   useNA='no')[, 2]
-            # Eliminate empty bins:
-            lims <- lims[1:length(counts)]
-        } else {
-            counts <- as.numeric(table(cut(slope[sampleindices], lims, 
-                                           include.lowest=TRUE), useNA='no'))
-        }
-        # The [-1] below is because clean_intervals only needs the upper limits
-        lims <- clean_intervals(counts, lims[-1], 1000)
-        slopeclass <- c(1*pi/180, lims)
-    } else {
-        slopeclass <- (pi/180) * slopeclass
+        slopeclass <- c(1, 5, 10, 15, 20, 25, 30, 45) * (pi/180)
     }
 
+    if (is.null(sampleindices)) {
+        counts <- raster::freq(raster::cut(slope, slopeclass,
+                                           include.lowest=TRUE), 
+                               useNA='no')
+        # Eliminate empty bins:
+        slopeclass <- slopeclass[c(TRUE, 1:(length(slopeclass) - 1) %in% counts[, 1])]
+        counts <- counts[, 2]
+    } else {
+        counts <- as.numeric(table(cut(slope[sampleindices], slopeclass, 
+                                       include.lowest=TRUE), useNA='no'))
+    }
+    # The [-1] below is because clean_intervals only needs the upper limits
+    slopeclass <- clean_intervals(counts, slopeclass[-1], 100)
+    if (length(slopeclass) < 1) {
+        stop('insufficient sample size to estimate k values - try changing slopeclass or sampleindices')
+    }
+    slopeclass <- c(1*pi/180, slopeclass)
+
+    stopifnot(all((slopeclass >= 0) & slopeclass <= pi/2))
+
     # some inputs are in degrees, but we need radians
+    stopifnot((sunelev >= 0) & (sunelev <= 90))
+    stopifnot((sunazimuth >= 0) & (sunazimuth <= 360))
     sunzenith <- (pi/180) * (90 - sunelev)
     sunazimuth <- (pi/180) * sunazimuth
 
