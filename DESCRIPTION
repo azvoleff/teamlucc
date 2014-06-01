@@ -40,7 +40,6 @@ Imports:
 Suggests:
     testthat,
     landsat,
-    doSNOW,
     notifyR
 LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
