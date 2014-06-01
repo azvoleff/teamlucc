@@ -197,27 +197,10 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         # Mask out clouds and missing values
         if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
                                                              '-', 'masking'))
-        # fmask_band key:
-        # 	0 = clear
-        # 	1 = water
-        # 	2 = cloud_shadow
-        # 	3 = snow
-        # 	4 = cloud
-        # 	255 = fill value
-        # fill_QA key:
-        # 	0 = not fill
-        # 	255 = fill
-        image_stack_mask <- overlay(mask_stack$fmask_band, mask_stack$fill_QA,
-            fun=function(fmask, fill) {
-                ret <- ((fmask == 0) | (fmask == 1) | (fmask == 3))
-                ret[fill == 255] <- NA
-                return(ret)
-                })
-        image_stack <- image_stack * image_stack_mask
 
         # The cloud_comb cloud mask includes the cloud_QA, cloud_shadow_QA, and 
-        # adjacent_cloud_QA layers. Missing or clouded pixels are coded as 0, 
-        # while good pixels are coded as 1.
+        # adjacent_cloud_QA layers. Pixels in cloud, cloud shadow, or adjacent 
+        # cloud are coded as 1.
         cloud_comb <- overlay(mask_stack$cloud_QA, mask_stack$cloud_shadow_QA, 
                               mask_stack$adjacent_cloud_QA,
             fun=function(clo, sha, adj) {
@@ -259,7 +242,23 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                 proj4string(slopeaspect) <- proj4string(image_stack)
             }
 
-            if (ncell(image_stack) > 400000) {
+            # Make a mask where clouds and gaps are coded as 1, clear as 0
+            # fmask_band key:
+            # 	0 = clear
+            # 	1 = water
+            # 	2 = cloud_shadow
+            # 	3 = snow
+            # 	4 = cloud
+            # 	255 = fill value
+            image_stack_mask <- calc(mask_stack$fmask_band,
+                fun=function(fmask) {
+                    ret <- ((fmask == 2) | (fmask == 4) | (fmask == 255))
+                    return(ret)
+                    })
+
+            image_stack_masked <- image_stack
+            image_stack_masked[image_stack_mask] <- NA
+            if (ncell(image_stack_masked) > 400000) {
                 # Draw a sample for the Minnaert k regression
                 horizcells <- 10
                 vertcells <- 10
@@ -267,7 +266,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                 # Note that rowmajor indices are needed as raster layers are stored in 
                 # rowmajor order, unlike most R objects that are addressed in column 
                 # major order
-                sampleindices <- gridsample(image_stack, horizcells=10, vertcells=10, 
+                sampleindices <- gridsample(image_stack_masked, horizcells=10, vertcells=10, 
                                             nsamp=nsamp, rowmajor=TRUE)
             } else {
                 sampleindices <- NULL
@@ -282,10 +281,18 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             output_filename <- file.path(this_output_path,
                                          paste(prefix, image_basename, 
                                                'tc.envi', sep='_'))
-            image_stack <- topographic_corr(image_stack, slopeaspect_flt, sunelev, 
-                                            sunazimuth, method='minnaert_full', 
-                                            asinteger=TRUE, 
-                                            sampleindices=sampleindices)
+            image_stack_tc <- topographic_corr(image_stack_masked, 
+                                               slopeaspect_flt, sunelev, 
+                                               sunazimuth, 
+                                               method='minnaert_full', 
+                                               asinteger=TRUE, 
+                                               sampleindices=sampleindices)
+
+            # Now add back in the original values of areas that were masked out 
+            # from the topographic correction:
+            image_stack_tc[image_stack_mask] <- image_stack[image_stack_mask]
+            image_stack <- image_stack_tc
+            
             if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                                 '-', 'topocorr'))
 
