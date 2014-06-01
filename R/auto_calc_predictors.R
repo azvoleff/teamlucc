@@ -6,7 +6,8 @@
 #' @param image_dirs list of paths to a set of Landsat images that have been 
 #' preprocessed by the \code{auto_preprocess_landsat} function.
 #' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem}
-#' @param output_path the path to use for the output
+#' @param output_path the path to use for the output (optional - if NULL then 
+#' output images will be saved alongside the input images in the same folder).
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
@@ -21,7 +22,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
     }
-    if (!file_test("-d", output_path)) {
+    if (!is.null(output_path) && !file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
 
@@ -73,10 +74,17 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
 
             image_stack <- brick(image_path)
 
+            if (is.null(output_path)) {
+                this_output_path <- dirname(filename(image_stack))
+            } else {
+                this_output_path <- output_path
+            }
+
+
             ######################################################################
             # Calculate additional predictor layers (MSAVI and textures)
             timer <- start_timer(timer, label=paste(image_basename, '-', 'MSAVI2'))
-            MSAVI2_filename <- file.path(output_path,
+            MSAVI2_filename <- file.path(this_output_path,
                                          paste(image_basename, 'MSAVI2.envi', 
                                                sep='_'))
             MSAVI2_layer <- MSAVI2(red=raster(image_stack, layer=3),
@@ -91,7 +99,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             timer <- stop_timer(timer, label=paste(image_basename, '-', 'MSAVI2'))
 
             timer <- start_timer(timer, label=paste(image_basename, '-', 'glcm'))
-            MSAVI2_glcm_filename <- file.path(output_path,
+            MSAVI2_glcm_filename <- file.path(this_output_path,
                                               paste(image_basename, 
                                                     'MSAVI2_glcm.envi', 
                                                     sep='_'))
@@ -149,7 +157,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
                                 dem,
                                 slopeaspect$slope,
                                 aspect_cut)
-            predictors_filename <- file.path(output_path,
+            predictors_filename <- file.path(this_output_path,
                                              paste(image_basename, 
                                                    'predictors.envi', sep='_'))
             #TODO: load mask

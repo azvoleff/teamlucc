@@ -19,10 +19,13 @@
 #' @param size the number pixels to use in developing the model
 #' @return a \code{Raster*} of \code{y} normalized to \code{x}
 #' @examples
-#' normalize(L5TSR_1986, L5TSR_2001)
+#' L5TSR_2001_normed_1 <- normalize(L5TSR_1986, L5TSR_2001)
+#' plotRGB(L5TSR_2001_normed_1, stretch='lin')
 #'
 #' # Use only half as many pixels to calculate the models
-#' normalize(L5TSR_1986, L5TSR_2001, size=ncell(x)/2)
+#' L5TSR_2001_normed_2 <- normalize(L5TSR_1986, L5TSR_2001, 
+#'                                  size=ncell(L5TSR_1986)/2)
+#' plotRGB(L5TSR_2001_normed_2, stretch='lin')
 #' @references
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
