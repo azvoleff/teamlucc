@@ -13,12 +13,15 @@ Depends:
     raster (>= 2.2-6)
 Imports:
     sp,
+    foreach,
+    itertools,
     glcm,
     wrspathrow,
     rgeos,
     rgdal,
     mgcv,
     plyr,
+    lmodel2,
     reshape2,
     ggplot2,
     stringr,
@@ -35,10 +38,8 @@ Imports:
     lubridate,
     XML
 Suggests:
-    itertools,
     testthat,
     landsat,
-    foreach,
     doSNOW,
     notifyR
 LinkingTo: Rcpp, RcppArmadillo
