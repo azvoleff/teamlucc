@@ -1,10 +1,10 @@
-context("normrast")
+context("normalize")
 
 suppressMessages(library(landsat))
 
 ###############################################################################
 # Test on single band rasters
-tl_res <- normrast(L5TSR_1986[[1]], L5TSR_2001[[1]])
+tl_res <- normalize(L5TSR_1986[[1]], L5TSR_2001[[1]])
 
 ls_res <- suppressMessages(relnorm(as(L5TSR_1986[[1]], 'SpatialGridDataFrame'),
                                    as(L5TSR_2001[[1]], 'SpatialGridDataFrame'), nperm=0))
@@ -16,7 +16,7 @@ test_that("rastnorm works for RasterLayers", {
 
 ###############################################################################
 # Test on stacks
-tl_res_stack <- suppressMessages(normrast(L5TSR_1986, L5TSR_2001))
+tl_res_stack <- suppressMessages(normalize(L5TSR_1986, L5TSR_2001))
 
 ls_res_stack <- stack()
 for (n in 1:nlayers(L5TSR_2001)) {
@@ -37,7 +37,7 @@ library(foreach)
 library(doParallel)
 
 registerDoParallel(2)
-tl_res_stack_parallel <- normrast(L5TSR_1986, L5TSR_2001)
+tl_res_stack_parallel <- normalize(L5TSR_1986, L5TSR_2001)
 stopImplicitCluster()
 
 test_that("rastnorm works in parallel for RasterStacks", {
@@ -56,10 +56,10 @@ test_that("rastnorm works in parallel for RasterStacks", {
 # msk_spdf[msk_spdf == 0] <- NA
 # msk_spdf <- as(msk_spdf, "SpatialGridDataFrame")
 #
-# normed_y_tl <- normrast(x[[1]], y[[2]], msk)
+# normed_y_tl <- normalize(x[[1]], y[[2]], msk)
 # normed_y_ls <- relnorm(x_spdf, y_spdf, msk_spdf, nperm=0)
 #
-# normed_y_tl <- normrast(x, y, msk)
+# normed_y_tl <- normalize(x, y, msk)
 #
 # normed_y_ls <- raster(normed_y_ls$newimage)
 # normed_y_tl

@@ -20,7 +20,7 @@
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
-normrast <- function(x, y, msk, method="MA", size=ncell(x)) {
+normalize <- function(x, y, msk, method="MA", size=ncell(x)) {
     compareRaster(x, y)
     stopifnot(nlayers(x) == nlayers(y))
     stopifnot(size <= ncell(x))
