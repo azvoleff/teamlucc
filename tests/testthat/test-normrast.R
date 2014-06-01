@@ -6,8 +6,8 @@ suppressMessages(library(landsat))
 # Test on single band rasters
 tl_res <- normrast(L5TSR_1986[[1]], L5TSR_2001[[1]])
 
-ls_res <- relnorm(as(L5TSR_1986[[1]], 'SpatialGridDataFrame'),
-                  as(L5TSR_2001[[1]], 'SpatialGridDataFrame'), nperm=0)
+ls_res <- suppressMessages(relnorm(as(L5TSR_1986[[1]], 'SpatialGridDataFrame'),
+                                   as(L5TSR_2001[[1]], 'SpatialGridDataFrame'), nperm=0))
 ls_res <- raster(ls_res$newimage)
 
 test_that("rastnorm works for RasterLayers", {
@@ -16,12 +16,13 @@ test_that("rastnorm works for RasterLayers", {
 
 ###############################################################################
 # Test on stacks
-tl_res_stack <- normrast(L5TSR_1986, L5TSR_2001)
+tl_res_stack <- suppressMessages(normrast(L5TSR_1986, L5TSR_2001))
 
 ls_res_stack <- stack()
 for (n in 1:nlayers(L5TSR_2001)) {
-    ls_out <- relnorm(as(L5TSR_1986[[n]], 'SpatialGridDataFrame'),
-                      as(L5TSR_2001[[n]], 'SpatialGridDataFrame'), nperm=0)
+    ls_out <- suppressMessages(relnorm(as(L5TSR_1986[[n]], 'SpatialGridDataFrame'),
+                                       as(L5TSR_2001[[n]], 'SpatialGridDataFrame'),
+                                       nperm=0))
     ls_out <- raster(ls_out$newimage)
     ls_res_stack <- addLayer(ls_res_stack, ls_out)
 }
@@ -35,10 +36,9 @@ test_that("rastnorm works for RasterStacks", {
 library(foreach)
 library(doParallel)
 
-cl <- makeCluster(4)
-registerDoParallel(cl)
+registerDoParallel(2)
 tl_res_stack_parallel <- normrast(L5TSR_1986, L5TSR_2001)
-stopCluster(cl)
+stopImplicitCluster()
 
 test_that("rastnorm works in parallel for RasterStacks", {
     expect_equal(tl_res_stack, tl_res_stack_parallel)
