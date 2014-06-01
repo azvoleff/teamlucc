@@ -136,6 +136,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
                                               paste0('slopeaspect_', wrspath, 
                                                      '-', wrsrow, '.envi'))
             slopeaspect <- brick(slopeaspect_filename)
+            names(slopeaspect) <- c('slope', 'aspect')
             # Classify aspect into north facing, east facing, etc., recalling 
             # that the aspect is stored in radians scaled by 1000.
             #     1: north facing (0-45, 315-360)
