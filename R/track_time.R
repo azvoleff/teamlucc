@@ -36,11 +36,11 @@ Track_time <- function(notify=print) {
 #' Print a Track_time object
 #'
 #' @export
+#' @importFrom lubridate now as.duration
 #' @import methods
 #' @param x a Track_time object
 #' @param label (optional) selects a specific tracking timer to print
 #' @param ... ignored
-#' @importFrom lubridate now as.duration
 print.Track_time <- function(x, label, ...) {
     timers <- x@timers
     if (!missing(label)) {

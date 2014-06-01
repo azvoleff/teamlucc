@@ -5,7 +5,7 @@
 #' package.
 #'
 #' @export
-#' @importFrom itertools iter
+#' @importFrom iterators iter
 #' @importFrom foreach foreach %dopar%
 #' @importFrom lmodel2 lmodel2
 #' @param x a \code{Raster*} to use as the base image
