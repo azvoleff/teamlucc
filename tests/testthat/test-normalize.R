@@ -33,8 +33,8 @@ test_that("rastnorm works for RasterStacks", {
 
 ###############################################################################
 # Test on stacks
-library(foreach)
-library(doParallel)
+suppressMessages(library(foreach))
+suppressMessages(library(doParallel))
 
 registerDoParallel(2)
 tl_res_stack_parallel <- normalize(L5TSR_1986, L5TSR_2001)

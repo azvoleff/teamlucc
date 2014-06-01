@@ -2,7 +2,9 @@
 #'
 #' Performs relative normalization on two rasters using model II regression. 
 #' Based on the approach in the \code{relnorm} function in the \code{landsat} 
-#' package.
+#' package. Will use \code{foreach} to run in parallel over the bands in a 
+#' \code{RasterStack} or \code{RasterBrick} if \code{makeCluster()} is called 
+#' prior to calling \code{normalize}.
 #'
 #' @export
 #' @importFrom iterators iter
@@ -16,6 +18,11 @@
 #' \code{lmodel2}
 #' @param size the number pixels to use in developing the model
 #' @return a \code{Raster*} of \code{y} normalized to \code{x}
+#' @examples
+#' normalize(L5TSR_1986, L5TSR_2001)
+#'
+#' # Use only half as many pixels to calculate the models
+#' normalize(L5TSR_1986, L5TSR_2001, size=ncell(x)/2)
 #' @references
 #' Sarah Goslee. Analyzing Remote Sensing Data in {R}: The {landsat} Package.  
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
