@@ -8,8 +8,6 @@
 #' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem}
 #' @param output_path the path to use for the output (optional - if NULL then 
 #' output images will be saved alongside the input images in the same folder).
-#' @param n_cpus the number of CPUs to use for processes that can run in 
-#' parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
@@ -17,7 +15,7 @@
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
 auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL, 
-                                 n_cpus=1, cleartmp=FALSE, overwrite=FALSE,
+                                 cleartmp=FALSE, overwrite=FALSE,
                                  notify=print) {
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
@@ -29,10 +27,8 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Predictor calculation')
 
-    if (n_cpus > 1) beginCluster(n_cpus)
-
     # Setup a regex to identify preprocessed images
-    preproc_regex <- '^{a-zA-Z}{2,3}_[0-9]{3}-[0-9]{3}_[0-9]{4}_L[457][ET]SR_tc'
+    preproc_regex <- '^[a-zA-Z]{2,3}_[0-9]{3}-[0-9]{3}_[0-9]{4}-[0-9]{3}_L[457][ET]SR_tc'
 
     for (image_dir in image_dirs) {
         if (!file_test("-d", image_dir)) {
@@ -46,8 +42,8 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
 
         for (image_basename in image_basenames) {
             wrspathrow <- str_extract(image_basename, '_[0-9]{3}-[0-9]{3}_')
-            wrspath <- gsub('_-', '', str_extract(wrspathrow, '^_[0-9]{3}-'))
-            wrsrow <- gsub('_-', '', str_extract(wrspathrow, '-[0-9]{3}_$'))
+            wrspath <- gsub('[_-]', '', str_extract(wrspathrow, '^_[0-9]{3}-'))
+            wrsrow <- gsub('[_-]', '', str_extract(wrspathrow, '-[0-9]{3}_$'))
             timer <- start_timer(timer, label=paste0('Calculating predictors for ', wrspath, '-', wrsrow))
 
             # Choose between cloud filled, gap filled, or original files, 
@@ -80,6 +76,17 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
                 this_output_path <- output_path
             }
 
+            dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
+                                                       wrsrow, '.envi'))
+            image_basename_nosuffix <- gsub('_tc', '', image_basename)
+            mask_stack_file <- file.path(image_dir,
+                                         paste(image_basename_nosuffix, 'masks.envi', 
+                                               sep='_'))
+            mask_stack <- brick(mask_stack_file)
+            image_mask <- calc(mask_stack[[2]], function(maskvals) {
+                               # Mask clouds, cloud shadow, and fill
+                               (maskvals == 2) | (maskvals == 4) | (maskvals == 255)
+                               })
 
             ######################################################################
             # Calculate additional predictor layers (MSAVI and textures)
@@ -106,8 +113,9 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             glcm_statistics <- c('mean', 'variance', 'homogeneity', 'contrast', 
                                  'dissimilarity', 'entropy', 'second_moment', 
                                  'correlation')
-            # Note the min_x and max_x are given for MSAVI2 that has been scaled by 
-            # 10,000
+            MSAVI2_layer[image_mask] <- NA
+            # Note the min_x and max_x are given for MSAVI2 that has been 
+            # scaled by 10,000
             MSAVI2_glcm <- apply_windowed(MSAVI2_layer, glcm, edge=c(1, 3), 
                                           min_x=0, max_x=10000, 
                                           filename=MSAVI2_glcm_filename, 
@@ -121,7 +129,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             timer <- start_timer(timer, label=paste(image_basename, '-', 'process dem and slopeaspect'))
 
             dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
-                                                          wrsrow, '.envi'))
+                                                       wrsrow, '.envi'))
             dem <- raster(dem_filename)
 
             slopeaspect_filename <- file.path(dem_path,
@@ -160,12 +168,10 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             predictors_filename <- file.path(this_output_path,
                                              paste(image_basename, 
                                                    'predictors.envi', sep='_'))
-            #TODO: load mask
-            image_stack_mask <- NULL
 
-            predictors <- mask(predictors, image_stack_mask, maskvalue=0, 
-                               filename=predictors_filename, overwrite=overwrite,
-                               datatype='INT2S')
+            predictors <- mask(predictors, image_mask, maskvalue=1, 
+                               filename=predictors_filename, 
+                               overwrite=overwrite, datatype='INT2S')
             names(predictors) <- c('b1', 'b2', 'b3', 'b4', 'b5', 'b7', 'msavi', 
                                   'msavi_glcm_mean', 'msavi_glcm_variance', 
                                   'msavi_glcm_dissimilarity', 'elev', 'slope', 
@@ -177,7 +183,6 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             if (cleartmp) removeTmpFiles(h=1)
         }
     }
-    if (n_cpus > 1) endCluster()
 
     timer <- stop_timer(timer, label='Predictor calculation')
 }
