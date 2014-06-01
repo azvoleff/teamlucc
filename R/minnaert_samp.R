@@ -133,8 +133,8 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     }
     # The [-1] below is because clean_intervals only needs the upper limits
     slopeclass <- clean_intervals(counts, slopeclass[-1], 100)
-    if (length(slopeclass) < 1) {
-        stop('insufficient sample size to estimate k values - try changing slopeclass or sampleindices')
+    if (length(slopeclass) <= 5) {
+        stop('insufficient sample size to develop k model - try changing slopeclass or sampleindices')
     }
     slopeclass <- c(1*pi/180, slopeclass)
 
@@ -152,8 +152,7 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
     k_table <- .calc_k_table(x, IL, slope, sampleindices, slopeclass, 
                              coverclass, sunzenith)
     
-    k_model <- with(k_table, bam(k ~ s(midpoint, k=length(midpoint) - 1), 
-                                 data=k_table))
+    k_model <- with(k_table, bam(k ~ s(midpoint, k=length(midpoint) - 1), data=k_table))
 
     # If slope is greater than modeled range, use maximum of modeled range. If 
     # slope is less than modeled range, treat it as flat.

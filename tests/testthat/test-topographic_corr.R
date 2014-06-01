@@ -145,8 +145,6 @@ test_that("teamlucc and landsat minnaert match when sampling is used in teamlucc
 
 ###############################################################################
 # minslope with sampling
-set.seed(1)
-sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
 tl_tc_b1_minslope_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, 
                                              sunelev, sunazimuth, 
                                              method='minslope', 
@@ -159,8 +157,6 @@ test_that("teamlucc and landsat minslope match when sampling is used in teamlucc
 
 ###############################################################################
 # ccorrection with sampling
-set.seed(1)
-sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
 tl_tc_b1_ccorrection_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, 
                                                 sunelev, sunazimuth, 
                                                 method='ccorrection', 
@@ -205,14 +201,21 @@ test_that("teamlucc minnaert and landsat minnaert match", {
 
 ###############################################################################
 # minnaert_full with sampling
+test_that("teamlucc minnaert sample fails with inadequate sample size", {
+    expect_error(topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
+                                  sunazimuth, method='minnaert_full', 
+                                  sampleindices=sampleindices))
+})
+
 set.seed(1)
-sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
+sampleindices_largesample <- gridsample(L5TSR_1986_b1, rowmajor=TRUE, 
+                                        nsamp=100)
 tl_min_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev, 
                                   sunazimuth, method='minnaert_full',
-                                  sampleindices=sampleindices)
+                                  sampleindices=sampleindices_largesample)
 
 test_that("teamlucc minnaert sample and landsat minnaert match", {
-    expect_equal(tl_min_sample, expected=ls_min, tolerance=.25)
+    expect_equal(tl_min_sample, expected=ls_min, tolerance=.02)
 })
 
 ###############################################################################
@@ -229,18 +232,16 @@ tl_min_b1b2_par <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                     method='minnaert_full')
 stopImplicitCluster()
 
-test_that("teamlucc minnaert sample and landsat minnaert match when run in parallel", {
+test_that("teamlucc minnaert and landsat minnaert match when run in parallel on stack", {
     expect_equal(tl_min_b1b2_seq, expected=tl_min_b1b2_par)
 })
 
 ###############################################################################
 # minnaert_full in parallel with sampling
-set.seed(1)
-sampleindices <- gridsample(L5TSR_1986_b1, rowmajor=TRUE)
 tl_min_sample_b1b2_seq <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                            slopeaspect, sunelev, sunazimuth, 
                                            method='minnaert_full',
-                                           sampleindices=sampleindices)
+                                           sampleindices=sampleindices_largesample)
 
 suppressMessages(library(foreach))
 suppressMessages(library(doParallel))
@@ -248,5 +249,9 @@ registerDoParallel(2)
 tl_min_sample_b1b2_par <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                            slopeaspect, sunelev, sunazimuth, 
                                            method='minnaert_full',
-                                           sampleindices=sampleindices)
+                                           sampleindices=sampleindices_largesample)
 stopImplicitCluster()
+
+test_that("teamlucc minnaert and landsat minnaert match when run in parallel on stack with sampling", {
+    expect_equal(tl_min_sample_b1b2_seq, expected=tl_min_sample_b1b2_par)
+})
