@@ -2,6 +2,7 @@
 #'
 #' @export
 #' @importFrom glcm glcm
+#' @importFrom stringr str_extract
 #' @param image_dirs list of paths to a set of Landsat images that have been 
 #' preprocessed by the \code{auto_preprocess_landsat} function.
 #' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem}
@@ -14,8 +15,8 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
-auto_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1, 
-                                 cleartmp=FALSE, overwrite=FALSE,
+auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL, 
+                                 n_cpus=1, cleartmp=FALSE, overwrite=FALSE,
                                  notify=print) {
     if (!file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
@@ -30,7 +31,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1,
     if (n_cpus > 1) beginCluster(n_cpus)
 
     # Setup a regex to identify preprocessed images
-    preproc_regex <- '^{a-zA-Z}{2,3}_[0-9]{6}_[0-9]_L[457][ET]SR_masked_tc'
+    preproc_regex <- '^{a-zA-Z}{2,3}_[0-9]{3}-[0-9]{3}_[0-9]{4}_L[457][ET]SR_tc'
 
     for (image_dir in image_dirs) {
         if (!file_test("-d", image_dir)) {
@@ -43,6 +44,11 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1,
         }
 
         for (image_basename in image_basenames) {
+            wrspathrow <- str_extract(image_basename, '_[0-9]{3}-[0-9]{3}_')
+            wrspath <- gsub('_-', '', str_extract(wrspathrow, '^_[0-9]{3}-'))
+            wrsrow <- gsub('_-', '', str_extract(wrspathrow, '-[0-9]{3}_$'))
+            timer <- start_timer(timer, label=paste0('Calculating predictors for ', wrspath, '-', wrsrow))
+
             # Choose between cloud filled, gap filled, or original files, 
             # depending on what is available
             poss_files <- c(file.path(image_dir, paste0(image_basename, 
@@ -105,10 +111,15 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1,
             ######################################################################
             # Load DEM, slope, and aspect, and reclass aspect
             timer <- start_timer(timer, label=paste(image_basename, '-', 'process dem and slopeaspect'))
-            
-            #TODO: load dem and slopeaspect layers
-            cropped_dem <- NULL
-            slopeaspect <- NULL
+
+            dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
+                                                          wrsrow, '.envi'))
+            dem <- raster(dem_filename)
+
+            slopeaspect_filename <- file.path(dem_path,
+                                              paste0('slopeaspect_', WRS_Path, 
+                                                     '-', WRS_Row, '.envi'))
+            slopeaspect <- brick(slopeaspect_filename)
             # Classify aspect into north facing, east facing, etc., recalling 
             # that the aspect is stored in radians scaled by 1000.
             #     1: north facing (0-45, 315-360)
@@ -135,7 +146,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1,
                                 scale_raster(MSAVI2_glcm$glcm_mean),
                                 scale_raster(MSAVI2_glcm$glcm_variance),
                                 scale_raster(MSAVI2_glcm$glcm_dissimilarity),
-                                cropped_dem,
+                                dem,
                                 slopeaspect$slope,
                                 aspect_cut)
             predictors_filename <- file.path(output_path,
@@ -153,7 +164,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path, n_cpus=1,
                                   'aspect')
             timer <- stop_timer(timer, label=paste(image_basename, '-', 'write predictors'))
 
-            timer <- stop_timer(timer, label=paste('Calculating predictors', image_basename))
+            timer <- stop_timer(timer, label=paste0('Calculating predictors for ', wrspath, '-', wrsrow))
 
             if (cleartmp) removeTmpFiles(h=1)
         }
