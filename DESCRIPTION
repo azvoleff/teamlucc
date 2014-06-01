@@ -14,7 +14,7 @@ Depends:
 Imports:
     sp,
     foreach,
-    itertools,
+    iterators,
     glcm,
     wrspathrow,
     rgeos,
