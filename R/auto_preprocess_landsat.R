@@ -216,6 +216,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                         cloud_comb), 
                                   filename=mask_stack_path, 
                                   overwrite=overwrite, datatype='INT2S')
+        names(mask_stack) <- c('fill_QA', 'fmask_band', 'cloud_comb')
         if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                             '-', 'masking'))
 
@@ -295,7 +296,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             
             if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                                 '-', 'topocorr'))
-
         } else {
             # Skip topographic correction, so don't append _tc to filename
             output_filename <- file.path(this_output_path,
