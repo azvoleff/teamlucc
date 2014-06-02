@@ -28,7 +28,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
     timer <- start_timer(timer, label='Predictor calculation')
 
     # Setup a regex to identify preprocessed images
-    preproc_regex <- '^[a-zA-Z]{2,3}_[0-9]{3}-[0-9]{3}_[0-9]{4}-[0-9]{3}_L[457][ET]SR_tc'
+    preproc_regex <- '^[a-zA-Z]{2,3}_[0-9]{3}-[0-9]{3}_[0-9]{4}-[0-9]{3}_L[457][ET]SR(_tc)?'
 
     for (image_dir in image_dirs) {
         if (!file_test("-d", image_dir)) {

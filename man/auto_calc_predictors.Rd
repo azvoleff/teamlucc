@@ -3,7 +3,7 @@
 \alias{auto_calc_predictors}
 \title{Calculate predictor layers for a classification}
 \usage{
-auto_calc_predictors(image_dirs, dem_path, output_path = NULL, n_cpus = 1,
+auto_calc_predictors(image_dirs, dem_path, output_path = NULL,
   cleartmp = FALSE, overwrite = FALSE, notify = print)
 }
 \arguments{
@@ -14,9 +14,6 @@ preprocessed by the \code{auto_preprocess_landsat} function.}
 
 \item{output_path}{the path to use for the output (optional - if NULL then
 output images will be saved alongside the input images in the same folder).}
-
-\item{n_cpus}{the number of CPUs to use for processes that can run in
-parallel}
 
 \item{cleartmp}{whether to clear temp files on each run through the loop}
 
