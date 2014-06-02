@@ -24,7 +24,11 @@
 #' @param dem_extents a \code{SpatialPolygonsDataFrame} of the extents and 
 #' filenames for a set of locally available DEM raster(s) that cover the 
 #' \code{aoi}. See the \code{\link{get_extent_polys}} function for one means of 
-#' generating this list. \code{dem_extents} must have a "filename" column.
+#' generating this list. \code{dem_extents} must have a "filename" 
+#' column.
+#' @param smoothing factor by which to smooth slope (useful when smoothing 
+#' slope prior to calculating illumination for topographic correction). Only 
+#' relevant for slope calculation.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -36,7 +40,7 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages and timing 
 #' information
-auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1, 
+auto_setup_dem <- function(aoi, output_path, dem_extents, smoothing=1, n_cpus=1, 
                            overwrite=FALSE, crop_to_aoi=FALSE, notify=print, 
                            verbose=FALSE) {
     if (!file_test("-d", output_path)) {
@@ -157,7 +161,8 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                           paste0('slopeaspect_',
                                                  pathrow_label, '.envi'))
         # Note that the default output of 'terrain' is in radians
-        slopeaspect <- terrain(dem_mosaic_crop, opt=c('slope', 'aspect'))
+        slopeaspect <- terrain(dem_mosaic_crop, opt=c('slope', 'aspect'), 
+                               smoothing=smoothing)
         slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {
             vals[vals >= 2*pi] <- 0
             vals
