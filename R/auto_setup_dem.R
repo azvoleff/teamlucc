@@ -75,6 +75,8 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, smoothing=1, n_cpus=1,
         row.names(pathrows_cropped) <- row.names(pathrows)
         pathrows_cropped <- SpatialPolygonsDataFrame(pathrows_cropped, 
                                                      data=pathrows@data)
+    } else {
+        pathrows_cropped <- pathrows
     }
 
     # Add a 500 m buffer in UTM coordinate system, as 1) slope calculation 

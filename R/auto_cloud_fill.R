@@ -310,5 +310,6 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #if (n_cpus > 1) sfQuickStop(n_cpus)
     if (n_cpus > 1) endCluster()
 
+    #TODO: Also return base_mask (cloud mask)
     return(base_img)
 }
