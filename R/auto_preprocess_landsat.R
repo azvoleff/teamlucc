@@ -32,6 +32,11 @@
 #' output. Must be in a projected coordinate system.
 #' @param output_path the path to use for the output (optional - if NULL then 
 #' output images will be saved alongside the input images in the same folder).
+#' @param mask_output if \code{TRUE}, cloud, cloud shadow, and fill areas 
+#' (SLC-off gaps and areas with no data) will be set to \code{NA} in the 
+#' output. Note this setting affects the final output file only - cloud, cloud 
+#' shadow, and gap areas are masked out of the image during topographic 
+#' correction regardless of the value of \code{mask_output}.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param cleartmp whether to clear temp files on each run through the loop
@@ -46,7 +51,8 @@
 #' \code{\link{auto_setup_dem}}
 auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                     dem_path=NULL, aoi=NULL, output_path=NULL, 
-                                    n_cpus=1, cleartmp=FALSE,  overwrite=FALSE, 
+                                    mask_output=FALSE, n_cpus=1, 
+                                    cleartmp=FALSE,  overwrite=FALSE, 
                                     notify=print, verbose=FALSE) {
     if (tc && !file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
@@ -295,9 +301,11 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                                method='minnaert_full', 
                                                asinteger=TRUE, 
                                                sampleindices=sampleindices)
-            # Now add back in the original values of areas that were masked out 
-            # from the topographic correction:
-            image_stack_tc[image_stack_mask] <- image_stack[image_stack_mask]
+            if (!mask_output) {
+                # Add back in the original values of areas that were masked out 
+                # from the topographic correction:
+                image_stack_tc[image_stack_mask] <- image_stack[image_stack_mask]
+            }
             image_stack <- image_stack_tc
             
             if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
