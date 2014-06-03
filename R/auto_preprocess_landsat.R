@@ -28,7 +28,7 @@
 #' (only required if tc=TRUE)
 #' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}.  If 
 #' supplied, this aoi is used to crop and set the projection system of the 
-#' output.
+#' output. Must be in a projected coordinate system.
 #' @param output_path the path to use for the output (optional - if NULL then 
 #' output images will be saved alongside the input images in the same folder).
 #' @param n_cpus the number of CPUs to use for processes that can run in 
@@ -56,6 +56,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
     if (!is.null(aoi)) {
         stop('aoi should be a SpatialPolygonsDataFrame of length 1')
     }
+    stopifnot(is.projected(aoi))
 
     timer <- Track_time(notify)
 

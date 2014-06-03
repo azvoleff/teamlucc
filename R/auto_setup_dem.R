@@ -19,7 +19,8 @@
 #' @importFrom gdalUtils mosaic_rasters gdalwarp
 #' @param aoi area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to 
 #' use as as bounding box when selecting DEMs. Also used to crop and set 
-#' projection of the output DEM(s) if \code{crop_to_aoi=TRUE}.
+#' projection of the output DEM(s) if \code{crop_to_aoi=TRUE}. Must be in a 
+#' projected coordinate system.
 #' @param output_path the path to use for the output
 #' @param dem_extents a \code{SpatialPolygonsDataFrame} of the extents and 
 #' filenames for a set of locally available DEM raster(s) that cover the 
@@ -50,6 +51,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, smoothing=1, n_cpus=1,
     if (length(aoi) > 1) {
         stop('aoi should be a SpatialPolygonsDataFrame of length 1')
     }
+    stopifnot(is.projected(aoi))
 
     timer <- Track_time(notify)
 
