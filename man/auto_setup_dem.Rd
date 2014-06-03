@@ -3,9 +3,8 @@
 \alias{auto_setup_dem}
 \title{Setup the DEM mosaic for a given AOI}
 \usage{
-auto_setup_dem(aoi, output_path, dem_extents, smoothing = 1, n_cpus = 1,
-  overwrite = FALSE, crop_to_aoi = FALSE, notify = print,
-  verbose = FALSE)
+auto_setup_dem(aoi, output_path, dem_extents, n_cpus = 1, overwrite = FALSE,
+  crop_to_aoi = FALSE, notify = print, verbose = FALSE)
 }
 \arguments{
 \item{aoi}{area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to
@@ -18,12 +17,7 @@ projected coordinate system.}
 \item{dem_extents}{a \code{SpatialPolygonsDataFrame} of the extents and
 filenames for a set of locally available DEM raster(s) that cover the
 \code{aoi}. See the \code{\link{get_extent_polys}} function for one means of
-generating this list. \code{dem_extents} must have a "filename"
-column.}
-
-\item{smoothing}{factor by which to smooth slope (useful when smoothing
-slope prior to calculating illumination for topographic correction). Only
-relevant for slope calculation.}
+generating this list. \code{dem_extents} must have a "filename" column.}
 
 \item{n_cpus}{the number of CPUs to use for processes that can run in
 parallel}
