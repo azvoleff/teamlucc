@@ -47,6 +47,10 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, smoothing=1, n_cpus=1,
         stop(paste(output_path, "does not exist"))
     }
 
+    if (length(aoi) > 1) {
+        stop('aoi should be a SpatialPolygonsDataFrame of length 1')
+    }
+
     timer <- Track_time(notify)
 
     pathrows <- pathrow_num(aoi, wrs_type=2, wrs_mode='D', as_polys=TRUE)
