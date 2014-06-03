@@ -117,7 +117,8 @@ minnaert_samp <- function(x, slope, aspect, sunelev, sunazimuth,
                           DN_max=NULL) {
 
     if (is.null(slopeclass)) {
-        slopeclass <- c(1, 5, 10, 15, 20, 25, 30, 45) * (pi/180)
+        slopeclass <- c(1, 2, 3, 4, 5, 6, 8, 10, 12,
+                        15, 20, 25, 30, 45, 75) * (pi/180)
     }
 
     if (is.null(sampleindices)) {

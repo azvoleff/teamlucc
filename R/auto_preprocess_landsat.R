@@ -259,11 +259,11 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
 
             image_stack_masked <- image_stack
             image_stack_masked[image_stack_mask] <- NA
-            if (ncell(image_stack_masked) > 400000) {
+            if (ncell(image_stack_masked) > 500000) {
                 # Draw a sample for the Minnaert k regression
                 horizcells <- 10
                 vertcells <- 10
-                nsamp <- 200000 / (horizcells * vertcells)
+                nsamp <- 500000 / (horizcells * vertcells)
                 # Note that rowmajor indices are needed as raster layers are stored in 
                 # rowmajor order, unlike most R objects that are addressed in column 
                 # major order
@@ -288,7 +288,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                                method='minnaert_full', 
                                                asinteger=TRUE, 
                                                sampleindices=sampleindices)
-
             # Now add back in the original values of areas that were masked out 
             # from the topographic correction:
             image_stack_tc[image_stack_mask] <- image_stack[image_stack_mask]
