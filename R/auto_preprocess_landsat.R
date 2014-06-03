@@ -55,7 +55,9 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         stop(paste(output_path, "does not exist"))
     }
     if (!is.null(aoi)) {
-        stop('aoi should be a SpatialPolygonsDataFrame of length 1')
+        if (length(aoi) > 1) {
+            stop('aoi should be a SpatialPolygonsDataFrame of length 1')
+        }
         stopifnot(is.projected(aoi))
     }
 
