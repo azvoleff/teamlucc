@@ -53,6 +53,9 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
     if (!is.null(output_path) && !file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
+    if (!is.null(aoi)) {
+        stop('aoi should be a SpatialPolygonsDataFrame of length 1')
+    }
 
     timer <- Track_time(notify)
 
