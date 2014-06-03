@@ -154,7 +154,9 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                     dstfile=dem_mosaic_crop_filename,
                                     te=dem_te, t_srs=to_srs, tr=to_res, 
                                     r='cubicspline', output_Raster=TRUE, 
-                                    of="ENVI", overwrite=overwrite)
+                                    multi=TRUE, of="ENVI",
+                                    wo=paste0("NUM_THREADS=", n_cpus), 
+                                    overwrite=overwrite)
         if (verbose) timer <- stop_timer(timer,
                                          label=paste('Cropping/reprojecting DEM mosaic crop for', 
                                          pathrow_label))

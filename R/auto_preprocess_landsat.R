@@ -190,6 +190,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                 dstfile=image_stack_reproj_file,
                                 te=out_te, t_srs=to_srs, tr=to_res, 
                                 r='cubicspline', output_Raster=TRUE, of="ENVI", 
+                                multi=TRUE, wo=paste0("NUM_THREADS=", n_cpus), 
                                 overwrite=overwrite)
         names(image_stack) <- image_bands
         # Ensure mask layers are written to desk in a single raster file
@@ -201,6 +202,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                dstfile=mask_stack_reproj_file,
                                te=out_te, t_srs=to_srs, tr=to_res, 
                                r='cubicspline', output_Raster=TRUE, of="ENVI", 
+                               multi=TRUE, wo=paste0("NUM_THREADS=", n_cpus), 
                                overwrite=overwrite)
         names(mask_stack) <- mask_bands
         if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
