@@ -129,7 +129,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
     }
 
     for (n in 1:length(image_stacks)) {
-        if (n_cpus > 1) beginCluster(n_cpus)
         image_stack <- image_stacks[[n]]
         mask_stack <- mask_stacks[[n]]
         band1_imagefile <- image_files[[n]][1]
@@ -325,7 +324,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
 
         if (cleartmp) removeTmpFiles(h=1)
-        if (n_cpus > 1) endCluster()
     }
 
     timer <- stop_timer(timer, label='Preprocessing images')

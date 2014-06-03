@@ -185,8 +185,6 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                                 pathrow_label))
     }
 
-    if (n_cpus > 1) endCluster()
-
     timer <- stop_timer(timer, label=paste('Processing DEMS for', nrow(pathrows), 
                                             'path/rows'))
 }
