@@ -19,6 +19,7 @@
 #' @importFrom wrspathrow pathrow_poly
 #' @importFrom tools file_path_sans_ext
 #' @importFrom gdalUtils gdalwarp
+#' @importFrom sp is.projected
 #' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
 #' format as output by the \code{unstack_ledapscdr} function.
 #' @param prefix string to use as a prefix for all filenames
@@ -55,8 +56,8 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
     }
     if (!is.null(aoi)) {
         stop('aoi should be a SpatialPolygonsDataFrame of length 1')
+        stopifnot(is.projected(aoi))
     }
-    stopifnot(is.projected(aoi))
 
     timer <- Track_time(notify)
 

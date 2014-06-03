@@ -13,7 +13,7 @@
 #' @export
 #' @importFrom wrspathrow pathrow_num
 #' @importFrom rgdal readOGR writeOGR
-#' @importFrom sp spTransform
+#' @importFrom sp spTransform is.projected
 #' @importFrom rgeos gBuffer gIntersects gUnaryUnion gIntersection
 #' @importFrom tools file_path_sans_ext
 #' @importFrom gdalUtils mosaic_rasters gdalwarp

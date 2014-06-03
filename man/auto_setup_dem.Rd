@@ -10,7 +10,8 @@ auto_setup_dem(aoi, output_path, dem_extents, smoothing = 1, n_cpus = 1,
 \arguments{
 \item{aoi}{area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to
 use as as bounding box when selecting DEMs. Also used to crop and set
-projection of the output DEM(s) if \code{crop_to_aoi=TRUE}.}
+projection of the output DEM(s) if \code{crop_to_aoi=TRUE}. Must be in a
+projected coordinate system.}
 
 \item{output_path}{the path to use for the output}
 

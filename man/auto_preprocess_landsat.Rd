@@ -21,7 +21,7 @@ format as output by the \code{unstack_ledapscdr} function.}
 
 \item{aoi}{area of interest (AOI), as a \code{SpatialPolygonsDataFrame}.  If
 supplied, this aoi is used to crop and set the projection system of the
-output.}
+output. Must be in a projected coordinate system.}
 
 \item{output_path}{the path to use for the output (optional - if NULL then
 output images will be saved alongside the input images in the same folder).}
