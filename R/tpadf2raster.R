@@ -38,7 +38,7 @@ tpadf2raster <- function(x, base_image, variable) {
         out_rasters <- c(out_rasters, out_raster)
     }
     out_rasters <- stack(out_rasters)
-    names(out_rasters) <- seasons
+    names(out_rasters) <- paste0('season_', seasons)
 
     return(out_rasters)
 }

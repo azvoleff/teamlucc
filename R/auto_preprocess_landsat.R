@@ -69,8 +69,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
 
     timer <- Track_time(notify)
 
-    timer <- start_timer(timer, label='Preprocessing images')
-
     # Setup a regex to identify Landsat CDR images
     lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
 
@@ -325,6 +323,4 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
 
         if (cleartmp) removeTmpFiles(h=1)
     }
-
-    timer <- stop_timer(timer, label='Preprocessing images')
 }
