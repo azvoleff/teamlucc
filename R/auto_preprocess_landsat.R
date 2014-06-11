@@ -272,15 +272,11 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             image_stack_masked <- image_stack
             image_stack_masked[image_stack_mask] <- NA
             if (ncell(image_stack_masked) > 500000) {
-                # Draw a sample for the Minnaert k regression
-                horizcells <- 10
-                vertcells <- 10
-                nsamp <- 500000 / (horizcells * vertcells)
-                # Note that rowmajor indices are needed as raster layers are stored in 
-                # rowmajor order, unlike most R objects that are addressed in column 
-                # major order
-                sampleindices <- gridsample(image_stack_masked, horizcells=10, vertcells=10, 
-                                            nsamp=nsamp, rowmajor=TRUE)
+                # Draw a sample for the Minnaert k regression. Note that 
+                # sampleRegular with cells=TRUE returns cell numbers in the 
+                # first column
+                sampleindices <- sampleRegular(x, size=500000, cells=TRUE)
+                sampleindices <- x_vals[, 1]
             } else {
                 sampleindices <- NULL
             }
