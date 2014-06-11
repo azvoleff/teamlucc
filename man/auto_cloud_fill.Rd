@@ -55,7 +55,9 @@ as \code{DN_min}, \code{DN_max}, \code{algorithm}, \code{byblock},
 \code{verbose}, etc. See \code{\link{cloud_remove}} for details}
 }
 \value{
-\code{Raster*} object with cloud filled image.
+a list with two elements: "filled", a \code{Raster*} object with
+cloud filled image, and "mask", a \code{RasterLayer} object with the cloud
+mask for the cloud filled image.
 }
 \description{
 Uses the NSPI algorithm from Zhu et al. See \code{\link{cloud_remove}} for

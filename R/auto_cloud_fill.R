@@ -67,7 +67,9 @@ pct_clouds <- function(cloud_mask) {
 #' @param ...  additional arguments passed to \code{\link{cloud_remove}}, such 
 #' as \code{DN_min}, \code{DN_max}, \code{algorithm}, \code{byblock}, 
 #' \code{verbose}, etc. See \code{\link{cloud_remove}} for details
-#' @return \code{Raster*} object with cloud filled image.
+#' @return a list with two elements: "filled", a \code{Raster*} object with 
+#' cloud filled image, and "mask", a \code{RasterLayer} object with the cloud 
+#' mask for the cloud filled image.
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified 
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images.  Geoscience and Remote Sensing Letters, IEEE 9, 521--525.  
@@ -310,6 +312,5 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #if (n_cpus > 1) sfQuickStop(n_cpus)
     if (n_cpus > 1) endCluster()
 
-    #TODO: Also return base_mask (cloud mask)
-    return(base_img)
+    return(list(filled=base_img, mask=base_mask))
 }
