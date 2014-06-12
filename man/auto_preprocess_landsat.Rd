@@ -4,8 +4,9 @@
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
 auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, dem_path = NULL,
-  aoi = NULL, output_path = NULL, mask_output = FALSE, n_cpus = 1,
-  cleartmp = FALSE, overwrite = FALSE, notify = print, verbose = FALSE)
+  aoi = NULL, output_path = NULL, cloud_mask = "fmask",
+  mask_output = FALSE, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
+  notify = print, verbose = FALSE)
 }
 \arguments{
 \item{image_dirs}{list of paths to a set of Landsat CDR image files in ENVI
@@ -25,6 +26,10 @@ output. Must be in a projected coordinate system.}
 
 \item{output_path}{the path to use for the output (optional - if NULL then
 output images will be saved alongside the input images in the same folder).}
+
+\item{cloud_mask}{which cloud mask to use to mask clouds when performing
+topographic correction. Can be one of "fmask", "6S", or "both".  See
+Details.  (Ignored if \code{tc=FALSE)}.}
 
 \item{mask_output}{if \code{TRUE}, cloud, cloud shadow, and fill areas
 (SLC-off gaps and areas with no data) will be set to \code{NA} in the
@@ -56,6 +61,9 @@ missing data and clouds out of the CDR tiles, and perform topographic
 correction.
 }
 \details{
+\code{cloud_mask} chooses the cloud mask to use if topographic correction is
+performed (\code{tc=TRUE}). TODO: Fill in coding of cloud masks.
+
 Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}}
 should be used to extract the original zipfiles supplied by USGS.
 \code{\link{unstack_ledapscdr}} should then be used to unstack the HDF

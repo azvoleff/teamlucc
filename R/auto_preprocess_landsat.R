@@ -7,6 +7,9 @@
 #' missing data and clouds out of the CDR tiles, and perform topographic 
 #' correction.
 #'
+#' \code{cloud_mask} chooses the cloud mask to use if topographic correction is 
+#' performed (\code{tc=TRUE}). TODO: Fill in coding of cloud masks.
+#'
 #' Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}} 
 #' should be used to extract the original zipfiles supplied by USGS.  
 #' \code{\link{unstack_ledapscdr}} should then be used to unstack the HDF 
@@ -32,6 +35,9 @@
 #' output. Must be in a projected coordinate system.
 #' @param output_path the path to use for the output (optional - if NULL then 
 #' output images will be saved alongside the input images in the same folder).
+#' @param cloud_mask which cloud mask to use to mask clouds when performing 
+#' topographic correction. Can be one of "fmask", "6S", or "both".  See 
+#' Details.  (Ignored if \code{tc=FALSE)}.
 #' @param mask_output if \code{TRUE}, cloud, cloud shadow, and fill areas 
 #' (SLC-off gaps and areas with no data) will be set to \code{NA} in the 
 #' output. Note this setting affects the final output file only - cloud, cloud 
@@ -51,8 +57,8 @@
 #' \code{\link{auto_setup_dem}}
 auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                     dem_path=NULL, aoi=NULL, output_path=NULL, 
-                                    mask_output=FALSE, n_cpus=1, 
-                                    cleartmp=FALSE,  overwrite=FALSE, 
+                                    cloud_mask='fmask', mask_output=FALSE, 
+                                    n_cpus=1, cleartmp=FALSE,  overwrite=FALSE, 
                                     notify=print, verbose=FALSE) {
     if (tc && !file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
@@ -210,25 +216,14 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
                                                              '-', 'calculating masks'))
 
-        # The cloud_comb cloud mask includes the cloud_QA, cloud_shadow_QA, and 
-        # adjacent_cloud_QA layers. Pixels in cloud, cloud shadow, or adjacent 
-        # cloud are coded as 1.
-        cloud_comb <- overlay(mask_stack$cloud_QA, mask_stack$cloud_shadow_QA, 
-                              mask_stack$adjacent_cloud_QA,
-            fun=function(clo, sha, adj) {
-                return((clo == 255) | (sha == 255) | (adj == 255))
-            }, datatype='INT2S')
-        
-
         mask_stack_path <- file.path(this_output_path,
                                      paste(prefix, image_basename, 
                                            'masks.envi', sep='_'))
         mask_stack <- writeRaster(stack(mask_stack$fill_QA,
-                                        mask_stack$fmask_band, 
-                                        cloud_comb), 
+                                        mask_stack$fmask_band),
                                   filename=mask_stack_path, 
                                   overwrite=overwrite, datatype='INT2S')
-        names(mask_stack) <- c('fill_QA', 'fmask_band', 'cloud_comb')
+        names(mask_stack) <- c('fill_QA', 'fmask_band')
         if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                             '-', 'calculating masks'))
 
@@ -255,19 +250,45 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                 proj4string(slopeaspect) <- proj4string(image_stack)
             }
 
-            # Make a mask where clouds and gaps are coded as 1, clear as 0
-            # fmask_band key:
-            # 	0 = clear
-            # 	1 = water
-            # 	2 = cloud_shadow
-            # 	3 = snow
-            # 	4 = cloud
-            # 	255 = fill value
-            image_stack_mask <- calc(mask_stack$fmask_band,
-                fun=function(fmask) {
-                    ret <- ((fmask == 2) | (fmask == 4) | (fmask == 255))
-                    return(ret)
-                    })
+            if (cloud_mask == 'fmask') {
+                # Make a mask where clouds and gaps are coded as 1, clear as 0
+                # fmask_band key:
+                # 	0 = clear
+                # 	1 = water
+                # 	2 = cloud_shadow
+                # 	3 = snow
+                # 	4 = cloud
+                # 	255 = fill value
+                image_stack_mask <- calc(mask_stack$fmask_band,
+                    fun=function(fmask) {
+                        return((fmask == 2) | (fmask == 4) | (fmask == 255))
+                    }, datatype='INT2S')
+            } else if (cloud_mask == '6S') {
+                # This cloud mask includes the cloud_QA, cloud_shadow_QA, and 
+                # adjacent_cloud_QA layers. Pixels in cloud, cloud shadow, or 
+                # adjacent cloud are coded as 1.
+                image_stack_mask <- overlay(mask_stack$fill_QA,
+                                            mask_stack$cloud_QA, 
+                                            mask_stack$cloud_shadow_QA, 
+                                            mask_stack$adjacent_cloud_QA,
+                    fun=function(fill, clo, sha, adj) {
+                        return((fill == 255) | (clo == 255) | (sha == 255) | 
+                               (adj == 255))
+                    }, datatype='INT2S')
+        
+            } else if (cloud_mask == 'both') {
+                image_stack_mask <- overlay(mask_stack$fmask_band, 
+                                            mask_stack$cloud_QA, 
+                                            mask_stack$cloud_shadow_QA, 
+                                            mask_stack$adjacent_cloud_QA,
+                    fun=function(fmask, clo, sha, adj) {
+                        return((fmask == 2) | (fmask == 4) | (fmask == 255) | 
+                               (cloud_comb == 1) | (clo == 255) |
+                               (sha == 255) | (adj == 255))
+                    }, datatype='INT2S')
+            } else {
+                stop(paste0('unrecognized option "', cloud_mask, '" for cloud_mask"'))
+            }
 
             image_stack_masked <- image_stack
             image_stack_masked[image_stack_mask] <- NA
