@@ -208,7 +208,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         ######################################################################
         # Mask out clouds and missing values
         if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
-                                                             '-', 'masking'))
+                                                             '-', 'calculating masks'))
 
         # The cloud_comb cloud mask includes the cloud_QA, cloud_shadow_QA, and 
         # adjacent_cloud_QA layers. Pixels in cloud, cloud shadow, or adjacent 
@@ -230,7 +230,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                   overwrite=overwrite, datatype='INT2S')
         names(mask_stack) <- c('fill_QA', 'fmask_band', 'cloud_comb')
         if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
-                                                            '-', 'masking'))
+                                                            '-', 'calculating masks'))
 
         ######################################################################
         # Perform topographic correction if tc=TRUE
