@@ -30,6 +30,7 @@ pct_clouds <- function(cloud_mask) {
 #' \code{auto_cloud_fill} script.
 #'
 #' @export
+#' @importFrom tools file_path_sans_ext
 #' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract
@@ -47,6 +48,9 @@ pct_clouds <- function(cloud_mask) {
 #' @param base_date ideal date for base image (base image will be chosen as the 
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
+#' @param out_name filename for cloud filled image. The mask file for the cloud 
+#' filled image will be saved with the same name, with the added suffix 
+#' "_mask".
 #' @param tc if \code{TRUE}, use topographically corrected imagery as output by 
 #' \code{auto_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface 
 #' reflectance as output by \code{unstack_ledaps} or 
@@ -75,10 +79,17 @@ pct_clouds <- function(cloud_mask) {
 #' in Landsat images.  Geoscience and Remote Sensing Letters, IEEE 9, 521--525.  
 #' doi:10.1109/LGRS.2011.2173290
 auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
-                            n_cpus=1, notify=print, verbose=1, ...) {
+                            out_name, base_date=NULL, tc=TRUE, 
+                            threshold=1, max_iter=5, n_cpus=1, notify=print, 
+                            verbose=1, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
+    }
+    if (!file_test('-d', dirname(out_name))) {
+        stop('output folder does not exist')
+    }
+    if (file_test('-f', out_name)) {
+        stop('output file already exists - use a different "out_name"')
     }
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Cloud fill')
@@ -218,14 +229,16 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             return(base_vals)
         }, datatype=dataType(base_img[[1]]))
 
-    if (verbose > 0) {
-        timer <- stop_timer(timer, label='Masking base image')
-    }
-    n <- 0
     cur_pct_clouds <- pct_clouds(base_mask)
     if (verbose > 0) {
         notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover before fill'))
     }
+
+    if (verbose > 0) {
+        timer <- stop_timer(timer, label='Masking base image')
+    }
+
+    n <- 0
     while ((cur_pct_clouds > threshold) & (n < max_iter) & (length(imgs) >= 1)) {
         if (verbose > 0) {
             timer <- start_timer(timer, label=paste('Fill iteration', n + 1))
@@ -286,20 +299,24 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             timer <- start_timer(timer, label="Performing fill")
         }
         base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
-                                 verbose=verbose, ...)
+                                 out_name=out_name, verbose=verbose, 
+                                 overwrite=TRUE, ...)
         if (verbose > 0) {
             timer <- stop_timer(timer, label="Performing fill")
         }
 
         # Revise base mask to account for newly filled pixels
+        mask_out_name <- paste0(file_path_sans_ext(out_name), '_mask', 
+                                extension(out_name))
         base_mask <- overlay(base_mask, base_img[[1]],
             fun=function(mask_vals, filled_vals) {
                 mask_vals[(mask_vals == 1) & (filled_vals != 0)] <- 0
                 return(mask_vals)
-            }, datatype=dataType(base_mask))
+            }, datatype=dataType(base_mask), filename=out_name)
         cur_pct_clouds <- pct_clouds(base_mask)
         if (verbose > 0) {
-            notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover remaining'))
+            notify(paste0('Base image has ', round(cur_pct_clouds, 2),
+                          '% cloud cover remaining'))
             timer <- stop_timer(timer, label=paste('Fill iteration', n + 1))
         }
 

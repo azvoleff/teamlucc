@@ -3,7 +3,7 @@
 \alias{auto_cloud_fill}
 \title{Automated removal of clouds using Xiaolin Zhu's NSPI algorithm}
 \usage{
-auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date,
+auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, out_name,
   base_date = NULL, tc = TRUE, threshold = 1, max_iter = 5,
   n_cpus = 1, notify = print, verbose = 1, ...)
 }
@@ -26,6 +26,10 @@ cloudy areas in the the base image (as \code{Date} object)}
 \item{base_date}{ideal date for base image (base image will be chosen as the
 image among the available images that is closest to this date). If NULL,
 then the base image will be the image with the lowest cloud cover.}
+
+\item{out_name}{filename for cloud filled image. The mask file for the cloud
+filled image will be saved with the same name, with the added suffix
+"_mask".}
 
 \item{tc}{if \code{TRUE}, use topographically corrected imagery as output by
 \code{auto_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface

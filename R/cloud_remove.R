@@ -36,7 +36,8 @@ prep_fmask <- function(image_dir) {
 cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              algorithm, num_class, min_pixel, max_pixel, 
                              cloud_nbh, DN_min, DN_max, 
-                             verbose, idl, byblock, patch_long=1000) {
+                             verbose, idl, byblock, patch_long=1000,
+                             overwrite) {
     if (verbose > 0) {
         warning("verbose not supported with CLOUD_REMOVE and CLOUD_REMOVE_FAST algorithms")
     }
@@ -70,9 +71,11 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     # temporarily reset.
     dummy <- capture.output(def_format <- rasterOptions()$format)
     rasterOptions(format='ENVI')
-    cloudy <- writeRaster(cloudy, rasterTmpFile(), datatype=dataType(cloudy)[1])
+    cloudy <- writeRaster(cloudy, rasterTmpFile(), 
+                          datatype=dataType(cloudy)[1])
     clear <- writeRaster(clear, rasterTmpFile(), datatype=dataType(clear)[1])
-    cloud_mask <- writeRaster(cloud_mask, rasterTmpFile(), datatype=dataType(cloud_mask)[1])
+    cloud_mask <- writeRaster(cloud_mask, rasterTmpFile(), 
+                              datatype=dataType(cloud_mask)[1])
     cloudy_file <- filename(cloudy)
     clear_file <- filename(clear)
     cloud_mask_file <- filename(cloud_mask)
@@ -111,7 +114,7 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     # Ensure original proj4string and extent are saved and returned
     proj4string(filled) <- cloudy_proj
     extent(filled) <- cloudy_ext
-    writeRaster(filled, filename=out_name, overwrite=TRUE, 
+    writeRaster(filled, filename=out_name, overwrite=overwrite, 
                 datatype=dataType(filled)[1])
 
     return(filled)
@@ -159,14 +162,14 @@ call_cpp_cloud_fill <- function(cloudy, clear, cloud_mask, algorithm, dims,
 #' @importFrom spatial.tools rasterEngine
 cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm, 
                            num_class, min_pixel, max_pixel, cloud_nbh, DN_min, 
-                           DN_max, verbose, byblock) {
+                           DN_max, verbose, byblock, overwrite) {
     # Note that call_cpp_cloud_fill uses the algorithm to decide whether to 
     # call cloud_fill or cloud_fill_simple (and call_cpp_cloud_fill is called 
     # by cloud_fill_rasterengine)
     if (byblock) {
         bs <- blockSize(cloudy)
         out <- brick(cloudy, values=FALSE)
-        out <- writeStart(out, out_name)
+        out <- writeStart(out, out_name, overwrite=overwrite)
         for (block_num in 1:bs$n) {
             if (verbose > 0) {
                 message("Processing block ", block_num, " of ", bs$n, "...")
@@ -213,7 +216,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
                                       dims, num_class, min_pixel, max_pixel, 
                                       cloud_nbh, DN_min, DN_max, verbose>1)
         out <- setValues(out, filled)
-        out <- writeRaster(out, out_name, datatype=out_datatype)
+        out <- writeRaster(out, out_name, datatype=out_datatype, overwrite=overwrite)
     }
 
     return(out)
@@ -266,6 +269,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
 #' (\code{byblock=TRUE}) or all at once (\code{byblock=FALSE}). Use 
 #' \code{byblock=FALSE} with caution, as this option will cause the cloud fill 
 #' routine to consume a large amount of memory.
+#' @param overwrite whether to overwrite \code{out_name} if it already exists
 #' @return \code{Raster*} with cloud-filled image
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
@@ -285,7 +289,7 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
                          num_class=4, min_pixel=20, max_pixel=1000, 
                          cloud_nbh=10, DN_min=0, DN_max=255, 
                          idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
-                         verbose=FALSE, byblock=TRUE) {
+                         verbose=FALSE, byblock=TRUE, overwrite=FALSE) {
     if (!(algorithm %in% c('CLOUD_REMOVE', 'CLOUD_REMOVE_FAST', 'teamlucc', 
                            'simple'))) {
         stop('algorithm must be one of "CLOUD_REMOVE", "CLOUD_REMOVE_FAST", "teamlucc", or "simple"')
@@ -316,17 +320,24 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
         out_name <- rasterTmpFile()
     } else {
         out_name <- normalizePath(out_name, mustWork=FALSE)
+        if (!file_test('-d', dirname(out_name))) {
+            stop('output folder does not exist')
+        }
+        if (file_test('-f', out_name) & !overwrite) {
+            stop('output file already exists - use a different "out_name"')
+        }
     }
     
     if (algorithm %in% c('CLOUD_REMOVE', 'CLOUD_REMOVE_FAST')) {
         filled <- cloud_remove_IDL(cloudy, clear, cloud_mask, out_name,
                                    algorithm, num_class, min_pixel, max_pixel, 
                                    cloud_nbh, DN_min, DN_max, verbose, idl, 
-                                   byblock)
+                                   byblock, overwrite)
     } else if (algorithm %in% c('teamlucc', 'simple')) {
         filled <- cloud_remove_R(cloudy, clear, cloud_mask, out_name, 
                                  algorithm, num_class, min_pixel, max_pixel, 
-                                 cloud_nbh, DN_min, DN_max, verbose, byblock)
+                                 cloud_nbh, DN_min, DN_max, verbose, byblock, 
+                                 overwrite)
     } else {
         stop(paste0('unrecognized cloud fill algorithm "', algorithm, '"'))
     }
