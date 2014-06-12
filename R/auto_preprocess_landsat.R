@@ -275,8 +275,9 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                 # Draw a sample for the Minnaert k regression. Note that 
                 # sampleRegular with cells=TRUE returns cell numbers in the 
                 # first column
-                sampleindices <- sampleRegular(x, size=500000, cells=TRUE)
-                sampleindices <- x_vals[, 1]
+                sampleindices <- sampleRegular(image_stack_masked, size=500000, 
+                                               cells=TRUE)
+                sampleindices <- as.vector(sampleindices[, 1])
             } else {
                 sampleindices <- NULL
             }
