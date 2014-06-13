@@ -1,7 +1,8 @@
 #' Classify a preprocessed surface reflectance image
 #'
-#' First the image should be preprocesed using the \code{auto_preprocess} 
-#' function.
+#' First the image should be preprocessed using the \code{auto_preprocess} 
+#' function. For Landsat CDR imagery, predictor layers can be generated using 
+#' the \code{auto_generate_predictors} function.
 #'
 #' @export
 #' @importFrom rgdal readOGR
