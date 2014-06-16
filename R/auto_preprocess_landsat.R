@@ -35,7 +35,7 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
                        (clo == 255) | (sha == 255) | (adj == 255))
             }, datatype='INT2S', ...)
     } else {
-        stop(paste0('unrecognized option "', cloud_mask, '" for cloud_mask"'))
+        stop(paste0('unrecognized option "', cloud_mask, '" for mask_type"'))
     }
     return(cloud_mask)
 }
