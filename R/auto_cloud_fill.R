@@ -68,6 +68,7 @@ pct_clouds <- function(cloud_mask) {
 #' @param verbose whether to print detailed status messages. Set to FALSE or 0 
 #' for no status messages. Set to 1 for basic status messages. Set to 2 for 
 #' detailed status messages.
+#' @param overwrite whether to overwrite \code{out_name} if it already exists
 #' @param ...  additional arguments passed to \code{\link{cloud_remove}}, such 
 #' as \code{DN_min}, \code{DN_max}, \code{algorithm}, \code{byblock}, 
 #' \code{verbose}, etc. See \code{\link{cloud_remove}} for details
@@ -81,14 +82,14 @@ pct_clouds <- function(cloud_mask) {
 auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             out_name, base_date=NULL, tc=TRUE, 
                             threshold=1, max_iter=5, n_cpus=1, notify=print, 
-                            verbose=1, ...) {
+                            verbose=1, overwrite=FALSE, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
     if (!file_test('-d', dirname(out_name))) {
         stop('output folder does not exist')
     }
-    if (file_test('-f', out_name)) {
+    if (file_test('-f', out_name) & !overwrite) {
         stop('output file already exists - use a different "out_name"')
     }
     timer <- Track_time(notify)
@@ -96,9 +97,6 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
     stopifnot(class(start_date) == 'Date')
     stopifnot(class(end_date) == 'Date')
-
-    #if (n_cpus > 1) sfQuickInit(n_cpus)
-    if (n_cpus > 1) beginCluster(n_cpus)
 
     wrspath <- sprintf('%03i', wrspath)
     wrsrow <- sprintf('%03i', wrsrow)
@@ -243,6 +241,15 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         if (verbose > 0) {
             timer <- start_timer(timer, label=paste('Fill iteration', n + 1))
         }
+
+        # If the base image is stored in a file named out_name (as it will be 
+        # on iteration 2 and beyond), save the base_img to a temp file so that 
+        # out_name can be safely overwritten by cloud_remove.
+        if (filename(base_img) == out_name) {
+            base_img <- writeRaster(base_img, filename=rasterTmpFile(), 
+                                    datatype=dataType(base_img[[1]]))
+        }
+
         # Calculate a raster indicating the pixels in each potential fill image 
         # that are available for filling pixels of base_img that are missing 
         # due to cloud contamination. Areas coded 1 are missing due to cloud or 
@@ -312,7 +319,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             fun=function(mask_vals, filled_vals) {
                 mask_vals[(mask_vals == 1) & (filled_vals != 0)] <- 0
                 return(mask_vals)
-            }, datatype=dataType(base_mask), filename=out_name)
+            }, datatype=dataType(base_mask), filename=mask_out_name, 
+            overwrite=TRUE)
         cur_pct_clouds <- pct_clouds(base_mask)
         if (verbose > 0) {
             notify(paste0('Base image has ', round(cur_pct_clouds, 2),
@@ -325,9 +333,6 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     }
 
     timer <- stop_timer(timer, label='Cloud fill')
-
-    #if (n_cpus > 1) sfQuickStop(n_cpus)
-    if (n_cpus > 1) endCluster()
 
     return(list(filled=base_img, mask=base_mask))
 }

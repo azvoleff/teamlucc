@@ -5,7 +5,7 @@
 \usage{
 auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, out_name,
   base_date = NULL, tc = TRUE, threshold = 1, max_iter = 5,
-  n_cpus = 1, notify = print, verbose = 1, ...)
+  n_cpus = 1, notify = print, verbose = 1, overwrite = FALSE, ...)
 }
 \arguments{
 \item{data_dir}{folder where input images are located, with filenames as
@@ -53,6 +53,8 @@ parallel}
 \item{verbose}{whether to print detailed status messages. Set to FALSE or 0
 for no status messages. Set to 1 for basic status messages. Set to 2 for
 detailed status messages.}
+
+\item{overwrite}{whether to overwrite \code{out_name} if it already exists}
 
 \item{...}{additional arguments passed to \code{\link{cloud_remove}}, such
 as \code{DN_min}, \code{DN_max}, \code{algorithm}, \code{byblock},
