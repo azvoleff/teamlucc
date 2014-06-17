@@ -2,7 +2,17 @@
 
 using namespace arma;
 
-//' Cloud fill using the algorithm developed by Xiaolin Zhu
+//' Cloud fill using a simple linear model approach
+//'
+//' This algorithm fills clouds using a simple approach in which the value of 
+//' each clouded pixel is calculated using a linear model. The script
+//' develops a separate linear model (with slope and intercept) for each band 
+//' and each cloud. For each cloud, and each image band, the script finds all 
+//' pixels clear in both the cloudy and fill images, and calculates a 
+//' regression model in which pixel values in the fill image are the 
+//' independent variable, and pixel values in the clouded image are the 
+//' dependent variable. The script then uses this model to predict pixel values 
+//' for each band in each cloud in the clouded image.
 //'
 //' This function is called by the \code{\link{cloud_remove}} function. It is
 //' not intended to be used directly.
@@ -24,9 +34,6 @@ using namespace arma;
 //' @param verbose whether to print detailed status messages
 //' @return array with cloud filled image with dims: cols, rows, bands
 //' parameter, containing the selected textures measures
-//' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
-//' neighborhood similar pixel interpolator approach for removing thick clouds 
-//' in Landsat images. Geoscience and Remote Sensing Letters, IEEE 9, 521--525.
 // [[Rcpp::export]]
 arma::mat cloud_fill_simple(arma::mat cloudy, arma::mat& clear,
         arma::ivec& cloud_mask, arma::ivec dims, int num_class,
