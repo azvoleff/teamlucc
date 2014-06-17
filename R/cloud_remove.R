@@ -36,8 +36,8 @@ prep_fmask <- function(image_dir) {
 cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              algorithm, num_class, min_pixel, max_pixel, 
                              cloud_nbh, DN_min, DN_max, 
-                             verbose, idl, byblock, patch_long=1000,
-                             overwrite) {
+                             verbose, idl, byblock, overwrite,
+                             patch_long=1000) {
     if (verbose > 0) {
         warning("verbose not supported with CLOUD_REMOVE and CLOUD_REMOVE_FAST algorithms")
     }
@@ -114,9 +114,8 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     # Ensure original proj4string and extent are saved and returned
     proj4string(filled) <- cloudy_proj
     extent(filled) <- cloudy_ext
-    writeRaster(filled, filename=out_name, overwrite=overwrite, 
-                datatype=dataType(filled)[1])
-
+    filled <- writeRaster(filled, filename=out_name, overwrite=overwrite, 
+                          datatype=dataType(filled)[1])
     return(filled)
 }
 
@@ -216,7 +215,8 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
                                       dims, num_class, min_pixel, max_pixel, 
                                       cloud_nbh, DN_min, DN_max, verbose>1)
         out <- setValues(out, filled)
-        out <- writeRaster(out, out_name, datatype=out_datatype, overwrite=overwrite)
+        out <- writeRaster(out, out_name, datatype=out_datatype, 
+                           overwrite=overwrite)
     }
 
     return(out)
