@@ -56,6 +56,9 @@ pct_clouds <- function(cloud_mask) {
 #' reflectance as output by \code{unstack_ledaps} or 
 #' \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also 
 #' run with tc=FALSE).
+#' @param sensors choose the sensors to include when selecting images (useful 
+#' for excluding images from a particular satellite if desired). Can be any of 
+#' "L4T", "L5T", "L7E", and/or "L8E".
 #' @param threshold maximum percent cloud cover allowable in base image. Cloud 
 #' fill will iterate until percent cloud cover in base image is below this 
 #' value, or until \code{max_iter} iterations have been run
@@ -80,7 +83,8 @@ pct_clouds <- function(cloud_mask) {
 #' in Landsat images.  Geoscience and Remote Sensing Letters, IEEE 9, 521--525.  
 #' doi:10.1109/LGRS.2011.2173290
 auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            out_name, base_date=NULL, tc=TRUE, 
+                            out_name, base_date=NULL, tc=TRUE,
+                            sensors=c('L4T', 'L5T', 'L7E', 'L8E'),
                             threshold=1, max_iter=5, n_cpus=1, notify=print, 
                             verbose=1, overwrite=FALSE, ...) {
     if (!file_test('-d', data_dir)) {
@@ -91,6 +95,9 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     }
     if (file_test('-f', out_name) & !overwrite) {
         stop('output file already exists - use a different "out_name"')
+    }
+    if (!all(sensors %in% c('L4T', 'L5T', 'L7E', 'L8E'))) {
+        stop('"sensors" must be a list of one or more of: "L4T", "L5T", "L7E", "L8E"')
     }
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Cloud fill')
@@ -106,7 +113,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #pathrow_re <-"[012][0-9]{2}-[012][0-9]{2}"
     pathrow_re <- paste(wrspath, wrsrow, sep='-')
     date_re <-"((19)|(2[01]))[0-9]{2}-[0123][0-9]{2}"
-    sensor_re <-"((L[45]T)|(L[78]E))SR"
+    sensor_re <- paste0('(', paste0(paste0('(', sensors,')'), collapse='|'), ')', "SR")
     if (tc) {
         suffix_re <- '_tc.envi$'
     } else {
@@ -173,7 +180,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
     }
 
-    # Convert masks to binary indicating: 0 = other; 1 = cloud or shadow
+    # Convert masks to indicate: 0 = clear; 1 = cloud or shadow; 2 = fill
     #
     #   fmask_band key:
     #       0 = clear
@@ -321,6 +328,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
                 return(mask_vals)
             }, datatype=dataType(base_mask), filename=mask_out_name, 
             overwrite=TRUE)
+
         cur_pct_clouds <- pct_clouds(base_mask)
         if (verbose > 0) {
             notify(paste0('Base image has ', round(cur_pct_clouds, 2),
