@@ -9,8 +9,8 @@ auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, dem_path = NULL,
   notify = print, verbose = FALSE)
 }
 \arguments{
-\item{image_dirs}{list of paths to a set of Landsat CDR image files in ENVI
-format as output by the \code{unstack_ledapscdr} function.}
+\item{image_dirs}{list of paths to a set of Landsat CDR image files in HDF
+format}
 
 \item{prefix}{string to use as a prefix for all filenames}
 
@@ -62,12 +62,28 @@ correction.
 }
 \details{
 \code{mask_type} chooses the cloud mask to use if topographic correction is
-performed (\code{tc=TRUE}). TODO: Fill in coding of cloud masks.
+performed (\code{tc=TRUE}). The mask can be one of three different options:
+"6S", "fmask", or "combined". Each option uses a different combination of
+cloud mask layers from the CDR product. The "6S" masks out any areas coded
+as fill (fill_QA=255), cloud (cloud_QA=255), cloud shadow
+(cloud_shadow_QA=255) or adjacent to cloud (adjacent_cloud_QA=255). The
+"fmask" option masks out any areas coded as fill (fmask=255), cloud
+(fmask=4) or cloud shadow (fmask=2).  The combined option combines the "6S"
+and "fmask" approaches to masks out areas coded as fill, cloud, cloud
+shadow, or adjacent to cloud using either method.
+
+\tabular{6S}{
+    Nodata               \tab 0 \cr
+    Forest               \tab 1 \cr
+    Non-forest           \tab 2 \cr
+    Forest loss          \tab 3 \cr
+    Forest gain          \tab 4 \cr
+    Forest loss and gain \tab 5 \cr
+    Water                \tab 6 \cr
+}
 
 Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}}
-should be used to extract the original zipfiles supplied by USGS.
-\code{\link{unstack_ledapscdr}} should then be used to unstack the HDF
-format files and convert them into ENVI binary format. To perform
+should be used to extract the original zipfiles supplied by USGS. To perform
 topographic correction with \code{auto_preprocess_landsat}, first run
 \code{\link{auto_setup_dem}} to preprocess a set of DEM tiles. Then run
 \code{auto_preprocess_landsat} with the \code{tc=TRUE} option.
