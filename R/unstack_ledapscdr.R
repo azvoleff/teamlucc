@@ -1,8 +1,8 @@
-#' Convert Landsat CDR images from HDF4 to ENVI format
+#' Convert Landsat CDR images from HDF4 to GeoTIFF format
 #'
 #' This function converts a Landsat surface reflectance (SR) image from the 
 #' Landsat Climate Data Record (CDR) archive into a series of single band 
-#' images in ENVI format.
+#' images in GeoTIFF format.
 #'
 #' This function uses \code{gdalUtils}, which requires a local GDAL 
 #' installation.  See http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries 
@@ -49,22 +49,22 @@ unstack_ledapscdr <- function(x, output_folder=NULL, overwrite=FALSE,
         start_char <- loc[n]
         stop_char <- start_char + attr(loc, 'match.length')[n]
         band_name <- substr(sds[[n]], start_char, stop_char)
-        this_out <- paste0(file.path(output_folder, out_basename), '_', band_name, '.envi')
+        this_out <- paste0(file.path(output_folder, out_basename), '_', band_name, '.tif')
         if (file.exists(this_out)) {
             if (overwrite) {
                 unlink(this_out)
                 if (file.exists(extension(this_out, 'hdr'))) 
                     unlink(extension(this_out, 'hdr'))
-                if (file.exists(extension(this_out, 'envi.aux.xml'))) 
-                    unlink(extension(this_out, 'envi.aux.xml'))
-                if (file.exists(extension(this_out, 'envi.enp'))) 
-                    unlink(extension(this_out, 'envi.enp'))
+                if (file.exists(extension(this_out, 'tif.aux.xml'))) 
+                    unlink(extension(this_out, 'tif.aux.xml'))
+                if (file.exists(extension(this_out, 'tif.enp'))) 
+                    unlink(extension(this_out, 'tif.enp'))
             } else {
                 warning(paste(this_out, 'already exists - skipping file'))
                 next
             }
         }
-        out_rast <- gdal_translate(x, of="ENVI", sd_index=n, this_out, 
+        out_rast <- gdal_translate(x, of="GTiff", sd_index=n, this_out, 
                                    outRaster=TRUE)
     }
     if (rmhdf) {

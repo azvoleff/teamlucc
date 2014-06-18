@@ -20,8 +20,8 @@ get_freq <- function(band, value, freq_table) {
 #'
 #' @export
 #' @importFrom stringr str_extract
-#' @param image_dirs list of paths to a set of Landsat CDR image files in ENVI 
-#' format as output by the \code{unstack_ledapscdr} function.
+#' @param image_dirs list of paths to a set of Landsat CDR image files in 
+#' GeoTIFF format as output by the \code{unstack_ledapscdr} function.
 #' @param aoi an area of interest (AOI) to crop from each image
 #' @return a \code{data.frame}
 auto_QA_stats <- function(image_dirs, aoi) {
@@ -54,7 +54,7 @@ auto_QA_stats <- function(image_dirs, aoi) {
                                                      image_basename), 
                                            mask_band, sep='_'))
             }
-            mask_band_files <- paste0(mask_band_files, '.envi')
+            mask_band_files <- paste0(mask_band_files, '.tif')
             mask_stack <- stack(mask_band_files)
             names(mask_stack) <- mask_bands
             if (!missing(aoi)) {
