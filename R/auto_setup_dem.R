@@ -112,11 +112,11 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         ######################################################################
         # Mosaic DEMs
         if (verbose) timer <- start_timer(timer, label='Mosaicking DEMs')
-        mosaic_file <- extension(rasterTmpFile(), '.envi')
+        mosaic_file <- extension(rasterTmpFile(), '.tif')
         # Calculate minimum bounding box coordinates:
         mosaic_te <- as.numeric(bbox(pathrows_buffered))
         # Use mosaic_rasters from gdalUtils for speed:
-        mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of="ENVI", 
+        mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of="GTiff", 
                        overwrite=overwrite)
         dem_mosaic <- raster(mosaic_file)
         if (verbose) timer <- stop_timer(timer, label='Mosaicking DEMs')
@@ -149,12 +149,12 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         # Calculate minimum bounding box coordinates:
         dem_mosaic_crop_filename <- file.path(output_path,
                                          paste0('dem_', pathrow_label, 
-                                                '.envi'))
+                                                '.tif'))
         dem_mosaic_crop <- gdalwarp(mosaic_file, 
                                     dstfile=dem_mosaic_crop_filename,
                                     te=dem_te, t_srs=to_srs, tr=to_res, 
                                     r='cubicspline', output_Raster=TRUE, 
-                                    multi=TRUE, of="ENVI",
+                                    multi=TRUE, of="GTiff",
                                     wo=paste0("NUM_THREADS=", n_cpus), 
                                     overwrite=overwrite)
         if (verbose) timer <- stop_timer(timer,
@@ -165,7 +165,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                                 pathrow_label))
         slopeaspect_filename <- file.path(output_path,
                                           paste0('slopeaspect_',
-                                                 pathrow_label, '.envi'))
+                                                 pathrow_label, '.tif'))
         # Note that the default output of 'terrain' is in radians
         slopeaspect <- terrain(dem_mosaic_crop, opt=c('slope', 'aspect'))
         slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {

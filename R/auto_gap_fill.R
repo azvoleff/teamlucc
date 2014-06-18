@@ -90,9 +90,9 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     date_re <-"((19)|(2[01]))[0-9]{2}-[0123][0-9]{2}"
     sensor_re <-"((L[45]T)|(L[78]E))SR"
     if (tc) {
-        suffix_re <- '_tc.envi$'
+        suffix_re <- '_tc.tif$'
     } else {
-        suffix_re <- '.envi$'
+        suffix_re <- '.tif$'
     }
     file_re <- paste0(prefix_re, paste(pathrow_re, date_re, sensor_re, 
                                        sep='_'), suffix_re)
@@ -121,7 +121,7 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     masks <- list()
     imgs <- list()
     for (img_file in img_files) {
-        masks_file <- gsub(suffix_re, '_masks.envi', img_file)
+        masks_file <- gsub(suffix_re, '_masks.tif', img_file)
         this_mask <- raster(masks_file, band=2)
         masks <- c(masks, this_mask)
         this_img <- stack(img_file)

@@ -37,8 +37,9 @@ will be raised)}
 \code{notify} function should accept a string as the only argument.}
 }
 \description{
-First the image should be preprocesed using the \code{auto_preprocess}
-function.
+First the image should be preprocessed using the \code{auto_preprocess}
+function. For Landsat CDR imagery, predictor layers can be generated using
+the \code{auto_generate_predictors} function.
 }
 \examples{
 #TODO: Add example

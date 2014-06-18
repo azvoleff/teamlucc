@@ -1,7 +1,8 @@
 #' Classify a preprocessed surface reflectance image
 #'
-#' First the image should be preprocesed using the \code{auto_preprocess} 
-#' function.
+#' First the image should be preprocessed using the \code{auto_preprocess} 
+#' function. For Landsat CDR imagery, predictor layers can be generated using 
+#' the \code{auto_generate_predictors} function.
 #'
 #' @export
 #' @importFrom rgdal readOGR
@@ -63,12 +64,12 @@ auto_classify <- function(predictor_file, train_shp, output_path,
                                                   'predmodel.RData', sep='_')))
     writeRaster(classification$pred_classes,
                 filename=file.path(output_path, paste(pred_rast_basename, 
-                                                      'predclasses.envi', 
+                                                      'predclasses.tif', 
                                                       sep='_')),
                 datatype='INT2S', overwrite=overwrite)
     writeRaster(scale_raster(classification$pred_probs),
                 filename=file.path(output_path, paste(pred_rast_basename, 
-                                                      'predprobs.envi', 
+                                                      'predprobs.tif', 
                                                       sep='_')),
                 datatype='INT2S', overwrite=overwrite)
     timer <- stop_timer(timer, label='Running classify_image')
@@ -77,7 +78,7 @@ auto_classify <- function(predictor_file, train_shp, output_path,
     # cls <- data.frame(code=seq(1:length(cls)), name=cls)
     # color_image(classification$predclasses, cls,
     #             file.path(output_path, paste(pred_rast_basename, 
-    #             'predclasses_colored.envi', sep='_')))
+    #             'predclasses_colored.tif', sep='_')))
 
     # Perform accuracy assessment using an independent dataset:
     timer <- start_timer(timer, label='Running accuracy assessment')

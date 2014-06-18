@@ -30,6 +30,7 @@ pct_clouds <- function(cloud_mask) {
 #' \code{auto_cloud_fill} script.
 #'
 #' @export
+#' @importFrom tools file_path_sans_ext
 #' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract
@@ -47,11 +48,17 @@ pct_clouds <- function(cloud_mask) {
 #' @param base_date ideal date for base image (base image will be chosen as the 
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
+#' @param out_name filename for cloud filled image. The mask file for the cloud 
+#' filled image will be saved with the same name, with the added suffix 
+#' "_mask".
 #' @param tc if \code{TRUE}, use topographically corrected imagery as output by 
 #' \code{auto_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface 
 #' reflectance as output by \code{unstack_ledaps} or 
 #' \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also 
 #' run with tc=FALSE).
+#' @param sensors choose the sensors to include when selecting images (useful 
+#' for excluding images from a particular satellite if desired). Can be any of 
+#' "L4T", "L5T", "L7E", and/or "L8E".
 #' @param threshold maximum percent cloud cover allowable in base image. Cloud 
 #' fill will iterate until percent cloud cover in base image is below this 
 #' value, or until \code{max_iter} iterations have been run
@@ -64,28 +71,39 @@ pct_clouds <- function(cloud_mask) {
 #' @param verbose whether to print detailed status messages. Set to FALSE or 0 
 #' for no status messages. Set to 1 for basic status messages. Set to 2 for 
 #' detailed status messages.
+#' @param overwrite whether to overwrite \code{out_name} if it already exists
 #' @param ...  additional arguments passed to \code{\link{cloud_remove}}, such 
 #' as \code{DN_min}, \code{DN_max}, \code{algorithm}, \code{byblock}, 
 #' \code{verbose}, etc. See \code{\link{cloud_remove}} for details
-#' @return \code{Raster*} object with cloud filled image.
+#' @return a list with two elements: "filled", a \code{Raster*} object with 
+#' cloud filled image, and "mask", a \code{RasterLayer} object with the cloud 
+#' mask for the cloud filled image.
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified 
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
 #' in Landsat images.  Geoscience and Remote Sensing Letters, IEEE 9, 521--525.  
 #' doi:10.1109/LGRS.2011.2173290
 auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            base_date=NULL, tc=TRUE, threshold=1, max_iter=5, 
-                            n_cpus=1, notify=print, verbose=1, ...) {
+                            out_name, base_date=NULL, tc=TRUE,
+                            sensors=c('L4T', 'L5T', 'L7E', 'L8E'),
+                            threshold=1, max_iter=5, n_cpus=1, notify=print, 
+                            verbose=1, overwrite=FALSE, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
+    }
+    if (!file_test('-d', dirname(out_name))) {
+        stop('output folder does not exist')
+    }
+    if (file_test('-f', out_name) & !overwrite) {
+        stop('output file already exists - use a different "out_name"')
+    }
+    if (!all(sensors %in% c('L4T', 'L5T', 'L7E', 'L8E'))) {
+        stop('"sensors" must be a list of one or more of: "L4T", "L5T", "L7E", "L8E"')
     }
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Cloud fill')
 
     stopifnot(class(start_date) == 'Date')
     stopifnot(class(end_date) == 'Date')
-
-    #if (n_cpus > 1) sfQuickInit(n_cpus)
-    if (n_cpus > 1) beginCluster(n_cpus)
 
     wrspath <- sprintf('%03i', wrspath)
     wrsrow <- sprintf('%03i', wrsrow)
@@ -95,11 +113,11 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #pathrow_re <-"[012][0-9]{2}-[012][0-9]{2}"
     pathrow_re <- paste(wrspath, wrsrow, sep='-')
     date_re <-"((19)|(2[01]))[0-9]{2}-[0123][0-9]{2}"
-    sensor_re <-"((L[45]T)|(L[78]E))SR"
+    sensor_re <- paste0('(', paste0(paste0('(', sensors,')'), collapse='|'), ')', "SR")
     if (tc) {
-        suffix_re <- '_tc.envi$'
+        suffix_re <- '_tc.tif$'
     } else {
-        suffix_re <- '.envi$'
+        suffix_re <- '.tif$'
     }
     file_re <- paste0(prefix_re, paste(pathrow_re, date_re, sensor_re, 
                                        sep='_'), suffix_re)
@@ -128,7 +146,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     masks <- list()
     imgs <- list()
     for (img_file in img_files) {
-        masks_file <- gsub(suffix_re, '_masks.envi', img_file)
+        masks_file <- gsub(suffix_re, '_masks.tif', img_file)
         this_mask <- raster(masks_file, band=2)
         masks <- c(masks, this_mask)
         this_img <- stack(img_file)
@@ -162,7 +180,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
     }
 
-    # Convert masks to binary indicating: 0 = other; 1 = cloud or shadow
+    # Convert masks to indicate: 0 = clear; 1 = cloud or shadow; 2 = fill
     #
     #   fmask_band key:
     #       0 = clear
@@ -216,18 +234,29 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             return(base_vals)
         }, datatype=dataType(base_img[[1]]))
 
-    if (verbose > 0) {
-        timer <- stop_timer(timer, label='Masking base image')
-    }
-    n <- 0
     cur_pct_clouds <- pct_clouds(base_mask)
     if (verbose > 0) {
         notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover before fill'))
     }
+
+    if (verbose > 0) {
+        timer <- stop_timer(timer, label='Masking base image')
+    }
+
+    n <- 0
     while ((cur_pct_clouds > threshold) & (n < max_iter) & (length(imgs) >= 1)) {
         if (verbose > 0) {
             timer <- start_timer(timer, label=paste('Fill iteration', n + 1))
         }
+
+        # If the base image is stored in a file named out_name (as it will be 
+        # on iteration 2 and beyond), save the base_img to a temp file so that 
+        # out_name can be safely overwritten by cloud_remove.
+        if (filename(base_img) == out_name) {
+            base_img <- writeRaster(base_img, filename=rasterTmpFile(), 
+                                    datatype=dataType(base_img[[1]]))
+        }
+
         # Calculate a raster indicating the pixels in each potential fill image 
         # that are available for filling pixels of base_img that are missing 
         # due to cloud contamination. Areas coded 1 are missing due to cloud or 
@@ -284,20 +313,26 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             timer <- start_timer(timer, label="Performing fill")
         }
         base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
-                                 verbose=verbose, ...)
+                                 out_name=out_name, verbose=verbose, 
+                                 overwrite=TRUE, ...)
         if (verbose > 0) {
             timer <- stop_timer(timer, label="Performing fill")
         }
 
         # Revise base mask to account for newly filled pixels
+        mask_out_name <- paste0(file_path_sans_ext(out_name), '_mask', 
+                                extension(out_name))
         base_mask <- overlay(base_mask, base_img[[1]],
             fun=function(mask_vals, filled_vals) {
                 mask_vals[(mask_vals == 1) & (filled_vals != 0)] <- 0
                 return(mask_vals)
-            }, datatype=dataType(base_mask))
+            }, datatype=dataType(base_mask), filename=mask_out_name, 
+            overwrite=TRUE)
+
         cur_pct_clouds <- pct_clouds(base_mask)
         if (verbose > 0) {
-            notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover remaining'))
+            notify(paste0('Base image has ', round(cur_pct_clouds, 2),
+                          '% cloud cover remaining'))
             timer <- stop_timer(timer, label=paste('Fill iteration', n + 1))
         }
 
@@ -307,9 +342,5 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
     timer <- stop_timer(timer, label='Cloud fill')
 
-    #if (n_cpus > 1) sfQuickStop(n_cpus)
-    if (n_cpus > 1) endCluster()
-
-    #TODO: Also return base_mask (cloud mask)
-    return(base_img)
+    return(list(filled=base_img, mask=base_mask))
 }

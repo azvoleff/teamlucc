@@ -3,11 +3,14 @@
 \alias{tpa2df}
 \title{Function to convert TIMESAT .tpa binary format file to an R dataframe.}
 \usage{
-tpa2df(x)
+tpa2df(x, max_num_seasons)
 }
 \arguments{
 \item{x}{A string giving the location of a .tpa file output by
 TIMESAT}
+
+\item{max_num_seasons}{the maximum number of seasons for any of the pixels
+in the file}
 }
 \value{
 A data.frame containing 14 columns: row, col, season, start, end,

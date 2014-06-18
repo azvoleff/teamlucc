@@ -4,12 +4,13 @@
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
 auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, dem_path = NULL,
-  aoi = NULL, output_path = NULL, n_cpus = 1, cleartmp = FALSE,
-  overwrite = FALSE, notify = print, verbose = FALSE)
+  aoi = NULL, output_path = NULL, mask_type = "fmask",
+  mask_output = FALSE, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
+  notify = print, verbose = FALSE)
 }
 \arguments{
-\item{image_dirs}{list of paths to a set of Landsat CDR image files in ENVI
-format as output by the \code{unstack_ledapscdr} function.}
+\item{image_dirs}{list of paths to a set of Landsat CDR image files in HDF
+format}
 
 \item{prefix}{string to use as a prefix for all filenames}
 
@@ -25,6 +26,16 @@ output. Must be in a projected coordinate system.}
 
 \item{output_path}{the path to use for the output (optional - if NULL then
 output images will be saved alongside the input images in the same folder).}
+
+\item{mask_type}{which cloud mask to use to mask clouds when performing
+topographic correction. Can be one of "fmask", "6S", or "both".  See
+Details.  (Ignored if \code{tc=FALSE)}.}
+
+\item{mask_output}{if \code{TRUE}, cloud, cloud shadow, and fill areas
+(SLC-off gaps and areas with no data) will be set to \code{NA} in the
+output. Note this setting affects the final output file only - cloud, cloud
+shadow, and gap areas are masked out of the image during topographic
+correction regardless of the value of \code{mask_output}.}
 
 \item{n_cpus}{the number of CPUs to use for processes that can run in
 parallel}
@@ -50,10 +61,29 @@ missing data and clouds out of the CDR tiles, and perform topographic
 correction.
 }
 \details{
+\code{mask_type} chooses the cloud mask to use if topographic correction is
+performed (\code{tc=TRUE}). The mask can be one of three different options:
+"6S", "fmask", or "combined". Each option uses a different combination of
+cloud mask layers from the CDR product. The "6S" masks out any areas coded
+as fill (fill_QA=255), cloud (cloud_QA=255), cloud shadow
+(cloud_shadow_QA=255) or adjacent to cloud (adjacent_cloud_QA=255). The
+"fmask" option masks out any areas coded as fill (fmask=255), cloud
+(fmask=4) or cloud shadow (fmask=2).  The combined option combines the "6S"
+and "fmask" approaches to masks out areas coded as fill, cloud, cloud
+shadow, or adjacent to cloud using either method.
+
+\tabular{6S}{
+    Nodata               \tab 0 \cr
+    Forest               \tab 1 \cr
+    Non-forest           \tab 2 \cr
+    Forest loss          \tab 3 \cr
+    Forest gain          \tab 4 \cr
+    Forest loss and gain \tab 5 \cr
+    Water                \tab 6 \cr
+}
+
 Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}}
-should be used to extract the original zipfiles supplied by USGS.
-\code{\link{unstack_ledapscdr}} should then be used to unstack the HDF
-format files and convert them into ENVI binary format. To perform
+should be used to extract the original zipfiles supplied by USGS. To perform
 topographic correction with \code{auto_preprocess_landsat}, first run
 \code{\link{auto_setup_dem}} to preprocess a set of DEM tiles. Then run
 \code{auto_preprocess_landsat} with the \code{tc=TRUE} option.

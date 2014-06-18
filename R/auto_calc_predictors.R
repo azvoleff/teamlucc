@@ -49,13 +49,13 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             # Choose between cloud filled, gap filled, or original files, 
             # depending on what is available
             poss_files <- c(file.path(image_dir, paste0(image_basename, 
-                                                        '_cf_gf.envi')),
+                                                        '_cf_gf.tif')),
                             file.path(image_dir, paste0(image_basename, 
-                                                        '_gf.envi')),
+                                                        '_gf.tif')),
                             file.path(image_dir, paste0(image_basename, 
-                                                        '_cf.envi')),
+                                                        '_cf.tif')),
                             file.path(image_dir, paste0(image_basename, 
-                                                        '.envi')))
+                                                        '.tif')))
             exist_files <- unlist(lapply(poss_files, file.exists))
             if (sum(exist_files) > 1) {
                 stop(paste('multiple file versions exist for', image_basename))
@@ -77,10 +77,10 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             }
 
             dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
-                                                       wrsrow, '.envi'))
+                                                       wrsrow, '.tif'))
             image_basename_nosuffix <- gsub('_tc', '', image_basename)
             mask_stack_file <- file.path(image_dir,
-                                         paste(image_basename_nosuffix, 'masks.envi', 
+                                         paste(image_basename_nosuffix, 'masks.tif', 
                                                sep='_'))
             mask_stack <- brick(mask_stack_file)
             image_mask <- calc(mask_stack[[2]], function(maskvals) {
@@ -92,7 +92,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             # Calculate additional predictor layers (MSAVI and textures)
             timer <- start_timer(timer, label=paste(image_basename, '-', 'MSAVI2'))
             MSAVI2_filename <- file.path(this_output_path,
-                                         paste(image_basename, 'MSAVI2.envi', 
+                                         paste(image_basename, 'MSAVI2.tif', 
                                                sep='_'))
             MSAVI2_layer <- MSAVI2(red=raster(image_stack, layer=3),
                                    nir=raster(image_stack, layer=4))
@@ -108,7 +108,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             timer <- start_timer(timer, label=paste(image_basename, '-', 'glcm'))
             MSAVI2_glcm_filename <- file.path(this_output_path,
                                               paste(image_basename, 
-                                                    'MSAVI2_glcm.envi', 
+                                                    'MSAVI2_glcm.tif', 
                                                     sep='_'))
             glcm_statistics <- c('mean', 'variance', 'homogeneity', 'contrast', 
                                  'dissimilarity', 'entropy', 'second_moment', 
@@ -129,12 +129,12 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
             timer <- start_timer(timer, label=paste(image_basename, '-', 'process dem and slopeaspect'))
 
             dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
-                                                       wrsrow, '.envi'))
+                                                       wrsrow, '.tif'))
             dem <- raster(dem_filename)
 
             slopeaspect_filename <- file.path(dem_path,
                                               paste0('slopeaspect_', wrspath, 
-                                                     '-', wrsrow, '.envi'))
+                                                     '-', wrsrow, '.tif'))
             slopeaspect <- brick(slopeaspect_filename)
             names(slopeaspect) <- c('slope', 'aspect')
             # Classify aspect into north facing, east facing, etc., recalling 
@@ -168,7 +168,7 @@ auto_calc_predictors <- function(image_dirs, dem_path, output_path=NULL,
                                 aspect_cut)
             predictors_filename <- file.path(this_output_path,
                                              paste(image_basename, 
-                                                   'predictors.envi', sep='_'))
+                                                   'predictors.tif', sep='_'))
 
             predictors <- mask(predictors, image_mask, maskvalue=1, 
                                filename=predictors_filename, 
