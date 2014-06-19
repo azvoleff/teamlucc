@@ -56,10 +56,10 @@ pct_clouds <- function(cloud_mask) {
 #' reflectance as output by \code{unstack_ledaps} or 
 #' \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also 
 #' run with tc=FALSE).
-#' @param ext file extension to use when searching for input rasters, and when 
-#' saving output rasters. Should match file extension of input rasters (and 
-#' should most likely match the value chosen for \code{ext} when 
-#' \code{auto_preprocess_landsat} was run).
+#' @param ext file extension to use when searching for input rasters and when 
+#' saving output rasters (determines output file format). Should match file 
+#' extension of input rasters (and should most likely match the value chosen 
+#' for \code{ext} when \code{auto_preprocess_landsat} was run).
 #' @param sensors choose the sensors to include when selecting images (useful 
 #' for excluding images from a particular satellite if desired). Can be any of 
 #' "L4T", "L5T", "L7E", and/or "L8E".
@@ -103,6 +103,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     if (!all(sensors %in% c('L4T', 'L5T', 'L7E', 'L8E'))) {
         stop('"sensors" must be a list of one or more of: "L4T", "L5T", "L7E", "L8E"')
     }
+
+    ext <- gsub('^[.]', '', ext)
 
     log_file <- file(paste0(file_path_sans_ext(out_name), '_log.txt'), open="wt")
     msg <- function(txt) {

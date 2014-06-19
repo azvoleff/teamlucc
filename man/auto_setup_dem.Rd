@@ -23,8 +23,9 @@ generating this list. \code{dem_extents} must have a "filename" column.}
 \item{of}{output format to use when saving output rasters. See description
 of \code{of} in \code{\link{gdalwarp}}.}
 
-\item{ext}{file extension to use when saving output rasters. Should match
-expected file extension for output format chosen by \code{of}.}
+\item{ext}{file extension to use when saving output rasters (determines
+output file format). Should match file extension for output format chosen by
+\code{of}.}
 
 \item{n_cpus}{the number of CPUs to use for processes that can run in
 parallel}

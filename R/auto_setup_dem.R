@@ -28,8 +28,9 @@
 #' generating this list. \code{dem_extents} must have a "filename" column.
 #' @param of output format to use when saving output rasters. See description 
 #' of \code{of} in \code{\link{gdalwarp}}.
-#' @param ext file extension to use when saving output rasters. Should match 
-#' expected file extension for output format chosen by \code{of}.
+#' @param ext file extension to use when saving output rasters (determines 
+#' output file format). Should match file extension for output format chosen by 
+#' \code{of}.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -52,6 +53,8 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, of="GTiff",
         stop('aoi should be a SpatialPolygonsDataFrame of length 1')
     }
     stopifnot(is.projected(aoi))
+
+    ext <- gsub('^[.]', '', ext)
 
     timer <- Track_time(notify)
 

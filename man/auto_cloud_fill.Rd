@@ -38,10 +38,10 @@ reflectance as output by \code{unstack_ledaps} or
 \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also
 run with tc=FALSE).}
 
-\item{ext}{file extension to use when searching for input rasters, and when
-saving output rasters. Should match file extension of input rasters (and
-should most likely match the value chosen for \code{ext} when
-\code{auto_preprocess_landsat} was run).}
+\item{ext}{file extension to use when searching for input rasters and when
+saving output rasters (determines output file format). Should match file
+extension of input rasters (and should most likely match the value chosen
+for \code{ext} when \code{auto_preprocess_landsat} was run).}
 
 \item{sensors}{choose the sensors to include when selecting images (useful
 for excluding images from a particular satellite if desired). Can be any of

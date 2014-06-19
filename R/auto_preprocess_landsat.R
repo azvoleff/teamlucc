@@ -105,8 +105,9 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' will be raised)
 #' @param of output format to use when saving output rasters. See description 
 #' of \code{of} in \code{\link{gdalwarp}}.
-#' @param ext file extension to use when saving output rasters. Should match 
-#' expected file extension for output format chosen by \code{of}.
+#' @param ext file extension to use when saving output rasters (determines 
+#' output file format). Should match file extension for output format chosen by 
+#' \code{of}.
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.

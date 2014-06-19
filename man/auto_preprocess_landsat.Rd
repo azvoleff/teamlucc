@@ -48,8 +48,9 @@ will be raised)}
 \item{of}{output format to use when saving output rasters. See description
 of \code{of} in \code{\link{gdalwarp}}.}
 
-\item{ext}{file extension to use when saving output rasters. Should match
-expected file extension for output format chosen by \code{of}.}
+\item{ext}{file extension to use when saving output rasters (determines
+output file format). Should match file extension for output format chosen by
+\code{of}.}
 
 \item{notify}{notifier to use (defaults to \code{print} function). See the
 \code{notifyR} package for one way of sending notifications from R. The
