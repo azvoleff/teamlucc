@@ -4,9 +4,9 @@
 \title{Automated removal of clouds using Xiaolin Zhu's NSPI algorithm}
 \usage{
 auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, out_name,
-  base_date = NULL, tc = TRUE, sensors = c("L4T", "L5T", "L7E", "L8E"),
-  threshold = 1, max_iter = 5, n_cpus = 1, notify = print,
-  verbose = 1, overwrite = FALSE, ...)
+  base_date = NULL, tc = TRUE, ext = "tif", sensors = c("L4T", "L5T",
+  "L7E", "L8E"), threshold = 1, max_iter = 5, n_cpus = 1,
+  notify = print, verbose = 1, overwrite = FALSE, ...)
 }
 \arguments{
 \item{data_dir}{folder where input images are located, with filenames as
@@ -37,6 +37,11 @@ filled image will be saved with the same name, with the added suffix
 reflectance as output by \code{unstack_ledaps} or
 \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also
 run with tc=FALSE).}
+
+\item{ext}{file extension to use when searching for input rasters and when
+saving output rasters (determines output file format). Should match file
+extension of input rasters (and should most likely match the value chosen
+for \code{ext} when \code{auto_preprocess_landsat} was run).}
 
 \item{sensors}{choose the sensors to include when selecting images (useful
 for excluding images from a particular satellite if desired). Can be any of

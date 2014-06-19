@@ -16,7 +16,7 @@
 #' coded as 1, and all other values coded as 0 (optional)
 #' @param method the regression method to use (must be a method recognized by 
 #' \code{lmodel2}
-#' @param size the number pixels to use in developing the model
+#' @param size the number of pixels to use in developing the model
 #' @return a \code{Raster*} of \code{y} normalized to \code{x}
 #' @examples
 #' L5TSR_2001_normed_1 <- normalize(L5TSR_1986, L5TSR_2001)

@@ -3,8 +3,9 @@
 \alias{auto_setup_dem}
 \title{Setup the DEM mosaic for a given AOI}
 \usage{
-auto_setup_dem(aoi, output_path, dem_extents, n_cpus = 1, overwrite = FALSE,
-  crop_to_aoi = FALSE, notify = print, verbose = FALSE)
+auto_setup_dem(aoi, output_path, dem_extents, of = "GTiff", ext = "tif",
+  n_cpus = 1, overwrite = FALSE, crop_to_aoi = FALSE, notify = print,
+  verbose = FALSE)
 }
 \arguments{
 \item{aoi}{area of interest (AOI), as a \code{SpatialPolygonsDataFrame}, to
@@ -18,6 +19,13 @@ projected coordinate system.}
 filenames for a set of locally available DEM raster(s) that cover the
 \code{aoi}. See the \code{\link{get_extent_polys}} function for one means of
 generating this list. \code{dem_extents} must have a "filename" column.}
+
+\item{of}{output format to use when saving output rasters. See description
+of \code{of} in \code{\link{gdalwarp}}.}
+
+\item{ext}{file extension to use when saving output rasters (determines
+output file format). Should match file extension for output format chosen by
+\code{of}.}
 
 \item{n_cpus}{the number of CPUs to use for processes that can run in
 parallel}

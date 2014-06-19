@@ -26,6 +26,11 @@
 #' filenames for a set of locally available DEM raster(s) that cover the 
 #' \code{aoi}. See the \code{\link{get_extent_polys}} function for one means of 
 #' generating this list. \code{dem_extents} must have a "filename" column.
+#' @param of output format to use when saving output rasters. See description 
+#' of \code{of} in \code{\link{gdalwarp}}.
+#' @param ext file extension to use when saving output rasters (determines 
+#' output file format). Should match file extension for output format chosen by 
+#' \code{of}.
 #' @param n_cpus the number of CPUs to use for processes that can run in 
 #' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
@@ -37,9 +42,9 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages and timing 
 #' information
-auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1, 
-                           overwrite=FALSE, crop_to_aoi=FALSE, notify=print, 
-                           verbose=FALSE) {
+auto_setup_dem <- function(aoi, output_path, dem_extents, of="GTiff", 
+                           ext='tif', n_cpus=1, overwrite=FALSE, 
+                           crop_to_aoi=FALSE, notify=print, verbose=FALSE) {
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
@@ -48,6 +53,8 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         stop('aoi should be a SpatialPolygonsDataFrame of length 1')
     }
     stopifnot(is.projected(aoi))
+
+    ext <- gsub('^[.]', '', ext)
 
     timer <- Track_time(notify)
 
@@ -112,11 +119,11 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         ######################################################################
         # Mosaic DEMs
         if (verbose) timer <- start_timer(timer, label='Mosaicking DEMs')
-        mosaic_file <- extension(rasterTmpFile(), '.tif')
+        mosaic_file <- extension(rasterTmpFile(), ext)
         # Calculate minimum bounding box coordinates:
         mosaic_te <- as.numeric(bbox(pathrows_buffered))
         # Use mosaic_rasters from gdalUtils for speed:
-        mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of="GTiff", 
+        mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of=of, 
                        overwrite=overwrite)
         dem_mosaic <- raster(mosaic_file)
         if (verbose) timer <- stop_timer(timer, label='Mosaicking DEMs')
@@ -149,12 +156,12 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
         # Calculate minimum bounding box coordinates:
         dem_mosaic_crop_filename <- file.path(output_path,
                                          paste0('dem_', pathrow_label, 
-                                                '.tif'))
+                                                '.', ext))
         dem_mosaic_crop <- gdalwarp(mosaic_file, 
                                     dstfile=dem_mosaic_crop_filename,
                                     te=dem_te, t_srs=to_srs, tr=to_res, 
                                     r='cubicspline', output_Raster=TRUE, 
-                                    multi=TRUE, of="GTiff",
+                                    multi=TRUE, of=of,
                                     wo=paste0("NUM_THREADS=", n_cpus), 
                                     overwrite=overwrite)
         if (verbose) timer <- stop_timer(timer,
@@ -165,7 +172,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, n_cpus=1,
                                                 pathrow_label))
         slopeaspect_filename <- file.path(output_path,
                                           paste0('slopeaspect_',
-                                                 pathrow_label, '.tif'))
+                                                 pathrow_label, '.', ext))
         # Note that the default output of 'terrain' is in radians
         slopeaspect <- terrain(dem_mosaic_crop, opt=c('slope', 'aspect'))
         slopeaspect$aspect <- calc(slopeaspect$aspect, fun=function(vals) {

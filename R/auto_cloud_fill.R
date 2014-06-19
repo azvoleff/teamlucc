@@ -56,6 +56,10 @@ pct_clouds <- function(cloud_mask) {
 #' reflectance as output by \code{unstack_ledaps} or 
 #' \code{auto_preprocess_landsat} (if \code{auto_preprocess_landsat} was also 
 #' run with tc=FALSE).
+#' @param ext file extension to use when searching for input rasters and when 
+#' saving output rasters (determines output file format). Should match file 
+#' extension of input rasters (and should most likely match the value chosen 
+#' for \code{ext} when \code{auto_preprocess_landsat} was run).
 #' @param sensors choose the sensors to include when selecting images (useful 
 #' for excluding images from a particular satellite if desired). Can be any of 
 #' "L4T", "L5T", "L7E", and/or "L8E".
@@ -83,7 +87,7 @@ pct_clouds <- function(cloud_mask) {
 #' in Landsat images.  Geoscience and Remote Sensing Letters, IEEE 9, 521--525.  
 #' doi:10.1109/LGRS.2011.2173290
 auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
-                            out_name, base_date=NULL, tc=TRUE,
+                            out_name, base_date=NULL, tc=TRUE, ext='tif',
                             sensors=c('L4T', 'L5T', 'L7E', 'L8E'),
                             threshold=1, max_iter=5, n_cpus=1, notify=print, 
                             verbose=1, overwrite=FALSE, ...) {
@@ -94,12 +98,24 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         stop('output folder does not exist')
     }
     if (file_test('-f', out_name) & !overwrite) {
-        stop('output file already exists - use a different "out_name"')
+        stop('out_name already exists')
     }
     if (!all(sensors %in% c('L4T', 'L5T', 'L7E', 'L8E'))) {
         stop('"sensors" must be a list of one or more of: "L4T", "L5T", "L7E", "L8E"')
     }
-    timer <- Track_time(notify)
+
+    ext <- gsub('^[.]', '', ext)
+
+    log_file <- file(paste0(file_path_sans_ext(out_name), '_log.txt'), open="wt")
+    msg <- function(txt) {
+        cat(paste0(txt, '\n'), file=log_file, append=TRUE)
+        print(txt)
+    }
+
+    mask_out_name <- paste0(file_path_sans_ext(out_name), '_masks', 
+                            extension(out_name))
+
+    timer <- Track_time(msg)
     timer <- start_timer(timer, label='Cloud fill')
 
     stopifnot(class(start_date) == 'Date')
@@ -115,9 +131,9 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     date_re <-"((19)|(2[01]))[0-9]{2}-[0123][0-9]{2}"
     sensor_re <- paste0('(', paste0(paste0('(', sensors,')'), collapse='|'), ')', "SR")
     if (tc) {
-        suffix_re <- '_tc.tif$'
+        suffix_re <- paste0('_tc.', ext, '$')
     } else {
-        suffix_re <- '.tif$'
+        suffix_re <- paste0('.', ext, '$')
     }
     file_re <- paste0(prefix_re, paste(pathrow_re, date_re, sensor_re, 
                                        sep='_'), suffix_re)
@@ -139,20 +155,31 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     }
 
     if (verbose > 0) {
-        notify(paste('Found', length(img_files), 'image(s)'))
+        msg(paste('Found', length(img_files), 'image(s)'))
         timer <- start_timer(timer, label='Analyzing cloud cover in input images')
     }
     # Run QA stats
-    masks <- list()
+    fmasks <- list()
+    fill_QAs <- list()
     imgs <- list()
     for (img_file in img_files) {
-        masks_file <- gsub(suffix_re, '_masks.tif', img_file)
-        this_mask <- raster(masks_file, band=2)
-        masks <- c(masks, this_mask)
+        masks_file <- paste0(file_path_sans_ext(img_file), '_masks.', ext)
+        if (!file_test('-f', masks_file)) {
+            masks_file <- gsub(suffix_re, paste0('_masks.', ext), img_file)
+            if (file_test('-f', masks_file)) {
+                warning('using masks file with old format (pre v0.5) teamlucc naming')
+            } else {
+                stop('could not find masks file')
+            }
+        }
+        this_fill_QA <- raster(masks_file, band=1)
+        fill_QAs <- c(fill_QAs, this_fill_QA)
+        this_fmask <- raster(masks_file, band=2)
+        fmasks <- c(fmasks, this_fmask)
         this_img <- stack(img_file)
         imgs <- c(imgs, stack(this_img))
     }
-    freq_table <- freq(stack(masks), useNA='no', merge=TRUE)
+    freq_table <- freq(stack(fmasks), useNA='no', merge=TRUE)
     # Convert frequency table to fractions
     freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
     if (verbose > 0) {
@@ -180,6 +207,11 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
     }
 
+    # Save the original base image fmask so it can be used to recode the final 
+    # cloud mask at the end of cloud filling
+    base_fmask <- fmasks[[base_img_index]]
+    base_fill_QA <- fill_QAs[[base_img_index]]
+
     # Convert masks to indicate: 0 = clear; 1 = cloud or shadow; 2 = fill
     #
     #   fmask_band key:
@@ -203,15 +235,15 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         ret[(ret != 1) & (ret != 2) & is.na(img)] <- NA
         return(ret)
     }
-    for (n in 1:length(masks)) {
-        masks[n] <- overlay(masks[[n]], imgs[[n]][[1]], fun=calc_cloud_mask, 
-                            datatype=dataType(masks[[n]]))
+    for (n in 1:length(fmasks)) {
+        fmasks[n] <- overlay(fmasks[[n]], imgs[[n]][[1]], fun=calc_cloud_mask, 
+                            datatype=dataType(fmasks[[n]]))
     }
 
     base_img <- imgs[[base_img_index]]
     imgs <- imgs[-base_img_index]
-    base_mask <- masks[[base_img_index]]
-    masks <- masks[-base_img_index]
+    base_mask <- fmasks[[base_img_index]]
+    fmasks <- fmasks[-base_img_index]
 
     base_img_date <- img_dates[base_img_index]
     img_dates <- img_dates[-base_img_index]
@@ -235,8 +267,9 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }, datatype=dataType(base_img[[1]]))
 
     cur_pct_clouds <- pct_clouds(base_mask)
+
     if (verbose > 0) {
-        notify(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover before fill'))
+        msg(paste0('Base image has ', round(cur_pct_clouds, 2), '% cloud cover before fill'))
     }
 
     if (verbose > 0) {
@@ -262,7 +295,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # due to cloud contamination. Areas coded 1 are missing due to cloud or 
         # shadow in the base image and are available in the merge image. This 
         # will return a stack with number of layers equal to number of masks.
-        fill_areas <- overlay(base_mask, stack(masks),
+        fill_areas <- overlay(base_mask, stack(fmasks),
             fun=function(base_mask_vals, fill_mask_vals) {
                 ret <- rep(NA, length(base_mask_vals))
                 # Code cloudy in base, clear in fill as 1
@@ -290,14 +323,14 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         fill_img_index <- which(fill_areas_freq[avail_fill_row, ] == 
                                 max(fill_areas_freq[avail_fill_row, ]))
         if (fill_areas_freq[avail_fill_row, fill_img_index] == 0) {
-            notify(paste('No fill pixels available. Stopping fill.'))
+            msg(paste('No fill pixels available. Stopping fill.'))
             break
         }
 
         fill_img <- imgs[[fill_img_index]]
         imgs <- imgs[-fill_img_index]
         base_img_mask <- fill_areas[[fill_img_index]]
-        masks <- masks[-fill_img_index]
+        fmasks <- fmasks[-fill_img_index]
         fill_img_date <- img_dates[fill_img_index]
         img_dates <- img_dates[-fill_img_index]
 
@@ -308,7 +341,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         dataType(base_img_mask) <- 'INT2S'
 
         if (verbose > 0) {
-            notify(paste0('Filling image from ', base_img_date,
+            msg(paste0('Filling image from ', base_img_date,
                           ' with image from ', fill_img_date, '.'))
             timer <- start_timer(timer, label="Performing fill")
         }
@@ -320,8 +353,6 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         }
 
         # Revise base mask to account for newly filled pixels
-        mask_out_name <- paste0(file_path_sans_ext(out_name), '_mask', 
-                                extension(out_name))
         base_mask <- overlay(base_mask, base_img[[1]],
             fun=function(mask_vals, filled_vals) {
                 mask_vals[(mask_vals == 1) & (filled_vals != 0)] <- 0
@@ -331,7 +362,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
         cur_pct_clouds <- pct_clouds(base_mask)
         if (verbose > 0) {
-            notify(paste0('Base image has ', round(cur_pct_clouds, 2),
+            msg(paste0('Base image has ', round(cur_pct_clouds, 2),
                           '% cloud cover remaining'))
             timer <- stop_timer(timer, label=paste('Fill iteration', n + 1))
         }
@@ -340,7 +371,40 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         n <- n + 1
     }
 
+    # Recode base mask so final coding matches that of fmask (though cloud and 
+    # cloud shadow are no longer differentiated)
+    #   fmask_band key:
+    #       0 = clear
+    #       1 = water
+    #       2 = cloud_shadow
+    #       3 = snow
+    #       4 = cloud
+    #       255 = fill value
+    #   base_mask key:
+    #   	0 = clear
+    #   	1 = cloud
+    #   	2 = fill
+    filled_fmask <- overlay(base_mask, base_fmask,
+        fun=function(after_fill, before_fill) {
+            ret <- after_fill
+            # Code clear after filling but water in fmask as water (1 in fmask)
+            ret[(after_fill == 0) & (before_fill == 1)] <- 1
+            # Code clear after filling but snow in fmask as snow (3 in fmask)
+            ret[(after_fill == 0) & (before_fill == 3)] <- 3
+            # Code cloudy after filling as cloud (4 in fmask)
+            ret[after_fill == 1] <- 4
+            # Code gap in fmask as gap (3 in fmask)
+            ret[before_fill == 255] <- 255
+            return(ret)
+        }, datatype=dataType(base_mask))
+    final_masks <- stack(base_fill_QA, filled_fmask)
+    names(final_masks) <- c("fill_QA", "fmask")
+    final_masks <- writeRaster(final_masks, datatype=dataType(base_mask), 
+                               filename=mask_out_name, overwrite=TRUE)
+
     timer <- stop_timer(timer, label='Cloud fill')
 
-    return(list(filled=base_img, mask=base_mask))
+    close(log_file)
+
+    return(list(filled=base_img, mask=final_masks))
 }

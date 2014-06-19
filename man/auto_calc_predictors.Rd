@@ -3,17 +3,24 @@
 \alias{auto_calc_predictors}
 \title{Calculate predictor layers for a classification}
 \usage{
-auto_calc_predictors(image_dirs, dem_path, output_path = NULL,
-  cleartmp = FALSE, overwrite = FALSE, notify = print)
+auto_calc_predictors(x, wrspath, wrsrow, dem_path, output_path = NULL,
+  ext = "tif", cleartmp = FALSE, overwrite = FALSE, notify = print)
 }
 \arguments{
-\item{image_dirs}{list of paths to a set of Landsat images that have been
-preprocessed by the \code{auto_preprocess_landsat} function.}
+\item{x}{path to a preprocessed image as output by
+\code{auto_preprocess_landsat} or \code{auto_cloud_fill}.}
+
+\item{wrspath}{World Reference System (WRS) path}
+
+\item{wrsrow}{World Reference System (WRS) row}
 
 \item{dem_path}{path to a set of DEMs as output by \code{auto_setup_dem}}
 
 \item{output_path}{the path to use for the output (optional - if NULL then
 output images will be saved alongside the input images in the same folder).}
+
+\item{ext}{file extension to use when saving output rasters (determines
+output file format).}
 
 \item{cleartmp}{whether to clear temp files on each run through the loop}
 
@@ -25,6 +32,40 @@ will be raised)}
 \code{notify} function should accept a string as the only argument.}
 }
 \description{
-Calculate predictor layers for a classification
+This function automates the calculation of a layer stack of predictor layers
+to use in a land use and/or land cover classification. See Details for the
+output layers.
+}
+\details{
+The layers in the output layer stack are listed below. Note that all the
+layers are rescaled so that they range between -32,767 and 32,767 (allowing
+them to be stored as 16 bit unsigned integers).
+
+\bold{Predictor layer stack:}
+\tabular{ll}{
+    Layer 1: \tab Band 1 reflectance \cr
+    Layer 2: \tab Band 2 reflectance \cr
+    Layer 3: \tab Band 3 reflectance \cr
+    Layer 4: \tab Band 4 reflectance \cr
+    Layer 5: \tab Band 5 reflectance \cr
+    Layer 6: \tab Band 7 reflectance \cr
+    Layer 7: \tab MSAVI2 \cr
+    Layer 8: \tab GLCM mean (from MSAVI2) \cr
+    Layer 9: \tab GLCM variance (from MSAVI2) \cr
+    Layer 10: \tab GLCM dissimilarity (from MSAVI2) \cr
+    Layer 11: \tab Elevation \cr
+    Layer 12: \tab Slope (radians X 10000) \cr
+    Layer 13: \tab Aspect (see below) \cr
+}
+
+The aspect is recoded as:
+
+\bold{Aspect coding:}
+\tabular{ll}{
+    1: \tab north facing (0-45 degrees, 315-360 degrees) \cr
+    2: \tab east facing (45-135 degrees) \cr
+    3: \tab south facing (135-225 degrees) \cr
+    4: \tab west facing (225-315 degrees) \cr
+}
 }
 
