@@ -1,36 +1,38 @@
 #' Calculate predictor layers for a classification
 #'
 #' This function automates the calculation of a layer stack of predictor layers 
-#' to use in a land use and/or land cover classification. The layers in the 
-#' output layer stack are listed below. Note that all layers are rescaled so 
-#' they range between -32,767 and 32,767 so that they can be stored as 16 bit 
-#' unsigned integers.
+#' to use in a land use and/or land cover classification. See Details for the 
+#' output layers.
+#' 
+#' The layers in the output layer stack are listed below. Note that all the 
+#' layers are rescaled so that they range between -32,767 and 32,767 (allowing 
+#' them to be stored as 16 bit unsigned integers).
 #'
 #' \bold{Predictor layer stack:}
-#' \tabular{lc}{
-#'     Layer 1 \tab Band 1 reflectance \cr
-#'     Layer 2 \tab Band 2 reflectance \cr
-#'     Layer 3 \tab Band 3 reflectance \cr
-#'     Layer 4 \tab Band 4 reflectance \cr
-#'     Layer 5 \tab Band 5 reflectance \cr
-#'     Layer 6 \tab Band 7 reflectance \cr
-#'     Layer 7 \tab MSAVI2 \cr
-#'     Layer 8 \tab GLCM mean (from MSAVI2) \cr
-#'     Layer 9 \tab GLCM variance (from MSAVI2) \cr
-#'     Layer 10 \tab GLCM dissimilarity (from MSAVI2) \cr
-#'     Layer 11 \tab Elevation \cr
-#'     Layer 12 \tab Slope (radians X 10000) \cr
-#'     Layer 13 \tab Aspect (see below) \cr
+#' \tabular{ll}{
+#'     Layer 1: \tab Band 1 reflectance \cr
+#'     Layer 2: \tab Band 2 reflectance \cr
+#'     Layer 3: \tab Band 3 reflectance \cr
+#'     Layer 4: \tab Band 4 reflectance \cr
+#'     Layer 5: \tab Band 5 reflectance \cr
+#'     Layer 6: \tab Band 7 reflectance \cr
+#'     Layer 7: \tab MSAVI2 \cr
+#'     Layer 8: \tab GLCM mean (from MSAVI2) \cr
+#'     Layer 9: \tab GLCM variance (from MSAVI2) \cr
+#'     Layer 10: \tab GLCM dissimilarity (from MSAVI2) \cr
+#'     Layer 11: \tab Elevation \cr
+#'     Layer 12: \tab Slope (radians X 10000) \cr
+#'     Layer 13: \tab Aspect (see below) \cr
 #' }
 #'
 #' The aspect is recoded as:
 #'
 #' \bold{Aspect coding:}
-#' \tabular{lc}{
-#'     1 \tab north facing (0-45 degrees, 315-360 degrees) \cr
-#'     2 \tab east facing (45-135 degrees) \cr
-#'     3 \tab south facing (135-225 degrees) \cr
-#'     4 \tab west facing (225-315 degrees) \cr
+#' \tabular{ll}{
+#'     1: \tab north facing (0-45 degrees, 315-360 degrees) \cr
+#'     2: \tab east facing (45-135 degrees) \cr
+#'     3: \tab south facing (135-225 degrees) \cr
+#'     4: \tab west facing (225-315 degrees) \cr
 #' }
 #' @export
 #' @importFrom glcm glcm
