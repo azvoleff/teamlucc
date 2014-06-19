@@ -6,7 +6,7 @@
 auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, dem_path = NULL,
   aoi = NULL, output_path = NULL, mask_type = "fmask",
   mask_output = FALSE, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
-  notify = print, verbose = FALSE)
+  of = "GTiff", ext = "tif", notify = print, verbose = FALSE)
 }
 \arguments{
 \item{image_dirs}{list of paths to a set of Landsat CDR image files in HDF
@@ -45,6 +45,12 @@ parallel}
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
 
+\item{of}{output format to use when saving output rasters. See description
+of \code{of} in \code{\link{gdalwarp}}.}
+
+\item{ext}{file extension to use when saving output rasters. Should match
+expected file extension for output format chosen by \code{of}.}
+
 \item{notify}{notifier to use (defaults to \code{print} function). See the
 \code{notifyR} package for one way of sending notifications from R. The
 \code{notify} function should accept a string as the only argument.}
@@ -71,16 +77,6 @@ as fill (fill_QA=255), cloud (cloud_QA=255), cloud shadow
 (fmask=4) or cloud shadow (fmask=2).  The combined option combines the "6S"
 and "fmask" approaches to masks out areas coded as fill, cloud, cloud
 shadow, or adjacent to cloud using either method.
-
-\tabular{6S}{
-    Nodata               \tab 0 \cr
-    Forest               \tab 1 \cr
-    Non-forest           \tab 2 \cr
-    Forest loss          \tab 3 \cr
-    Forest gain          \tab 4 \cr
-    Forest loss and gain \tab 5 \cr
-    Water                \tab 6 \cr
-}
 
 Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}}
 should be used to extract the original zipfiles supplied by USGS. To perform

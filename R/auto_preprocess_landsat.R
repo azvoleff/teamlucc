@@ -67,17 +67,6 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' and "fmask" approaches to masks out areas coded as fill, cloud, cloud 
 #' shadow, or adjacent to cloud using either method.
 #'
-#' \tabular{6S}{
-#'     Nodata               \tab 0 \cr
-#'     Forest               \tab 1 \cr
-#'     Non-forest           \tab 2 \cr
-#'     Forest loss          \tab 3 \cr
-#'     Forest gain          \tab 4 \cr
-#'     Forest loss and gain \tab 5 \cr
-#'     Water                \tab 6 \cr
-#' }
-#'
-#'
 #' Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}} 
 #' should be used to extract the original zipfiles supplied by USGS. To perform 
 #' topographic correction with \code{auto_preprocess_landsat}, first run 
@@ -114,6 +103,10 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' @param cleartmp whether to clear temp files on each run through the loop
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
+#' @param of output format to use when saving output rasters. See description 
+#' of \code{of} in \code{\link{gdalwarp}}.
+#' @param ext file extension to use when saving output rasters. Should match 
+#' expected file extension for output format chosen by \code{of}.
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
@@ -125,7 +118,8 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                     dem_path=NULL, aoi=NULL, output_path=NULL, 
                                     mask_type='fmask', mask_output=FALSE, 
                                     n_cpus=1, cleartmp=FALSE,  overwrite=FALSE, 
-                                    notify=print, verbose=FALSE) {
+                                    of="GTiff", ext='tif', notify=print, 
+                                    verbose=FALSE) {
     if (tc && is.null(dem_path)) {
         stop('dem_path must be supplied if tc=TRUE')
     }
@@ -142,6 +136,8 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         stopifnot(is.projected(aoi))
     }
     stopifnot(mask_type %in% c('fmask', '6S', 'both'))
+
+    ext <- gsub('^[.]', '', ext)
 
     # Setup a regex to identify Landsat CDR images
     lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}.hdf$'
@@ -182,13 +178,13 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
 
         if (tc) {
             output_filename <- file.path(this_output_path,
-                                         paste(prefix, image_basename, 
-                                               'tc.tif', sep='_'))
+                                         paste0(prefix, '_', image_basename, 
+                                                '_tc.', ext))
         } else {
             # Skip topographic correction, so don't append _tc to filename
             output_filename <- file.path(this_output_path,
                                          paste0(prefix, '_', image_basename, 
-                                                '.tif'))
+                                                '.', ext))
         }
 
         log_file <- file(paste0(file_path_sans_ext(output_filename), '_log.txt'), open="wt")
@@ -238,22 +234,22 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         out_te <- as.numeric(bbox(crop_area))
         to_res <- c(30, 30)
 
-        image_stack_reproj_file <- extension(rasterTmpFile(), '.tif')
+        image_stack_reproj_file <- extension(rasterTmpFile(), ext)
         image_stack <- gdalwarp(band_vrt_file,
                                 dstfile=image_stack_reproj_file,
                                 te=out_te, t_srs=to_srs, tr=to_res, 
-                                r='cubicspline', output_Raster=TRUE, of="GTiff", 
+                                r='cubicspline', output_Raster=TRUE, of=of, 
                                 multi=TRUE, wo=paste0("NUM_THREADS=", n_cpus), 
                                 overwrite=overwrite)
         # Can't just directly assign image_bands as the names since the bands 
         # may have been read in different order from the HDF file
         names(image_stack) <- gsub('^:', '', str_extract(band_sds, ':[a-zA-Z0-9_]*$'))
 
-        mask_stack_reproj_file <- extension(rasterTmpFile(), '.tif')
+        mask_stack_reproj_file <- extension(rasterTmpFile(), paste0('.', ext))
         mask_stack <- gdalwarp(mask_vrt_file,
                                dstfile=mask_stack_reproj_file,
                                te=out_te, t_srs=to_srs, tr=to_res, 
-                               r='near', output_Raster=TRUE, of="GTiff", 
+                               r='near', output_Raster=TRUE, of=of, 
                                multi=TRUE, wo=paste0("NUM_THREADS=", n_cpus), 
                                overwrite=overwrite)
         # Can't just directly assign mask_bands as the names since the bands 
@@ -267,7 +263,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         if (verbose) timer <- start_timer(timer, label='calculating masks')
 
         mask_stack_path <- paste0(file_path_sans_ext(output_filename), 
-                                  '_masks.tif')
+                                  '_masks.', ext)
         mask_stack <- writeRaster(stack(mask_stack$fill_QA,
                                         mask_stack$fmask_band),
                                   filename=mask_stack_path, 
@@ -284,7 +280,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             # Load dem, slope, and aspect
             slopeaspect_filename <- file.path(dem_path,
                                               paste0('slopeaspect_', 
-                                                     WRS_Path, '-', WRS_Row, '.tif'))
+                                                     WRS_Path, '-', WRS_Row, '.', ext))
             slopeaspect <- brick(slopeaspect_filename)
 
             if (!proj4comp(proj4string(image_stack), proj4string(slopeaspect))) {
