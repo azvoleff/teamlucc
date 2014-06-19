@@ -266,8 +266,8 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         # Mask out clouds and missing values
         if (verbose) timer <- start_timer(timer, label='calculating masks')
 
-        mask_stack_path <- file.path(paste0(file_path_sans_ext(output_filename),
-                                            '_masks.tif', sep='_'))
+        mask_stack_path <- paste0(file_path_sans_ext(output_filename), 
+                                  '_masks.tif')
         mask_stack <- writeRaster(stack(mask_stack$fill_QA,
                                         mask_stack$fmask_band),
                                   filename=mask_stack_path, 
