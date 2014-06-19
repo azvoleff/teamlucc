@@ -143,8 +143,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
     }
     stopifnot(mask_type %in% c('fmask', '6S', 'both'))
 
-    timer <- Track_time(notify)
-
     # Setup a regex to identify Landsat CDR images
     lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}.hdf$'
 
@@ -176,6 +174,30 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         image_basename <- paste0(WRS_Path, '-', WRS_Row, '_',
                                  format(aq_date, '%Y-%j'), '_', short_name)
 
+        if (is.null(output_path)) {
+            this_output_path <- dirname(lndsr_file)
+        } else {
+            this_output_path  <- output_path
+        }
+
+        if (tc) {
+            output_filename <- file.path(this_output_path,
+                                         paste(prefix, image_basename, 
+                                               'tc.tif', sep='_'))
+        } else {
+            # Skip topographic correction, so don't append _tc to filename
+            output_filename <- file.path(this_output_path,
+                                         paste0(prefix, '_', image_basename, 
+                                                '.tif'))
+        }
+
+        log_file <- file(paste0(file_path_sans_ext(output_filename), '_log.txt'), open="wt")
+        msg <- function(txt) {
+            cat(paste0(txt, '\n'), file=log_file, append=TRUE)
+            print(txt)
+        }
+
+        timer <- Track_time(msg)
         timer <- start_timer(timer, label=paste('Preprocessing', image_basename))
 
         #######################################################################
@@ -194,12 +216,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         mask_sds <- sds[grepl(paste0(':(', paste(mask_bands, collapse='|'), ')$'), sds)]
         mask_vrt_file <- extension(rasterTmpFile(), '.vrt')
         gdalbuildvrt(mask_sds, mask_vrt_file, separate=TRUE, srcnodata='None')
-
-        if (is.null(output_path)) {
-            this_output_path <- dirname(lndsr_file)
-        } else {
-            this_output_path  <- output_path
-        }
 
         this_pathrow_poly <- pathrow_poly(as.numeric(WRS_Path), 
                                           as.numeric(WRS_Row))
@@ -253,9 +269,8 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
                                                              '-', 'calculating masks'))
 
-        mask_stack_path <- file.path(this_output_path,
-                                     paste(prefix, image_basename, 
-                                           'masks.tif', sep='_'))
+        mask_stack_path <- file.path(paste0(file_path_sans_ext(output_filename),
+                                            '_masks.tif', sep='_'))
         mask_stack <- writeRaster(stack(mask_stack$fill_QA,
                                         mask_stack$fmask_band),
                                   filename=mask_stack_path, 
@@ -308,9 +323,6 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                      raster(slopeaspect, layer=2) / 1000)
             sunelev <- 90 - as.numeric(get_gdalinfo_item('SolarZenith', lndsr_file_gdalinfo))
             sunazimuth <- as.numeric(get_gdalinfo_item('SolarAzimuth', lndsr_file_gdalinfo))
-            output_filename <- file.path(this_output_path,
-                                         paste(prefix, image_basename, 
-                                               'tc.tif', sep='_'))
             image_stack_tc <- topographic_corr(image_stack_masked, 
                                                slopeaspect_flt, sunelev, 
                                                sunazimuth, 
@@ -326,17 +338,14 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             
             if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
                                                                 '-', 'topocorr'))
-        } else {
-            # Skip topographic correction, so don't append _tc to filename
-            output_filename <- file.path(this_output_path,
-                                         paste0(prefix, '_', image_basename, 
-                                                '.tif'))
         }
 
         image_stack <- writeRaster(image_stack, filename=output_filename, 
                                    overwrite=overwrite, datatype='INT2S')
 
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
+
+        close(log_file)
 
         if (cleartmp) removeTmpFiles(h=1)
     }
