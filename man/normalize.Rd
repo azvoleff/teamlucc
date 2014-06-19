@@ -16,7 +16,7 @@ coded as 1, and all other values coded as 0 (optional)}
 \item{method}{the regression method to use (must be a method recognized by
 \code{lmodel2}}
 
-\item{size}{the number pixels to use in developing the model}
+\item{size}{the number of pixels to use in developing the model}
 }
 \value{
 a \code{Raster*} of \code{y} normalized to \code{x}
