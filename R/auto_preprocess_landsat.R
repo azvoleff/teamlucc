@@ -204,8 +204,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         # Crop and reproject images to match the projection being used for this 
         # image.  This is either the projection of the aoi (if aoi is 
         # supplied), or the UTM zone of the centroid of this path and row.
-        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
-                                                             '-', 'cropping and reprojecting'))
+        if (verbose) timer <- start_timer(timer, label='cropping and reprojecting')
 
         sds <- get_subdatasets(lndsr_file)
 
@@ -261,13 +260,11 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         # may have been read in different order from the HDF file
         names(mask_stack) <- gsub('^:', '', str_extract(mask_sds, ':[a-zA-Z0-9_]*$'))
 
-        if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
-                                                            '-', 'cropping and reprojecting'))
+        if (verbose) timer <- stop_timer(timer, label='cropping and reprojecting')
 
         ######################################################################
         # Mask out clouds and missing values
-        if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
-                                                             '-', 'calculating masks'))
+        if (verbose) timer <- start_timer(timer, label='calculating masks')
 
         mask_stack_path <- file.path(paste0(file_path_sans_ext(output_filename),
                                             '_masks.tif', sep='_'))
@@ -276,14 +273,12 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                   filename=mask_stack_path, 
                                   overwrite=overwrite, datatype='INT2S')
         names(mask_stack) <- c('fill_QA', 'fmask_band')
-        if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
-                                                            '-', 'calculating masks'))
+        if (verbose) timer <- stop_timer(timer, label='calculating masks')
 
         ######################################################################
         # Perform topographic correction if tc=TRUE
         if (tc) {
-            if (verbose) timer <- start_timer(timer, label=paste(image_basename, 
-                                                                 '-', 'topocorr'))
+            if (verbose) timer <- start_timer(timer, label='topocorr')
 
             ######################################################################
             # Load dem, slope, and aspect
@@ -336,8 +331,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             }
             image_stack <- image_stack_tc
             
-            if (verbose) timer <- stop_timer(timer, label=paste(image_basename, 
-                                                                '-', 'topocorr'))
+            if (verbose) timer <- stop_timer(timer, label='topocorr')
         }
 
         image_stack <- writeRaster(image_stack, filename=output_filename, 
