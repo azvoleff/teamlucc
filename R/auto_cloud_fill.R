@@ -395,8 +395,9 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             ret[before_fill == 255] <- 255
             return(ret)
         }, datatype=dataType(base_mask))
-    final_masks <- writeRaster(stack(fill_QA=base_fill_QA, fmask=filled_fmask), 
-                               datatype=dataType(base_mask), 
+    final_masks <- stack(base_fill_QA, filled_fmask)
+    names(final_masks) <- c("fill_QA", "fmask")
+    final_masks <- writeRaster(final_masks, datatype=dataType(base_mask), 
                                filename=mask_out_name, overwrite=TRUE)
 
     timer <- stop_timer(timer, label='Cloud fill')
