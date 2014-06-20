@@ -237,7 +237,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     }
     for (n in 1:length(fmasks)) {
         fmasks[n] <- overlay(fmasks[[n]], imgs[[n]][[1]], fun=calc_cloud_mask, 
-                            datatype=dataType(fmasks[[n]]))
+                             datatype=dataType(fmasks[[n]]))
     }
 
     base_img <- imgs[[base_img_index]]
