@@ -1,6 +1,4 @@
-#' Runs an image classification using a random forest classifier
-#'
-#' Currently only supports classification using a random forest
+#' Trains a random forest to classifier
 #'
 #' @export
 #' @import caret randomForest
@@ -24,39 +22,13 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
-#' @return a list with 3 elements: the trained classifier, the predicted classes 
-#' \code{RasterLayer} and the class probabilities \code{RasterBrick}
-#' @details Processing can be done in parallel using all using the cluster 
-#' facilities in the \code{spatial.tools} package. To enable clustering, call 
-#' \code{beginCluster} before running \code{classify_image_rf}.  To stop the 
-#' cluster when finished, call \code{endCluster}.
-#' @examples
-#' \dontrun{
-#' # Don't run long example
-#' set.seed(0)
-#' train_data_1986 <- get_pixels(L5TSR_1986, polys=L5TSR_1986_2001_training,
-#'                               class_col="class_1986", training=.7)
-#' L5TSR_1986_classified <- classify_image_rf(L5TSR_1986, train_data_1986)
-#'
-#' L5TSR_1986_classified$model
-#' plot(L5TSR_1986_classified$pred_classes)
-#' plot(L5TSR_1986_classified$pred_probs)
-#' accuracy(L5TSR_1986_classified$model)
-#' }
-classify_image_rf <- function(x, train_data, class_probs=TRUE, 
-                           use_training_flag=TRUE, 
-                           train_control=NULL, tune_grid=NULL, 
-                           use_rfe=FALSE, notify=print) {
-    cl <- options('rasterClusterObject')[[1]]
-    inparallel <- FALSE
-    if (!is.null(cl)) {
-        if (!require(doSNOW)) {
-            warning('Cluster object found, but "doSNOW" package is required to run training in parallel. Running sequentially.')
-        } else {
-            registerDoSNOW(cl)
-            inparallel <- TRUE
-        }
-    }
+#' @return a trained random forest model (as a \code{train} object from the  
+#' \code{caret} package)
+rf_train <- function(x, train_data, class_probs=TRUE, use_training_flag=TRUE, 
+                     train_control=NULL, tune_grid=NULL, use_rfe=FALSE) {
+    # Assign standardized layer names so different images can be used with the 
+    # same model
+    names(x) <- paste0('pred', seq(1:nlayers(x)))
 
     if (is.null(train_control)) {
         train_control <- trainControl(classProbs=class_probs)
@@ -106,31 +78,9 @@ classify_image_rf <- function(x, train_data, class_probs=TRUE,
                         training_flag=train_data@training_flag,
                         poly_ID=train_data@poly_ID)
 
-    notify('Training classifier...')
     model <- train(model_formula, data=train_data, method="rf",
                    preProc=c('range'), subset=train_data$training_flag,
                    trControl=train_control, tuneGrid=tune_grid)
 
-    notify('Predicting classes...')
-    n_classes <- length(levels(model))
-    if (inparallel) {
-        pred_classes <- clusterR(x, predict, args=list(model))
-    } else {
-        pred_classes <- predict(x, model)
-    }
-    names(pred_classes) <- 'cover'
-
-
-    if (class_probs) {
-        notify('Calculating class probabilities...')
-        if (inparallel) {
-            pred_probs <- clusterR(x, predict, args=list(model, type="prob", index=c(1:n_classes)))
-        } else {
-            pred_probs <- predict(x, model, type="prob", index=c(1:n_classes))
-        }
-    } else {
-        pred_probs <- NULL
-    }
-
-    return(list(model=model, pred_classes=pred_classes, pred_probs=pred_probs))
+    return(model)
 }
