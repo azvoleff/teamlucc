@@ -98,9 +98,9 @@ auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path=NULL,
     }
     mask_stack <- brick(mask_stack_file)
     image_mask <- calc(mask_stack[[2]], function(maskvals) {
-                       # Mask clouds, cloud shadow, and fill
-                       (maskvals == 2) | (maskvals == 4) | (maskvals == 255)
-                       })
+        # Mask clouds, cloud shadow, and fill
+        (maskvals == 2) | (maskvals == 4) | (maskvals == 255)
+    })
 
     ######################################################################
     # Calculate additional predictor layers (MSAVI and textures)
