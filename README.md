@@ -69,6 +69,7 @@ at the R command prompt. This will fecth the latest version of `devtools` from
 CRAN. After installing `devtools` type:
 
 ```R
+library(devtools)
 install_github('teamlucc', username='azvoleff')
 ```
 
