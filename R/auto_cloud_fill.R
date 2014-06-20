@@ -1,7 +1,7 @@
 pct_clouds <- function(cloud_mask) {
     num_clouds <- cellStats(cloud_mask == 1, stat='sum', na.rm=TRUE)
     num_clear <- cellStats(cloud_mask == 0, stat='sum', na.rm=TRUE)
-    return((num_clouds / num_clear) * 100)
+    return((num_clouds / (num_clouds + num_clear)) * 100)
 }
 
 #' Automated removal of clouds using Xiaolin Zhu's NSPI algorithm
