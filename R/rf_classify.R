@@ -23,23 +23,17 @@
 #' #TODO: Add example.
 rf_classify <- function(x, model, class_probs=TRUE, notify=print) {
     if (class_probs) {
-        pred_classes <- predict_rasterEngine(object=model, newdata=x, type='prob')
+        pred_probs <- predict_rasterEngine(object=model, newdata=x, 
+                                           type='prob')
+        names(pred_probs) <- levels(model)
+        # TODO: Need to calculate the index of the highest probability 
+        # prediction for each pixel and assign that value to the pred_classes 
+        # layer
     } else {
         pred_classes <- predict_rasterEngine(object=model, newdata=x)
-    }
-    names(pred_classes) <- 'prediction'
-
-    if (class_probs) {
-        notify('Calculating class probabilities...')
-        n_classes <- length(levels(model))
-        if (inparallel) {
-            pred_probs <- clusterR(x, predict, args=list(model, type="prob", index=c(1:n_classes)))
-        } else {
-            pred_probs <- predict(x, model, type="prob", index=c(1:n_classes))
-        }
-    } else {
         pred_probs <- NULL
     }
+    names(pred_classes) <- 'prediction'
 
     return(list(pred_classes=pred_classes, pred_probs=pred_probs))
 }
