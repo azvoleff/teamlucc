@@ -22,21 +22,16 @@
 #' @examples
 #' #TODO: Add example.
 rf_classify <- function(x, model, class_probs=TRUE, notify=print) {
-    # Assign standardized layer names to input image so that different images 
-    # can be used with the same model
-    names(x) <- paste0('pred', seq(1:nlayers(x)))
-
-    notify('Predicting classes...')
-    n_classes <- length(levels(model))
-    if (inparallel) {
-        pred_classes <- clusterR(x, predict, args=list(model))
+    if (class_probs) {
+        pred_classes <- predict_rasterEngine(object=model, newdata=x, type='prob')
     } else {
         pred_classes <- predict_rasterEngine(object=model, newdata=x)
     }
-    names(pred_classes) <- 'cover'
+    names(pred_classes) <- 'prediction'
 
     if (class_probs) {
         notify('Calculating class probabilities...')
+        n_classes <- length(levels(model))
         if (inparallel) {
             pred_probs <- clusterR(x, predict, args=list(model, type="prob", index=c(1:n_classes)))
         } else {

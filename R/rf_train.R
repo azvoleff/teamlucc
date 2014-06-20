@@ -26,10 +26,6 @@
 #' \code{caret} package)
 rf_train <- function(x, train_data, class_probs=TRUE, use_training_flag=TRUE, 
                      train_control=NULL, tune_grid=NULL, use_rfe=FALSE) {
-    # Assign standardized layer names so different images can be used with the 
-    # same model
-    names(x) <- paste0('pred', seq(1:nlayers(x)))
-
     if (is.null(train_control)) {
         train_control <- trainControl(classProbs=class_probs)
     }
