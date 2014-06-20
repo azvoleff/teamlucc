@@ -194,6 +194,16 @@ auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path,
                           'msavi_glcm_mean', 'msavi_glcm_variance', 
                           'msavi_glcm_dissimilarity', 'elev', 'slope', 
                           'aspect')
+
+    # Save a copy of the original masks file along with the predictors file, so 
+    # the masks can be easily located later.
+    predictors_mask_filename <- file.path(output_path,
+                                          paste0(image_basename, 
+                                                 '_predictors_masks.', ext))
+    mask_stack <- writeRaster(mask_stack, filename=predictors_mask_filename, 
+                              overwrite=overwrite, 
+                              datatype=dataType(mask_stack)[1])
+
     timer <- stop_timer(timer, label='Writing predictors')
 
     if (cleartmp) removeTmpFiles(h=1)
