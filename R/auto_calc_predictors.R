@@ -90,7 +90,7 @@ auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path,
 
     mask_stack_file <- paste0(file_path_sans_ext(x), '_masks.', ext)
     if (!file_test('-f', mask_stack_file)) {
-        mask_stack_file <- gsub(suffix_re, paste0('_masks.', ext), x)
+        mask_stack_file <- gsub(paste0('(_tc)?.', ext, '$'), paste0('_masks.', ext), x)
         if (file_test('-f', mask_stack_file)) {
             warning('using masks file with old format (pre v0.5) teamlucc naming')
         } else {
