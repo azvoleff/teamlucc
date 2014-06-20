@@ -7,14 +7,12 @@
 The `teamlucc` package is designed to facilitate analysis of land use and cover 
 change (LUCC) around the monitoring sites of the Tropical Ecology Assessment 
 and Monitoring (TEAM) Network. The [TEAM Network](http://www.teamnetwork.org/) 
-is a global network of sites in tropical forests focused on collecting 
-standardized real-time data measuring the response of tropical forests to 
-changing climate, land cover and land use, and population.
+is a global network of sites in tropical forests wth standardized real-time 
+data collection designed to measure tropical forest responses to climate 
+variability and change, land cover and land use change, and other threats.
 
-`teamlucc` assists with processing and analysis of TEAM data and remote sensing 
-imagery of TEAM sites for measuring change in ecosystems from the 
-plot-landscape scales. `teamlucc` supports a range of analyses using satellite 
-imagery with TEAM monitoring data, including:
+`teamlucc` assists with processing and analysis of remote sensing imagery. 
+`teamlucc` supports a range of preprocessing steps and analyses, including: 
 
 * Image selection from USGS archive
     * Parsing metadata files from USGS EarthExplorer
@@ -27,27 +25,27 @@ imagery with TEAM monitoring data, including:
     * Extraction and file conversion of surface reflectance imagery from the 
       Landsat Climate Data Record (CDR) archive
     * Topographic correction using parallel processing (Goslee, 2011)
-    * Cloud fill and gap fill (for SLC-off Landsat 7 scenes) with R scripts 
-      wrapping the modified Neighborhood Similar Pixel Interpolator (NSPI) and
+    * Cloud fill and gap fill (for SLC-off Landsat 7 scenes), including support 
+      for the modified Neighborhood Similar Pixel Interpolator (NSPI) and 
       Geostatistical Neighborhood Similar Pixel Interpolator (GNSPI) by Zhu et 
-      al. (2012a, 2012b)
-    * Calculation of vegetation indices and image texture measures from 
-      grey-level co-occurrence matrices (GLCMs)
+      al.  (2012a, 2012b)
+    * Image normalization
+    
+* Calculation of vegetation indices and image texture measures from grey-level 
+  co-occurrence matrices (GLCMs)
 
-* Image classification using support vector machine (SVM)
+* Image classification using random forests
 
-* Change detection: implementation of Change Vector Analysis in Posterior 
-  Probability Space (CVAPS) and Double Window Flexible Pace Search (DFPS) 
-  algorithms (Chen et al. 2011)
+* Change detection using the Change Vector Analysis in Posterior Probability 
+  Space (CVAPS) and Double Window Flexible Pace Search (DFPS) algorithms (Chen 
+  et al. 2011)
 
-* Accuracy assessment using quantity agreement and disagreement (Pontius and 
-  Millones, 2011)
+* Accuracy assessment using user's, producer's and overall accuracies, in 
+  addition to quantity agreement and disagreement (Pontius and Millones, 2011)
 
-The toolkit is still under active development. Follow the [TEAM 
+The toolkit is under active development. Follow the [TEAM 
 website](http://www.teamnetwork.org/) for news, and the [toolkit project page
-on github](https://github.com/azvoleff/teamlucc) for the latest version of the 
-code.
-
+on github](https://github.com/azvoleff/teamlucc) for the latest updates.
 
 ## Package installation
 
