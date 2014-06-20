@@ -41,7 +41,9 @@
 #' \code{auto_preprocess_landsat} or \code{auto_cloud_fill}.
 #' @param wrspath World Reference System (WRS) path
 #' @param wrsrow World Reference System (WRS) row
-#' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem}
+#' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem}, or 
+#' \code{NULL}, in which case elevation, slope, and aspect will not be included 
+#' in the predictor layer stack.
 #' @param output_path the path to use for the output (optional - if NULL then 
 #' output images will be saved alongside the input images in the same folder).
 #' @param ext file extension to use when saving output rasters (determines 
@@ -52,13 +54,13 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
-auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path, 
+auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path=NULL, 
                                  output_path=NULL, ext='tif', cleartmp=FALSE, 
                                  overwrite=FALSE, notify=print) {
     if (!file_test("-f", x)) {
         stop(paste("input image", x, "does not exist"))
     }
-    if (!file_test("-d", dem_path)) {
+    if (!is.null(dem_path) && !file_test("-d", dem_path)) {
         stop(paste(dem_path, "does not exist"))
     }
     if (!is.null(output_path) && !file_test("-d", output_path)) {
@@ -84,9 +86,6 @@ auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path,
     if (is.null(output_path)) {
         output_path <- dirname(x)
     }
-
-    dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
-                                               wrsrow, '.', ext))
 
     mask_stack_file <- paste0(file_path_sans_ext(x), '_masks.', ext)
     if (!file_test('-f', mask_stack_file)) {
@@ -137,31 +136,35 @@ auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path,
     names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
     timer <- stop_timer(timer, label='Calculating GLCM textures')
 
-    ######################################################################
-    # Load DEM, slope, and aspect, and reclass aspect
-    timer <- start_timer(timer, label='Processing dem and slopeaspect')
+    if (!is.null(dem_path)) {
+        ######################################################################
+        # Load DEM, slope, and aspect, and reclass aspect
+        dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
+                                                       wrsrow, '.', ext))
+        timer <- start_timer(timer, label='Processing dem and slopeaspect')
 
-    dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
-                                               wrsrow, '.', ext))
-    dem <- raster(dem_filename)
+        dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
+                                                   wrsrow, '.', ext))
+        dem <- raster(dem_filename)
 
-    slopeaspect_filename <- file.path(dem_path,
-                                      paste0('slopeaspect_', wrspath, 
-                                             '-', wrsrow, '.', ext))
-    slopeaspect <- brick(slopeaspect_filename)
-    names(slopeaspect) <- c('slope', 'aspect')
-    # Classify aspect into north facing, east facing, etc., recalling 
-    # that the aspect is stored in radians scaled by 1000.
-    #     1: north facing (0-45, 315-360)
-    #     2: east facing (45-135)
-    #     3: south facing (135-225)
-    #     4: west facing (225-315)
-    aspect_cut <- raster::cut(slopeaspect$aspect/1000,
-                              c(-1, 45, 135, 225, 315, 361)*(pi/180))
-    # Code both 0-45 and 315-360 aspect as North facing (1)
-    aspect_cut[aspect_cut == 5] <- 1
-    names(aspect_cut) <- 'aspect'
-    timer <- stop_timer(timer, label='Processing dem and slopeaspect')
+        slopeaspect_filename <- file.path(dem_path,
+                                          paste0('slopeaspect_', wrspath, 
+                                                 '-', wrsrow, '.', ext))
+        slopeaspect <- brick(slopeaspect_filename)
+        names(slopeaspect) <- c('slope', 'aspect')
+        # Classify aspect into north facing, east facing, etc., recalling 
+        # that the aspect is stored in radians scaled by 1000.
+        #     1: north facing (0-45, 315-360)
+        #     2: east facing (45-135)
+        #     3: south facing (135-225)
+        #     4: west facing (225-315)
+        aspect_cut <- raster::cut(slopeaspect$aspect/1000,
+                                  c(-1, 45, 135, 225, 315, 361)*(pi/180))
+        # Code both 0-45 and 315-360 aspect as North facing (1)
+        aspect_cut[aspect_cut == 5] <- 1
+        names(aspect_cut) <- 'aspect'
+        timer <- stop_timer(timer, label='Processing dem and slopeaspect')
+    }
 
     ######################################################################
     # Layer stack predictor layers:
@@ -175,25 +178,25 @@ auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path,
                         MSAVI2_layer,
                         scale_raster(MSAVI2_glcm$glcm_mean),
                         scale_raster(MSAVI2_glcm$glcm_variance),
-                        scale_raster(MSAVI2_glcm$glcm_dissimilarity),
-                        dem,
-                        slopeaspect$slope,
-                        aspect_cut)
+                        scale_raster(MSAVI2_glcm$glcm_dissimilarity))
+    predictor_names <- c('b1', 'b2', 'b3', 'b4', 'b5', 'b7', 'msavi', 
+                         'msavi_glcm_mean', 'msavi_glcm_variance', 
+                         'msavi_glcm_dissimilarity')
+
+    if (!is.null(dem_path)) {
+        predictors <- stack(predictors, dem, slopeaspect$slope, aspect_cut)
+        predictor_names <- c(predictor_names, 'elev', 'slope', 'aspect')
+    }
+
     predictors_filename <- file.path(output_path,
                                      paste0(image_basename, '_predictors.', 
                                             ext))
 
-    names(predictors) <- c('b1', 'b2', 'b3', 'b4', 'b5', 'b7', 'msavi', 
-                          'msavi_glcm_mean', 'msavi_glcm_variance', 
-                          'msavi_glcm_dissimilarity', 'elev', 'slope', 
-                          'aspect')
+    names(predictors) <- predictor_names
     predictors <- mask(predictors, image_mask, maskvalue=1, 
                        filename=predictors_filename, 
                        overwrite=overwrite, datatype='INT2S')
-    names(predictors) <- c('b1', 'b2', 'b3', 'b4', 'b5', 'b7', 'msavi', 
-                          'msavi_glcm_mean', 'msavi_glcm_variance', 
-                          'msavi_glcm_dissimilarity', 'elev', 'slope', 
-                          'aspect')
+    names(predictors) <- predictor_names
 
     # Save a copy of the original masks file along with the predictors file, so 
     # the masks can be easily located later.
