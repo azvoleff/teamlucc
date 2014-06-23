@@ -10,6 +10,8 @@
 #' were preprocessed using the \codE{auto_preprocess_landsat} function.
 #'
 #' @export
+#' @importFrom tools file_path_sans_ext
+#' @importFrom foreach foreach iter
 #' @param image_files list of filenames for images to normalize
 #' @param base (optional) filename of base image. If not supplied, the base 
 #' image will be automatically chosen from the images in \code{image_files}, as 
@@ -17,14 +19,20 @@
 #' @param overwrite whether to overwrite \code{out_name} if it already exists
 #' @return nothing - used for side effect of normalizing imagery
 auto_normalize <- function(image_files, base) {
+    stopifnot(length(image_files) >= 1)
+
     image_stacks <- lapply(image_files, stack)
 
     mask_files <- paste0(file_path_sans_ext(image_files), '_masks', 
                          extension(image_files))
 
-    if (missing(base)) {
-        # First figure out which image has lowest percent cloud cover - use 
-        # that image as the base image
+    if (!missing(base)) {
+        base_img_file <- base
+    } else if (missing(base) & (length(image_files) == 1)) {
+        stop('length of image_files is 1 but no base image was supplied')
+    } else {
+        # Figure out which image has lowest percent cloud cover - use that 
+        # image as the base image
         pct_clouds <- function(cloud_mask) {
             clouded_pixels <- calc(cloud_mask, fun=function(vals) {
                 # For fmask layer, 2 is cloud shadow, and 4 is cloud
@@ -36,7 +44,7 @@ auto_normalize <- function(image_files, base) {
             return((num_clouds / (num_clouds + num_clear)) * 100)
         }
 
-        cloud_cover <- foreach (mask_stack=iter(mask_stacks),
+        cloud_cover <- foreach(mask_stack=iter(mask_stacks),
                  .packages=c('teamlucc', 'stringr', 'rgdal'),
                  .combine=c) %dopar% {
             # Note that fmask layer is 2nd layer in stack
@@ -52,8 +60,6 @@ auto_normalize <- function(image_files, base) {
 
         base_mask <- mask_stacks[[base_index]]
         mask_stacks <- mask_stacks[-base_index]
-    } else {
-        base_img_file <- base
     }
 
     # Copy the base image to a new file with the _base.tif extension
@@ -97,11 +103,11 @@ auto_normalize <- function(image_files, base) {
         normed_image <- normalize(base_img, image_stack, missing_vals, size=size)
 
         normed_image <- writeRaster(normed_image, filename=output_normed_file, 
-                                    datatype=dataType(normed_image)[1], 
+                                    datatype=dataType(base_img)[1], 
                                     overwrite=overwrite)
         mask_stack <- writeRaster(mask_stack, 
                                   filename=output_normed_masks_file, 
-                                  datatype=dataType(mask_stack), 
+                                  datatype=dataType(mask_stack)[1], 
                                   overwrite=overwrite)
     }
 }
