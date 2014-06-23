@@ -81,7 +81,6 @@ auto_normalize <- function(image_files, base) {
     foreach (image_file=iter(image_files), image_stack=iter(image_stacks), 
              mask_stack=iter(mask_stacks),
              .packages=c('teamlucc', 'stringr', 'tools')) %dopar% {
-
         message(paste('Preprocessing ', image_file))
         output_normed_file <- paste0(file_path_sans_ext(image_file), 
                                      '_normalized.tif')
@@ -90,9 +89,9 @@ auto_normalize <- function(image_files, base) {
 
         # Note that fmask layer is 2nd layer in stack
         missing_vals <- overlay(base_mask[[2]], mask_stack[[2]],
-                            fun=function(base, this) {
+                            fun=function(base_vals, this_vals) {
             # Only use clear pixels when normalizing (0 in fmask)
-            (base != 0) & (this != 0)
+            (base_vals != 0) & (this_vals != 0)
         }, datatype=dataType(base_mask))
 
         if (ncell(image_stack) > 500000) {
