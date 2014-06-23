@@ -10,8 +10,8 @@
 #' were preprocessed using the \codE{auto_preprocess_landsat} function.
 #'
 #' @export
+#' @import foreach
 #' @importFrom tools file_path_sans_ext
-#' @importFrom foreach foreach iter
 #' @param image_files list of filenames for images to normalize
 #' @param base (optional) filename of base image. If not supplied, the base 
 #' image will be automatically chosen from the images in \code{image_files}, as 
