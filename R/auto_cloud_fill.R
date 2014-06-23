@@ -4,11 +4,11 @@ pct_clouds <- function(cloud_mask) {
     return((num_clouds / (num_clouds + num_clear)) * 100)
 }
 
-#' Automated removal of clouds using Xiaolin Zhu's NSPI algorithm
+#' Automated removal of clouds from Landsat CDR imagery
 #'
-#' Uses the NSPI algorithm from Zhu et al. See \code{\link{cloud_remove}} for 
-#' details. In hilly areas, cloud fill should be done after topographic 
-#' correction.
+#' Uses one of four cloud reomval algorithms (see \code{\link{cloud_remove}}) 
+#' to remove thick clouds from Landsat imagery. In hilly areas, topographic 
+#' correction should be done before cloud fill.
 #'
 #' The \code{auto_cloud_fill} function allows an analyst to automatically 
 #' construct a cloud-filled image after specifying: \code{data_dir} (a folder 
@@ -251,10 +251,13 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     if (verbose > 0) {
         timer <- stop_timer(timer, label='Calculating cloud masks')
     }
+
     if (verbose > 0) {
         timer <- start_timer(timer, label='Masking base image')
     }
-    # Mask out clouds in base image:
+    # Mask out clouds in base image. Save this image to disk so it is available 
+    # even if no cloud fill is done (if the pct_clouds in this image is below 
+    # the threshold).
     base_img <- overlay(base_img, base_mask,
         fun=function(base_vals, mask_vals) {
             # Set clouds/shadows to 0
@@ -264,7 +267,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             # Set slc-off gaps and areas outside scene to NA
             base_vals[mask_vals == 2] <- NA
             return(base_vals)
-        }, datatype=dataType(base_img[[1]]))
+        }, datatype=dataType(base_img[[1]]), filename=out_name, 
+        overwrite=overwrite)
 
     cur_pct_clouds <- pct_clouds(base_mask)
 
@@ -282,9 +286,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             timer <- start_timer(timer, label=paste('Fill iteration', n + 1))
         }
 
-        # If the base image is stored in a file named out_name (as it will be 
-        # on iteration 2 and beyond), save the base_img to a temp file so that 
-        # out_name can be safely overwritten by cloud_remove.
+        # Save the base_img to a temp file so that out_name can be safely 
+        # overwritten by cloud_remove.
         if (filename(base_img) == out_name) {
             base_img <- writeRaster(base_img, filename=rasterTmpFile(), 
                                     datatype=dataType(base_img[[1]]))
