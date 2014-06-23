@@ -44,7 +44,8 @@ This function trains a Support Vector Machine (SVM) or Random Forest (RF)
 classifier for use in an image classification.
 }
 \details{
-For \code{type='SVM'}, \code{tunegrid} must be a \code{data.frame} with two
-columns: ".sigma" and ".C".
+For \code{type='svm'}, \code{tunegrid} must be a \code{data.frame} with two
+columns: ".sigma" and ".C". For \code{type='rf'}, must be a
+\code{data.frame} with one column: '.mtry'.
 }
 
