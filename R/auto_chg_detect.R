@@ -17,8 +17,6 @@
 #' @param output_path the path to use for the output
 #' @param output_basename the base filename for output files from 
 #' \code{auto_chg_detect} (without an extension)
-#' @param n_cpus the number of CPUs to use for processes that can run in 
-#' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
 #' @param notify notifier to use (defaults to \code{print} function). See the 
@@ -28,16 +26,13 @@
 #' analysis in posterior probability space: a new method for land cover change 
 #' detection.  IEEE Geoscience and Remote Sensing Letters 8:317-321.
 auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename, 
-                            output_path, n_cpus=1, overwrite=FALSE, 
-                            notify=print) {
+                            output_path, overwrite=FALSE, notify=print) {
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
 
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Change detection')
-
-    if (n_cpus > 1) beginCluster(n_cpus)
 
     ###########################################################################
     # Calculate change magnitude and direction

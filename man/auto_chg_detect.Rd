@@ -4,7 +4,7 @@
 \title{Perform change detection for two Landsat CDR surface reflectance images}
 \usage{
 auto_chg_detect(t1_classes, t1_probs, t2_probs, output_basename, output_path,
-  n_cpus = 1, overwrite = FALSE, notify = print)
+  overwrite = FALSE, notify = print)
 }
 \arguments{
 \item{t1_classes}{cover classes as output from \code{auto_classify_image}
@@ -20,9 +20,6 @@ for time 1 image}
 
 \item{output_basename}{the base filename for output files from
 \code{auto_chg_detect} (without an extension)}
-
-\item{n_cpus}{the number of CPUs to use for processes that can run in
-parallel}
 
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
