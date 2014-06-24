@@ -9,8 +9,6 @@
 #'
 #' @export
 #' @import caret randomForest
-#' @param x a \code{Raster*} image with the predictor layer(s) for the 
-#' classification
 #' @param train_data a \code{link{pixel_data}} object
 #' @param type either "svm" (to fit a support vector machine) or "rf" (to fit a
 #' random forest).
@@ -31,14 +29,13 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @return a trained random forest model (as a \code{train} object from the  
 #' \code{caret} package)
-train_classifier <- function(x, train_data, type='rf', use_training_flag=TRUE, 
+train_classifier <- function(train_data, type='rf', use_training_flag=TRUE, 
                              train_control=NULL, tune_grid=NULL,
                              use_rfe=FALSE) {
     stopifnot(type %in% c('svm', 'rf'))
 
     if (is.null(train_control)) {
-        train_control <- trainControl(method="repeatedcv", repeats=10, 
-                                      classProbs=10)
+        train_control <- trainControl(method="oob")
     }
 
     # Build the formula, excluding the training flag column (if it exists) from 
@@ -82,7 +79,8 @@ train_classifier <- function(x, train_data, type='rf', use_training_flag=TRUE,
     train_data <- cbind(y=train_data@y,
                         train_data@x,
                         training_flag=train_data@training_flag,
-                        poly_ID=train_data@poly_ID)
+                        poly_src=train_data@pixel_src$src,
+                        poly_ID=train_data@pixel_src$ID)
 
     if (type == 'rf') {
         model <- train(model_formula, data=train_data, method="rf",

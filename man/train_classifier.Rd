@@ -3,13 +3,10 @@
 \alias{train_classifier}
 \title{Trains a classifier}
 \usage{
-train_classifier(x, train_data, type = "rf", use_training_flag = TRUE,
+train_classifier(train_data, type = "rf", use_training_flag = TRUE,
   train_control = NULL, tune_grid = NULL, use_rfe = FALSE)
 }
 \arguments{
-\item{x}{a \code{Raster*} image with the predictor layer(s) for the
-classification}
-
 \item{train_data}{a \code{link{pixel_data}} object}
 
 \item{type}{either "svm" (to fit a support vector machine) or "rf" (to fit a

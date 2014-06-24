@@ -114,7 +114,7 @@ function(x) {
 setGeneric("src_name<-", function(x, value) standardGeneric("src_name<-"))
 
 #' @rdname src_name<-
-#' @aliases src_name,pixel_data-method
+#' @aliases src_name<-,pixel_data-method
 setMethod("src_name<-", signature(x="pixel_data"),
 function(x, value) {
     if (length(value) == 1) {
@@ -212,18 +212,19 @@ get_pixels <- function(x, polys, class_col, training=1, src='none') {
         stop('"training" must be a column name, vector of same length as polys, or length 1 numeric')
     }
     pixels <- extract(x, polys, small=TRUE, df=TRUE)
-    poly_pixel_match <- match(pixels$ID, polys$ID)
+
+    poly_rows <- pixels$ID
     pixels <- pixels[!(names(pixels) == 'ID')]
 
     # Convert y classes to valid R variable names - if they are not valid R 
     # variable names, the classification algorithm may throw an error
-    y <- factor(make.names(polys@data[poly_pixel_match, class_colnum]))
+    y <- factor(make.names(polys@data[poly_rows, class_colnum]))
 
-    pixel_src <- data.frame(src=polys@data[poly_pixel_match, ]$src,
-                            ID=polys@data[poly_pixel_match, ]$ID, 
+    pixel_src <- data.frame(src=polys@data[poly_rows, ]$src,
+                            ID=polys@data[poly_rows, ]$ID, 
                             stringsAsFactors=FALSE)
 
     return(new("pixel_data", x=pixels, y=y, pixel_src=pixel_src,
-               training_flag=polys@data[poly_pixel_match, ]$training_flag,
+               training_flag=polys@data[poly_rows, ]$training_flag,
                polys=polys))
 }
