@@ -117,7 +117,7 @@ function(x, y) {
 #' @rdname adj_areas
 #' @aliases adj_areas,numeric,missing-method
 setMethod("adj_areas", signature(x="accuracy", y='missing'),
-function(x){
+function(x) {
     pop <- x@pop
     ct <- x@ct
     adj_areas(pop, ct)

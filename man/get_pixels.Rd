@@ -3,7 +3,7 @@
 \alias{get_pixels}
 \title{Extract observed data for use in a classification (training or testing)}
 \usage{
-get_pixels(x, polys, class_col, training = 1)
+get_pixels(x, polys, class_col, training = 1, src = "none")
 }
 \arguments{
 \item{x}{a \code{Raster*} object from which observed data will be extracted.
@@ -22,6 +22,9 @@ used in training (column equal to TRUE) or in testing (column equal to
 FALSE), or 2) a logical vector of length equal to length(polys), or 3) a
 number between 0 and 1 indicating the fraction of the polygons to be
 randomly selected for use in training.}
+
+\item{src}{name of this data source. Useful when gathering training
+data from multiple images.}
 }
 \value{
 data.frame with the training data. Each row will contain the

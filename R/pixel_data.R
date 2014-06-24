@@ -7,8 +7,8 @@
 #' @slot x a \code{data.frame} of independent variables (usually pixel values)
 #' @slot y a \code{data.frame} of the dependent variable (usually land cover 
 #' classes)
-#' @slot poly_ID a character vector used to link polygons each row in \code{x} 
-#' and \code{y} to an input polygon
+#' @slot pixel_src a data.framevector used to link pixels in \code{x} and 
+#' \code{y} to an input polygon
 #' @slot training_flag a binary vector of length equal to \code{nrow(x)} 
 #' indicating each row in x should be used in training (TRUE) or in testing 
 #' (FALSE)
@@ -17,7 +17,7 @@
 #' @import methods
 #' @importFrom sp SpatialPolygonsDataFrame
 setClass('pixel_data', slots=c(x='data.frame', y='factor', 
-                               poly_ID='character', training_flag='logical', 
+                               pixel_src='data.frame', training_flag='logical', 
                                polys='SpatialPolygonsDataFrame')
 )
 
@@ -28,14 +28,16 @@ summary.pixel_data <- function(object, ...) {
     obj = list()
     obj[['class']] <- class(object)
     obj[['n_classes']] <- nlevels(object)
-    obj[['n_polys']] <- length(unique(object@poly_ID))
+    obj[['n_sources']] <- length(unique(object@polys$src))
+    obj[['n_polys']] <- nrow(object@polys)
     obj[['n_pixels']] <- nrow(object@x)
-    training_df <- data.frame(y=object@y, poly_ID=object@poly_ID, 
+    training_df <- data.frame(y=object@y,
+                              pixel_src=src_name(object), 
                               training_flag=object@training_flag)
-    y=poly_ID=training_flag=NULL # Keep R CMD CHECK happy
+    y=pixel_src=training_flag=NULL # Keep R CMD CHECK happy
     class_stats <- ddply(training_df, .(class=y), summarize,
                          n_pixels=length(y),
-                         n_polys=length(unique(poly_ID)),
+                         n_polys=length(unique(pixel_src)),
                          train_frac=round(sum(training_flag) / length(training_flag), 2))
     obj[['class_stats']]  <- class_stats
     obj[['training_frac']] <- sum(object@training_flag==TRUE) / length(object@training_flag)
@@ -51,6 +53,7 @@ print.summary.pixel_data <- function(x, ...) {
     cat(paste('Number of classes:\t', x[['n_classes']], '\n', sep=''))
     cat(paste('Number of polygons:\t', x[['n_polys']], '\n', sep=''))
     cat(paste('Number of pixels:\t', x[['n_pixels']], '\n', sep=''))
+    cat(paste('Number of sources:\t', x[['n_sources']], '\n', sep=''))
     cat('\n')
     cat('Training data statistics:\n')
     print(x[['class_stats']])
@@ -70,9 +73,69 @@ levels.pixel_data <- function(x) {
 print.pixel_data <- function(x, ...) {
     print(summary(x, ...))
 }
+#' @rdname pixel_data-class
+#' @importFrom maptools spRbind
+#' @export
+rbind.pixel_data <- function(x, ...) {
+    for (item in c(...)) {
+        x@x <- rbind(x@x, item@x)
+        x@y <- factor(c(as.character(x@y), as.character(item@y)))
+        x@pixel_src <- rbind(x@pixel_src, item@pixel_src)
+        x@training_flag <- c(x@training_flag, item@training_flag)
+        if (any(row.names(x@polys) %in% row.names(item@polys)))
+            stop('training polygon IDs are not unique - are src_names unique?')
+        x@polys <- spRbind(x@polys, item@polys)
+    }
+    return(x)
+}
 
 setMethod("show", signature(object="pixel_data"), function(object) 
           print(object))
+
+#' Get src_name for a pixel_data object
+#'
+#' @export src_name
+#' @param x a \code{pixel_data} object
+#' this pixel_data object
+setGeneric("src_name", function(x) standardGeneric("src_name"))
+
+#' @rdname src_name
+#' @aliases src_name,pixel_data-method
+setMethod("src_name", signature(x="pixel_data"),
+function(x) {
+    return(paste0(x@pixel_src$src, '_', x@pixel_src$ID))
+})
+
+#' Set src_name for a pixel_data object
+#'
+#' @export src_name<-
+#' @param x a \code{pixel_data} object
+#' @param src_name a new \code{src_name} to assign for pixels in \code{x}
+setGeneric("src_name<-", function(x, value) standardGeneric("src_name<-"))
+
+#' @rdname src_name<-
+#' @aliases src_name,pixel_data-method
+setMethod("src_name<-", signature(x="pixel_data"),
+function(x, value) {
+    if (length(value) == 1) {
+        value <- rep(value, nrow(x@polys))
+    } else if (length(value) != nrow(x@polys)) {
+        stop('src_name must be equal to 1 or number of polygons in x')
+    }
+    old_full_polyID <- paste(x@polys$src, x@polys$ID)
+    x@polys$src <- value
+    row.names(x@polys) <- paste0(x@polys$src, '_', x@polys$ID)
+
+    new_full_polyID <- paste(x@polys$src, x@polys$ID)
+
+    poly_pixel_match <- match(paste(x@pixel_src$src, x@pixel_src$ID), 
+                              old_full_polyID)
+
+    x@pixel_src$src <- x@polys$src[poly_pixel_match]
+    x@pixel_src$ID <- x@polys$ID[poly_pixel_match]
+
+    return(x)
+})
 
 #' Extract observed data for use in a classification (training or testing)
 #'
@@ -90,6 +153,8 @@ setMethod("show", signature(object="pixel_data"), function(object)
 #' FALSE), or 2) a logical vector of length equal to length(polys), or 3) a 
 #' number between 0 and 1 indicating the fraction of the polygons to be 
 #' randomly selected for use in training.
+#' @param src name of this data source. Useful when gathering training 
+#' data from multiple images.
 #' @return data.frame with the training data. Each row will contain the 
 #' response (the column chosen by \code{class_col}) as the first column, with 
 #' the remaining columns containing the values at that location of each band in 
@@ -98,16 +163,20 @@ setMethod("show", signature(object="pixel_data"), function(object)
 #' set.seed(1)
 #' train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
 #'                          training=.6)
-get_pixels <- function(x, polys, class_col, training=1) {
+get_pixels <- function(x, polys, class_col, training=1, src='none') {
     if (projection(x) != projection(polys)) {
         stop('Coordinate systems do not match')
     }
+    stopifnot(length(src) == 1)
     # Convert class_col from the name of the column to an index
     class_colnum <- grep(paste0('^', class_col, '$'), names(polys))
     if (length(class_colnum) == 0) {
         stop(paste0('"', class_col, '" not found in polys'))
     }
+    # This is displayed in the dataframe, and should never change
     polys$ID <- row.names(polys)
+    polys$src <- src
+    row.names(polys) <- paste0(polys$src, '_', polys$ID)
     if (is.character(training)) {
         # Handle case of having column name suppled as 'training'
         training_col_index <- grep(training, names(polys))
@@ -143,15 +212,18 @@ get_pixels <- function(x, polys, class_col, training=1) {
         stop('"training" must be a column name, vector of same length as polys, or length 1 numeric')
     }
     pixels <- extract(x, polys, small=TRUE, df=TRUE)
-    poly_pixel_match <- match(pixels$ID, seq(1, nrow(polys)))
+    poly_pixel_match <- match(pixels$ID, polys$ID)
     pixels <- pixels[!(names(pixels) == 'ID')]
 
     # Convert y classes to valid R variable names - if they are not valid R 
     # variable names, the classification algorithm may throw an error
     y <- factor(make.names(polys@data[poly_pixel_match, class_colnum]))
 
-    return(new("pixel_data", x=pixels, y=y, 
-               poly_ID=polys@data[poly_pixel_match, ]$ID,
+    pixel_src <- data.frame(src=polys@data[poly_pixel_match, ]$src,
+                            ID=polys@data[poly_pixel_match, ]$ID, 
+                            stringsAsFactors=FALSE)
+
+    return(new("pixel_data", x=pixels, y=y, pixel_src=pixel_src,
                training_flag=polys@data[poly_pixel_match, ]$training_flag,
                polys=polys))
 }
