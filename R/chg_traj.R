@@ -54,7 +54,7 @@ chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, classnames=NULL,
         traj_lut$t0_name <- classnames[match(traj_lut$t0_code, classcodes)]
         traj_lut$t1_name <- classnames[match(traj_lut$t1_code, classcodes)]
     }
-    if (ignorepersistence) traj_lut <- traj_lut[!(traj_lut$t0_code == traj_lut$t1_code),]
+    if (ignorepersistence) traj_lut <- traj_lut[!(traj_lut$t0_code == traj_lut$t1_code), ]
     # Code trajectories by summing t0 and t1 after multiplying t1 by the number 
     # of classes.
     traj_lut$Code <- traj_lut$t0_code + traj_lut$t1_code * length(classcodes)

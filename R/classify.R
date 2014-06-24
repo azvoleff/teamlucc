@@ -43,13 +43,9 @@ classify <- function(x, model, classes_file, prob_file, overwrite=FALSE,
         if (length(out) != 1) out <- NA
         return(out)
     }, datatype='INT2S', filename=classes_file, overwrite=overwrite)
-
     names(classes) <- 'prediction'
-    classes <- ratify(classes)
-    rat <- levels(classes)[[1]]
-    rat$class <- levels(model)
-    rat$code <- seq(0:(nlevels(model) - 1))
-    levels(classes) <- rat
 
-    return(list(classes=classes, probs=probs))
+    codes <- data.frame(code=seq(0, (nlevels(model) - 1)), class=levels(model))
+
+    return(list(classes=classes, probs=probs, codes=codes))
 }
