@@ -1,7 +1,11 @@
 #' Perform change detection for two Landsat CDR surface reflectance images
 #'
-#' First the images should be classified using the \code{auto_classify} 
-#' function.
+#' This image automates the change detection process using the Change Vector 
+#' Analysis in Posterior Probability Space (CVAPS) algorithm. The threshold for 
+#' change/no-change mapping is determined using Huang's algorithm (see 
+#' \code{\link{threshold}}. First the images should be classified using the 
+#' \code{auto_classify} function (or any other classification approach that 
+#' yields per-pixel probabilities of class membership).
 #'
 #' @export
 #' @param t1_classes cover classes as output from \code{auto_classify_image} 
@@ -20,6 +24,9 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
+#' @references Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector 
+#' analysis in posterior probability space: a new method for land cover change 
+#' detection.  IEEE Geoscience and Remote Sensing Letters 8:317-321.
 auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename, 
                             output_path, n_cpus=1, overwrite=FALSE, 
                             notify=print) {
