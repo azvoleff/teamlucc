@@ -23,8 +23,6 @@
 auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename, 
                             output_path, n_cpus=1, overwrite=FALSE, 
                             notify=print) {
-    stop('auto_chg_detect not yet supported')
-
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
@@ -55,11 +53,12 @@ auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename,
     chg_traj_filename <- file.path(output_path,
                                    paste(output_basename, 'chg_traj.tif', 
                                          sep='_'))
-    #TODO: Determine threshold with DFPS or automatic algorithm
-    threshold <- NULL
+
+    chg_threshold <- threshold(chg_mag_image, by=.025)
+
     chg_traj_traj <- chg_traj(t1_classes, chg_mag_image, chg_dir_image, 
                               classnames=levels(t1_classes),
-                              threshold=threshold, overwrite=overwrite, 
+                              chg_threshold=chg_threshold, overwrite=overwrite, 
                               filename=chg_traj_filename)
     timer <- stop_timer(timer, label='Change trajectories')
 

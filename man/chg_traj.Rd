@@ -3,7 +3,7 @@
 \alias{chg_traj}
 \title{Calculate change-trajectory image}
 \usage{
-chg_traj(initial, chg_mag, chg_dir, threshold, classnames = NULL,
+chg_traj(initial, chg_mag, chg_dir, chg_threshold, classnames = NULL,
   ignorepersistence = TRUE, filename = NULL, ...)
 }
 \arguments{
@@ -13,7 +13,7 @@ chg_traj(initial, chg_mag, chg_dir, threshold, classnames = NULL,
 
 \item{chg_dir}{change direction \code{RasterLayer} from \code{CVAPS}}
 
-\item{threshold}{the threshold to use as a minimum when determining change
+\item{chg_threshold}{the threshold to use as a minimum when determining change
 areas (can use \code{DFPS} to determine this value).}
 
 \item{classnames}{an optional vector of classnames to output with the

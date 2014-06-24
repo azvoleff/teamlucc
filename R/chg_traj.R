@@ -5,7 +5,7 @@
 #' @param initial initial cover class as \code{RasterLayer}
 #' @param chg_mag change magnitude \code{RasterLayer} from \code{CVAPS}
 #' @param chg_dir change direction \code{RasterLayer} from \code{CVAPS}
-#' @param threshold the threshold to use as a minimum when determining change 
+#' @param chg_threshold the threshold to use as a minimum when determining change 
 #' areas (can use \code{DFPS} to determine this value).
 #' @param classnames an optional vector of classnames to output with the 
 #' returned trajectory lookup table
@@ -28,7 +28,7 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in
 #' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-chg_traj <- function(initial, chg_mag, chg_dir, threshold, classnames=NULL, 
+chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, classnames=NULL, 
                      ignorepersistence=TRUE, filename=NULL, ...) {
     if (proj4string(initial) != proj4string(chg_mag) ) {
         stop('initial and chg_mag coordinate systems do not match')
@@ -59,12 +59,12 @@ chg_traj <- function(initial, chg_mag, chg_dir, threshold, classnames=NULL,
     # of classes.
     traj_lut$Code <- traj_lut$t0_code + traj_lut$t1_code * length(classcodes)
 
-    calc_chg_traj <- function(initial, chg_mag, chg_dir, classcodes, threshold, 
+    calc_chg_traj <- function(initial, chg_mag, chg_dir, classcodes, chg_threshold, 
                               ignorepersistence, ...) {
         # Code trajectories by summing t0 and chg_dir after multiplying chg_dir 
         # by the number of classes.
         traj <- initial + chg_dir * length(classcodes)
-        traj[chg_mag < threshold] <- NA
+        traj[chg_mag < chg_threshold] <- NA
         # Ignore persistence of a class if desired
         if (ignorepersistence) traj[initial == chg_dir] <- NA
         traj <- array(traj, dim=c(dim(initial)[1], dim(initial)[2], 1))
@@ -72,7 +72,7 @@ chg_traj <- function(initial, chg_mag, chg_dir, threshold, classnames=NULL,
     }
     out <- rasterEngine(initial=initial, chg_mag=chg_mag, chg_dir=chg_dir, 
                         fun=calc_chg_traj, args=list(classcodes=classcodes, 
-                                                     threshold=threshold,
+                                                     chg_threshold=chg_threshold,
                                                      ignorepersistence=ignorepersistence), 
                         filename=filename, ...)
 
