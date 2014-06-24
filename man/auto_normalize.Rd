@@ -25,6 +25,6 @@ function. A base image can be optionally supplied. If a base image is not
 supplied, then the function will calculate the percent cloud cover of each
 input image, and automatically choose the image with the least cloud cover
 as the base image. This function assumes that the images (and image masks)
-were preprocessed using the \codE{auto_preprocess_landsat} function.
+were preprocessed using the \code{auto_preprocess_landsat} function.
 }
 

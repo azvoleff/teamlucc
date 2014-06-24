@@ -6,6 +6,21 @@
 
 using namespace Rcpp;
 
+// threshold_Huang
+int threshold_Huang(arma::ivec& data);
+RcppExport SEXP teamlucc_threshold_Huang(SEXP dataSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< arma::ivec& >::type data(dataSEXP );
+        int __result = threshold_Huang(data);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // cloud_fill
 arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear, arma::ivec& cloud_mask, arma::ivec dims, int num_class, int min_pixel, int max_pixel, int cloud_nbh, int DN_min, int DN_max, bool verbose = false);
 RcppExport SEXP teamlucc_cloud_fill(SEXP cloudySEXP, SEXP clearSEXP, SEXP cloud_maskSEXP, SEXP dimsSEXP, SEXP num_classSEXP, SEXP min_pixelSEXP, SEXP max_pixelSEXP, SEXP cloud_nbhSEXP, SEXP DN_minSEXP, SEXP DN_maxSEXP, SEXP verboseSEXP) {
