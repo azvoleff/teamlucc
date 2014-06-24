@@ -15,7 +15,8 @@ classification}
 
 \item{classes_file}{filename for predicted classes (or missing)}
 
-\item{prob_file}{filename for predicted probabilities (or missing)}
+\item{prob_file}{filename for predicted probabilities (or missing) CURRENTLY
+IGNORED}
 
 \item{use_training_flag}{indicates whether to exclude data flagged as
 testing data when training the classifier. For this to work the input

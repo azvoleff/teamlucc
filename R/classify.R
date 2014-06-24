@@ -8,7 +8,8 @@
 #' @param model a trained random forest model as output by 
 #' \code{\link{rf_train}}
 #' @param classes_file filename for predicted classes (or missing)
-#' @param prob_file filename for predicted probabilities (or missing)
+#' @param prob_file filename for predicted probabilities (or missing) CURRENTLY 
+#' IGNORED
 #' @param use_training_flag indicates whether to exclude data flagged as 
 #' testing data when training the classifier. For this to work the input 
 #' train_data \code{data.frame} must have a column named 'training_flag' that 
