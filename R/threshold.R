@@ -33,7 +33,7 @@ threshold <- function(x, method="huang", by=1, maxpixels=100000) {
         image_hist <- hist(x[[bandnum]], breaks=seq(minval, maxval, by=by), 
                            plot=FALSE, maxpixels=maxpixels)
         threshold_index <- threshold_Huang(image_hist$counts)
-        threshold <- image_hist$breaks[threshold_index]
+        image_hist$breaks[threshold_index]
     }
 
     return(thresholds)
