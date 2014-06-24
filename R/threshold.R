@@ -5,6 +5,9 @@
 #' the Auto_threshold imageJ plugin by Gabriel Landini. See original code at:
 #' http:#www.mecourse.com/landinig/software/autothreshold/autothreshold.html
 #'
+#' @export
+#' @import foreach
+#' @importFrom iterators iter
 #' @param x the input image, as a matrix or raster
 #' @param method the thresholding method. Currently only "huang" is 
 #' implemented.
@@ -29,7 +32,8 @@ threshold <- function(x, method="huang", by=1, maxpixels=100000) {
                           .combine=c) %dopar% {
         image_hist <- hist(x[[bandnum]], breaks=seq(minval, maxval, by=by), 
                            plot=FALSE, maxpixels=maxpixels)
-        threshold_Huang(image_hist$counts)
+        threshold_index <- threshold_Huang(image_hist$counts)
+        threshold <- image_hist$breaks[threshold_index]
     }
 
     return(thresholds)
