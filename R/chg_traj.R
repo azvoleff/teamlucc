@@ -64,9 +64,9 @@ chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, filename,
     calc_chg_traj <- function(initial, chg_mag, chg_dir, classcodes, 
                               chg_threshold, ...) {
         # Code change trajectories by summing t0 and chg_dir after multiplying 
-        # chg_dir by the number of classes.
+        # chg_dir by the number of classes
         traj <- initial + chg_dir * length(classcodes)
-        # Code classes that persist
+        # Code classes that persist, being sure to ignore NAs
         persist_pixels <- which(chg_mag < chg_threshold)
         persist_pixels <- persist_pixels[!is.na(persist_pixels)]
         traj[persist_pixels] <- initial[persist_pixels] + initial[persist_pixels] * length(classcodes)
@@ -83,7 +83,8 @@ chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, filename,
     # to a tempfile in that format then copy over to the requested final output 
     # format if a filename was supplied
     if (!missing(filename)) {
-        out <- writeRaster(out, filename=filename, overwrite=overwrite, datatype='INT2S')
+        out <- writeRaster(out, filename=filename, overwrite=overwrite, 
+                           datatype='INT2S')
     }
 
     return(list(lut=traj_lut, traj=out))
