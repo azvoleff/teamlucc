@@ -27,8 +27,7 @@ arma::ivec calc_chg_dir(arma::mat t1p, arma::mat t2p, int n_classes) {
         mat Eab = (t2p.row(i) - t1p.row(i)) * eye(n_classes, n_classes);
         uword max_location;
         Eab.max(max_location);
-        // Add one since R uses one based indexing
-        chg_dir(i) = max_location + 1;
+        chg_dir(i) = max_location;
     }
     return(chg_dir);
 }

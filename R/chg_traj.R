@@ -87,5 +87,5 @@ chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, filename,
         out <- writeRaster(out, filename=filename, overwrite=overwrite, datatype='INT2S')
     }
 
-    return(list(traj_lut=traj_lut, chg_traj=out))
+    return(list(lut=traj_lut, traj=out))
 }
