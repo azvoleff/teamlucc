@@ -22,11 +22,12 @@
 #' @return a list with 2 elements: the predicted classes as a 
 #' \code{RasterLayer} and the class probabilities as a \code{RasterBrick}
 #' @examples
-#' #TODO: Fix example
-#' model <- rf_train(x, tr_data)
-#' preds <- rf_classify(x, model)
-#' require(rasterVis)
-#' levelplot(preds$classes)
+#' train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
+#'                          training=.6)
+#' model <- train_classifier(train_data)
+#' preds <- classify(L5TSR_1986, model)
+#' plot(preds$classes)
+#' plot(preds$probs)
 classify <- function(x, model, classes_file, prob_file, overwrite=FALSE, 
                      notify=print) {
     #if (missing(prob_file)) prob_file <- rasterTmpFile()

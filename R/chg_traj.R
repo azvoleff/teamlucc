@@ -19,7 +19,7 @@
 #' in the output image.
 #' @details Processing can be done in parallel using all using the cluster 
 #' facilities in the \code{spatial.tools} package. To enable clustering, call 
-#' \code{beginCluster} before running \code{classify_image}.  To stop the 
+#' \code{beginCluster} before running \code{classify}.  To stop the 
 #' cluster when finished, call \code{endCluster}.
 #' @references Chen, J., P. Gong, C.  He, R.  Pu, and P.  Shi.  2003.
 #' Land-use/land-cover change detection using improved change-vector analysis.

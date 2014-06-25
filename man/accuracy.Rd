@@ -45,7 +45,7 @@ number of clasess, or NULL (see Details).}
 the observed cover class IDs}
 
 \item{reclass_mat}{a reclassification matrix to be used in the case of a
-model fit by \code{classify_image} with the \code{do_split} option selected}
+model fit by \code{classify} with the \code{do_split} option selected}
 }
 \value{
 \code{\link{accuracy-class}} instance
@@ -69,7 +69,7 @@ need to be provided (see Details).
 \enumerate{
 
 \item A prediction model as output from one of the \code{teamlucc}
-  \code{classify_image} functions. If \code{x} is a model, and testing data
+  \code{classify} functions. If \code{x} is a model, and testing data
   is included in the model, \code{pop} and \code{test_data} can both be
   missing, and accuracy will still run (though the output will in this case
   be biased unless the testing data is from a simple random sample). If
@@ -84,7 +84,7 @@ need to be provided (see Details).
         testing data included in \code{x}. This will only work if \code{x}
         is a model of class \code{train} from the \code{caret} package, and
         if the model was run using the one of the \code{teamlucc}
-        \code{classify_image} functions.
+        \code{classify} functions.
 
 \item A \code{SpatialPolygonsDataFrame} object, in which case \code{accuracy}
         will extract the predicted classes within each polygon from \code{x}.
@@ -109,7 +109,7 @@ need to be provided (see Details).
 }
 }
 \examples{
-accuracy(L5TSR_1986_classified$model)
+accuracy(L5TSR_1986_rfmodel)
 }
 \references{
 Pontius, R. G., and M. Millones. 2011. Death to Kappa: birth of

@@ -45,4 +45,9 @@ For \code{type='svm'}, \code{tunegrid} must be a \code{data.frame} with two
 columns: ".sigma" and ".C". For \code{type='rf'}, must be a
 \code{data.frame} with one column: '.mtry'.
 }
+\examples{
+train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",
+                         training=.6)
+model <- train_classifier(train_data)
+}
 

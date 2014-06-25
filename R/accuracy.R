@@ -209,7 +209,7 @@ plot.error_adj_area <- function(x, ...) {
 #' \enumerate{
 #'
 #'   \item A prediction model as output from one of the \code{teamlucc} 
-#'   \code{classify_image} functions. If \code{x} is a model, and testing data 
+#'   \code{classify} functions. If \code{x} is a model, and testing data 
 #'   is included in the model, \code{pop} and \code{test_data} can both be 
 #'   missing, and accuracy will still run (though the output will in this case 
 #'   be biased unless the testing data is from a simple random sample). If 
@@ -224,7 +224,7 @@ plot.error_adj_area <- function(x, ...) {
 #'         testing data included in \code{x}. This will only work if \code{x}
 #'         is a model of class \code{train} from the \code{caret} package, and 
 #'         if the model was run using the one of the \code{teamlucc} 
-#'         \code{classify_image} functions.
+#'         \code{classify} functions.
 #'
 #'   \item A \code{SpatialPolygonsDataFrame} object, in which case \code{accuracy} 
 #'         will extract the predicted classes within each polygon from \code{x}.  
@@ -258,7 +258,7 @@ plot.error_adj_area <- function(x, ...) {
 #' \code{SpatialPolygonsDataFrame}. Defines the name of the column containing 
 #' the observed cover class IDs
 #' @param reclass_mat a reclassification matrix to be used in the case of a 
-#' model fit by \code{classify_image} with the \code{do_split} option selected
+#' model fit by \code{classify} with the \code{do_split} option selected
 #' @return \code{\link{accuracy-class}} instance
 #' @references Pontius, R. G., and M. Millones. 2011. Death to Kappa: birth of 
 #' quantity disagreement and allocation disagreement for accuracy assessment.  
@@ -272,7 +272,7 @@ plot.error_adj_area <- function(x, ...) {
 #' Foody, G.M., Stehman, S.V., 2009. Accuracy Assessment, in: Warner, T.A., 
 #' Nellis, M.D., Foody, G.M. (Eds.), The SAGE Handbook of Remote Sensing. SAGE.
 #' @examples
-#' accuracy(L5TSR_1986_classified$model)
+#' accuracy(L5TSR_1986_rfmodel)
 setGeneric("accuracy", function(x, test_data, pop, class_col, reclass_mat) 
            standardGeneric("accuracy"))
 

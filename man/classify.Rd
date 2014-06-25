@@ -38,10 +38,11 @@ a list with 2 elements: the predicted classes as a
 Classifies an image using a trained random forest classifier
 }
 \examples{
-#TODO: Fix example
-model <- rf_train(x, tr_data)
-preds <- rf_classify(x, model)
-require(rasterVis)
-levelplot(preds$classes)
+train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",
+                         training=.6)
+model <- train_classifier(train_data)
+preds <- classify(L5TSR_1986, model)
+plot(preds$classes)
+plot(preds$probs)
 }
 

@@ -64,11 +64,11 @@ NULL
 #' @name ASTER_V002_EAST
 #' @seealso ASTER_V002_WEST
 NULL
-#' Example output from classify_image.R
+#' Example output from classify function
 #'
-#' This is the output from running the classification example from the
-#' \code{classify_image} function.
+#' This is an example Random Forest model as output from the classification 
+#' example in the code{classify} function.
 #' 
 #' @docType data
-#' @name L5TSR_1986_classified
+#' @name L5TSR_1986_rfmodel
 NULL

@@ -29,13 +29,17 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @return a trained random forest model (as a \code{train} object from the  
 #' \code{caret} package)
+#' @examples
+#' train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
+#'                          training=.6)
+#' model <- train_classifier(train_data)
 train_classifier <- function(train_data, type='rf', use_training_flag=TRUE, 
                              train_control=NULL, tune_grid=NULL,
                              use_rfe=FALSE) {
     stopifnot(type %in% c('svm', 'rf'))
 
     if (is.null(train_control)) {
-        train_control <- trainControl(method="oob")
+        train_control <- trainControl(method="oob", classProbs=TRUE)
     }
 
     # Build the formula, excluding the training flag column (if it exists) from 

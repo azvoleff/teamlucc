@@ -22,8 +22,6 @@
 #' FALSE), or 2) a logical vector of length equal to length(polys), or 3) a 
 #' number between 0 and 1 indicating the fraction of the polygons to be 
 #' randomly selected for use in training.
-#' @param n_cpus the number of CPUs to use for processes that can run in 
-#' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
 #' @param notify notifier to use (defaults to \code{print} function). See the 
@@ -32,8 +30,8 @@
 #' @examples
 #' #TODO: Add example
 auto_classify <- function(predictor_file, train_shp, output_path, 
-                          class_col="Poly_Type", training=.6, n_cpus=1, 
-                          overwrite=FALSE, notify=print) {
+                          class_col="Poly_Type", training=.6, overwrite=FALSE, 
+                          notify=print) {
     if (!file_test("-f", train_shp)) {
         stop(paste(train_shp, "does not exist"))
     }
@@ -43,8 +41,6 @@ auto_classify <- function(predictor_file, train_shp, output_path,
     if (!file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
-
-    if (n_cpus > 1) beginCluster(n_cpus)
 
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Running auto_classify')
@@ -57,8 +53,8 @@ auto_classify <- function(predictor_file, train_shp, output_path,
     train_data <- get_pixels(predictors, train_polys, 
                                         class_col=class_col, training=training)
 
-    timer <- start_timer(timer, label='Running classify_image')
-    classification <- classify_image(predictors, train_data, notify=notify)
+    timer <- start_timer(timer, label='Running classify')
+    classification <- classify(predictors, train_data, notify=notify)
     model <- classification$model
     save(model, file=file.path(output_path, paste(pred_rast_basename, 
                                                   'predmodel.RData', sep='_')))
@@ -72,7 +68,7 @@ auto_classify <- function(predictor_file, train_shp, output_path,
                                                       'predprobs.tif', 
                                                       sep='_')),
                 datatype='INT2S', overwrite=overwrite)
-    timer <- stop_timer(timer, label='Running classify_image')
+    timer <- stop_timer(timer, label='Running classify')
 
     # cls <- levels(train_data$y) 
     # cls <- data.frame(code=seq(1:length(cls)), name=cls)
@@ -87,8 +83,6 @@ auto_classify <- function(predictor_file, train_shp, output_path,
     capture.output(summary(acc),
                    file=file.path(output_path, paste(pred_rast_basename, 'predacc.txt', sep='_')))
     timer <- stop_timer(timer, label='Running accuracy assessment')
-
-    if (n_cpus > 1) endCluster()
 
     timer <- stop_timer(timer, label='Running auto_classify')
 }
