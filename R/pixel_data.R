@@ -113,11 +113,12 @@ function(x) {
 #' Set src_name for a pixel_data object
 #'
 #' @export src_name<-
+#' @rdname src_name
 #' @param x a \code{pixel_data} object
 #' @param src_name a new \code{src_name} to assign for pixels in \code{x}
 setGeneric("src_name<-", function(x, value) standardGeneric("src_name<-"))
 
-#' @rdname src_name<-
+#' @rdname src_name
 #' @aliases src_name<-,pixel_data-method
 setMethod("src_name<-", signature(x="pixel_data"),
 function(x, value) {
