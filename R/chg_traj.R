@@ -13,8 +13,6 @@
 #' returned trajectory lookup table
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
-#' @param overwrite whether to overwrite existing files (otherwise an error 
-#' will be raised)
 #' @param ... additional parameters to pass to rasterEngine
 #' @return a table of all possible trajectories, with their \code{classnames} 
 #' (if specified) and the integer codes used to indicate specific trajectories 
