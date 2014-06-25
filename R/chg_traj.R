@@ -7,12 +7,12 @@
 #' @param chg_dir change direction \code{RasterLayer} from \code{CVAPS}
 #' @param chg_threshold the threshold to use as a minimum when determining change 
 #' areas (can use \code{DFPS} to determine this value).
+#' @param filename filename to save the output \code{RasterLayer} to disk 
+#' (optional)
 #' @param classnames an optional vector of classnames to output with the 
 #' returned trajectory lookup table
 #' @param ignorepersistence whether to ignore persistence of a class (if 
 #' ignored all pixels where a class persists will be set to NA)
-#' @param filename filename to save the output \code{RasterLayer} to disk 
-#' (optional)
 #' @param ... additional parameters to pass to rasterEngine
 #' @return a table of all possible trajectories, with their \code{classnames} 
 #' (if specified) and the integer codes used to indicate specific trajectories 
@@ -28,8 +28,8 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in
 #' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, classnames=NULL, 
-                     ignorepersistence=TRUE, filename=NULL, ...) {
+chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, filename,
+                     classnames=NULL, ignorepersistence=TRUE, ...) {
     if (proj4string(initial) != proj4string(chg_mag) ) {
         stop('initial and chg_mag coordinate systems do not match')
     } else if (proj4string(initial) != proj4string(chg_dir) ) {
@@ -43,6 +43,9 @@ chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, classnames=NULL,
     if (nlayers(initial) > 1) stop('initial has more than 1 layer')
     if (nlayers(chg_mag) > 1) stop('chg_mag has more than 1 layer')
     if (nlayers(chg_dir) > 1) stop('chg_dir has more than 1 layer')
+    if (!missing(filename) && file_test('-f', filename) && !overwrite) {
+        stop('output file already exists and overwrite=FALSE')
+    }
 
     # Make a lookup table of codes for each type of transition
     classcodes <- sort(unique(getValues(initial)))
@@ -71,10 +74,18 @@ chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, classnames=NULL,
         return(traj)
     }
     out <- rasterEngine(initial=initial, chg_mag=chg_mag, chg_dir=chg_dir, 
-                        fun=calc_chg_traj, args=list(classcodes=classcodes, 
-                                                     chg_threshold=chg_threshold,
-                                                     ignorepersistence=ignorepersistence), 
-                        filename=filename, ...)
+                        fun=calc_chg_traj,
+                        args=list(classcodes=classcodes, 
+                                  chg_threshold=chg_threshold,
+                                  ignorepersistence=ignorepersistence), 
+                        datatype='INT2S', ...)
+
+    # spatial.tools can only output the raster package grid format - so output 
+    # to a tempfile in that format then copy over to the requested final output 
+    # format if a filename was supplied
+    if (!missing(filename)) {
+        out <- writeRaster(out, filename=filename, overwrite=overwrite, datatype='INT2S')
+    }
 
     return(list(traj_lut=traj_lut, chg_traj=out))
 }
