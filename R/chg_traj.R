@@ -11,8 +11,8 @@
 #' (optional)
 #' @param classnames an optional vector of classnames to output with the 
 #' returned trajectory lookup table
-#' @param ignorepersistence whether to ignore persistence of a class (if 
-#' ignored all pixels where a class persists will be set to NA)
+#' @param overwrite whether to overwrite existing files (otherwise an error 
+#' will be raised)
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
 #' @param ... additional parameters to pass to rasterEngine
@@ -31,8 +31,7 @@
 #' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
 chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, filename,
-                     classnames=NULL, ignorepersistence=TRUE,
-                     overwrite=FALSE, ...) {
+                     classnames=NULL, overwrite=FALSE, ...) {
     if (proj4string(initial) != proj4string(chg_mag) ) {
         stop('initial and chg_mag coordinate systems do not match')
     } else if (proj4string(initial) != proj4string(chg_dir) ) {
@@ -60,34 +59,34 @@ chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, filename,
         traj_lut$t0_name <- classnames[match(traj_lut$t0_code, classcodes)]
         traj_lut$t1_name <- classnames[match(traj_lut$t1_code, classcodes)]
     }
-    if (ignorepersistence) traj_lut <- traj_lut[!(traj_lut$t0_code == traj_lut$t1_code), ]
     # Code trajectories by summing t0 and t1 after multiplying t1 by the number 
     # of classes.
     traj_lut$Code <- traj_lut$t0_code + traj_lut$t1_code * length(classcodes)
 
-    calc_chg_traj <- function(initial, chg_mag, chg_dir, classcodes, chg_threshold, 
-                              ignorepersistence, ...) {
-        # Code trajectories by summing t0 and chg_dir after multiplying chg_dir 
-        # by the number of classes.
+    calc_chg_traj <- function(initial, chg_mag, chg_dir, classcodes, 
+                              chg_threshold, ...) {
+        # Code change trajectories by summing t0 and chg_dir after multiplying 
+        # chg_dir by the number of classes
         traj <- initial + chg_dir * length(classcodes)
-        traj[chg_mag < chg_threshold] <- NA
-        # Ignore persistence of a class if desired
-        if (ignorepersistence) traj[initial == chg_dir] <- NA
+        # Code classes that persist, being sure to ignore NAs
+        persist_pixels <- which(chg_mag < chg_threshold)
+        persist_pixels <- persist_pixels[!is.na(persist_pixels)]
+        traj[persist_pixels] <- initial[persist_pixels] + initial[persist_pixels] * length(classcodes)
         traj <- array(traj, dim=c(dim(initial)[1], dim(initial)[2], 1))
         return(traj)
     }
     out <- rasterEngine(initial=initial, chg_mag=chg_mag, chg_dir=chg_dir, 
                         fun=calc_chg_traj,
                         args=list(classcodes=classcodes, 
-                                  chg_threshold=chg_threshold,
-                                  ignorepersistence=ignorepersistence), 
+                                  chg_threshold=chg_threshold),
                         datatype='INT2S', ...)
 
     # spatial.tools can only output the raster package grid format - so output 
     # to a tempfile in that format then copy over to the requested final output 
     # format if a filename was supplied
     if (!missing(filename)) {
-        out <- writeRaster(out, filename=filename, overwrite=overwrite, datatype='INT2S')
+        out <- writeRaster(out, filename=filename, overwrite=overwrite, 
+                           datatype='INT2S')
     }
 
     return(list(lut=traj_lut, traj=out))

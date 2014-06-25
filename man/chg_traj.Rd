@@ -4,7 +4,7 @@
 \title{Calculate change-trajectory image}
 \usage{
 chg_traj(initial, chg_mag, chg_dir, chg_threshold, filename,
-  classnames = NULL, ignorepersistence = TRUE, overwrite = FALSE, ...)
+  classnames = NULL, overwrite = FALSE, ...)
 }
 \arguments{
 \item{initial}{initial cover class as \code{RasterLayer}}
@@ -21,9 +21,6 @@ areas (can use \code{DFPS} to determine this value).}
 
 \item{classnames}{an optional vector of classnames to output with the
 returned trajectory lookup table}
-
-\item{ignorepersistence}{whether to ignore persistence of a class (if
-ignored all pixels where a class persists will be set to NA)}
 
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
