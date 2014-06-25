@@ -16,6 +16,7 @@
 #' \code{RasterLayer}
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
+#' @param verbose whether to print detailed status messages
 #' @param ... additional parameters to pass to rasterEngine
 #' @return \code{Raster*} object with change direction image
 #' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
@@ -25,7 +26,7 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
 #' posterior probability space: a new method for land cover change detection.  
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-chg_dir <- function(t1p, t2p, filename, overwrite=FALSE, ...) {
+chg_dir <- function(t1p, t2p, filename, overwrite=FALSE, verbose=FALSE, ...) {
     if (proj4string(t1p) != proj4string(t2p)) {
         stop('t0 and t1 coordinate systems do not match')
     }
@@ -44,27 +45,51 @@ chg_dir <- function(t1p, t2p, filename, overwrite=FALSE, ...) {
         stop('cannot calculate change probabilities for only one class')
     }
 
-    calc_chg_dir <- function(t1p, t2p, n_classes, ...) {
-        # Calculate change direction (eqns 5 and 6 in Chen 2011)
-        dP <- array(t2p - t1p, dim=c(dim(t1p)[1], dim(t1p)[2], n_classes))
-        unit_vecs <- array(diag(n_classes), dim=c(n_classes, n_classes))
-        Eab <- apply(dP, c(1, 2), function(pixel) pixel %*% unit_vecs)
-        chgdir <- apply(Eab, c(2, 3),
-                        function(pixel) which(pixel == max(pixel)))
-        chgdir <- array(chgdir, dim=c(dim(t1p)[1], dim(t1p)[2], 1))
-        return(chgdir)
+    # calc_chg_dir_st <- function(t1p, t2p, n_classes, ...) {
+    #     # Calculate change direction (eqns 5 and 6 in Chen 2011)
+    #     dP <- array(t2p - t1p, dim=c(dim(t1p)[1], dim(t1p)[2], n_classes))
+    #     unit_vecs <- array(diag(n_classes), dim=c(n_classes, n_classes))
+    #     Eab <- apply(dP, c(1, 2), function(pixel) pixel %*% unit_vecs)
+    #     chgdir <- apply(Eab, c(2, 3),
+    #                     function(pixel) which(pixel == max(pixel)))
+    #     chgdir <- array(chgdir, dim=c(dim(t1p)[1], dim(t1p)[2], 1))
+    #     return(chgdir)
+    # }
+    # out <- rasterEngine(t1p=t1p, t2p=t2p, fun=calc_chg_dir_st, 
+    #                     args=list(n_classes=n_classes), 
+    #                     outbands=1, datatype='INT2S', ...)
+    #
+    # # spatial.tools can only output the raster package grid format - so output 
+    # # to a tempfile in that format then copy over to the requested final output 
+    # # format if a filename was supplied
+    # if (!missing(filename)) {
+    #     out <- writeRaster(out, filename=filename, dataType='INT2S', 
+    #                        overwrite=overwrite)
+    # }
+    
+    if (missing(filename)) {
+        filename <- rasterTmpFile()
+        overwrite <- TRUE
     }
-    out <- rasterEngine(t1p=t1p, t2p=t2p, fun=calc_chg_dir, 
-                        args=list(n_classes=n_classes), 
-                        outbands=1, datatype='INT2S', ...)
-
-    # spatial.tools can only output the raster package grid format - so output 
-    # to a tempfile in that format then copy over to the requested final output 
-    # format if a filename was supplied
-    if (!missing(filename)) {
-        out <- writeRaster(out, filename=filename, dataType='INT2S', 
-                           overwrite=overwrite)
+   
+    bs <- blockSize(t1p)
+    out <- raster(t1p)
+    out <- writeStart(out, filename=filename, overwrite=overwrite)
+    for (block_num in 1:bs$n) {
+        if (verbose > 0) {
+            message("Processing block ", block_num, " of ", bs$n, "...")
+        }
+        dims <- c(bs$nrows[block_num], ncol(t1p), nlayers(t1p))
+        t1p_bl <- array(getValuesBlock(t1p, row=bs$row[block_num], 
+                                 nrows=bs$nrows[block_num]),
+                        dim=c(dims[1] * dims[2], dims[3]))
+        t2p_bl <- array(getValuesBlock(t2p, row=bs$row[block_num], 
+                                       nrows=bs$nrows[block_num]),
+                        dim=c(dims[1] * dims[2], dims[3]))
+        chg_dirs <- calc_chg_dir(t1p_bl, t2p_bl, n_classes)
+        out <- writeValues(out, chg_dirs, bs$row[block_num])
     }
+    out <- writeStop(out)
 
     return(out)
 }

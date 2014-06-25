@@ -3,7 +3,7 @@
 \alias{chg_dir}
 \title{Change Direction Image for CVAPS}
 \usage{
-chg_dir(t1p, t2p, filename, overwrite = FALSE, ...)
+chg_dir(t1p, t2p, filename, overwrite = FALSE, verbose = FALSE, ...)
 }
 \arguments{
 \item{t1p}{time 0 posterior probability \code{Raster*}}
@@ -15,6 +15,8 @@ chg_dir(t1p, t2p, filename, overwrite = FALSE, ...)
 
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
+
+\item{verbose}{whether to print detailed status messages}
 
 \item{...}{additional parameters to pass to rasterEngine}
 }
