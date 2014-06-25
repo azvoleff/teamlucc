@@ -11,8 +11,7 @@
 #' @param predictor_file a \code{Raster*} of predictor layers output by the 
 #' \code{auto_preprocess} function or path to an image stack in a format 
 #' readable by the \code{raster} package.
-#' @param train_shp a training dataset as output by 
-#' \code{pixel_data}
+#' @param train_shp a file readable by readOGR with training polygons
 #' @param output_path the path to use for the output
 #' @param class_col the name of the column containing the response variable 
 #' (for example the land cover type of each pixel)
@@ -22,8 +21,6 @@
 #' FALSE), or 2) a logical vector of length equal to length(polys), or 3) a 
 #' number between 0 and 1 indicating the fraction of the polygons to be 
 #' randomly selected for use in training.
-#' @param n_cpus the number of CPUs to use for processes that can run in 
-#' parallel
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
 #' @param notify notifier to use (defaults to \code{print} function). See the 
@@ -32,8 +29,10 @@
 #' @examples
 #' #TODO: Add example
 auto_classify <- function(predictor_file, train_shp, output_path, 
-                          class_col="Poly_Type", training=.6, n_cpus=1, 
-                          overwrite=FALSE, notify=print) {
+                          class_col="Poly_Type", training=.6, overwrite=FALSE, 
+                          notify=print) {
+    stop("auto_classify not currently supported")
+
     if (!file_test("-f", train_shp)) {
         stop(paste(train_shp, "does not exist"))
     }
@@ -44,8 +43,6 @@ auto_classify <- function(predictor_file, train_shp, output_path,
         stop(paste(output_path, "does not exist"))
     }
 
-    if (n_cpus > 1) beginCluster(n_cpus)
-
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Running auto_classify')
 
@@ -54,8 +51,8 @@ auto_classify <- function(predictor_file, train_shp, output_path,
 
     train_polys <- readOGR(dirname(train_shp), basename(file_path_sans_ext(train_shp)))
     train_polys <- spTransform(train_polys, crs(predictors))
-    train_data <- get_pixels(predictors, train_polys, 
-                                        class_col=class_col, training=training)
+    train_data <- get_pixels(predictors, train_polys, class_col=class_col, 
+                             training=training)
 
     timer <- start_timer(timer, label='Running classify_image')
     classification <- classify_image(predictors, train_data, notify=notify)
@@ -87,8 +84,6 @@ auto_classify <- function(predictor_file, train_shp, output_path,
     capture.output(summary(acc),
                    file=file.path(output_path, paste(pred_rast_basename, 'predacc.txt', sep='_')))
     timer <- stop_timer(timer, label='Running accuracy assessment')
-
-    if (n_cpus > 1) endCluster()
 
     timer <- stop_timer(timer, label='Running auto_classify')
 }

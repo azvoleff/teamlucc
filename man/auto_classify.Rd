@@ -4,15 +4,14 @@
 \title{Classify a preprocessed surface reflectance image}
 \usage{
 auto_classify(predictor_file, train_shp, output_path, class_col = "Poly_Type",
-  training = 0.6, n_cpus = 1, overwrite = FALSE, notify = print)
+  training = 0.6, overwrite = FALSE, notify = print)
 }
 \arguments{
 \item{predictor_file}{a \code{Raster*} of predictor layers output by the
 \code{auto_preprocess} function or path to an image stack in a format
 readable by the \code{raster} package.}
 
-\item{train_shp}{a training dataset as output by
-\code{pixel_data}}
+\item{train_shp}{a file readable by readOGR with training polygons}
 
 \item{output_path}{the path to use for the output}
 
@@ -25,9 +24,6 @@ used in training (column equal to TRUE) or in testing (column equal to
 FALSE), or 2) a logical vector of length equal to length(polys), or 3) a
 number between 0 and 1 indicating the fraction of the polygons to be
 randomly selected for use in training.}
-
-\item{n_cpus}{the number of CPUs to use for processes that can run in
-parallel}
 
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
