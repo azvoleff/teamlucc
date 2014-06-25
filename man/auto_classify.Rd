@@ -11,8 +11,7 @@ auto_classify(predictor_file, train_shp, output_path, class_col = "Poly_Type",
 \code{auto_preprocess} function or path to an image stack in a format
 readable by the \code{raster} package.}
 
-\item{train_shp}{a training dataset as output by
-\code{pixel_data}}
+\item{train_shp}{a file readable by readOGR with training polygons}
 
 \item{output_path}{the path to use for the output}
 
