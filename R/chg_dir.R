@@ -44,11 +44,6 @@ chg_dir <- function(t1p, t2p, filename, overwrite=FALSE, ...) {
         stop('cannot calculate change probabilities for only one class')
     }
 
-    # spatial.tools can only output the raster package grid format - so output 
-    # to a tempfile in that format then copy over to the requested final output 
-    # format if a filename was supplied
-    st_filename <- rasterTmpFile()
-
     calc_chg_dir <- function(t1p, t2p, n_classes, ...) {
         # Calculate change direction (eqns 5 and 6 in Chen 2011)
         dP <- array(t2p - t1p, dim=c(dim(t1p)[1], dim(t1p)[2], n_classes))
@@ -63,6 +58,9 @@ chg_dir <- function(t1p, t2p, filename, overwrite=FALSE, ...) {
                         args=list(n_classes=n_classes), 
                         outbands=1, datatype='INT2S', ...)
 
+    # spatial.tools can only output the raster package grid format - so output 
+    # to a tempfile in that format then copy over to the requested final output 
+    # format if a filename was supplied
     if (!missing(filename)) {
         out <- writeRaster(out, filename=filename, dataType='INT2S', 
                            overwrite=overwrite)

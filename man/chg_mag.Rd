@@ -24,10 +24,11 @@ will be raised)}
 \description{
 This code calculate the change magnitude image for the Change Vector
 Analysis in Posterior Probability Space (CVAPS) method of Chen et al. 2011.
-Use the change magnitude image in conjunction with the change direction
-image from \code{chg_dir}, and \code{DFPS} to use the Double Window Flexible
-Pace Search method (Chen et al. 2003) to determine the threshold to use to
-map areas of change and no-change.
+Use the change magnitude image and use it in conjunction with the change
+direction image from \code{chg_dir} to map areas of change and no-change.
+The threshold can be determined using \code{\link{DFPS}} (to use the Double
+Window Flexible Pace Search method, from Chen et al. 2003) or
+\code{\link{threshold}} (which uses an unsupervised method).
 }
 \references{
 Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.

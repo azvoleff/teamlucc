@@ -2,10 +2,11 @@
 #'
 #' This code calculate the change magnitude image for the Change Vector 
 #' Analysis in Posterior Probability Space (CVAPS) method of Chen et al. 2011.  
-#' Use the change magnitude image in conjunction with the change direction 
-#' image from \code{chg_dir}, and \code{DFPS} to use the Double Window Flexible 
-#' Pace Search method (Chen et al. 2003) to determine the threshold to use to 
-#' map areas of change and no-change.
+#' Use the change magnitude image and use it in conjunction with the change 
+#' direction image from \code{chg_dir} to map areas of change and no-change.  
+#' The threshold can be determined using \code{\link{DFPS}} (to use the Double 
+#' Window Flexible Pace Search method, from Chen et al. 2003) or 
+#' \code{\link{threshold}} (which uses an unsupervised method).
 #'
 #' @export
 #' @importFrom spatial.tools rasterEngine
@@ -40,11 +41,6 @@ chg_mag <- function(t1p, t2p, filename, overwrite=FALSE, ...) {
 
     n_classes <- nlayers(t1p)
 
-    # spatial.tools can only output the raster package grid format - so output 
-    # to a tempfile in that format then copy over to the requested final output 
-    # format if a filename was supplied
-    st_filename <- rasterTmpFile()
-
     calc_chg_mag <- function(t1p, t2p, n_classes, ...) {
         if (is.null(dim(t1p))) {
             # Handle RasterLayer images
@@ -57,9 +53,12 @@ chg_mag <- function(t1p, t2p, filename, overwrite=FALSE, ...) {
         return(chgmag)
     }
     out <- rasterEngine(t1p=t1p, t2p=t2p, fun=calc_chg_mag, 
-                        args=list(n_classes=n_classes), filename=st_filename,
-                        outbands=1, ...)
+                        args=list(n_classes=n_classes), 
+                        outbands=1, outfiles=1, ...)
     
+    # spatial.tools can only output the raster package grid format - so output 
+    # to a tempfile in that format then copy over to the requested final output 
+    # format if a filename was supplied
     if (!missing(filename)) {
         out <- writeRaster(out, filename=filename, overwrite=overwrite)
     }
