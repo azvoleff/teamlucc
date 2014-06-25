@@ -13,6 +13,8 @@
 #' @param t2p time 1 posterior probability \code{Raster*}
 #' @param filename (optional) filename for output change magnitude
 #' \code{RasterLayer}
+#' @param overwrite whether to overwrite existing files (otherwise an error 
+#' will be raised)
 #' @param ... additional parameters to pass to rasterEngine
 #' @return \code{Raster*} object with change magnitude image
 #' @references Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
@@ -22,7 +24,7 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
 #' posterior probability space: a new method for land cover change detection.  
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-chg_mag <- function(t1p, t2p, filename=NULL, ...) {
+chg_mag <- function(t1p, t2p, filename, overwrite=FALSE, ...) {
     if (proj4string(t1p) != proj4string(t2p)) {
         stop('t0 and t1 coordinate systems do not match')
     }
@@ -32,8 +34,16 @@ chg_mag <- function(t1p, t2p, filename=NULL, ...) {
     if (nlayers(t1p) != nlayers(t2p)) {
         stop('t0 and t1 probability maps have differing number of classes')
     }
+    if (!missing(filename) && file_test('-f', filename) && !overwrite) {
+        stop('output file already exists and overwrite=FALSE')
+    }
 
     n_classes <- nlayers(t1p)
+
+    # spatial.tools can only output the raster package grid format - so output 
+    # to a tempfile in that format then copy over to the requested final output 
+    # format if a filename was supplied
+    st_filename <- rasterTmpFile()
 
     calc_chg_mag <- function(t1p, t2p, n_classes, ...) {
         if (is.null(dim(t1p))) {
@@ -47,7 +57,12 @@ chg_mag <- function(t1p, t2p, filename=NULL, ...) {
         return(chgmag)
     }
     out <- rasterEngine(t1p=t1p, t2p=t2p, fun=calc_chg_mag, 
-                        args=list(n_classes=n_classes), filename=filename,
+                        args=list(n_classes=n_classes), filename=st_filename,
                         outbands=1, ...)
+    
+    if (!missing(filename)) {
+        out <- writeRaster(out, filename=filename, overwrite=overwrite)
+    }
+
     return(out)
 }

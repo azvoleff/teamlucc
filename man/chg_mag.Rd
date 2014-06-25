@@ -3,7 +3,7 @@
 \alias{chg_mag}
 \title{Change Magnitude Image for CVAPS}
 \usage{
-chg_mag(t1p, t2p, filename = NULL, ...)
+chg_mag(t1p, t2p, filename, overwrite = FALSE, ...)
 }
 \arguments{
 \item{t1p}{time 0 posterior probability \code{Raster*}}
@@ -12,6 +12,9 @@ chg_mag(t1p, t2p, filename = NULL, ...)
 
 \item{filename}{(optional) filename for output change magnitude
 \code{RasterLayer}}
+
+\item{overwrite}{whether to overwrite existing files (otherwise an error
+will be raised)}
 
 \item{...}{additional parameters to pass to rasterEngine}
 }
