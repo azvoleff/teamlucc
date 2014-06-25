@@ -3,7 +3,7 @@
 \alias{auto_chg_detect}
 \title{Perform change detection for two Landsat CDR surface reflectance images}
 \usage{
-auto_chg_detect(t1_classes, t1_probs, t2_probs, output_basename, output_path,
+auto_chg_detect(t1_classes, t1_probs, t2_probs, output_path, output_basename,
   overwrite = FALSE, notify = print)
 }
 \arguments{
