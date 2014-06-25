@@ -30,7 +30,7 @@ threshold <- function(x, method="huang", by=1, maxpixels=100000) {
     thresholds <- foreach(bandnum=iter(1:nlayers(x)), minval=iter(mins), 
                           maxval=iter(maxs), .packages=c('teamlucc'),
                           .combine=c) %dopar% {
-        image_hist <- hist(x[[bandnum]], breaks=seq(minval, maxval, by=by), 
+        image_hist <- hist(x[[bandnum]], breaks=seq(minval, maxval+by, by=by), 
                            plot=FALSE, maxpixels=maxpixels)
         threshold_index <- threshold_Huang(image_hist$counts)
         image_hist$breaks[threshold_index]

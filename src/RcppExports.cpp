@@ -21,6 +21,23 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// calc_chg_dir
+arma::ivec calc_chg_dir(arma::mat t1p, arma::mat t2p, int n_classes);
+RcppExport SEXP teamlucc_calc_chg_dir(SEXP t1pSEXP, SEXP t2pSEXP, SEXP n_classesSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< arma::mat >::type t1p(t1pSEXP );
+        Rcpp::traits::input_parameter< arma::mat >::type t2p(t2pSEXP );
+        Rcpp::traits::input_parameter< int >::type n_classes(n_classesSEXP );
+        arma::ivec __result = calc_chg_dir(t1p, t2p, n_classes);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // cloud_fill
 arma::mat cloud_fill(arma::mat cloudy, arma::mat& clear, arma::ivec& cloud_mask, arma::ivec dims, int num_class, int min_pixel, int max_pixel, int cloud_nbh, int DN_min, int DN_max, bool verbose = false);
 RcppExport SEXP teamlucc_cloud_fill(SEXP cloudySEXP, SEXP clearSEXP, SEXP cloud_maskSEXP, SEXP dimsSEXP, SEXP num_classSEXP, SEXP min_pixelSEXP, SEXP max_pixelSEXP, SEXP cloud_nbhSEXP, SEXP DN_minSEXP, SEXP DN_maxSEXP, SEXP verboseSEXP) {

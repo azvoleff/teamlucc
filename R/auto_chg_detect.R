@@ -38,14 +38,17 @@ auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_basename,
     # Calculate change magnitude and direction
     ###########################################################################
     timer <- start_timer(timer, label='Change magnitude and direction')
+
     chg_dir_filename <- file.path(output_path, paste(output_basename, 
-                                                     'chg_dir.tif', sep='_'))
+                                                     'chgdir.tif', sep='_'))
     chg_dir_image <- chg_dir(t1_probs, t2_probs, filename=chg_dir_filename, 
                              overwrite=overwrite)
+
     chg_mag_filename <- file.path(output_path, paste(output_basename, 
-                                                     'chg_mag.tif', sep='_'))
+                                                     'chgmag.tif', sep='_'))
     chg_mag_image <- chg_mag(t1_probs, t2_probs, filename=chg_mag_filename, 
                              overwrite=overwrite)
+
     timer <- stop_timer(timer, label='Change magnitude and direction')
 
     ###########################################################################
