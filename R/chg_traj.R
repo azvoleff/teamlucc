@@ -13,6 +13,8 @@
 #' returned trajectory lookup table
 #' @param ignorepersistence whether to ignore persistence of a class (if 
 #' ignored all pixels where a class persists will be set to NA)
+#' @param overwrite whether to overwrite existing files (otherwise an error 
+#' will be raised)
 #' @param ... additional parameters to pass to rasterEngine
 #' @return a table of all possible trajectories, with their \code{classnames} 
 #' (if specified) and the integer codes used to indicate specific trajectories 
@@ -29,7 +31,8 @@
 #' posterior probability space: a new method for land cover change detection.
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
 chg_traj <- function(initial, chg_mag, chg_dir, chg_threshold, filename,
-                     classnames=NULL, ignorepersistence=TRUE, ...) {
+                     classnames=NULL, ignorepersistence=TRUE,
+                     overwrite=FALSE, ...) {
     if (proj4string(initial) != proj4string(chg_mag) ) {
         stop('initial and chg_mag coordinate systems do not match')
     } else if (proj4string(initial) != proj4string(chg_dir) ) {
