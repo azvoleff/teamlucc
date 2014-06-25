@@ -40,6 +40,8 @@ summary.pixel_data <- function(object, ...) {
                          n_polys=length(unique(pixel_src)),
                          train_frac=round(sum(training_flag) / length(training_flag), 2))
     obj[['class_stats']]  <- class_stats
+    obj[['n_training']] <- sum(object@training_flag==TRUE)
+    obj[['n_testing']] <- sum(object@training_flag==FALSE)
     obj[['training_frac']] <- sum(object@training_flag==TRUE) / length(object@training_flag)
     class(obj) <- 'summary.pixel_data'
     obj
@@ -58,7 +60,9 @@ print.summary.pixel_data <- function(x, ...) {
     cat('Training data statistics:\n')
     print(x[['class_stats']])
     cat('\n')
-    cat(paste('Training fraction:\t', round(x[['training_frac']], 2), '\n', sep=''))
+    cat(paste('Number of training samples:\t', x[['n_training']], '\n', sep=''))
+    cat(paste('Number of testing samples:\t', x[['n_testing']], '\n', sep=''))
+    cat(paste('Training fraction:\t\t', round(x[['training_frac']], 2), '\n', sep=''))
     invisible(x)
 }
 
