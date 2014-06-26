@@ -66,6 +66,8 @@ auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_path,
                                    paste0(output_basename, 'chgtraj.', ext))
 
     chg_threshold <- threshold(chg_mag_image, by=by)
+    
+    notify(paste0('Using threshold=', chg_threshold))
 
     chg_traj_out <- chg_traj(t1_classes, chg_mag_image, chg_dir_image, 
                               classnames=levels(t1_classes),
