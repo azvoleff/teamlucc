@@ -12,10 +12,11 @@ sample_observed(x, size, strata = NULL, side = xres(x), fields = c(),
 
 \item{size}{the sample size (number of sample polygons to return)}
 
-\item{side}{the length each side of the sample polygon}
+\item{side}{desired length for each side of the sample polygon (units of the
+input \code{Raster*}, usually meters)}
 
 \item{strata}{(optional) a \code{RasterLayer} of integers giving the strata
-of each pixel.}
+of each pixel (for example, a classified image)}
 
 \item{fields}{a list of fields to include in the output
 \code{SpatialPolygonsDataFrame} (such as a "class" field if you will be

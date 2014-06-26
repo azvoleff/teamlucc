@@ -14,9 +14,10 @@
 #' @importFrom rgdal writeOGR
 #' @param x a \code{Raster*}
 #' @param size the sample size (number of sample polygons to return)
-#' @param side the length each side of the sample polygon
+#' @param side desired length for each side of the sample polygon (units of the 
+#' input \code{Raster*}, usually meters)
 #' @param strata (optional) a \code{RasterLayer} of integers giving the strata 
-#' of each pixel.
+#' of each pixel (for example, a classified image)
 #' @param fields a list of fields to include in the output 
 #' \code{SpatialPolygonsDataFrame} (such as a "class" field if you will be 
 #' digitizing classes).
