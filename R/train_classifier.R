@@ -24,9 +24,6 @@
 #' @param use_rfe whether to use Recursive Feature Extraction (RFE) as 
 #' implemented in the \code{caret} package to select a subset of the input 
 #' features to be used in the classification. NOT YET SUPPORTED.
-#' @param notify notifier to use (defaults to \code{print} function). See the 
-#' \code{notifyR} package for one way of sending notifications from R. The 
-#' \code{notify} function should accept a string as the only argument.
 #' @return a trained random forest model (as a \code{train} object from the  
 #' \code{caret} package)
 #' @examples
@@ -50,7 +47,6 @@ train_classifier <- function(train_data, type='rf', use_training_flag=TRUE,
 
     if (use_rfe) {
         stop('recursive feature extraction not yet supported')
-        notify('Training classifier using RFE...')
         # This recursive feature elimination procedure follows Algorithm 19.5 
         # in Kuhn and Johnson 2013
         svmFuncs <- caretFuncs

@@ -3,8 +3,7 @@
 \alias{classify}
 \title{Classifies an image using a trained random forest classifier}
 \usage{
-classify(x, model, classes_file, prob_file, overwrite = FALSE,
-  notify = print)
+classify(x, model, classes_file, prob_file, overwrite = FALSE)
 }
 \arguments{
 \item{x}{a \code{Raster*} image with the predictor layer(s) for the
@@ -18,17 +17,7 @@ classification}
 \item{prob_file}{filename for predicted probabilities (or missing) CURRENTLY
 IGNORED}
 
-\item{use_training_flag}{indicates whether to exclude data flagged as
-testing data when training the classifier. For this to work the input
-train_data \code{data.frame} must have a column named 'training_flag' that
-indicates, for each pixel, whether that pixel is a training pixel (coded as
-TRUE) or testing pixel (coded as FALSE).}
-
 \item{overwrite}{whether to overwrite \code{out_name} if it already exists}
-
-\item{notify}{notifier to use (defaults to \code{print} function). See the
-\code{notifyR} package for one way of sending notifications from R. The
-\code{notify} function should accept a string as the only argument.}
 }
 \value{
 a list with 2 elements: the predicted classes as a

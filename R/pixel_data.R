@@ -114,8 +114,7 @@ function(x) {
 #'
 #' @export src_name<-
 #' @rdname src_name
-#' @param x a \code{pixel_data} object
-#' @param src_name a new \code{src_name} to assign for pixels in \code{x}
+#' @param value a new \code{src_name} to assign for pixels in \code{x}
 setGeneric("src_name<-", function(x, value) standardGeneric("src_name<-"))
 
 #' @rdname src_name

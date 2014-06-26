@@ -18,7 +18,7 @@
 #' the image with the lowest percent cloud cover.
 #' @param overwrite whether to overwrite \code{out_name} if it already exists
 #' @return nothing - used for side effect of normalizing imagery
-auto_normalize <- function(image_files, base) {
+auto_normalize <- function(image_files, base, overwrite=TRUE) {
     stopifnot(length(image_files) >= 1)
 
     image_stacks <- lapply(image_files, stack)

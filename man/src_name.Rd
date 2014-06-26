@@ -19,9 +19,7 @@ src_name(x) <- value
 \item{x}{a \code{pixel_data} object
 this pixel_data object}
 
-\item{x}{a \code{pixel_data} object}
-
-\item{src_name}{a new \code{src_name} to assign for pixels in \code{x}}
+\item{value}{a new \code{src_name} to assign for pixels in \code{x}}
 }
 \description{
 Get src_name for a pixel_data object

@@ -3,7 +3,7 @@
 \alias{auto_normalize}
 \title{Normalize a set of preprocessed CDR images to a base image}
 \usage{
-auto_normalize(image_files, base)
+auto_normalize(image_files, base, overwrite = TRUE)
 }
 \arguments{
 \item{image_files}{list of filenames for images to normalize}
