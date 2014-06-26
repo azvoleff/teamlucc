@@ -26,6 +26,7 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
+#' @return nothing - used for the side effect of performing change detection
 #' @references Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector 
 #' analysis in posterior probability space: a new method for land cover change 
 #' detection.  IEEE Geoscience and Remote Sensing Letters 8:317-321.
@@ -62,13 +63,13 @@ auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_path,
     # Calculate change trajectories
     ###########################################################################
     timer <- start_timer(timer, label='Change trajectories')
-    chg_traj_filename <- file.path(output_path,
-                                   paste0(output_basename, 'chgtraj.', ext))
 
     chg_threshold <- threshold(chg_mag_image, by=by)
     
     notify(paste0('Using threshold=', chg_threshold))
 
+    chg_traj_filename <- file.path(output_path,
+                                   paste0(output_basename, '_chgtraj.', ext))
     chg_traj_out <- chg_traj(t1_classes, chg_mag_image, chg_dir_image, 
                               classnames=levels(t1_classes),
                               chg_threshold=chg_threshold, overwrite=overwrite, 

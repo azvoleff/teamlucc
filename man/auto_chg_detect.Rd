@@ -34,6 +34,9 @@ image using \code{\link{threshold}}}
 \code{notifyR} package for one way of sending notifications from R. The
 \code{notify} function should accept a string as the only argument.}
 }
+\value{
+nothing - used for the side effect of performing change detection
+}
 \description{
 This image automates the change detection process using the Change Vector
 Analysis in Posterior Probability Space (CVAPS) algorithm. The threshold for
