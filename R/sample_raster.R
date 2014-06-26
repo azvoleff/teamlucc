@@ -32,12 +32,12 @@
 #' \dontrun{
 #' set.seed(0)
 #' L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
-#' training_polys <- sample_observed(L5TSR_1986_b1, 30,
+#' training_polys <- sample_raster(L5TSR_1986_b1, 30,
 #'                                   side=6*xres(L5TSR_1986_b1))
 #' plot(L5TSR_1986_b1)
 #' plot(training_polys, add=TRUE)
 #' }
-sample_observed <- function(x, size, strata=NULL, side=xres(x), fields=c(), 
+sample_raster <- function(x, size, strata=NULL, side=xres(x), fields=c(), 
                             na.rm=TRUE, exp=5) {
     if (!is.null(strata)) {
         stratified <- TRUE
