@@ -64,20 +64,6 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, of="GTiff",
 
     timer <- start_timer(timer, label=paste('Processing DEMS for', nrow(pathrows), 
                                             'path/rows'))
-
-    # writeOGR(pathrows, output_path, 
-    #          paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows'), 
-    #          driver='ESRI Shapefile', overwrite_layer=overwrite)
-
-    # png(file.path(output_path, 
-    #     paste0(basename(file_path_sans_ext(aoi_file)), '_pathrows.png')),
-    #     width=900, height=900)
-    # plot(pathrows, lwd=2)
-    # plot(aoi_prproj, add=TRUE, lty=2, col="#00ff0050", lwd=2)
-    # text(coordinates(pathrows), labels=paste(pathrows$PATH, pathrows$ROW, 
-    #                                          sep=', '), cex=2)
-    # dev.off()
-
     if (crop_to_aoi) {
         # Do a rough crop of the pathrows to the AOI in the pathrow CRS 
         # (pathrow will later be cropped in the AOI CRS).
