@@ -154,10 +154,10 @@ function(x, value) {
 #' (for example the land cover type of each pixel)
 #' @param training indicator of which polygons to use in training. Can be: 1) a 
 #' string giving the name of a column indicating whether each polygon is to be 
-#' used in training (column equal to TRUE) or in testing (column equal to 
-#' FALSE), or 2) a logical vector of length equal to length(polys), or 3) a 
-#' number between 0 and 1 indicating the fraction of the polygons to be 
-#' randomly selected for use in training.
+#' used in training (rows equal to 1) or in testing (rows equal to FALSE), or 
+#' 2) a logical vector of length equal to length(polys), or 3) a number between 
+#' 0 and 1 indicating the fraction of the polygons to be randomly selected for 
+#'   use in training.
 #' @param src name of this data source. Useful when gathering training 
 #' data from multiple images.
 #' @return data.frame with the training data. Each row will contain the 
