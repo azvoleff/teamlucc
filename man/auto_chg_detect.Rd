@@ -4,7 +4,7 @@
 \title{Perform change detection for two Landsat CDR surface reflectance images}
 \usage{
 auto_chg_detect(t1_classes, t1_probs, t2_probs, output_path, output_basename,
-  overwrite = FALSE, notify = print)
+  ext = "tif", overwrite = FALSE, by = 0.005, notify = print)
 }
 \arguments{
 \item{t1_classes}{cover classes as output from \code{auto_classify_image}
@@ -21,8 +21,14 @@ for time 1 image}
 \item{output_basename}{the base filename for output files from
 \code{auto_chg_detect} (without an extension)}
 
+\item{ext}{file extension to use when saving output rasters (determines
+output file format).}
+
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
+
+\item{by}{step size to use when calculating histogram from change magnitude
+image using \code{\link{threshold}}}
 
 \item{notify}{notifier to use (defaults to \code{print} function). See the
 \code{notifyR} package for one way of sending notifications from R. The
