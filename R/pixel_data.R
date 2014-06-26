@@ -96,11 +96,10 @@ rbind.pixel_data <- function(x, ...) {
 setMethod("show", signature(object="pixel_data"), function(object) 
           print(object))
 
-#' Get src_name for a pixel_data object
+#' Get or set src_name for a pixel_data object
 #'
 #' @export src_name
 #' @param x a \code{pixel_data} object
-#' this pixel_data object
 setGeneric("src_name", function(x) standardGeneric("src_name"))
 
 #' @rdname src_name
@@ -110,8 +109,6 @@ function(x) {
     return(paste0(x@pixel_src$src, '_', x@pixel_src$ID))
 })
 
-#' Set src_name for a pixel_data object
-#'
 #' @export src_name<-
 #' @rdname src_name
 #' @param value a new \code{src_name} to assign for pixels in \code{x}
