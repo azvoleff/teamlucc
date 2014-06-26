@@ -117,6 +117,7 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages and timing 
 #' information
+#' @return nothing - used for the side effect of preprocessing imagery
 #' @seealso \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}}, 
 #' \code{\link{auto_setup_dem}}
 auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,

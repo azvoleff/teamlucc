@@ -43,6 +43,9 @@ Landsat path/row polygon for that particular path/row}
 \item{verbose}{whether to print detailed status messages and timing
 information}
 }
+\value{
+nothing - used for the side effect of setting up DEMs
+}
 \description{
 This function will setup a set of DEM tiles for each the Landsat path/row
 needed to cover a given AOI. The tiles can optionally be cropped to cover

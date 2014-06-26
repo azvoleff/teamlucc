@@ -59,6 +59,9 @@ output file format). Should match file extension for output format chosen by
 \item{verbose}{whether to print detailed status messages and timing
 information}
 }
+\value{
+nothing - used for the side effect of preprocessing imagery
+}
 \description{
 This function preprocesses surface reflectance imagery from the Landsat
 Climate Data Record (CDR) archive. \code{auto_preprocess_landsat} can

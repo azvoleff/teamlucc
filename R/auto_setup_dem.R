@@ -42,6 +42,7 @@
 #' \code{notify} function should accept a string as the only argument.
 #' @param verbose whether to print detailed status messages and timing 
 #' information
+#' @return nothing - used for the side effect of setting up DEMs
 auto_setup_dem <- function(aoi, output_path, dem_extents, of="GTiff", 
                            ext='tif', n_cpus=1, overwrite=FALSE, 
                            crop_to_aoi=FALSE, notify=print, verbose=FALSE) {
