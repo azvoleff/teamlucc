@@ -11,7 +11,7 @@ classify(x, model, classes_file, prob_file, overwrite = FALSE,
 classification}
 
 \item{model}{a trained random forest model as output by
-\code{\link{rf_train}}}
+\code{\link{train_classifier}}}
 
 \item{classes_file}{filename for predicted classes (or missing)}
 

@@ -6,7 +6,7 @@
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
 #' @param model a trained random forest model as output by 
-#' \code{\link{rf_train}}
+#' \code{\link{train_classifier}}
 #' @param classes_file filename for predicted classes (or missing)
 #' @param prob_file filename for predicted probabilities (or missing) CURRENTLY 
 #' IGNORED
@@ -30,9 +30,22 @@
 #' plot(preds$probs)
 classify <- function(x, model, classes_file, prob_file, overwrite=FALSE, 
                      notify=print) {
-    #if (missing(prob_file)) prob_file <- rasterTmpFile()
-    #TODO: find out how to use prob_file with spatial.tools
+    if (!missing(prob_file) && file_test('-f', prob_file) && !overwrite) {
+        stop(paste('output file', prob_file, 'already exists and overwrite=FALSE'))
+    }
+    if (!missing(classes_file) && file_test('-f', classes_file) && !overwrite) {
+        stop(paste('output file', classes_file, 'already exists and overwrite=FALSE'))
+    }
+
     probs <- predict_rasterEngine(object=model, newdata=x, type='prob')
+
+    # spatial.tools can only output the raster package grid format - so output 
+    # to a tempfile in that format then copy over to the requested final output 
+    # format if a filename was supplied
+    if (!missing(prob_file)) {
+        probs <- writeRaster(probs, filename=prob_file, overwrite=overwrite, 
+                             datatype='FLT4S')
+    }
     names(probs) <- levels(model)
 
     # Calculate the highest probability class from the class probabilities
