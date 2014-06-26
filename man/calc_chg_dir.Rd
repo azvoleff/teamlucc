@@ -3,7 +3,7 @@
 \alias{calc_chg_dir}
 \title{Calculate change direction}
 \usage{
-calc_chg_dir(t1p, t2p, n_classes)
+calc_chg_dir(t1p, t2p)
 }
 \arguments{
 \item{t1p}{time 1 posterior probability matrix (with pixels in rows, bands
@@ -16,7 +16,7 @@ in columns)}
 vector of change directions
 }
 \description{
-This code calculate the change direction from two probability images. Not '
+This code calculate the change direction from two probability images. Not
 intended to be called directly - see \code{chg_dir}.
 }
 \references{

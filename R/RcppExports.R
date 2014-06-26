@@ -23,7 +23,7 @@ threshold_Huang <- function(data) {
 
 #' Calculate change direction
 #'
-#' This code calculate the change direction from two probability images. Not ' 
+#' This code calculate the change direction from two probability images. Not
 #' intended to be called directly - see \code{chg_dir}.
 #'
 #' @export
@@ -39,8 +39,8 @@ threshold_Huang <- function(data) {
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
 #' posterior probability space: a new method for land cover change detection.  
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
-calc_chg_dir <- function(t1p, t2p, n_classes) {
-    .Call('teamlucc_calc_chg_dir', PACKAGE = 'teamlucc', t1p, t2p, n_classes)
+calc_chg_dir <- function(t1p, t2p) {
+    .Call('teamlucc_calc_chg_dir', PACKAGE = 'teamlucc', t1p, t2p)
 }
 
 #' Cloud fill using the algorithm developed by Xiaolin Zhu

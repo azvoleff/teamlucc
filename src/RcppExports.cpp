@@ -22,16 +22,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // calc_chg_dir
-arma::ivec calc_chg_dir(arma::mat t1p, arma::mat t2p, int n_classes);
-RcppExport SEXP teamlucc_calc_chg_dir(SEXP t1pSEXP, SEXP t2pSEXP, SEXP n_classesSEXP) {
+arma::ivec calc_chg_dir(arma::mat t1p, arma::mat t2p);
+RcppExport SEXP teamlucc_calc_chg_dir(SEXP t1pSEXP, SEXP t2pSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< arma::mat >::type t1p(t1pSEXP );
         Rcpp::traits::input_parameter< arma::mat >::type t2p(t2pSEXP );
-        Rcpp::traits::input_parameter< int >::type n_classes(n_classesSEXP );
-        arma::ivec __result = calc_chg_dir(t1p, t2p, n_classes);
+        arma::ivec __result = calc_chg_dir(t1p, t2p);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

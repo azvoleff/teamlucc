@@ -4,7 +4,7 @@ using namespace arma;
 
 //' Calculate change direction
 //'
-//' This code calculate the change direction from two probability images. Not ' 
+//' This code calculate the change direction from two probability images. Not
 //' intended to be called directly - see \code{chg_dir}.
 //'
 //' @export
@@ -21,10 +21,11 @@ using namespace arma;
 //' posterior probability space: a new method for land cover change detection.  
 //' IEEE Geoscience and Remote Sensing Letters 8:317-321.
 // [[Rcpp::export]]
-arma::ivec calc_chg_dir(arma::mat t1p, arma::mat t2p, int n_classes) {
+arma::ivec calc_chg_dir(arma::mat t1p, arma::mat t2p) {
     ivec chg_dir(t1p.n_rows);
     for (int i = 0; i < t1p.n_rows; i++) {
-        mat Eab = (t2p.row(i) - t1p.row(i)) * eye(n_classes, n_classes);
+        // note that t1p.n_cols is equal to the number of classes
+        mat Eab = (t2p.row(i) - t1p.row(i)) * eye(t1p.n_cols, t1p.n_cols);
         uword max_location;
         Eab.max(max_location);
         chg_dir(i) = max_location;

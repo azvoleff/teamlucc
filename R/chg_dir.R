@@ -86,7 +86,7 @@ chg_dir <- function(t1p, t2p, filename, overwrite=FALSE, verbose=FALSE, ...) {
         t2p_bl <- array(getValuesBlock(t2p, row=bs$row[block_num], 
                                        nrows=bs$nrows[block_num]),
                         dim=c(dims[1] * dims[2], dims[3]))
-        chg_dirs <- calc_chg_dir(t1p_bl, t2p_bl, n_classes)
+        chg_dirs <- calc_chg_dir(t1p_bl, t2p_bl)
         out <- writeValues(out, chg_dirs, bs$row[block_num])
     }
     out <- writeStop(out)
