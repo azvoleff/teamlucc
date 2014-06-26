@@ -30,6 +30,10 @@ The threshold can be determined using \code{\link{DFPS}} (to use the Double
 Window Flexible Pace Search method, from Chen et al. 2003) or
 \code{\link{threshold}} (which uses an unsupervised method).
 }
+\details{
+This function will run in parallel if a parallel backend is registered with
+\code{\link{foreach}}.
+}
 \references{
 Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
 Land-use/land-cover change detection using improved change-vector analysis.

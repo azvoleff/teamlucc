@@ -6,6 +6,9 @@
 #' \code{RasterStack} or \code{RasterBrick} if \code{makeCluster()} is called 
 #' prior to calling \code{normalize}.
 #'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export
 #' @importFrom iterators iter
 #' @import foreach

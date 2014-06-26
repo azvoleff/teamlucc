@@ -84,6 +84,9 @@ should be used to extract the original zipfiles supplied by USGS. To perform
 topographic correction with \code{auto_preprocess_landsat}, first run
 \code{\link{auto_setup_dem}} to preprocess a set of DEM tiles. Then run
 \code{auto_preprocess_landsat} with the \code{tc=TRUE} option.
+
+If topographic correction is being performed, it will be run in parallel if
+a parallel backend is registered with \code{\link{foreach}}.
 }
 \seealso{
 \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}},

@@ -53,6 +53,10 @@ modifed from \code{topocorr} to allow using a subsample of the image for
 Minnaert k calculations, and to provide the option of running the
 topographic correction in parallel using \code{foreach}.
 }
+\details{
+This function will run in parallel if a parallel backend is registered with
+\code{\link{foreach}}.
+}
 \examples{
 \dontrun{
 # Mosaic the two ASTER DEM tiles needed to a Landsat image

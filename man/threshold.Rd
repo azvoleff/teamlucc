@@ -25,6 +25,10 @@ The code for Huang's method was ported to C++ for teamluc from the code in
 the Auto_threshold imageJ plugin by Gabriel Landini. See original code at:
 http:#www.mecourse.com/landinig/software/autothreshold/autothreshold.html
 }
+\details{
+This function will run in parallel if a parallel backend is registered with
+\code{\link{foreach}}.
+}
 \examples{
 threshold(L5TSR_1986)
 }

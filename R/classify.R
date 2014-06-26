@@ -1,5 +1,13 @@
 #' Classifies an image using a trained random forest classifier
 #'
+#' This function will produce two outputs - a prediction image and a 
+#' probability image. The prediction image contains the predicted classes from 
+#' the random forest classifier, and the probability image contains the 
+#' per-pixel predicted probabilities of occurrence of each class.
+#'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export
 #' @import caret randomForest
 #' @importFrom spatial.tools rasterEngine predict_rasterEngine

@@ -28,6 +28,10 @@ package. Will use \code{foreach} to run in parallel over the bands in a
 \code{RasterStack} or \code{RasterBrick} if \code{makeCluster()} is called
 prior to calling \code{normalize}.
 }
+\details{
+This function will run in parallel if a parallel backend is registered with
+\code{\link{foreach}}.
+}
 \examples{
 L5TSR_2001_normed_1 <- normalize(L5TSR_1986, L5TSR_2001)
 plotRGB(L5TSR_2001_normed_1, stretch='lin')

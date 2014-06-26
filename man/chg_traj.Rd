@@ -33,9 +33,15 @@ a table of all possible trajectories, with their \code{classnames}
 in the output image.
 }
 \description{
-Calculate change-trajectory image
+This function will calculate trajectories of land cover change using the
+Change Vector Analysis in Posterior Probability Space (CVAPS) approach of
+comparing posterior probabilities of class membership with an automatically
+determined threshold.
 }
 \details{
+This function will run in parallel if a parallel backend is registered with
+\code{\link{foreach}}.
+
 Processing can be done in parallel using all using the cluster
 facilities in the \code{spatial.tools} package. To enable clustering, call
 \code{beginCluster} before running \code{classify}.  To stop the

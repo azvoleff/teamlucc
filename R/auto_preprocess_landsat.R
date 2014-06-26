@@ -72,6 +72,10 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' topographic correction with \code{auto_preprocess_landsat}, first run 
 #' \code{\link{auto_setup_dem}} to preprocess a set of DEM tiles. Then run 
 #' \code{auto_preprocess_landsat} with the \code{tc=TRUE} option.
+#'
+#' If topographic correction is being performed, it will be run in parallel if 
+#' a parallel backend is registered with \code{\link{foreach}}.
+#'
 #' @export
 #' @importFrom rgeos gIntersection
 #' @importFrom wrspathrow pathrow_poly

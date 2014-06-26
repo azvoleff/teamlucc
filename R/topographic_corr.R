@@ -6,6 +6,9 @@
 #' Minnaert k calculations, and to provide the option of running the 
 #' topographic correction in parallel using \code{foreach}.
 #'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export
 #' @import foreach
 #' @param x an image to correct

@@ -8,6 +8,9 @@
 #' Window Flexible Pace Search method, from Chen et al. 2003) or 
 #' \code{\link{threshold}} (which uses an unsupervised method).
 #'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export
 #' @importFrom spatial.tools rasterEngine
 #' @param t1p time 0 posterior probability \code{Raster*}

@@ -5,6 +5,9 @@
 #' the Auto_threshold imageJ plugin by Gabriel Landini. See original code at:
 #' http:#www.mecourse.com/landinig/software/autothreshold/autothreshold.html
 #'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export
 #' @import foreach
 #' @importFrom iterators iter

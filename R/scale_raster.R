@@ -5,6 +5,9 @@
 #' so that a layer can be saved as an integer datatype such as "INT1U", 
 #' "INT1S", "INT2" or "INT2S".
 #'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export scale_raster
 #' @import methods
 #' @seealso \code{\link{dataType}}

@@ -1,5 +1,13 @@
 #' Calculate change-trajectory image
 #'
+#' This function will calculate trajectories of land cover change using the 
+#' Change Vector Analysis in Posterior Probability Space (CVAPS) approach of 
+#' comparing posterior probabilities of class membership with an automatically 
+#' determined threshold.
+#'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export
 #' @importFrom spatial.tools rasterEngine
 #' @param initial initial cover class as \code{RasterLayer}

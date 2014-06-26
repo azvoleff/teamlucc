@@ -9,6 +9,9 @@
 #' as the base image. This function assumes that the images (and image masks) 
 #' were preprocessed using the \code{auto_preprocess_landsat} function.
 #'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export
 #' @import foreach
 #' @importFrom tools file_path_sans_ext

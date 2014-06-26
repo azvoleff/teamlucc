@@ -24,7 +24,14 @@ a list with 2 elements: the predicted classes as a
 \code{RasterLayer} and the class probabilities as a \code{RasterBrick}
 }
 \description{
-Classifies an image using a trained random forest classifier
+This function will produce two outputs - a prediction image and a
+probability image. The prediction image contains the predicted classes from
+the random forest classifier, and the probability image contains the
+per-pixel predicted probabilities of occurrence of each class.
+}
+\details{
+This function will run in parallel if a parallel backend is registered with
+\code{\link{foreach}}.
 }
 \examples{
 train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",
