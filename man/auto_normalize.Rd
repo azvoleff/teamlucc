@@ -3,7 +3,7 @@
 \alias{auto_normalize}
 \title{Normalize a set of preprocessed CDR images to a base image}
 \usage{
-auto_normalize(image_files, base, overwrite = TRUE)
+auto_normalize(image_files, base, overwrite = FALSE)
 }
 \arguments{
 \item{image_files}{list of filenames for images to normalize}
@@ -12,7 +12,7 @@ auto_normalize(image_files, base, overwrite = TRUE)
 image will be automatically chosen from the images in \code{image_files}, as
 the image with the lowest percent cloud cover.}
 
-\item{overwrite}{whether to overwrite \code{out_name} if it already exists}
+\item{overwrite}{whether to overwrite existing files}
 }
 \value{
 nothing - used for side effect of normalizing imagery

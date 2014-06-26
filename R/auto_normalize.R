@@ -19,15 +19,16 @@
 #' @param base (optional) filename of base image. If not supplied, the base 
 #' image will be automatically chosen from the images in \code{image_files}, as 
 #' the image with the lowest percent cloud cover.
-#' @param overwrite whether to overwrite \code{out_name} if it already exists
+#' @param overwrite whether to overwrite existing files
 #' @return nothing - used for side effect of normalizing imagery
-auto_normalize <- function(image_files, base, overwrite=TRUE) {
+auto_normalize <- function(image_files, base, overwrite=FALSE) {
     stopifnot(length(image_files) >= 1)
 
     image_stacks <- lapply(image_files, stack)
 
     mask_files <- paste0(file_path_sans_ext(image_files), '_masks', 
                          extension(image_files))
+    mask_stacks <- lapply(mask_files, stack)
 
     if (!missing(base)) {
         base_img_file <- base
