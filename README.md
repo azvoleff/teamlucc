@@ -51,6 +51,11 @@ on github](https://github.com/azvoleff/teamlucc) for the latest updates.
 
 ### Installing `teamlucc`
 
+**NOTE: If you are installing on Windows, you will need to install the 
+appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
+for your version of R (as `teamlucc` contains C++ code) before you follow the 
+below steps.**
+
 As `teamlucc` is still under development, it is not yet listed on 
 [CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
 version) of the `teamlucc` package is using the 
@@ -75,9 +80,13 @@ at the R prompt to install the latest version of `teamlucc`. Typing the above
 command will also work if you already have `teamlucc` installed and want to 
 install an updated version of the package.
 
-*NOTE:* If you are installing on Windows, you will first need to install the 
-appropriate version of [Rtools](http://cran.r-project.org/bin/windows/Rtools/) 
-for your version of R (as `teamlucc` contains C++ code).
+Some of the functions in `teamlucc` run in parallel using the `rasterEngine` 
+function in the `spatial.tools` function. For these functions you will want a 
+recent version of `spatial.tools`, which you can get from R-Forge by typing:
+
+```R
+install.packages("spatial.tools", repos="http://R-Forge.R-project.org")
+```
 
 ### Install GDAL
 
