@@ -128,6 +128,7 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
     timer <- stop_timer(timer, label='Calculating GLCM textures')
 
     if (!missing(slopeaspect)) {
+        timer <- start_timer(timer, label='Processing slopeaspect')
         names(slopeaspect) <- c('slope', 'aspect')
         # Classify aspect into north facing, east facing, etc., recalling 
         # that the aspect is stored in radians scaled by 1000.
@@ -140,7 +141,7 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
         # Code both 0-45 and 315-360 aspect as North facing (1)
         aspect_cut[aspect_cut == 5] <- 1
         names(aspect_cut) <- 'aspect'
-        timer <- stop_timer(timer, label='Processing dem and slopeaspect')
+        timer <- stop_timer(timer, label='Processing slopeaspect')
     }
 
     ######################################################################
