@@ -13,7 +13,7 @@ before_install:
 # For explanation of below see :
 # https://github.com/craigcitro/RNeXML/commit/4c23aeea632b167f364f4dc08816c4768761d67e
   - sudo apt-get update -qq
-  - ./travis-tool.sh install_aptget gdal-bin libgdal1 libgdal1-dev netcdf-bin libproj-dev
+  - ./travis-tool.sh install_aptget gdal-bin libgdal1h libgdal1h-dev netcdf-bin libproj-dev
   - ./travis-tool.sh bootstrap
     # teamlucc R depends
   - ./travis-tool.sh install_r_binary raster Rcpp RcppArmadillo
