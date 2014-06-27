@@ -3,21 +3,16 @@
 \alias{auto_calc_predictors}
 \title{Calculate predictor layers for a classification}
 \usage{
-auto_calc_predictors(x, wrspath, wrsrow, dem_path = NULL,
-  output_path = NULL, ext = "tif", cleartmp = FALSE, overwrite = FALSE,
-  notify = print)
+auto_calc_predictors(x, dem, slopeaspect, output_path = NULL, ext = "tif",
+  cleartmp = FALSE, overwrite = FALSE, notify = print)
 }
 \arguments{
 \item{x}{path to a preprocessed image as output by
 \code{auto_preprocess_landsat} or \code{auto_cloud_fill}.}
 
-\item{wrspath}{World Reference System (WRS) path}
+\item{dem}{DEM \code{RasterLayer} as output by \code{auto_setup_dem}}
 
-\item{wrsrow}{World Reference System (WRS) row}
-
-\item{dem_path}{path to a set of DEMs as output by \code{auto_setup_dem}, or
-\code{NULL}, in which case elevation, slope, and aspect will not be included
-in the predictor layer stack.}
+\item{slopeaspect}{\code{RasterStack} as output by \code{auto_setup_dem}}
 
 \item{output_path}{the path to use for the output (optional - if NULL then
 output images will be saved alongside the input images in the same folder).}

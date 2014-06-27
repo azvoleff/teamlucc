@@ -39,11 +39,8 @@
 #' @importFrom stringr str_extract
 #' @param x path to a preprocessed image as output by 
 #' \code{auto_preprocess_landsat} or \code{auto_cloud_fill}.
-#' @param wrspath World Reference System (WRS) path
-#' @param wrsrow World Reference System (WRS) row
-#' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem}, or 
-#' \code{NULL}, in which case elevation, slope, and aspect will not be included 
-#' in the predictor layer stack.
+#' @param dem DEM \code{RasterLayer} as output by \code{auto_setup_dem}
+#' @param slopeaspect \code{RasterStack} as output by \code{auto_setup_dem}
 #' @param output_path the path to use for the output (optional - if NULL then 
 #' output images will be saved alongside the input images in the same folder).
 #' @param ext file extension to use when saving output rasters (determines 
@@ -54,23 +51,17 @@
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
-auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path=NULL, 
-                                 output_path=NULL, ext='tif', cleartmp=FALSE, 
-                                 overwrite=FALSE, notify=print) {
+auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL, 
+                                 ext='tif', cleartmp=FALSE, overwrite=FALSE, 
+                                 notify=print) {
     if (!file_test("-f", x)) {
         stop(paste("input image", x, "does not exist"))
-    }
-    if (!is.null(dem_path) && !file_test("-d", dem_path)) {
-        stop(paste(dem_path, "does not exist"))
     }
     if (!is.null(output_path) && !file_test("-d", output_path)) {
         stop(paste(output_path, "does not exist"))
     }
 
     ext <- gsub('^[.]', '', ext)
-
-    wrspath <- sprintf('%03i', wrspath)
-    wrsrow <- sprintf('%03i', wrsrow)
 
     timer <- Track_time(notify)
     timer <- start_timer(timer, label='Predictor calculation')
@@ -136,21 +127,7 @@ auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path=NULL,
     names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
     timer <- stop_timer(timer, label='Calculating GLCM textures')
 
-    if (!is.null(dem_path)) {
-        ######################################################################
-        # Load DEM, slope, and aspect, and reclass aspect
-        dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
-                                                       wrsrow, '.', ext))
-        timer <- start_timer(timer, label='Processing dem and slopeaspect')
-
-        dem_filename <- file.path(dem_path, paste0('dem_', wrspath, '-', 
-                                                   wrsrow, '.', ext))
-        dem <- raster(dem_filename)
-
-        slopeaspect_filename <- file.path(dem_path,
-                                          paste0('slopeaspect_', wrspath, 
-                                                 '-', wrsrow, '.', ext))
-        slopeaspect <- brick(slopeaspect_filename)
+    if (!missing(slopeaspect)) {
         names(slopeaspect) <- c('slope', 'aspect')
         # Classify aspect into north facing, east facing, etc., recalling 
         # that the aspect is stored in radians scaled by 1000.
@@ -183,9 +160,13 @@ auto_calc_predictors <- function(x, wrspath, wrsrow, dem_path=NULL,
                          'msavi_glcm_mean', 'msavi_glcm_variance', 
                          'msavi_glcm_dissimilarity')
 
-    if (!is.null(dem_path)) {
-        predictors <- stack(predictors, dem, slopeaspect$slope, aspect_cut)
-        predictor_names <- c(predictor_names, 'elev', 'slope', 'aspect')
+    if (!missing(dem)) {
+        predictors <- stack(predictors, dem)
+        predictor_names <- c(predictor_names, 'elev')
+    }
+    if (!missing(slopeaspect)) {
+        predictors <- stack(predictors, slopeaspect$slope, aspect_cut)
+        predictor_names <- c(predictor_names, 'slope', 'aspect')
     }
 
     predictors_filename <- file.path(output_path,
