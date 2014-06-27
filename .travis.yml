@@ -9,7 +9,7 @@ language: c
 before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
-  - sudo add-apt-repository -y ppa:ubuntugis-unstable/ppa
+  - sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 # For explanation of below see :
 # https://github.com/craigcitro/RNeXML/commit/4c23aeea632b167f364f4dc08816c4768761d67e
   - sudo apt-get update -qq
