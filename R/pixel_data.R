@@ -169,7 +169,7 @@ get_pixels <- function(x, polys, class_col, training=1, src='none') {
         stop('Coordinate systems do not match')
     }
     stopifnot(length(src) == 1)
-    if (tolower(clas_col) == 'id') {
+    if (tolower(class_col) == 'id') {
         stop('class_col cannot be named "ID" (case insensitive)')
     }
     # Convert class_col from the name of the column to an index
