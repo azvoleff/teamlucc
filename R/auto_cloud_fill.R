@@ -374,7 +374,6 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             timer <- stop_timer(timer, label=paste('Fill iteration', n + 1))
         }
 
-        max_iter <- max_iter + 1
         n <- n + 1
     }
 
