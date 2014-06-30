@@ -249,6 +249,10 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     img_dates <- img_dates[-base_img_index]
 
     if (verbose > 0) {
+        msg(paste('Using image from', base_img_date, 'as base image.'))
+    }
+
+    if (verbose > 0) {
         timer <- stop_timer(timer, label='Calculating cloud masks')
     }
 
