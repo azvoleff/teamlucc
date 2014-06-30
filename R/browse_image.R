@@ -1,3 +1,17 @@
+plotprep <- function(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=NULL) {
+    x <- sampleRegular(x, size=maxpixels, asRaster=TRUE, useGDAL=TRUE)
+    x <- calc(x, fun=function(vals) {
+        vals[vals < DN_min] <- DN_min
+        vals[vals > DN_max] <- DN_max
+        vals <- ((vals - DN_min) / (DN_max - DN_min)) * 255
+        if (!is.null(x_fun)) {
+            vals <- x_fun(vals)
+        }
+        return(vals)
+    }, datatype='INT1U')
+    return(x)
+}
+
 #' Simple function to output browse image as PNG
 #'
 #' @export
@@ -29,17 +43,7 @@ browse_image <- function(x, filename, m=NULL, maxpixels=500000, DN_min=0,
     }
     stopifnot(nlayers(m) == 1)
 
-    x <- sampleRegular(x, size=maxpixels, asRaster=TRUE, useGDAL=TRUE)
-
-    x <- calc(x, fun=function(vals) {
-        vals[vals < DN_min] <- DN_min
-        vals[vals > DN_max] <- DN_max
-        vals <- ((vals - DN_min) / (DN_max - DN_min)) * 255
-        if (!is.null(x_fun)) {
-            vals <- x_fun(vals)
-        }
-        return(vals)
-    }, datatype='INT1U')
+    x <- plotprep(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=x_fun)
 
     if (!is.null(m_fun)) {
         m <- calc(m, fun=m_fun, datatype=dataType(m))
