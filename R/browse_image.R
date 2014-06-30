@@ -51,7 +51,7 @@ browse_image <- function(x, filename, m=NULL, maxpixels=500000, DN_min=0,
         if (nrow(x) > ncol(x)) par(mfrow=c(1, 2))
         else par(mfrow=c(2, 1))
         plotRGB(x, r=r, g=g, b=b, maxpixels=maxpixels)
-        plot(m, maxpixels=maxpixels, axes=FALSE)
+        plot(m, maxpixels=maxpixels, axes=FALSE, legend=FALSE, box=FALSE)
     } else {
         plotRGB(x, r=r, g=g, b=b, maxpixels=maxpixels)
     }
