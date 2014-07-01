@@ -322,6 +322,10 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # (counting only pixels in the fill image that are not ALSO clouded in 
         # the fill image)
         avail_fill_row <- which(fill_areas_freq$value == 1)
+        if (length(avail_fill_row) == 0) {
+            msg(paste('No fill pixels available. Stopping fill.'))
+            break
+        }
         # Remove the now unnecessary "value" column
         fill_areas_freq <- fill_areas_freq[!(names(fill_areas_freq) == 'value')]
         fill_img_index <- which(fill_areas_freq[avail_fill_row, ] == 
