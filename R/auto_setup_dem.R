@@ -111,7 +111,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, of="GTiff",
         mosaic_te <- as.numeric(bbox(pathrows_buffered))
         # Use mosaic_rasters from gdalUtils for speed:
         mosaic_rasters(dem_list, mosaic_file, te=mosaic_te, of=of, 
-                       overwrite=overwrite)
+                       overwrite=overwrite, ot='Int16')
         dem_mosaic <- raster(mosaic_file)
         if (verbose) timer <- stop_timer(timer, label='Mosaicking DEMs')
     } else {
@@ -150,7 +150,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, of="GTiff",
                                     r='cubicspline', output_Raster=TRUE, 
                                     multi=TRUE, of=of,
                                     wo=paste0("NUM_THREADS=", n_cpus), 
-                                    overwrite=overwrite)
+                                    overwrite=overwrite, ot='Int16')
         if (verbose) timer <- stop_timer(timer,
                                          label=paste('Cropping/reprojecting DEM mosaic crop for', 
                                          pathrow_label))

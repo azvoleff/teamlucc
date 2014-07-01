@@ -260,7 +260,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                 te=out_te, t_srs=to_srs, tr=to_res, 
                                 r='cubicspline', output_Raster=TRUE, of=of, 
                                 multi=TRUE, wo=paste0("NUM_THREADS=", n_cpus), 
-                                overwrite=overwrite)
+                                overwrite=overwrite, ot='Int16')
         # Can't just directly assign image_bands as the names since the bands 
         # may have been read in different order from the HDF file
         names(image_stack) <- gsub('^:', '', str_extract(band_sds, ':[a-zA-Z0-9_]*$'))
@@ -271,7 +271,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                te=out_te, t_srs=to_srs, tr=to_res, 
                                r='near', output_Raster=TRUE, of=of, 
                                multi=TRUE, wo=paste0("NUM_THREADS=", n_cpus), 
-                               overwrite=overwrite)
+                               overwrite=overwrite, ot='Int16')
         # Can't just directly assign mask_bands as the names since the bands 
         # may have been read in different order from the HDF file
         names(mask_stack) <- gsub('^:', '', str_extract(mask_sds, ':[a-zA-Z0-9_]*$'))
