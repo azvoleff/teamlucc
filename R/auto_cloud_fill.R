@@ -31,7 +31,6 @@ pct_clouds <- function(cloud_mask) {
 #'
 #' @export
 #' @importFrom tools file_path_sans_ext
-#' @importFrom spatial.tools sfQuickInit sfQuickStop
 #' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract
 #' @importFrom SDMTools ConnCompLabel
@@ -67,8 +66,6 @@ pct_clouds <- function(cloud_mask) {
 #' fill will iterate until percent cloud cover in base image is below this 
 #' value, or until \code{max_iter} iterations have been run
 #' @param max_iter maximum number of times to run cloud fill script
-#' @param n_cpus the number of CPUs to use for processes that can run in 
-#' parallel
 #' @param notify notifier to use (defaults to \code{print} function).  See the 
 #' \code{notifyR} package for one way of sending notifications from R.  The 
 #' \code{notify} function should accept a string as the only argument.
@@ -89,8 +86,8 @@ pct_clouds <- function(cloud_mask) {
 auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             out_name, base_date=NULL, tc=TRUE, ext='tif',
                             sensors=c('L4T', 'L5T', 'L7E', 'L8E'),
-                            threshold=1, max_iter=5, n_cpus=1, notify=print, 
-                            verbose=1, overwrite=FALSE, ...) {
+                            threshold=1, max_iter=5, notify=print, verbose=1, 
+                            overwrite=FALSE, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
@@ -328,8 +325,9 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         # Remove the now unnecessary "value" column
         fill_areas_freq <- fill_areas_freq[!(names(fill_areas_freq) == 'value')]
         fill_img_index <- which(fill_areas_freq[avail_fill_row, ] == 
-                                max(fill_areas_freq[avail_fill_row, ]))
-        if (fill_areas_freq[avail_fill_row, fill_img_index] == 0) {
+                                max(fill_areas_freq[avail_fill_row, ], na.rm=TRUE))
+        if ((length(fill_img_index) == 0) ||
+            (fill_areas_freq[avail_fill_row, fill_img_index] == 0)) {
             msg(paste('No fill pixels available. Stopping fill.'))
             break
         }
@@ -355,6 +353,10 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
                                  out_name=out_name, verbose=verbose, 
                                  overwrite=TRUE, ...)
+        # base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
+        #                          out_name=out_name, verbose=verbose, 
+        #                          overwrite=TRUE, DN_min=DN_min, DN_max=DN_max, 
+        #                          algorithm=algorithm, byblock=byblock)
         if (verbose > 0) {
             timer <- stop_timer(timer, label="Performing fill")
         }

@@ -5,8 +5,8 @@
 \usage{
 auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, out_name,
   base_date = NULL, tc = TRUE, ext = "tif", sensors = c("L4T", "L5T",
-  "L7E", "L8E"), threshold = 1, max_iter = 5, n_cpus = 1,
-  notify = print, verbose = 1, overwrite = FALSE, ...)
+  "L7E", "L8E"), threshold = 1, max_iter = 5, notify = print,
+  verbose = 1, overwrite = FALSE, ...)
 }
 \arguments{
 \item{data_dir}{folder where input images are located, with filenames as
@@ -52,9 +52,6 @@ fill will iterate until percent cloud cover in base image is below this
 value, or until \code{max_iter} iterations have been run}
 
 \item{max_iter}{maximum number of times to run cloud fill script}
-
-\item{n_cpus}{the number of CPUs to use for processes that can run in
-parallel}
 
 \item{notify}{notifier to use (defaults to \code{print} function).  See the
 \code{notifyR} package for one way of sending notifications from R.  The
