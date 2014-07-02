@@ -96,10 +96,62 @@ rbind.pixel_data <- function(x, ...) {
 setMethod("show", signature(object="pixel_data"), function(object) 
           print(object))
 
+#' Subsample a pixel_data object
+#'
+#' @export subsample
+#' @param x a \code{pixel_data} object
+#' @param frac fraction of pixels to remove
+#' @param by_src whether to draw samples from within individual source polygons 
+#' (\code{by_src=TRUE}) or from within classes alone \code{by_src=FALSE})
+#' @param flag whether to flag removed data as testing data (\code{flag=TRUE}) 
+#' or remove it from dataset entirely (\code{flag=FALSE})
+#' @param type whether to subsample training data (\code{type='training'}) or 
+#' testing data (\code{type='testing'}). Whichever type is chosen, the other 
+#' type will be left untouched (for example, if \code{type='testing'}, the 
+#' training data will not be changed.
+#' @rdname subsample
+#' @aliases subsample,pixel_data-method
+setGeneric("subsample", function(x, frac, by_src=TRUE, flag=TRUE, type="training")
+    standardGeneric("subsample")
+)
+
+#' @rdname subsample
+#' @aliases subsample,pixel_data,numeric-method
+#' @importFrom dplyr group_by sample_frac
+setMethod("subsample", signature(x="pixel_data", frac="numeric"),
+function(x, frac, by_src, flag, type) {
+    row_IDs <- data.frame(y=x@y,
+                          pixel_src=paste(x@pixel_src$src, x@pixel_src$ID),
+                          row_num=seq(1, length(x@y)))
+    stopifnot(type %in% c("training", "testing"))
+    if (type == "training") {
+        row_IDs <- row_IDs[x@training_flag, ]
+    } else {
+        row_IDs <- row_IDs[!x@training_flag, ]
+    }
+    stopifnot(nrow(row_IDs) > 1)
+    if (by_src) {
+        samp_rows <- sample_frac(group_by(row_IDs, y, pixel_src), frac)$row_num
+    } else {
+        samp_rows <- sample_frac(group_by(row_IDs, y), frac)$row_num
+    }
+    if (flag) {
+        x@training_flag[samp_rows] <- FALSE
+    } else {
+        x@x <- x@x[samp_rows, ]
+        x@y <- x@y[samp_rows]
+        x@training_flag <- x@training_flag[samp_rows]
+        x@pixel_src <- x@pixel_src[samp_rows, ]
+    }
+    return(x)
+})
+
 #' Get or set src_name for a pixel_data object
 #'
 #' @export src_name
 #' @param x a \code{pixel_data} object
+#' @rdname src_name
+#' @aliases src_name,pixel_data-method
 setGeneric("src_name", function(x) standardGeneric("src_name"))
 
 #' @rdname src_name
