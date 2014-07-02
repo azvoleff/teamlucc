@@ -169,7 +169,7 @@ plot.error_adj_area <- function(x, ...) {
 }
 
 # Adds margins to contingency table
-.add_ct_margins <- function(ct) {
+.add_ct_margins <- function(ct, digits=4) {
     # For user's, producer's, and overall accuracy formulas, see Table 
     # 21.3 in Foody, G.M., Stehman, S.V., 2009. Accuracy Assessment, in: 
     # Warner, T.A., Nellis, M.D., Foody, G.M. (Eds.), The SAGE Handbook of 
@@ -183,7 +183,7 @@ plot.error_adj_area <- function(x, ...) {
     dimnames(ct)[[2]][nrow(ct)] <- "Total"
     ct <- rbind(ct, Producers=c(users_acc, NA))
     ct <- cbind(ct, Users=c(prod_acc, NA, overall_acc))
-    ct <- round(ct, digits=4)
+    ct <- round(ct, digits=digits)
     dimnames(ct) <- list(predicted=dimnames(ct)[[1]],
                          observed=dimnames(ct)[[2]])
     class(ct) <- 'table'
@@ -294,7 +294,12 @@ setMethod("accuracy", signature(x="train", test_data="ANY", pop="ANY", class_col
             stop('cannot conduct accuracy assessment without independent testing data')
         }
         test_data <- test_data[!test_data$training_flag, ]
-
+        complete_rows <- complete.cases(test_data)
+        if (sum(complete_rows) != nrow(test_data)) {
+            warning(paste('ignored', nrow(test_data) - sum(complete_rows), 
+                          'rows because of missing data'))
+            test_data <- test_data[complete.cases(test_data), ]
+        }
         predicted <- predict(x, test_data)
         observed <- test_data$y
 
