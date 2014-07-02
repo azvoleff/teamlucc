@@ -157,9 +157,9 @@ function(x, size, strata, type, flag, invweight) {
         row_IDs <- group_by(row_IDs, y)
     }
     if (size < 1) {
-        samp_rows <- sample_frac(row_IDs, size)$row_num
+        samp_rows <- dplyr:::sample_frac.grouped_df(row_IDs, size)$row_num
     } else {
-        samp_rows <- sample_n(row_IDs, size)$row_num
+        samp_rows <- dplyr:::sample_n.grouped_df(row_IDs, size)$row_num
     }
     if (flag) {
         if (type == 'testing') {
