@@ -41,11 +41,11 @@ browse_image <- function(x, filename, m=NULL, maxpixels=500000, DN_min=0,
     if (!file_test('-d', dirname(filename))) {
         stop('output path does not exist')
     }
-    stopifnot(nlayers(m) == 1)
+    if (!is.null(m)) stopifnot(nlayers(m) == 1)
 
-    x <- plotprep(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=x_fun)
+    x <- plotprep(x, maxpixels=500000, DN_min=0, DN_max=DN_max, x_fun=x_fun)
 
-    if (!is.null(m_fun)) {
+    if (!is.null(m) && !is.null(m_fun)) {
         m <- calc(m, fun=m_fun, datatype=dataType(m))
     }
 
