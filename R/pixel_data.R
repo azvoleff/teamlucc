@@ -125,12 +125,10 @@ setMethod("show", signature(object="pixel_data"), function(object)
 #' sampled training data as testing data, if \code{flag=TRUE} and 
 #' \code{type='training'}) or remove sampled data from dataset entirely 
 #' (\code{flag=FALSE}).
-#' @param invweight whether to use weighted sampling, with inverse of group 
-#' size (with groups determined according to \code{strata}
 #' @rdname subsample
 #' @aliases subsample,pixel_data-method
 setGeneric("subsample", function(x, size, strata='sources', type="training", 
-                                 flag=TRUE, invweight=FALSE)
+                                 flag=TRUE)
     standardGeneric("subsample")
 )
 
@@ -138,7 +136,7 @@ setGeneric("subsample", function(x, size, strata='sources', type="training",
 #' @aliases subsample,pixel_data,numeric-method
 #' @importFrom dplyr group_by sample_frac
 setMethod("subsample", signature(x="pixel_data", size="numeric"),
-function(x, size, strata, type, flag, invweight) {
+function(x, size, strata, type, flag) {
     row_IDs <- data.frame(y=x@y,
                           pixel_src=paste(x@pixel_src$src, x@pixel_src$ID),
                           row_num=seq(1, length(x@y)))
