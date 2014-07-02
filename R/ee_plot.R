@@ -5,7 +5,7 @@
 #'
 #' @export
 #' @import ggplot2
-#' @importFrom plyr ddply .
+#' @importFrom dplyr group_by summarize
 #' @importFrom lubridate new_interval %within%
 #' @param x a \code{data.frame} with a list of Landsat scenes as output by
 #' \code{\link{ee_read}}
@@ -47,8 +47,8 @@ ee_plot <- function(x, start_date, end_date, min_clear=.7, exclude=list(),
 
     if (!normalize) {
         YearMonth=Month=Cum_Month=Path_Row=Sensor=Frac_Clear=NULL # Keep R CMD CHECK happy
-        x <- ddply(x, .(YearMonth), transform,
-                   Cum_Month=cumsum(rep(1, length(Month))))
+        x <- transform(group_by(x, YearMonth),
+                       Cum_Month=cumsum(rep(1, length(Month))))
         p <- ggplot(x, aes(xmin=Month,
                            xmax=Month + 1, 
                            ymin=Cum_Month - 1, 
@@ -72,12 +72,12 @@ ee_plot <- function(x, start_date, end_date, min_clear=.7, exclude=list(),
     } else {
         # Keep R CMD CHECK happy:
         YearMonth=Path_Row=Year=Month=Max_Frac_Clear=Frac_Clear=Sum_Max_Frac_Clear=NULL
-        Frac_Clear_Stats <- ddply(x, .(YearMonth, Path_Row), summarize,
-                                  Year=Year[1], Month=Month[1],
-                                  Max_Frac_Clear=max(Frac_Clear))
-        Frac_Clear_Stats <- ddply(Frac_Clear_Stats, .(YearMonth), summarize,
-                                  Year=Year[1], Month=Month[1],
-                                  Sum_Max_Frac_Clear=sum(Max_Frac_Clear))
+        Frac_Clear_Stats <- summarize(group_by(x, YearMonth, Path_Row),
+                                      Year=Year[1], Month=Month[1],
+                                      Max_Frac_Clear=max(Frac_Clear))
+        Frac_Clear_Stats <- summarize(group_by(Frac_Clear_Stats, YearMonth), 
+                                      Year=Year[1], Month=Month[1],
+                                      Sum_Max_Frac_Clear=sum(Max_Frac_Clear))
         p <- ggplot(Frac_Clear_Stats, aes(xmin=Month + .05,
                                           xmax=Month + 1-.05, 
                                           ymin=0, 

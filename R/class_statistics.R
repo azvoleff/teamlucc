@@ -1,7 +1,7 @@
 #' Exports statistics on pixels within each of a set of land cover classes
 #'
 #' @export
-#' @importFrom plyr ddply summarize .
+#' @importFrom dplyr group_by summarize
 #' @importFrom reshape2 melt
 #' @param x A \code{RasterLayer} from which class statistics will be 
 #' calculated.
@@ -25,12 +25,9 @@ class_statistics <- function(x, y, class_col) {
     pixels <- melt(data.frame(pixels@x, y=pixels@y), idvar='y')
     # Set y and variable to NULL to pass R CMD CHECK without notes
     value=variable=NULL
-    class_stats <- ddply(pixels, .(y, variable), summarize,
-                         mean=mean(value),
-                         sd=sd(value),
-                         min=min(value),
-                         max=max(value),
-                         n_pixels=length(value))
+    class_stats <- summarize(group_by(pixels, y, variable), mean=mean(value), 
+                             sd=sd(value), min=min(value), max=max(value), 
+                             n_pixels=length(value))
     class_stats <- class_stats[order(class_stats$variable, class_stats$y), ]
     return(class_stats)
 }

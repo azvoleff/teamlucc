@@ -22,7 +22,7 @@ setClass('pixel_data', slots=c(x='data.frame', y='factor',
 )
 
 #' @rdname pixel_data-class
-#' @importFrom plyr ddply summarize .
+#' @importFrom dplyr summarize group_by
 #' @export
 summary.pixel_data <- function(object, ...) {
     obj = list()
@@ -35,14 +35,17 @@ summary.pixel_data <- function(object, ...) {
                               pixel_src=src_name(object), 
                               training_flag=object@training_flag)
     y=pixel_src=training_flag=NULL # Keep R CMD CHECK happy
-    class_stats <- ddply(training_df, .(class=y), summarize,
-                         n_pixels=length(y),
-                         n_polys=length(unique(pixel_src)),
-                         train_frac=round(sum(training_flag) / length(training_flag), 2))
+    class_stats <- summarize(group_by(training_df, y),
+                             n_polys=length(unique(pixel_src)),
+                             n_train_pixels=sum(training_flag),
+                             n_test_pixels=sum(!training_flag),
+                             train_frac=round(sum(training_flag) / 
+                                              length(training_flag), 2))
+    names(class_stats)[names(class_stats) == 'y'] <- 'class'
     obj[['class_stats']]  <- class_stats
-    obj[['n_training']] <- sum(object@training_flag==TRUE)
-    obj[['n_testing']] <- sum(object@training_flag==FALSE)
-    obj[['training_frac']] <- sum(object@training_flag==TRUE) / length(object@training_flag)
+    obj[['n_training']] <- sum(object@training_flag == TRUE)
+    obj[['n_testing']] <- sum(object@training_flag == FALSE)
+    obj[['training_frac']] <- sum(object@training_flag == TRUE) / length(object@training_flag)
     class(obj) <- 'summary.pixel_data'
     obj
 }
@@ -68,6 +71,12 @@ print.summary.pixel_data <- function(x, ...) {
 
 #' @rdname pixel_data-class
 #' @export
+length.pixel_data <- function(x) {
+    return(length(x@y))
+}
+
+#' @rdname pixel_data-class
+#' @export
 levels.pixel_data <- function(x) {
     return(levels(x@y))
 }
@@ -77,6 +86,7 @@ levels.pixel_data <- function(x) {
 print.pixel_data <- function(x, ...) {
     print(summary(x, ...))
 }
+
 #' @rdname pixel_data-class
 #' @importFrom maptools spRbind
 #' @export
@@ -100,29 +110,40 @@ setMethod("show", signature(object="pixel_data"), function(object)
 #'
 #' @export subsample
 #' @param x a \code{pixel_data} object
-#' @param frac fraction of pixels to remove
-#' @param by_src whether to draw samples from within individual source polygons 
-#' (\code{by_src=TRUE}) or from within classes alone \code{by_src=FALSE})
-#' @param flag whether to flag removed data as testing data (\code{flag=TRUE}) 
-#' or remove it from dataset entirely (\code{flag=FALSE})
+#' @param size either 1) a number from 0 to 1, indicating \code{size} is the 
+#' fraction of pixels to sample, or 2) a number greater than 1, in which case 
+#' \code{size} is the number of pixels to sample. Size applies per strata, if 
+#' stratification is chosen.
+#' @param strata whether to draw samples from within individual classes, nested 
+#' within source polygons (\code{strata='sources'}), or from within individual 
+#' classes alone \code{strata='classes'})
 #' @param type whether to subsample training data (\code{type='training'}) or 
 #' testing data (\code{type='testing'}). Whichever type is chosen, the other 
 #' type will be left untouched (for example, if \code{type='testing'}, the 
 #' training data will not be changed.
+#' @param flag whether to swap training flag on sampled data (for example, flag 
+#' sampled training data as testing data, if \code{flag=TRUE} and 
+#' \code{type='training'}) or remove sampled data from dataset entirely 
+#' (\code{flag=FALSE}).
+#' @param invweight whether to use weighted sampling, with inverse of group 
+#' size (with groups determined according to \code{strata}
 #' @rdname subsample
 #' @aliases subsample,pixel_data-method
-setGeneric("subsample", function(x, frac, by_src=TRUE, flag=TRUE, type="training")
+setGeneric("subsample", function(x, size, strata='sources', type="training", 
+                                 flag=TRUE, invweight=FALSE)
     standardGeneric("subsample")
 )
 
 #' @rdname subsample
 #' @aliases subsample,pixel_data,numeric-method
 #' @importFrom dplyr group_by sample_frac
-setMethod("subsample", signature(x="pixel_data", frac="numeric"),
-function(x, frac, by_src, flag, type) {
+setMethod("subsample", signature(x="pixel_data", size="numeric"),
+function(x, size, strata, type, flag, invweight) {
     row_IDs <- data.frame(y=x@y,
                           pixel_src=paste(x@pixel_src$src, x@pixel_src$ID),
                           row_num=seq(1, length(x@y)))
+    stopifnot(size > 0)
+    stopifnot(strata %in% c("sources", "classes"))
     stopifnot(type %in% c("training", "testing"))
     if (type == "training") {
         row_IDs <- row_IDs[x@training_flag, ]
@@ -130,19 +151,58 @@ function(x, frac, by_src, flag, type) {
         row_IDs <- row_IDs[!x@training_flag, ]
     }
     stopifnot(nrow(row_IDs) > 1)
-    if (by_src) {
-        samp_rows <- sample_frac(group_by(row_IDs, y, pixel_src), frac)$row_num
+    if (strata == "sources") {
+        row_IDs <- group_by(row_IDs, y, pixel_src)
+    } else if (strata == "classes") {
+        row_IDs <- group_by(row_IDs, y)
+    }
+    if (size < 1) {
+        samp_rows <- sample_frac(row_IDs, size)$row_num
     } else {
-        samp_rows <- sample_frac(group_by(row_IDs, y), frac)$row_num
+        samp_rows <- sample_n(row_IDs, size)$row_num
     }
     if (flag) {
-        x@training_flag[samp_rows] <- FALSE
+        if (type == 'testing') {
+            x@training_flag[samp_rows] <- TRUE
+        } else if (type == 'training') {
+            x@training_flag[samp_rows] <- FALSE
+        }
     } else {
         x@x <- x@x[samp_rows, ]
         x@y <- x@y[samp_rows]
         x@training_flag <- x@training_flag[samp_rows]
         x@pixel_src <- x@pixel_src[samp_rows, ]
     }
+    return(x)
+})
+
+#' Get or set training_flag for a pixel_data object
+#'
+#' @export training_flag
+#' @param x a \code{pixel_data} object
+#' @rdname training_flag
+#' @aliases training_flag,pixel_data-method
+setGeneric("training_flag", function(x) standardGeneric("training_flag"))
+
+#' @rdname training_flag
+#' @aliases training_flag,pixel_data-method
+setMethod("training_flag", signature(x="pixel_data"),
+function(x) {
+    return(x@training_flag)
+})
+
+#' @export training_flag<-
+#' @rdname training_flag
+#' @param value a new \code{training_flag} to assign for pixels in \code{x}
+setGeneric("training_flag<-", function(x, value) standardGeneric("training_flag<-"))
+
+#' @rdname training_flag
+#' @aliases training_flag<-,pixel_data-method
+setMethod("training_flag<-", signature(x="pixel_data"),
+function(x, value) {
+    if (length(value) == 1) value <- rep(value, length(x@training_flag))
+    stopifnot(length(value) == length(x@training_flag))
+    x@training_flag <- value
     return(x)
 })
 
