@@ -6,26 +6,32 @@
 \alias{subsample,pixel_data-method}
 \title{Subsample a pixel_data object}
 \usage{
-subsample(x, frac, by_src = TRUE, flag = TRUE, type = "training")
+subsample(x, size, strata = "sources", type = "training", flag = TRUE)
 
-\S4method{subsample}{pixel_data,numeric}(x, frac, by_src = TRUE,
-  flag = TRUE, type = "training")
+\S4method{subsample}{pixel_data,numeric}(x, size, strata = "sources",
+  type = "training", flag = TRUE)
 }
 \arguments{
 \item{x}{a \code{pixel_data} object}
 
-\item{frac}{fraction of pixels to remove}
+\item{size}{either 1) a number from 0 to 1, indicating \code{size} is the
+fraction of pixels to sample, or 2) a number greater than 1, in which case
+\code{size} is the number of pixels to sample. Size applies per strata, if
+stratification is chosen.}
 
-\item{by_src}{whether to draw samples from within individual source polygons
-(\code{by_src=TRUE}) or from within classes alone \code{by_src=FALSE})}
-
-\item{flag}{whether to flag removed data as testing data (\code{flag=TRUE})
-or remove it from dataset entirely (\code{flag=FALSE})}
+\item{strata}{whether to draw samples from within individual classes, nested
+within source polygons (\code{strata='sources'}), or from within individual
+classes alone \code{strata='classes'})}
 
 \item{type}{whether to subsample training data (\code{type='training'}) or
 testing data (\code{type='testing'}). Whichever type is chosen, the other
 type will be left untouched (for example, if \code{type='testing'}, the
 training data will not be changed.}
+
+\item{flag}{whether to swap training flag on sampled data (for example, flag
+sampled training data as testing data, if \code{flag=TRUE} and
+\code{type='training'}) or remove sampled data from dataset entirely
+(\code{flag=FALSE}).}
 }
 \description{
 Subsample a pixel_data object
