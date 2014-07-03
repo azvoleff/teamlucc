@@ -60,8 +60,8 @@ test_that(".calc_A works for Pontius and Millones (2011) example", {
 test_image <- L5TSR_1986
 train_data <- get_pixels(test_image, L5TSR_1986_2001_training, "class_1986", 
                          training=.6)
-rfmodel <- train_classifier(train_data)
-classification <- classify(test_image, rfmodel)
+test_model <- train_classifier(train_data)
+classification <- classify(test_image, test_model)
 test_preds <- classification$classes
 
 test_that("accuracy calculations will run with model as first input", {
