@@ -113,7 +113,12 @@ need to be provided (see Details).
 }
 }
 \examples{
+\dontrun{
+train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",
+                         training=.6)
+model <- train_classifier(train_data)
 accuracy(L5TSR_1986_rfmodel)
+}
 }
 \references{
 Pontius, R. G., and M. Millones. 2011. Death to Kappa: birth of

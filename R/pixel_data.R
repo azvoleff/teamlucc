@@ -156,6 +156,7 @@ function(x, size, strata, type, flag, classes) {
     row_IDs <- row_IDs[row_IDs$y %in% classes, ]
     stopifnot(nrow(row_IDs) > 1)
     if (strata == "sources") {
+        y=pixel_src=NULL
         row_IDs <- group_by(row_IDs, y, pixel_src)
     } else if (strata == "classes") {
         row_IDs <- group_by(row_IDs, y)
@@ -191,6 +192,7 @@ setGeneric("training_flag", function(x, classes=levels(x@y)) {
     standardGeneric("training_flag")
 })
 
+#' @rdname pixel_data-class
 setMethod("[", signature(x="pixel_data", i='character'),
 function(x, i, j, ...) {
     if (!(i %in% levels(x@y))) {
@@ -219,14 +221,15 @@ function(x, classes) {
 #' @export training_flag<-
 #' @rdname training_flag
 #' @param value a new \code{training_flag} to assign for pixels in \code{x}
-setGeneric("training_flag<-", function(x, value, classes) {
+setGeneric("training_flag<-", function(x, classes, value) {
     standardGeneric("training_flag<-")
 })
 
 #' @rdname training_flag
 #' @aliases training_flag<-,pixel_data-method
-setMethod("training_flag<-", signature(x="pixel_data"),
-function(x, value, classes=levels(x@y)) {
+setMethod("training_flag<-", signature(x="pixel_data", classes='missing', 
+                                       value='logical'),
+function(x, classes=levels(x@y), value) {
     if (identical(classes, levels(x@y))) {
         # More efficiently handle special case of reassigning flags for all 
         # classes in x.

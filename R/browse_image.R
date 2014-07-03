@@ -12,12 +12,11 @@ plotprep <- function(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=NULL) {
     return(x)
 }
 
-#' Simple function to output browse image as PNG
+#' Simple function to make small preview plot from large raster image
 #'
 #' @export
 #' @param x input \code{RasterBrick} or \code{RasterStack} with at least three 
 #' bands
-#' @param filename a filename ending in .png
 #' @param m an optional mask \code{RasterLayer} to output below the browse 
 #' image
 #' @param maxpixels maximum number of pixels to use in plotting
@@ -26,22 +25,13 @@ plotprep <- function(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=NULL) {
 #' @param r index in \code{x} of the band to use as the red band
 #' @param g index in \code{x} of the band to use as the green band
 #' @param b index in \code{x} of the band to use as the blue band
-#' @param width width in pixels of output PNG file
-#' @param height height in pixels of output PNG file
 #' @param x_fun an optional function to apply to \code{x} after x is resampled 
 #' according to \code{maxpixels}
 #' @param m_fun an optional function to apply to \code{m} after m is resampled 
 #' according to \code{maxpixels}
 #' @return nothing - used for side-effect of saving browse image
-browse_image <- function(x, filename, m=NULL, maxpixels=500000, DN_min=0, 
-                         DN_max=255, r=3, g=2, b=1, width=1200, height=1200, 
-                         x_fun=NULL, m_fun=NULL) {
-    if (!tolower(extension(filename)) == '.png') {
-        stop('output filename does not end in ".png"')
-    }
-    if (!file_test('-d', dirname(filename))) {
-        stop('output path does not exist')
-    }
+browse_image <- function(x, m=NULL, maxpixels=500000, DN_min=0, DN_max=255, 
+                         r=3, g=2, b=1, x_fun=NULL, m_fun=NULL) {
     if (!is.null(m)) stopifnot(nlayers(m) == 1)
 
     x <- plotprep(x, maxpixels=500000, DN_min=DN_min, DN_max=DN_max, 
@@ -51,7 +41,6 @@ browse_image <- function(x, filename, m=NULL, maxpixels=500000, DN_min=0,
         m <- calc(m, fun=m_fun, datatype=dataType(m))
     }
 
-    png(filename=browse_file, width=width, height=height)
     if (!is.null(m)) {
         m <- sampleRegular(m, size=maxpixels, asRaster=TRUE, useGDAL=TRUE)
         if (nrow(x) > ncol(x)) par(mfrow=c(1, 2))
@@ -61,5 +50,4 @@ browse_image <- function(x, filename, m=NULL, maxpixels=500000, DN_min=0,
     } else {
         plotRGB(x, r=r, g=g, b=b, maxpixels=maxpixels)
     }
-    dev.off()
 }

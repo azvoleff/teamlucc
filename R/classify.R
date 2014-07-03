@@ -9,7 +9,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
-#' @import caret randomForest
+#' @import caret randomForest e1071 kernlab
 #' @importFrom spatial.tools rasterEngine predict_rasterEngine
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification

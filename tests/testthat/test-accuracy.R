@@ -57,8 +57,10 @@ test_that(".calc_A works for Pontius and Millones (2011) example", {
 ###############################################################################
 # Test the handling of data by the S4 accuracy methods
 
-test_model <- L5TSR_1986_rfmodel
 test_image <- L5TSR_1986
+train_data <- get_pixels(test_image, L5TSR_1986_2001_training, "class_1986", 
+                         training=.6)
+rfmodel <- train_classifier(train_data)
 classification <- classify(test_image, L5TSR_1986_rfmodel)
 test_preds <- classification$classes
 

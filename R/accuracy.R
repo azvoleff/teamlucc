@@ -274,7 +274,12 @@ plot.error_adj_area <- function(x, ...) {
 #' Foody, G.M., Stehman, S.V., 2009. Accuracy Assessment, in: Warner, T.A., 
 #' Nellis, M.D., Foody, G.M. (Eds.), The SAGE Handbook of Remote Sensing. SAGE.
 #' @examples
+#' \dontrun{
+#' train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
+#'                          training=.6)
+#' model <- train_classifier(train_data)
 #' accuracy(L5TSR_1986_rfmodel)
+#' }
 setGeneric("accuracy", function(x, test_data, pop, class_col, reclass_mat) 
            standardGeneric("accuracy"))
 

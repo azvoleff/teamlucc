@@ -64,11 +64,3 @@ NULL
 #' @name ASTER_V002_EAST
 #' @seealso ASTER_V002_WEST
 NULL
-#' Example output from classify function
-#'
-#' This is an example Random Forest model as output from the classification 
-#' example in the code{classify} function.
-#' 
-#' @docType data
-#' @name L5TSR_1986_rfmodel
-NULL

@@ -53,7 +53,7 @@ auto_classify <- function(predictor_file, train_shp, output_path,
                              training=training)
 
     timer <- start_timer(timer, label='Running classification')
-    classification <- classify(predictors, train_data, notify=notify)
+    classification <- classify(predictors, train_data)
     model <- classification$model
     save(model, file=file.path(output_path, paste(pred_rast_basename, 
                                                   'predmodel.RData', sep='_')))

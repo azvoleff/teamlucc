@@ -68,7 +68,6 @@ train_classifier <- function(train_data, type='rf', use_training_flag=TRUE,
                        metric="ROC",
                        rfeControl=ctrl,
                        method="svmRadial",
-                       tuneLength=tune_length,
                        trControl=train_control,
                        tuneGrid=tune_grid)
         #TODO: Extract best model from rfe_res

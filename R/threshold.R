@@ -30,6 +30,7 @@ threshold <- function(x, method="huang", by=1, maxpixels=100000) {
     mins <- minValue(x)
     maxs <- maxValue(x)
 
+    bandnum=minval=maxval=NULL
     thresholds <- foreach(bandnum=iter(1:nlayers(x)), minval=iter(mins), 
                           maxval=iter(maxs), .packages=c('teamlucc'),
                           .combine=c) %dopar% {

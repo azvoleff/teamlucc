@@ -81,6 +81,7 @@ auto_normalize <- function(image_files, base, overwrite=FALSE) {
     stopifnot(length(image_files) == length(image_stacks))
     stopifnot(length(image_files) == length(mask_stacks))
 
+    image_file=image_stack=NULL
     # Now normalize each remaining image to the _base.tif file
     foreach (image_file=iter(image_files), image_stack=iter(image_stacks), 
              mask_stack=iter(mask_stacks),

@@ -39,8 +39,7 @@ Imports:
     XML
 Suggests:
     testthat,
-    landsat,
-    notifyR
+    landsat
 LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
     Landsat scenes with heavy clouds using the IDL code by Xiaolin Zhu at the
