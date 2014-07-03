@@ -6,14 +6,11 @@
 \alias{levels.pixel_data}
 \alias{pixel_data-class}
 \alias{print.pixel_data}
-\alias{print.summary.pixel_data}
 \alias{rbind.pixel_data}
 \alias{summary.pixel_data}
 \title{A class for representing training or testing data}
 \usage{
 summary.pixel_data(object, ...)
-
-print.summary.pixel_data(x, ...)
 
 \method{length}{pixel_data}(x)
 
@@ -30,7 +27,9 @@ rbind.pixel_data(x, ...)
 
 \item{...}{additional arguments (none supported)}
 
-\item{x}{a \code{pixel_data} object}
+\item{x}{
+    object from which to extract element(s) or in which to replace element(s).
+  }
 
 \item{i}{
     indices specifying elements to extract or replace.  Indices are

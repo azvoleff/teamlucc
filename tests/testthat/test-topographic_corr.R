@@ -1,6 +1,8 @@
 context("topographic_corr")
 
 suppressMessages(library(landsat))
+suppressMessages(library(foreach))
+suppressMessages(library(doParallel))
 
 # Load sample data
 L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
@@ -214,8 +216,8 @@ tl_min_sample <- topographic_corr(L5TSR_1986_b1, slopeaspect, sunelev,
                                   sunazimuth, method='minnaert_full',
                                   sampleindices=sampleindices_largesample)
 
-test_that("teamlucc minnaert sample and landsat minnaert match", {
-    expect_equal(tl_min_sample, expected=ls_min, tolerance=.02)
+test_that("teamlucc minnaert_full sample and landsat minnaert match", {
+    expect_equal(tl_min_sample, expected=ls_min, tolerance=.04)
 })
 
 ###############################################################################
@@ -224,8 +226,6 @@ tl_min_b1b2_seq <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                     slopeaspect, sunelev, sunazimuth, 
                                     method='minnaert_full')
 
-suppressMessages(library(foreach))
-suppressMessages(library(doParallel))
 registerDoParallel(2)
 tl_min_b1b2_par <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                     slopeaspect, sunelev, sunazimuth, 
@@ -243,8 +243,6 @@ tl_min_sample_b1b2_seq <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                            method='minnaert_full',
                                            sampleindices=sampleindices_largesample)
 
-suppressMessages(library(foreach))
-suppressMessages(library(doParallel))
 registerDoParallel(2)
 tl_min_sample_b1b2_par <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                            slopeaspect, sunelev, sunazimuth, 

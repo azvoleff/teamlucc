@@ -52,9 +52,8 @@ summary.pixel_data <- function(object, ...) {
     obj
 }
 
-#' @rdname pixel_data-class
-#' @param x a \code{pixel_data} object
 #' @export
+#' @method print summary.pixel_data
 print.summary.pixel_data <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
     cat('\n')
@@ -194,7 +193,7 @@ setGeneric("training_flag", function(x, classes=levels(x@y)) {
 
 #' @rdname pixel_data-class
 setMethod("[", signature(x="pixel_data", i='character'),
-function(x, i, j, ...) {
+function(x, i, ...) {
     if (!(i %in% levels(x@y))) {
         stop(paste0('"', i, '"', ' is not a class in this pixel_data object'))
     }
@@ -226,8 +225,8 @@ setGeneric("training_flag<-", function(x, classes, value) {
 })
 
 #' @rdname training_flag
-#' @aliases training_flag<-,pixel_data-method
-setMethod("training_flag<-", signature(x="pixel_data", classes='missing', 
+#' @aliases training_flag<-,pixel_data,character,logical-method
+setMethod("training_flag<-", signature(x="pixel_data", classes='character', 
                                        value='logical'),
 function(x, classes=levels(x@y), value) {
     if (identical(classes, levels(x@y))) {
