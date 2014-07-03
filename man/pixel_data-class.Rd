@@ -2,31 +2,15 @@
 \docType{class}
 \name{pixel_data-class}
 \alias{[,pixel_data,character,ANY,ANY-method}
-\alias{length.pixel_data}
-\alias{levels.pixel_data}
 \alias{pixel_data-class}
-\alias{print.pixel_data}
 \alias{rbind.pixel_data}
-\alias{summary.pixel_data}
 \title{A class for representing training or testing data}
 \usage{
-summary.pixel_data(object, ...)
-
-\method{length}{pixel_data}(x)
-
-levels.pixel_data(x)
-
-print.pixel_data(x, ...)
-
 rbind.pixel_data(x, ...)
 
 \S4method{[}{pixel_data,character,ANY,ANY}(x, i, j, ..., drop = TRUE)
 }
 \arguments{
-\item{object}{a \code{pixel_data} object}
-
-\item{...}{additional arguments (none supported)}
-
 \item{x}{
     object from which to extract element(s) or in which to replace element(s).
   }

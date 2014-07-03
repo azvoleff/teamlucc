@@ -21,11 +21,7 @@ setClass('pixel_data', slots=c(x='data.frame', y='factor',
                                polys='SpatialPolygonsDataFrame')
 )
 
-#' @rdname pixel_data-class
-#' @importFrom dplyr summarize group_by
-#' @param object a \code{pixel_data} object
-#' @param ... additional arguments (none supported)
-#' @export
+#' @method summary pixel_data
 summary.pixel_data <- function(object, ...) {
     obj = list()
     obj[['class']] <- class(object)
@@ -71,20 +67,17 @@ print.summary.pixel_data <- function(x, ...) {
     invisible(x)
 }
 
-#' @rdname pixel_data-class
-#' @export
+#' @method length pixel_data
 length.pixel_data <- function(x) {
     return(length(x@y))
 }
 
-#' @rdname pixel_data-class
-#' @export
+#' @method levels pixel_data
 levels.pixel_data <- function(x) {
     return(levels(x@y))
 }
 
-#' @rdname pixel_data-class
-#' @export
+#' @method print pixel_data
 print.pixel_data <- function(x, ...) {
     print(summary(x, ...))
 }
