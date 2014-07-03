@@ -6,10 +6,11 @@
 \alias{subsample,pixel_data-method}
 \title{Subsample a pixel_data object}
 \usage{
-subsample(x, size, strata = "sources", type = "training", flag = TRUE)
+subsample(x, size, strata = "sources", type = "training", flag = TRUE,
+  classes = levels(x@y))
 
 \S4method{subsample}{pixel_data,numeric}(x, size, strata = "sources",
-  type = "training", flag = TRUE)
+  type = "training", flag = TRUE, classes = levels(x@y))
 }
 \arguments{
 \item{x}{a \code{pixel_data} object}
@@ -32,6 +33,9 @@ training data will not be changed.}
 sampled training data as testing data, if \code{flag=TRUE} and
 \code{type='training'}) or remove sampled data from dataset entirely
 (\code{flag=FALSE}).}
+
+\item{classes}{specifies which classes to sample, defaults to all classes in
+\code{x}}
 }
 \description{
 Subsample a pixel_data object

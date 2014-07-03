@@ -125,10 +125,12 @@ setMethod("show", signature(object="pixel_data"), function(object)
 #' sampled training data as testing data, if \code{flag=TRUE} and 
 #' \code{type='training'}) or remove sampled data from dataset entirely 
 #' (\code{flag=FALSE}).
+#' @param classes specifies which classes to sample, defaults to all classes in 
+#' \code{x}
 #' @rdname subsample
 #' @aliases subsample,pixel_data-method
-setGeneric("subsample", function(x, size, strata='sources', type="training", 
-                                 flag=TRUE)
+setGeneric("subsample", function(x, size, strata="sources", type="training", 
+                                 flag=TRUE, classes=levels(x@y))
     standardGeneric("subsample")
 )
 
@@ -136,7 +138,7 @@ setGeneric("subsample", function(x, size, strata='sources', type="training",
 #' @aliases subsample,pixel_data,numeric-method
 #' @importFrom dplyr group_by sample_frac
 setMethod("subsample", signature(x="pixel_data", size="numeric"),
-function(x, size, strata, type, flag) {
+function(x, size, strata, type, flag, classes) {
     row_IDs <- data.frame(y=x@y,
                           pixel_src=paste(x@pixel_src$src, x@pixel_src$ID),
                           row_num=seq(1, length(x@y)))
@@ -148,6 +150,7 @@ function(x, size, strata, type, flag) {
     } else {
         row_IDs <- row_IDs[!x@training_flag, ]
     }
+    row_IDs <- row_IDs[row_IDs$y %in% classes, ]
     stopifnot(nrow(row_IDs) > 1)
     if (strata == "sources") {
         row_IDs <- group_by(row_IDs, y, pixel_src)
@@ -178,30 +181,63 @@ function(x, size, strata, type, flag) {
 #'
 #' @export training_flag
 #' @param x a \code{pixel_data} object
+#' @param classes specifies a subset of classes in \code{x}
 #' @rdname training_flag
 #' @aliases training_flag,pixel_data-method
-setGeneric("training_flag", function(x) standardGeneric("training_flag"))
+setGeneric("training_flag", function(x, classes=levels(x@y)) {
+    standardGeneric("training_flag")
+})
+
+setMethod("[", signature(x="pixel_data", i='character'),
+function(x, i, j, ...) {
+    if (!(i %in% levels(x@y))) {
+        stop(paste0('"', i, '"', ' is not a class in this pixel_data object'))
+    }
+    sel_rows <- x@y %in% i
+    used_polys <- which(paste(x@polys@data$src, x@polys@data$ID) %in% 
+                        with(x@pixel_src[sel_rows, ], paste(src, ID)))
+    initialize(x, x=x@x[sel_rows, ], y=x@y[sel_rows], 
+               pixel_src=x@pixel_src[sel_rows, ], 
+               training_flag=x@training_flag[sel_rows], 
+               polys=x@polys[used_polys, ])
+})
 
 #' @rdname training_flag
 #' @aliases training_flag,pixel_data-method
 setMethod("training_flag", signature(x="pixel_data"),
-function(x) {
-    return(x@training_flag)
+function(x, classes) {
+    if (identical(classes, levels(x@y))) {
+        return(x@training_flag)
+    } else {
+        return(x@training_flag[x@y %in% classes])
+    }
 })
 
 #' @export training_flag<-
 #' @rdname training_flag
 #' @param value a new \code{training_flag} to assign for pixels in \code{x}
-setGeneric("training_flag<-", function(x, value) standardGeneric("training_flag<-"))
+setGeneric("training_flag<-", function(x, value, classes) {
+    standardGeneric("training_flag<-")
+})
 
 #' @rdname training_flag
 #' @aliases training_flag<-,pixel_data-method
 setMethod("training_flag<-", signature(x="pixel_data"),
-function(x, value) {
-    if (length(value) == 1) value <- rep(value, length(x@training_flag))
-    stopifnot(length(value) == length(x@training_flag))
-    x@training_flag <- value
-    return(x)
+function(x, value, classes=levels(x@y)) {
+    if (identical(classes, levels(x@y))) {
+        # More efficiently handle special case of reassigning flags for all 
+        # classes in x.
+        if (length(value) == 1) value <- rep(value, length(x@training_flag))
+        stopifnot(length(value) == length(x@training_flag))
+        x@training_flag <- value
+        return(x)
+    } else {
+        sel_rows <- which(x@y %in% classes)
+        if (length(value) == 1) value <- rep(value, length(sel_rows))
+        stopifnot(length(value) == length(sel_rows))
+        x@training_flag[sel_rows] <- value
+        return(x)
+    }
 })
 
 #' Get or set src_name for a pixel_data object
