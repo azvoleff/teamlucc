@@ -80,14 +80,6 @@ at the R prompt to install the latest version of `teamlucc`. Typing the above
 command will also work if you already have `teamlucc` installed and want to 
 install an updated version of the package.
 
-Some of the functions in `teamlucc` run in parallel using the `rasterEngine` 
-function in the `spatial.tools` function. For these functions you will want a 
-recent version of `spatial.tools`, which you can get from R-Forge by typing:
-
-```R
-install.packages("spatial.tools", repos="http://R-Forge.R-project.org")
-```
-
 ### Install GDAL
 
 `teamlucc` uses the `gdalUtils` package to facilitate fast image reprojection 
