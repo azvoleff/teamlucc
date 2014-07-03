@@ -31,6 +31,10 @@ accuracy(x, test_data, pop, class_col, reclass_mat)
   test_data, pop, class_col, reclass_mat)
 }
 \arguments{
+\item{object}{an \code{accuracy} object}
+
+\item{...}{additional arguments (none supported)}
+
 \item{x}{either a classification model with a \code{predict} method or a
 \code{RasterLayer} (see Details)}
 

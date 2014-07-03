@@ -22,6 +22,13 @@ print.pixel_data(x, ...)
 
 rbind.pixel_data(x, ...)
 }
+\arguments{
+\item{object}{a \code{pixel_data} object}
+
+\item{...}{additional arguments (none supported)}
+
+\item{x}{a \code{pixel_data} object}
+}
 \description{
 Used to represent training data for a machine learning classifier for image
 classificaion, or testing data used for testing a classification.

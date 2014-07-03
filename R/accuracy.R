@@ -15,6 +15,8 @@ setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric',
 )
 
 #' @rdname accuracy
+#' @param object an \code{accuracy} object
+#' @param ... additional arguments (none supported)
 #' @export
 summary.accuracy <- function(object, ...) {
     obj = list()

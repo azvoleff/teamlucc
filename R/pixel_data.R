@@ -23,6 +23,8 @@ setClass('pixel_data', slots=c(x='data.frame', y='factor',
 
 #' @rdname pixel_data-class
 #' @importFrom dplyr summarize group_by
+#' @param object a \code{pixel_data} object
+#' @param ... additional arguments (none supported)
 #' @export
 summary.pixel_data <- function(object, ...) {
     obj = list()
@@ -51,6 +53,7 @@ summary.pixel_data <- function(object, ...) {
 }
 
 #' @rdname pixel_data-class
+#' @param x a \code{pixel_data} object
 #' @export
 print.summary.pixel_data <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))

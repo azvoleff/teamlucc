@@ -13,7 +13,8 @@ bands}
 
 \item{filename}{a filename ending in .png}
 
-\item{an}{optional mask \code{RasterLayer} to output below the browse image}
+\item{m}{an optional mask \code{RasterLayer} to output below the browse
+image}
 
 \item{maxpixels}{maximum number of pixels to use in plotting}
 
@@ -27,7 +28,7 @@ bands}
 
 \item{b}{index in \code{x} of the band to use as the blue band}
 
-\item{with}{width in pixels of output PNG file}
+\item{width}{width in pixels of output PNG file}
 
 \item{height}{height in pixels of output PNG file}
 

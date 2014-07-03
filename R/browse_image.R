@@ -18,14 +18,15 @@ plotprep <- function(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=NULL) {
 #' @param x input \code{RasterBrick} or \code{RasterStack} with at least three 
 #' bands
 #' @param filename a filename ending in .png
-#' @param an optional mask \code{RasterLayer} to output below the browse image
+#' @param m an optional mask \code{RasterLayer} to output below the browse 
+#' image
 #' @param maxpixels maximum number of pixels to use in plotting
 #' @param DN_min minimum DN value
 #' @param DN_max maximum DN value
 #' @param r index in \code{x} of the band to use as the red band
 #' @param g index in \code{x} of the band to use as the green band
 #' @param b index in \code{x} of the band to use as the blue band
-#' @param with width in pixels of output PNG file
+#' @param width width in pixels of output PNG file
 #' @param height height in pixels of output PNG file
 #' @param x_fun an optional function to apply to \code{x} after x is resampled 
 #' according to \code{maxpixels}
