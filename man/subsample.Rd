@@ -27,7 +27,7 @@ classes alone (\code{strata='classes'})}
 \item{type}{whether to subsample training data (\code{type='training'}) or
 testing data (\code{type='testing'}). Whichever type is chosen, the other
 type will be left untouched (for example, if \code{type='testing'}, the
-training data will not be changed.}
+training data will not be changed).}
 
 \item{flag}{whether to swap training flag on sampled data (for example, flag
 sampled training data as testing data, if \code{flag=TRUE} and

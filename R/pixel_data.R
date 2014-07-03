@@ -123,7 +123,7 @@ setMethod("show", signature(object="pixel_data"), function(object)
 #' @param type whether to subsample training data (\code{type='training'}) or 
 #' testing data (\code{type='testing'}). Whichever type is chosen, the other 
 #' type will be left untouched (for example, if \code{type='testing'}, the 
-#' training data will not be changed.
+#' training data will not be changed).
 #' @param flag whether to swap training flag on sampled data (for example, flag 
 #' sampled training data as testing data, if \code{flag=TRUE} and 
 #' \code{type='training'}) or remove sampled data from dataset entirely 
