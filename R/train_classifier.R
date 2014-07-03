@@ -89,7 +89,7 @@ train_classifier <- function(train_data, type='rf', use_training_flag=TRUE,
                        trControl=train_control, tuneGrid=tune_grid, ...)
     } else if (type == 'svm') {
         model <- train(model_formula, data=train_data, method="svmRadial",
-                       preProc=c('range'), subset=train_data$training_flag,
+                       preProc=c('center', 'scale'), subset=train_data$training_flag,
                        trControl=train_control, tuneGrid=tune_grid, ...)
     } else {
         # should never get here
