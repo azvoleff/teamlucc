@@ -12,7 +12,7 @@ before_install:
 # See: https://github.com/travis-ci/travis-ci/issues/2401
   - sudo rm /etc/apt/sources.list.d/ubuntugis-stable-source.list
   - sudo apt-get update -qq
-  - ./travis-tool.sh install_aptget gdal-bin libgdal1-dev netcdf-bin libproj-dev
+  - ./travis-tool.sh install_aptget gdal-bin netcdf-bin
   - ./travis-tool.sh bootstrap
     # teamlucc R depends
   - ./travis-tool.sh install_r_binary raster Rcpp RcppArmadillo
