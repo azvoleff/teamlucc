@@ -214,6 +214,46 @@ function(x, classes) {
     }
 })
 
+#' Get number of testing pixels in a pixel_data object
+#'
+#' @export n_test
+#' @param x a \code{pixel_data} object
+#' @param classes specifies a subset of classes in \code{x}
+#' @aliases n_test,pixel_data-method
+setGeneric("n_test", function(x, classes=levels(x@y)) {
+    standardGeneric("n_test")
+})
+
+#' @rdname n_test
+setMethod("n_test", signature(x="pixel_data"),
+function(x, classes) {
+    if (identical(classes, levels(x@y))) {
+        return(sum(!x@training_flag))
+    } else {
+        return(sum(!x@training_flag[x@y %in% classes]))
+    }
+})
+
+#' Get number of training pixels in a pixel_data object
+#'
+#' @export n_train
+#' @param x a \code{pixel_data} object
+#' @param classes specifies a subset of classes in \code{x}
+#' @aliases n_train,pixel_data-method
+setGeneric("n_train", function(x, classes=levels(x@y)) {
+    standardGeneric("n_train")
+})
+
+#' @rdname n_train
+setMethod("n_train", signature(x="pixel_data"),
+function(x, classes) {
+    if (identical(classes, levels(x@y))) {
+        return(sum(x@training_flag))
+    } else {
+        return(sum(x@training_flag[x@y %in% classes]))
+    }
+})
+
 #' @export
 #' @rdname training_flag
 #' @param value a new \code{training_flag} to assign for pixels in \code{x}
