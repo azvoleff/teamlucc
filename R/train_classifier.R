@@ -24,15 +24,17 @@
 #' @param use_rfe whether to use Recursive Feature Extraction (RFE) as 
 #' implemented in the \code{caret} package to select a subset of the input 
 #' features to be used in the classification. NOT YET SUPPORTED.
-#' @return a trained random forest model (as a \code{train} object from the  
-#' \code{caret} package)
+#' @param ... additional arguments (such as \code{ntree} for random forest 
+#' classifier) to pass to \code{train}
+#' @return a trained model (as a \code{train} object from the  \code{caret} 
+#' package)
 #' @examples
 #' train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
 #'                          training=.6)
 #' model <- train_classifier(train_data)
 train_classifier <- function(train_data, type='rf', use_training_flag=TRUE, 
                              train_control=NULL, tune_grid=NULL,
-                             use_rfe=FALSE) {
+                             use_rfe=FALSE, ...) {
     stopifnot(type %in% c('svm', 'rf'))
 
     if (is.null(train_control)) {
@@ -84,13 +86,11 @@ train_classifier <- function(train_data, type='rf', use_training_flag=TRUE,
     if (type == 'rf') {
         model <- train(model_formula, data=train_data, method="rf",
                        preProc=c('range'), subset=train_data$training_flag,
-                       trControl=train_control, tuneLength=10, 
-                       tuneGrid=tune_grid, ntree=2000)
+                       trControl=train_control, tuneGrid=tune_grid, ...)
     } else if (type == 'svm') {
         model <- train(model_formula, data=train_data, method="svmRadial",
                        preProc=c('range'), subset=train_data$training_flag,
-                       trControl=train_control, tuneLength=10, 
-                       tuneGrid=tune_grid)
+                       trControl=train_control, tuneGrid=tune_grid, ...)
     } else {
         # should never get here
         stop("model type not recognized")

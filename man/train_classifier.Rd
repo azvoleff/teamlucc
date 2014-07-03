@@ -4,7 +4,7 @@
 \title{Trains a classifier}
 \usage{
 train_classifier(train_data, type = "rf", use_training_flag = TRUE,
-  train_control = NULL, tune_grid = NULL, use_rfe = FALSE)
+  train_control = NULL, tune_grid = NULL, use_rfe = FALSE, ...)
 }
 \arguments{
 \item{train_data}{a \code{link{pixel_data}} object}
@@ -27,10 +27,13 @@ See Details.}
 \item{use_rfe}{whether to use Recursive Feature Extraction (RFE) as
 implemented in the \code{caret} package to select a subset of the input
 features to be used in the classification. NOT YET SUPPORTED.}
+
+\item{...}{additional arguments (such as \code{ntree} for random forest
+classifier) to pass to \code{train}}
 }
 \value{
-a trained random forest model (as a \code{train} object from the
-\code{caret} package)
+a trained model (as a \code{train} object from the  \code{caret}
+package)
 }
 \description{
 This function trains a Support Vector Machine (SVM) or Random Forest (RF)
