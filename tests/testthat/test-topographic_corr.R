@@ -1,8 +1,6 @@
 context("topographic_corr")
 
 suppressMessages(library(landsat))
-suppressMessages(library(foreach))
-suppressMessages(library(doParallel))
 
 # Load sample data
 L5TSR_1986_b1 <- raster(L5TSR_1986, layer=1)
@@ -221,34 +219,30 @@ test_that("teamlucc minnaert_full sample and landsat minnaert match", {
 })
 
 ###############################################################################
-# minnaert_full in parallel
+# minnaert_full on stack
 tl_min_b1b2_seq <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                     slopeaspect, sunelev, sunazimuth, 
                                     method='minnaert_full')
 
-registerDoParallel(2)
 tl_min_b1b2_par <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                     slopeaspect, sunelev, sunazimuth, 
                                     method='minnaert_full')
-stopImplicitCluster()
 
 test_that("teamlucc minnaert and landsat minnaert match when run in parallel on stack", {
     expect_equal(tl_min_b1b2_seq, expected=tl_min_b1b2_par)
 })
 
 ###############################################################################
-# minnaert_full in parallel with sampling
+# minnaert_full on stack with sampling
 tl_min_sample_b1b2_seq <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                            slopeaspect, sunelev, sunazimuth, 
                                            method='minnaert_full',
                                            sampleindices=sampleindices_largesample)
 
-registerDoParallel(2)
 tl_min_sample_b1b2_par <- topographic_corr(stack(L5TSR_1986_b1, L5TSR_1986_b2),
                                            slopeaspect, sunelev, sunazimuth, 
                                            method='minnaert_full',
                                            sampleindices=sampleindices_largesample)
-stopImplicitCluster()
 
 test_that("teamlucc minnaert and landsat minnaert match when run in parallel on stack with sampling", {
     expect_equal(tl_min_sample_b1b2_seq, expected=tl_min_sample_b1b2_par)

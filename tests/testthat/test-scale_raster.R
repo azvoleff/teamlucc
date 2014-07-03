@@ -39,13 +39,3 @@ test_that("returning scale factors works correctly correctly", {
     expect_equal(scale_raster(test_stack, max_out=32768*2, do_scaling=FALSE), 
                  expected=list(b1=10, b2=10, b3=10, b4=10))
 })
-
-suppressMessages(library(foreach))
-suppressMessages(library(doParallel))
-registerDoParallel(2)
-test_that("scaling a RasterStack in parallel works correctly", {
-    expect_equivalent(scale_raster(test_stack, max_out=256), expected_stack)
-    expect_equal(scale_raster(test_stack, max_out=256, do_scaling=FALSE), 
-                 expected=list(b1=.1, b2=.1, b3=.1, b4=.01))
-})
-stopImplicitCluster()
