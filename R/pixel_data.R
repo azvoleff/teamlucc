@@ -4,6 +4,8 @@
 #' classificaion, or testing data used for testing a classification.
 #'
 #' @exportClass pixel_data
+#' @rdname pixel_data-class
+#' @aliases pixel_data
 #' @slot x a \code{data.frame} of independent variables (usually pixel values)
 #' @slot y a \code{data.frame} of the dependent variable (usually land cover 
 #' classes)
@@ -21,6 +23,7 @@ setClass('pixel_data', slots=c(x='data.frame', y='factor',
                                polys='SpatialPolygonsDataFrame')
 )
 
+#' @export
 #' @method summary pixel_data
 summary.pixel_data <- function(object, ...) {
     obj = list()
@@ -67,24 +70,27 @@ print.summary.pixel_data <- function(x, ...) {
     invisible(x)
 }
 
+#' @export
 #' @method length pixel_data
 length.pixel_data <- function(x) {
     return(length(x@y))
 }
 
+#' @export
 #' @method levels pixel_data
 levels.pixel_data <- function(x) {
     return(levels(x@y))
 }
 
+#' @export
 #' @method print pixel_data
 print.pixel_data <- function(x, ...) {
     print(summary(x, ...))
 }
 
-#' @rdname pixel_data-class
-#' @importFrom maptools spRbind
 #' @export
+#' @importFrom maptools spRbind
+#' @method rbind pixel_data
 rbind.pixel_data <- function(x, ...) {
     for (item in c(...)) {
         x@x <- rbind(x@x, item@x)
@@ -97,6 +103,21 @@ rbind.pixel_data <- function(x, ...) {
     }
     return(x)
 }
+
+#' @method [ pixel_data
+setMethod("[", signature(x="pixel_data", i='character'),
+function(x, i, ...) {
+    if (!(i %in% levels(x@y))) {
+        stop(paste0('"', i, '"', ' is not a class in this pixel_data object'))
+    }
+    sel_rows <- x@y %in% i
+    used_polys <- which(paste(x@polys@data$src, x@polys@data$ID) %in% 
+                        with(x@pixel_src[sel_rows, ], paste(src, ID)))
+    initialize(x, x=x@x[sel_rows, ], y=x@y[sel_rows], 
+               pixel_src=x@pixel_src[sel_rows, ], 
+               training_flag=x@training_flag[sel_rows], 
+               polys=x@polys[used_polys, ])
+})
 
 setMethod("show", signature(object="pixel_data"), function(object) 
           print(object))
@@ -178,29 +199,12 @@ function(x, size, strata, type, flag, classes) {
 #' @export training_flag
 #' @param x a \code{pixel_data} object
 #' @param classes specifies a subset of classes in \code{x}
-#' @rdname training_flag
 #' @aliases training_flag,pixel_data-method
 setGeneric("training_flag", function(x, classes=levels(x@y)) {
     standardGeneric("training_flag")
 })
 
-#' @rdname pixel_data-class
-setMethod("[", signature(x="pixel_data", i='character'),
-function(x, i, ...) {
-    if (!(i %in% levels(x@y))) {
-        stop(paste0('"', i, '"', ' is not a class in this pixel_data object'))
-    }
-    sel_rows <- x@y %in% i
-    used_polys <- which(paste(x@polys@data$src, x@polys@data$ID) %in% 
-                        with(x@pixel_src[sel_rows, ], paste(src, ID)))
-    initialize(x, x=x@x[sel_rows, ], y=x@y[sel_rows], 
-               pixel_src=x@pixel_src[sel_rows, ], 
-               training_flag=x@training_flag[sel_rows], 
-               polys=x@polys[used_polys, ])
-})
-
 #' @rdname training_flag
-#' @aliases training_flag,pixel_data-method
 setMethod("training_flag", signature(x="pixel_data"),
 function(x, classes) {
     if (identical(classes, levels(x@y))) {
@@ -210,15 +214,14 @@ function(x, classes) {
     }
 })
 
-#' @export training_flag<-
+#' @export
 #' @rdname training_flag
 #' @param value a new \code{training_flag} to assign for pixels in \code{x}
 setGeneric("training_flag<-", function(x, classes, value) {
     standardGeneric("training_flag<-")
 })
 
-#' @rdname training_flag
-#' @aliases training_flag<-,pixel_data,character,logical-method
+#' @method training_flag<- pixel_data
 setMethod("training_flag<-", signature(x="pixel_data", classes='character', 
                                        value='logical'),
 function(x, classes=levels(x@y), value) {
@@ -242,24 +245,28 @@ function(x, classes=levels(x@y), value) {
 #'
 #' @export src_name
 #' @param x a \code{pixel_data} object
-#' @rdname src_name
+#' @param classes specifies a subset of classes in \code{x}
 #' @aliases src_name,pixel_data-method
-setGeneric("src_name", function(x) standardGeneric("src_name"))
-
-#' @rdname src_name
-#' @aliases src_name,pixel_data-method
-setMethod("src_name", signature(x="pixel_data"),
-function(x) {
-    return(paste0(x@pixel_src$src, '_', x@pixel_src$ID))
+setGeneric("src_name", function(x, classes=levels(x@y)) {
+    standardGeneric("src_name")
 })
 
-#' @export src_name<-
+#' @method src_name pixel_data
+setMethod("src_name", signature(x="pixel_data"),
+function(x, classes) {
+    if (identical(classes, levels(x@y))) {
+        return(paste0(x@pixel_src$src, '_', x@pixel_src$ID))
+    } else {
+        return(with(x@pixel_src[x@y %in% classes, ], paste0(src, '_', ID)))
+    }
+})
+
+#' @export
 #' @rdname src_name
 #' @param value a new \code{src_name} to assign for pixels in \code{x}
 setGeneric("src_name<-", function(x, value) standardGeneric("src_name<-"))
 
-#' @rdname src_name
-#' @aliases src_name<-,pixel_data-method
+#' @method src_name<- pixel_data
 setMethod("src_name<-", signature(x="pixel_data"),
 function(x, value) {
     if (length(value) == 1) {
@@ -300,11 +307,8 @@ function(x, value) {
 #'   use in training.
 #' @param src name of this data source. Useful when gathering training 
 #' data from multiple images.
-#' @return data.frame with the training data. Each row will contain the 
-#' response (the column chosen by \code{class_col}) as the first column, with 
-#' the remaining columns containing the values at that location of each band in 
-#' the raster stack.
-#' @examples
+#' @return a \code{link{pixel_data}} object
+#' will contain the the @examples
 #' set.seed(1)
 #' train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
 #'                          training=.6)

@@ -27,10 +27,8 @@ used in training (rows equal to 1) or in testing (rows equal to FALSE), or
 data from multiple images.}
 }
 \value{
-data.frame with the training data. Each row will contain the
-response (the column chosen by \code{class_col}) as the first column, with
-the remaining columns containing the values at that location of each band in
-the raster stack.
+a \code{link{pixel_data}} object
+will contain the the
 }
 \description{
 Extract observed data for use in a classification (training or testing)
