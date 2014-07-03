@@ -119,7 +119,7 @@ setMethod("show", signature(object="pixel_data"), function(object)
 #' stratification is chosen.
 #' @param strata whether to draw samples from within individual classes, nested 
 #' within source polygons (\code{strata='sources'}), or from within individual 
-#' classes alone \code{strata='classes'})
+#' classes alone (\code{strata='classes'})
 #' @param type whether to subsample training data (\code{type='training'}) or 
 #' testing data (\code{type='testing'}). Whichever type is chosen, the other 
 #' type will be left untouched (for example, if \code{type='testing'}, the 
