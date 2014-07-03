@@ -34,11 +34,13 @@ This function will run in parallel if a parallel backend is registered with
 \code{\link{foreach}}.
 }
 \examples{
+\dontrun{
 train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",
                          training=.6)
 model <- train_classifier(train_data)
 preds <- classify(L5TSR_1986, model)
 plot(preds$classes)
 plot(preds$probs)
+}
 }
 
