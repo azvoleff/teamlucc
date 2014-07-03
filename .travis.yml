@@ -10,9 +10,6 @@ before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
   - sudo apt-get update -qq
-  - sudo rm /etc/apt/sources.list.d/ubuntugis-stable-source.list
-  - sudo apt-get update -qq
-  - ./travis-tool.sh install_aptget gdal-bin libgdal-dev libgdal1-dev netcdf-bin libproj-dev libgdal1h
   - ./travis-tool.sh bootstrap
     # teamlucc R depends
   - ./travis-tool.sh install_r_binary raster Rcpp RcppArmadillo
