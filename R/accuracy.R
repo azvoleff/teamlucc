@@ -14,10 +14,8 @@ setClass('accuracy', slots=c(ct='table', pop_ct='table', Q='numeric',
                              pop='numeric')
 )
 
-#' @rdname accuracy
-#' @param object an \code{accuracy} object
-#' @param ... additional arguments (none supported)
 #' @export
+#' @method summary accuracy
 summary.accuracy <- function(object, ...) {
     obj = list()
     obj[['class']] <- class(object)
@@ -32,8 +30,8 @@ summary.accuracy <- function(object, ...) {
     obj
 }
 
-#' @rdname accuracy
 #' @export
+#' @method print summary.accuracy
 print.summary.accuracy <- function(x, ...) {
     cat(paste('Object of class "', x[['class']], '"\n', sep = ''))
     cat('\n')
@@ -52,8 +50,8 @@ print.summary.accuracy <- function(x, ...) {
     invisible(x)
 }
 
-#' @rdname accuracy
 #' @export
+#' @method print accuracy
 print.accuracy <- function(x, ...) {
     print(summary(x, ...))
 }

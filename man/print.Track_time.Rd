@@ -3,7 +3,7 @@
 \alias{print.Track_time}
 \title{Print a Track_time object}
 \usage{
-print.Track_time(x, label, ...)
+\method{print}{Track_time}(x, label, ...)
 }
 \arguments{
 \item{x}{a Track_time object}

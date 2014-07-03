@@ -41,6 +41,7 @@ Track_time <- function(notify=print) {
 #' @param x a Track_time object
 #' @param label (optional) selects a specific tracking timer to print
 #' @param ... ignored
+#' @method print Track_time
 print.Track_time <- function(x, label, ...) {
     timers <- x@timers
     if (!missing(label)) {
