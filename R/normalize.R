@@ -34,6 +34,7 @@
 #' Journal of Statistical Software, 2011, 43:4, pg 1--25.  
 #' http://www.jstatsoft.org/v43/i04/
 normalize <- function(x, y, msk, method="MA", size=ncell(x)) {
+    orig_datatype <- dataType(y)[1]
     compareRaster(x, y)
     stopifnot(nlayers(x) == nlayers(y))
     stopifnot(size <= ncell(x))
@@ -86,6 +87,8 @@ normalize <- function(x, y, msk, method="MA", size=ncell(x)) {
         # Copy masked values back into the output raster
         normed_y[msk] <- y[msk]
     }
+
+    dataType(normed_y) <- orig_datatype
 
     return(normed_y)
 }
