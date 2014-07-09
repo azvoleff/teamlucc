@@ -87,7 +87,7 @@ espa_download <- function(email, order_ID, output_folder) {
 
     # Parse ESPA page for download links
     email_noat <- gsub('@', '%40', email)
-    espa_page <- scan(paste0("http://espa.cr.usgs.gov/status/", email_noat, 
+    espa_page <- scan(paste0("http://espa.cr.usgs.gov/ordering/status/", email_noat, 
                              "-", order_ID), what='character', quiet=TRUE)
     url_re <- paste0('http://espa\\.cr\\.usgs\\.gov/orders/', email, '-', 
                      order_ID, '/L[ET][0-9]{14}-SC[0-9]{14}\\.tar\\.gz')
