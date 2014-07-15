@@ -114,7 +114,7 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     # Ensure original proj4string and extent are saved and returned
     proj4string(filled) <- cloudy_proj
     extent(filled) <- cloudy_ext
-    filled <- writeRaster(filled, filename=out_name, overwrite=overwrite, 
+    filled <- writeRaster(filled, filename=out_name, overwrite=TRUE, 
                           datatype=dataType(filled)[1])
     return(filled)
 }
