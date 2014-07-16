@@ -20,9 +20,11 @@
 #' @param out_base path and base filename for the output file. The script will 
 #' save the output files by appending "_GNSPI.envi" and 
 #' "_GNSPI_uncertainty.envi" to this base filename.
-#' @param use_IDL whether to use Xiaolin Zhu's original IDL scripts 
-#' (\code{use_IDL=TRUE}) or the C++ implementation native to \code{teamlucc} 
-#' (\code{use_IDL=FALSE})
+#' @param ext file extension to use when and when saving output rasters 
+#' (determines output file format). Must be supported by 
+#' \code{\link{writeRaster}}.
+#' @param algorithm the algorithm to use, as a string ("GNSPI_IDL" is currently 
+#' the only supported algorithm)
 #' @param sample_size the sample size of sample pixels
 #' @param size_wind the maximum window size
 #' @param class_num the estimated number of classes
@@ -47,11 +49,12 @@
 #' 'TM20100208_toaR', package='teamlucc')))
 #' filled <- fill_gaps(slc_off, fill, timeseries)
 #' }
-fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, use_IDL=TRUE, 
-                      sample_size=20, size_wind=12, class_num=4, DN_min=0.0, 
+fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, ext="tif",
+                      algorithm="GNSPI_IDL", sample_size=20, size_wind=12, 
+                      class_num=4, DN_min=0.0, 
                       DN_max=1.0, patch_long=1000,
                       idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
-                      verbose=FALSE) {
+                      verbose=FALSE, overwrite=FALSE) {
     if (!(class(slc_off) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
         stop('slc_off must be a Raster* object')
     }
@@ -62,6 +65,11 @@ fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, use_IDL=TRUE
         stop('number of layers in slc_off must match number of layers in fill')
     }
     compareRaster(slc_off, fill)
+    if (!(algorithm %in% c('GNSPI_IDL'))) {
+        stop('algorithm must be "GNSPI_IDL" - no other algorithms are supported')
+    }
+
+    ext <- gsub('^[.]', '', ext)
 
     for (timeseries_img in timeseries) {
         if (!(class(timeseries_img) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
@@ -77,32 +85,48 @@ fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, use_IDL=TRUE
         out_base <- file_path_sans_ext(rasterTmpFile())
     } else {
         out_base <- normalizePath(out_base, mustWork=FALSE)
+        if (!file_test('-d', dirname(out_base))) {
+            stop('output folder does not exist')
+        }
+        if (!overwrite && file_test('-f', file.path(out_base, paste0('_GNSPI.', ext)))) {
+            stop('output file already exists - use a different "out_base"')
+        }
+        if (!overwrite && file_test('-f', file.path(out_base, paste0('_GNSPI_uncertainty.', ext)))) {
+            stop('output uncertainty file already exists - use a different "out_base"')
+        }
     }
     
-    if (use_IDL) {
+    if (algorithm == "GNSPI_IDL") {
         filled <- fill_gaps_idl(slc_off, fill, timeseries, out_base, 
                                 sample_size, size_wind, class_num, DN_min, 
-                                DN_max, patch_long, idl, verbose)
+                                DN_max, patch_long, idl, algorithm, ext, 
+                                verbose)
     } else {
         filled <- fill_gaps_R(slc_off, fill, timeseries, out_base, sample_size, 
                               size_wind, class_num, DN_min, DN_max, patch_long, 
-                              idl, verbose)
+                              idl, algorithm, verbose)
     }
 
     return(filled)
 }
 
-fill_gaps_idl <- function(slc_off, fill, timeseries, out_base, 
-                          sample_size, size_wind, class_num, DN_min, DN_max, 
-                          patch_long, idl, verbose) {
+fill_gaps_idl <- function(slc_off, fill, timeseries, out_base, sample_size, 
+                          size_wind, class_num, DN_min, DN_max, patch_long, 
+                          idl, algorithm, ext, verbose) {
     if (verbose) {
-        warning("verbose=TRUE not supported when use_IDL=TRUE")
+        warning('verbose=TRUE not supported when algorithm="GNSPI_IDL"')
     }
 
     script_path <- system.file("idl", "GNSPI.pro", package="teamlucc")
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
         stop('IDL not found - check "idl" parameter')
     }
+
+    # Save proj4string and extend to ensure the same proj4string and extent is 
+    # returned even if they are changed by IDL
+    orig_proj <- proj4string(slc_off)
+    orig_ext <- extent(slc_off)
+    orig_datatype <- dataType(slc_off)[1]
 
     # Write in-memory rasters to files for hand off to IDL. The capture.output 
     # line is used to avoid printing the rasterOptions to screen as they are 
@@ -126,8 +150,12 @@ fill_gaps_idl <- function(slc_off, fill, timeseries, out_base,
     temp_dir <- tempdir()
     dummy <- capture.output(rasterOptions(format=def_format))
 
+    # Save IDL output to a temp folder - it will be copied over and saved with 
+    # writeRaster later to ensure the extents and projection are not modified 
+    # from those of the original files.
+    temp_out_base <- file_path_sans_ext(rasterTmpFile())
     param_vals <- list(slc_off_file, fill_file, timeseries_files,
-                       out_base, sample_size, size_wind, class_num,
+                       temp_out_base, sample_size, size_wind, class_num,
                        DN_min, DN_max, patch_long, temp_dir)
     param_names <- list('slc_off_file', 'input_file', 'timeseries_files', 
                         'out_base', 'sample_size', 'size_wind', 'class_num', 
@@ -152,12 +180,25 @@ fill_gaps_idl <- function(slc_off, fill, timeseries, out_base,
     writeLines(idl_out, f) 
     close(f)
 
-    return(list(filled=brick(paste0(out_base, '_GNSPI.envi')),
-                uncertainty=brick(paste0(out_base, '_GNSPI_uncertainty.envi'))))
+    filled <- brick(paste0(temp_out_base, '_GNSPI.envi'))
+    filled_out_file <- paste0(out_base, paste0('_GNSPI.', ext))
+    proj4string(filled) <- orig_proj
+    extent(filled) <- orig_ext
+    filled <- writeRaster(filled, filename=filled_out_file, overwrite=TRUE, 
+                          datatype=orig_datatype)
+
+    uncertainty <- brick(paste0(temp_out_base, '_GNSPI_uncertainty.envi'))
+    uncertainty_out_file <- paste0(out_base, paste0('_GNSPI_uncertainty.', ext))
+    proj4string(uncertainty) <- orig_proj
+    extent(uncertainty) <- orig_ext
+    uncertainty <- writeRaster(uncertainty, filename=uncertainty_out_file, 
+                               overwrite=TRUE, datatype=orig_datatype)
+
+    return(list(filled=filled, uncertainty=uncertainty))
 }
 
 fill_gaps_R <- function(slc_off, fill, timeseries, out_base, sample_size, 
-                        size_wind, class_num, DN_min, DN_max, patch_long, idl, 
-                        verbose) {
-    stop("use_IDL=FALSE not yet supported")
+                        size_wind, class_num, DN_min, DN_max, patch_long, 
+                        algorithm, verbose) {
+    stop("fill_gaps_R not yet supported")
 }
