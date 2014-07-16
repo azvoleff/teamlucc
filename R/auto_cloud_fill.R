@@ -176,6 +176,10 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         this_img <- stack(img_file)
         imgs <- c(imgs, stack(this_img))
     }
+    
+    compareRaster(imgs, res=TRUE, orig=TRUE)
+    compareRaster(fmasks, res=TRUE, orig=TRUE)
+
     freq_table <- freq(stack(fmasks), useNA='no', merge=TRUE)
     # Convert frequency table to fractions
     freq_table[-1] <- freq_table[-1] / colSums(freq_table[-1], na.rm=TRUE)
