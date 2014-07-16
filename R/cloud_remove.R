@@ -61,10 +61,10 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
         patch_long <- max(dim(cloudy)) + 1
     }
 
-    # Save proj4string and extend to ensure the same proj4string and extend is 
+    # Save proj4string and extent to ensure the same proj4string and extent is 
     # returned even if they are changed by IDL
-    cloudy_proj <- proj4string(cloudy)
-    cloudy_ext <- extent(cloudy)
+    orig_proj <- proj4string(cloudy)
+    orig_ext <- extent(cloudy)
 
     # Write in-memory rasters to files for hand off to IDL. The capture.output 
     # line is used to avoid printing the rasterOptions to screen as they are 
@@ -112,8 +112,8 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     filled[filled < DN_min] <- NA
 
     # Ensure original proj4string and extent are saved and returned
-    proj4string(filled) <- cloudy_proj
-    extent(filled) <- cloudy_ext
+    proj4string(filled) <- orig_proj
+    extent(filled) <- orig_ext
     filled <- writeRaster(filled, filename=out_name, overwrite=TRUE, 
                           datatype=dataType(filled)[1])
     return(filled)
