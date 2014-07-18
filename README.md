@@ -19,7 +19,8 @@ variability and change, land cover and land use change, and other threats.
     * Plotting available imagery for an area of interest (AOI), including 
       AOIs that cover more than one path/row
     * Formatting an image order for upload to ESPA system
-    * Downloading images from a USGS ESPA order
+    * ~~Downloading images from a USGS ESPA order~~ Not working as of 7/1/2014 
+      due to changes in the ESPA system.
 
 * Preprocessing
     * Extraction and file conversion of surface reflectance imagery from the 
