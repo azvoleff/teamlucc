@@ -57,8 +57,8 @@ for your version of R (as `teamlucc` contains C++ code) before you follow the
 below steps.**
 
 As `teamlucc` is still under development, it is not yet listed on 
-[CRAN](http://cran.r-project.org).  The easiest way to install the (beta 
-version) of the `teamlucc` package is using the 
+[CRAN](http://cran.r-project.org).  The easiest way to install the `teamlucc` 
+package is using the 
 [`devtools`](http://cran.r-project.org/web/packages/devtools/index.html) 
 package by Hadley Wickham.
 
@@ -73,12 +73,23 @@ CRAN. After installing `devtools` type:
 
 ```R
 library(devtools)
-install_github('teamlucc', username='azvoleff')
+install_github('azvoleff/teamlucc')
 ```
 
 at the R prompt to install the latest version of `teamlucc`. Typing the above 
 command will also work if you already have `teamlucc` installed and want to 
 install an updated version of the package.
+
+### Installing `teamlucc` development version
+
+If you want the very latest version of `teamlucc` (though be aware this version 
+might not install as it is not as well tested as the above version), you can 
+install from the development branch by typing:
+
+```R
+library(devtools)
+install_github('azvoleff/teamlucc', ref="development")
+```
 
 ### Install GDAL
 
