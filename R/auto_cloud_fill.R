@@ -296,7 +296,14 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
         if (normalizePath(filename(base_img), mustWork=FALSE) == 
             normalizePath(out_name, mustWork=FALSE)) {
             base_img <- writeRaster(base_img, filename=rasterTmpFile(), 
-                                    datatype=dataType(base_img[[1]]))
+                                    datatype=dataType(base_img)[1])
+        }
+        # Save the base_mask to a temp file so that mask_out_name can be safely 
+        # overwritten after cloud_remove.
+        if (normalizePath(filename(base_mask), mustWork=FALSE) == 
+            normalizePath(mask_out_name, mustWork=FALSE)) {
+            base_mask <- writeRaster(base_mask, filename=rasterTmpFile(), 
+                                     datatype=dataType(base_mask)[1])
         }
 
         # Calculate a raster indicating the pixels in each potential fill image 
