@@ -60,6 +60,7 @@ download_ESPA_file <- function(espa_url, output_path) {
 #' @param output_folder the folder to save output data in
 #' @return used for the side effect of downloading Landsat scenes
 espa_download <- function(email, order_ID, output_folder) {
+    stop("Due to changes in the ESPA system, espa_download is not working as of 7/1/2014")
     email_re <- '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'
     if (!grepl(email_re, email, ignore.case=TRUE)) {
         stop(paste(email, 'does not appear to be a valid email address'))
