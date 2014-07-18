@@ -7,7 +7,7 @@ citEntry(entry = "Manual",
   url          = "http://github.com/azvoleff/teamlucc/",
 
   textVersion  =
-  paste("Alex Zvoleff (2013).",
+  paste("Alex Zvoleff (2014).",
         "Tropical Ecology Assessment and Monitoring Network Land Use and Cover Change Analysis Toolkit: The {teamlucc} Package.",
         "URL http://github.com/azvoleff/teamlucc/.")
 )
