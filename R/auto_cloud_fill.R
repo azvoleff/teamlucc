@@ -293,7 +293,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
         # Save the base_img to a temp file so that out_name can be safely 
         # overwritten by cloud_remove.
-        if (filename(base_img) == out_name) {
+        if (normalizePath(filename(base_img), mustWork=FALSE) == 
+            normalizePath(out_name, mustWork=FALSE)) {
             base_img <- writeRaster(base_img, filename=rasterTmpFile(), 
                                     datatype=dataType(base_img[[1]]))
         }
