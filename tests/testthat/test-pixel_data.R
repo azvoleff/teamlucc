@@ -28,8 +28,14 @@ test_that("src_name method works", {
                             paste(src, ID, sep='_'))))
 })
 
+all_training <- train_data
+training_flag(all_training) <- TRUE
+test_that("training_flag methods work for all pixels", {
+    expect_equal(training_flag(all_training), rep(TRUE, length(train_data)))
+})
+
 training_flag(train_data, 'Forest') <- TRUE
-test_that("training_flag methods work", {
+test_that("training_flag methods work for particular class", {
     expect_equal(training_flag(train_data, 'Forest'),
                  rep(TRUE, length(train_data['Forest'])))
 })

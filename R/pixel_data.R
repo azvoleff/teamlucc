@@ -257,13 +257,12 @@ function(x, classes) {
 #' @export
 #' @rdname training_flag
 #' @param value a new \code{training_flag} to assign for pixels in \code{x}
-setGeneric("training_flag<-", function(x, classes, value) {
+setGeneric("training_flag<-", function(x, classes=levels(x@y), value) {
     standardGeneric("training_flag<-")
 })
 
 #' @method training_flag<- pixel_data
-setMethod("training_flag<-", signature(x="pixel_data", classes='character', 
-                                       value='logical'),
+setMethod("training_flag<-", signature(x="pixel_data"),
 function(x, classes=levels(x@y), value) {
     if (identical(classes, levels(x@y))) {
         # More efficiently handle special case of reassigning flags for all 
