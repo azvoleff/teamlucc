@@ -1,3 +1,19 @@
+normalize_extent <- function(te, res=c(30, 30)) {
+    # Setup xmin
+    te[1] <- round(te[1] - te[1] %% res[1])
+    # Setup ymin
+    te[2] <- round(te[2] - te[2] %% res[2])
+    # Setup xmax
+    te[3] <- round(te[3] + res[1] - te[3] %% res[1])
+    # Setup ymax
+    te[4] <- round(te[4] + res[2] - te[4] %% res[2])
+    stopifnot(round(te[1] / res[1]) == (te[1] / res[1]))
+    stopifnot(round(te[2] / res[2]) == (te[2] / res[2]))
+    stopifnot(round(te[3] / res[1]) == (te[3] / res[1]))
+    stopifnot(round(te[4] / res[2]) == (te[4] / res[2]))
+    return(te)
+}
+
 #' Setup the DEM mosaic for a given AOI
 #'
 #' This function will setup a set of DEM tiles for each the Landsat path/row 
@@ -142,18 +158,7 @@ auto_setup_dem <- function(aoi, output_path, dem_extents, of="GTiff",
 
         # Ensure origin is set at 0,0
         to_res <- c(30, 30)
-        # Setup xmin
-        dem_te[1] <- round(dem_te[1] - dem_te[1] %% to_res[1])
-        # Setup ymin
-        dem_te[2] <- round(dem_te[2] - dem_te[2] %% to_res[2])
-        # Setup xmax
-        dem_te[3] <- round(dem_te[3] + to_res[1] - dem_te[3] %% to_res[1])
-        # Setup ymax
-        dem_te[4] <- round(dem_te[4] + to_res[2] - dem_te[4] %% to_res[2])
-        stopifnot(round(dem_te[1] / to_res[1]) == (dem_te[1] / to_res[1]))
-        stopifnot(round(dem_te[2] / to_res[2]) == (dem_te[2] / to_res[2]))
-        stopifnot(round(dem_te[3] / to_res[1]) == (dem_te[3] / to_res[1]))
-        stopifnot(round(dem_te[4] / to_res[2]) == (dem_te[4] / to_res[2]))
+        dem_te <- normalize_extent(dem_te, to_res)
 
         # Calculate minimum bounding box coordinates:
         dem_mosaic_crop_filename <- file.path(output_path,

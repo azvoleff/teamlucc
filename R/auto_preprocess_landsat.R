@@ -241,18 +241,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
 
         # Ensure origin is set at 0,0
         to_res <- c(30, 30)
-        # Setup xmin
-        out_te[1] <- round(out_te[1] - out_te[1] %% to_res[1])
-        # Setup ymin
-        out_te[2] <- round(out_te[2] - out_te[2] %% to_res[2])
-        # Setup xmax
-        out_te[3] <- round(out_te[3] + to_res[1] - out_te[3] %% to_res[1])
-        # Setup ymax
-        out_te[4] <- round(out_te[4] + to_res[2] - out_te[4] %% to_res[2])
-        stopifnot(round(out_te[1] / to_res[1]) == (out_te[1] / to_res[1]))
-        stopifnot(round(out_te[2] / to_res[2]) == (out_te[2] / to_res[2]))
-        stopifnot(round(out_te[3] / to_res[1]) == (out_te[3] / to_res[1]))
-        stopifnot(round(out_te[4] / to_res[2]) == (out_te[4] / to_res[2]))
+        out_te <- normalize_extent(out_te, to_res)
 
         image_stack_reproj_file <- extension(rasterTmpFile(), ext)
         image_stack <- gdalwarp(band_vrt_file,
