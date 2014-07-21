@@ -3,11 +3,11 @@
 \alias{fill_gaps}
 \title{Perform SLC-off gap fill of Landsat 7 ETM+ image}
 \usage{
-fill_gaps(slc_off, fill, timeseries = c(), out_base = NULL,
-  use_IDL = TRUE, sample_size = 20, size_wind = 12, class_num = 4,
-  DN_min = 0, DN_max = 1, patch_long = 1000,
+fill_gaps(slc_off, fill, timeseries = c(), out_base = NULL, ext = "tif",
+  algorithm = "GNSPI_IDL", sample_size = 20, size_wind = 12,
+  class_num = 4, DN_min = 0, DN_max = 1, patch_long = 1000,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
-  verbose = FALSE)
+  verbose = FALSE, overwrite = FALSE)
 }
 \arguments{
 \item{slc_off}{the SLC-off Landsat 7 file to gap fill, as a \code{Raster*}}
@@ -22,9 +22,12 @@ as additional inputs to the gap fill algorithm (optional)}
 save the output files by appending "_GNSPI.envi" and
 "_GNSPI_uncertainty.envi" to this base filename.}
 
-\item{use_IDL}{whether to use Xiaolin Zhu's original IDL scripts
-(\code{use_IDL=TRUE}) or the C++ implementation native to \code{teamlucc}
-(\code{use_IDL=FALSE})}
+\item{ext}{file extension to use when and when saving output rasters
+(determines output file format). Must be supported by
+\code{\link{writeRaster}}.}
+
+\item{algorithm}{the algorithm to use, as a string ("GNSPI_IDL" is currently
+the only supported algorithm)}
 
 \item{sample_size}{the sample size of sample pixels}
 

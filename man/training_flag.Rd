@@ -10,7 +10,7 @@ training_flag(x, classes = levels(x@y))
 
 \S4method{training_flag}{pixel_data}(x, classes = levels(x@y))
 
-training_flag(x, classes) <- value
+training_flag(x, classes = levels(x@y)) <- value
 }
 \arguments{
 \item{x}{a \code{pixel_data} object}

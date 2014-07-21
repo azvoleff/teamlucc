@@ -88,7 +88,7 @@ normalize <- function(x, y, msk, method="MA", size=ncell(x)) {
         normed_y[msk] <- y[msk]
     }
 
-    dataType(normed_y) <- orig_datatype
+    #dataType(normed_y) <- orig_datatype
 
     return(normed_y)
 }
