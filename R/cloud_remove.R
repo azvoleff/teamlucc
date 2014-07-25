@@ -258,8 +258,9 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
 #' @param max_pixel the maximum sample size to search for similar pixels 
 #' (ignored when \code{algorithm==TRUE})
 #' @param cloud_nbh the range of cloud neighborhood (in pixels)
-#' @param DN_min the minimum valid DN value
-#' @param DN_max the maximum valid DN value
+#' @param DN_min the minimum valid DN value (default of 0)
+#' @param DN_max the maximum valid DN value (default of 10000 assumes 2 byte 
+#' integer imagery)
 #' @param idl path to the IDL binary on your machine (on Windows, the path to 
 #' idl.exe)
 #' @param verbose whether to print detailed status messages. Set to FALSE or 0 
@@ -287,7 +288,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
 cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL, 
                          algorithm='simple',
                          num_class=4, min_pixel=20, max_pixel=1000, 
-                         cloud_nbh=10, DN_min=0, DN_max=255, 
+                         cloud_nbh=10, DN_min=0, DN_max=10000, 
                          idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
                          verbose=FALSE, byblock=TRUE, overwrite=FALSE) {
     if (!(algorithm %in% c('CLOUD_REMOVE', 'CLOUD_REMOVE_FAST', 'teamlucc', 

@@ -5,7 +5,7 @@
 \usage{
 cloud_remove(cloudy, clear, cloud_mask, out_name = NULL,
   algorithm = "simple", num_class = 4, min_pixel = 20, max_pixel = 1000,
-  cloud_nbh = 10, DN_min = 0, DN_max = 255,
+  cloud_nbh = 10, DN_min = 0, DN_max = 10000,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
   verbose = FALSE, byblock = TRUE, overwrite = FALSE)
 }
@@ -35,9 +35,10 @@ are clouded in \code{clear_rast} should be coded -1.}
 
 \item{cloud_nbh}{the range of cloud neighborhood (in pixels)}
 
-\item{DN_min}{the minimum valid DN value}
+\item{DN_min}{the minimum valid DN value (default of 0)}
 
-\item{DN_max}{the maximum valid DN value}
+\item{DN_max}{the maximum valid DN value (default of 10000 assumes 2 byte
+integer imagery)}
 
 \item{idl}{path to the IDL binary on your machine (on Windows, the path to
 idl.exe)}
