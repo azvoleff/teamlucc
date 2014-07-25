@@ -47,9 +47,9 @@ pct_clouds <- function(cloud_mask) {
 #' @param base_date ideal date for base image (base image will be chosen as the 
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
-#' @param out_name filename for cloud filled image. The mask file for the cloud 
-#' filled image will be saved with the same name, with the added suffix 
-#' "_mask".
+#' @param out_name base filename (without an extension - see \code{ext} 
+#' argument) for cloud filled image.  The mask file for the cloud filled image 
+#' will be saved with the same name, with the added suffix "_mask".
 #' @param tc if \code{TRUE}, use topographically corrected imagery as output by 
 #' \code{auto_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface 
 #' reflectance as output by \code{unstack_ledaps} or 
@@ -94,23 +94,25 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     if (!file_test('-d', dirname(out_name))) {
         stop('output folder does not exist')
     }
-    if (file_test('-f', out_name) & !overwrite) {
-        stop('out_name already exists')
+    if (file_path_sans_ext(out_name) != out_name) {
+        stop('out_name should not have a file extension')
+    }
+
+    ext <- gsub('^[.]', '', ext)
+
+    output_file <- paste0(out_name, '.', ext)
+    if (file_test('-f', output_file) & !overwrite) {
+        stop(paste0('output file "', output_file, '" already exists'))
     }
     if (!all(sensors %in% c('L4T', 'L5T', 'L7E', 'L8E'))) {
         stop('"sensors" must be a list of one or more of: "L4T", "L5T", "L7E", "L8E"')
     }
 
-    ext <- gsub('^[.]', '', ext)
-
-    log_file <- file(paste0(file_path_sans_ext(out_name), '_log.txt'), open="wt")
+    log_file <- file(paste0(out_name, '_log.txt'), open="wt")
     msg <- function(txt) {
         cat(paste0(txt, '\n'), file=log_file, append=TRUE)
         print(txt)
     }
-
-    mask_out_name <- paste0(file_path_sans_ext(out_name), '_masks', 
-                            extension(out_name))
 
     timer <- Track_time(msg)
     timer <- start_timer(timer, label='Cloud fill')
@@ -272,8 +274,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             # Set slc-off gaps and areas outside scene to NA
             base_vals[mask_vals == 2] <- NA
             return(base_vals)
-        }, datatype=dataType(base_img[[1]]), filename=out_name, 
-        overwrite=overwrite)
+        }, datatype=dataType(base_img[[1]]), 
+        filename=extension(rasterTmpFile(), ext), overwrite=overwrite)
 
     cur_pct_clouds <- pct_clouds(base_mask)
 
@@ -289,21 +291,6 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     while ((cur_pct_clouds > threshold) & (n < max_iter) & (length(imgs) >= 1)) {
         if (verbose > 0) {
             timer <- start_timer(timer, label=paste('Fill iteration', n + 1))
-        }
-
-        # Save the base_img to a temp file so that out_name can be safely 
-        # overwritten by cloud_remove.
-        if (normalizePath(filename(base_img), mustWork=FALSE) == 
-            normalizePath(out_name, mustWork=FALSE)) {
-            base_img <- writeRaster(base_img, filename=rasterTmpFile(), 
-                                    datatype=dataType(base_img)[1])
-        }
-        # Save the base_mask to a temp file so that mask_out_name can be safely 
-        # overwritten after cloud_remove.
-        if (normalizePath(filename(base_mask), mustWork=FALSE) == 
-            normalizePath(mask_out_name, mustWork=FALSE)) {
-            base_mask <- writeRaster(base_mask, filename=rasterTmpFile(), 
-                                     datatype=dataType(base_mask)[1])
         }
 
         # Calculate a raster indicating the pixels in each potential fill image 
@@ -367,11 +354,12 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             timer <- start_timer(timer, label="Performing fill")
         }
         base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
-                                 out_name=out_name, verbose=verbose, 
-                                 overwrite=TRUE, ...)
+                                 out_name=extension(rasterTmpFile(), ext), 
+                                 verbose=verbose, overwrite=TRUE, ...)
         # base_img <- cloud_remove(base_img, fill_img, base_img_mask, 
-        #                          out_name=out_name, verbose=verbose, 
-        #                          overwrite=TRUE, DN_min=DN_min, DN_max=DN_max, 
+        #                          out_name=extension(rasterTmpFile(), ext), 
+        #                          verbose=verbose, overwrite=TRUE, 
+        #                          DN_min=DN_min, DN_max=DN_max, 
         #                          algorithm=algorithm, byblock=byblock)
         if (verbose > 0) {
             timer <- stop_timer(timer, label="Performing fill")
@@ -382,8 +370,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
             fun=function(mask_vals, filled_vals) {
                 mask_vals[(mask_vals == 1) & (filled_vals != 0)] <- 0
                 return(mask_vals)
-            }, datatype=dataType(base_mask), filename=mask_out_name, 
-            overwrite=TRUE)
+            }, datatype=dataType(base_mask), 
+            filename=extension(rasterTmpFile(), ext), overwrite=TRUE)
 
         cur_pct_clouds <- pct_clouds(base_mask)
         if (verbose > 0) {
@@ -394,6 +382,9 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
 
         n <- n + 1
     }
+
+    base_img <- writeRaster(base_img, filename=output_file, datatype="INT2S", 
+                            overwrite=overwrite)
 
     # Recode base mask so final coding matches that of fmask (though cloud and 
     # cloud shadow are no longer differentiated)
@@ -408,6 +399,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #   	0 = clear
     #   	1 = cloud
     #   	2 = fill
+    mask_output_file <- paste0(out_name, '_masks.', ext)
     filled_fmask <- overlay(base_mask, base_fmask,
         fun=function(after_fill, before_fill) {
             ret <- after_fill
@@ -424,7 +416,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     final_masks <- stack(base_fill_QA, filled_fmask)
     names(final_masks) <- c("fill_QA", "fmask")
     final_masks <- writeRaster(final_masks, datatype=dataType(base_mask), 
-                               filename=mask_out_name, overwrite=TRUE)
+                               filename=mask_output_file, overwrite=TRUE)
 
     timer <- stop_timer(timer, label='Cloud fill')
 

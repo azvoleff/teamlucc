@@ -28,9 +28,9 @@ cloudy areas in the the base image (as \code{Date} object)}
 image among the available images that is closest to this date). If NULL,
 then the base image will be the image with the lowest cloud cover.}
 
-\item{out_name}{filename for cloud filled image. The mask file for the cloud
-filled image will be saved with the same name, with the added suffix
-"_mask".}
+\item{out_name}{base filename (without an extension - see \code{ext}
+argument) for cloud filled image.  The mask file for the cloud filled image
+will be saved with the same name, with the added suffix "_mask".}
 
 \item{tc}{if \code{TRUE}, use topographically corrected imagery as output by
 \code{auto_preprocess_landsat}. IF \code{FALSE} use bands 1-5 and 7 surface
