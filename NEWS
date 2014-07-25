@@ -1,0 +1,7 @@
+teamlucc 0.30
+=============
+* Change default DN_min and DN_max to 0 and 10000.
+* Bugfix handling of out_name parameter in auto_cloud_fill.
+* Fix bug in normalize related to attempted fix for setting output datatype.  
+  Still need to work on this for a future release.
+* Minor doc fixes.
