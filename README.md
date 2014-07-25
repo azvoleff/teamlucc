@@ -113,11 +113,13 @@ At a shell prompt, type:
 sudo apt-get install gdal-bin libgdal-dev
 ```
 
-### (optional) Install IDL
-[IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) is required for 
-running the IDL cloud fill and Landsat 7 SLC-off gap fill routines in 
-`teamlucc`. There are two native R cloud fill routines that can be used without 
-an IDL license.
+### (optional) Install IDL and ENVI
+[IDL](http://www.exelisvis.com/ProductsServices/IDL.aspx) and 
+[ENVI](http://www.exelisvis.com/ProductsServices/ENVIProducts/ENVI.aspx) are
+required for running the CLOUD_REMOVE and CLOUD_REMOVE_FAST cloud fill 
+algorithms in `teamlucc` (there are also two native R cloud fill routines that 
+can be used without an IDL license). IDL and ENVI are also needed to run the 
+Landsat 7 SLC-off gap fill routine.
 
 ## Using teamlucc
 
