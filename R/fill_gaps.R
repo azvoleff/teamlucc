@@ -33,6 +33,7 @@
 #' @param patch_long the size of block, to process whole ETM scene, set to 1000
 #' @param idl path to the IDL binary
 #' @param verbose whether to print detailed status messages
+#' @param overwrite whether to overwrite output files if they already exist
 #' @return a list of two rasters: 1) "filled", the gap filled image, and 2) 
 #' "uncertainty", the uncertainty image.
 #' @export

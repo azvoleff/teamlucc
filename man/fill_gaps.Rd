@@ -44,6 +44,8 @@ the only supported algorithm)}
 \item{idl}{path to the IDL binary}
 
 \item{verbose}{whether to print detailed status messages}
+
+\item{overwrite}{whether to overwrite output files if they already exist}
 }
 \value{
 a list of two rasters: 1) "filled", the gap filled image, and 2)
