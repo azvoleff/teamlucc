@@ -48,12 +48,14 @@
 #' @param cleartmp whether to clear temp files on each run through the loop
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
+#' @param ...  additional arguments passed to \code{\link{glcm}}, such as
+#' \code{n_grey}, \code{window}, or \code{shift}
 #' @param notify notifier to use (defaults to \code{print} function). See the 
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
 auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL, 
                                  ext='tif', cleartmp=FALSE, overwrite=FALSE, 
-                                 notify=print) {
+                                 notify=print, ...) {
     if (!file_test("-f", x)) {
         stop(paste("input image", x, "does not exist"))
     }
@@ -123,7 +125,8 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
                                   min_x=0, max_x=10000, 
                                   filename=MSAVI2_glcm_filename, 
                                   overwrite=overwrite, 
-                                  statistics=glcm_statistics, na_opt='center')
+                                  statistics=glcm_statistics, na_opt='center', 
+                                  ...)
     names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
     timer <- stop_timer(timer, label='Calculating GLCM textures')
 

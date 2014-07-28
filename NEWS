@@ -1,3 +1,7 @@
+teamlucc 0.32
+=============
+* Support passing additional arguments to glcm in auto_calc_predictors.
+
 teamlucc 0.30
 =============
 * Change default DN_min and DN_max to 0 and 10000.
