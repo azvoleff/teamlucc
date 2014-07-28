@@ -302,6 +302,8 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                 proj4string(slopeaspect) <- proj4string(image_stack)
             }
 
+            compareRaster(slopeaspect, image_stack, orig=TRUE)
+
             image_stack_mask <- calc_cloud_mask(mask_stack, mask_type)
 
             image_stack_masked <- image_stack
