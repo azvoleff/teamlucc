@@ -140,9 +140,10 @@ examples of a number of specific applications of `teamlucc`, including:
 
 ## Installing `teamlucc` development version
 
-If you want the very latest version of `teamlucc` (though be aware this version 
-might not install as it is not as well tested as the stable version), you can 
-install from the development branch by typing:
+If you want the very latest version of `teamlucc`, you can install the 
+development version. Be aware this version might not install as it is not as 
+well tested as the stable version. To install from the `teamlucc` development 
+branch, run:
 
 ```R
 library(devtools)
