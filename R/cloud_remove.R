@@ -271,6 +271,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
 #' \code{byblock=FALSE} with caution, as this option will cause the cloud fill 
 #' routine to consume a large amount of memory.
 #' @param overwrite whether to overwrite \code{out_name} if it already exists
+#' @param ... additional arguments passed to the chosen cloud fill routine
 #' @return \code{Raster*} with cloud-filled image
 #' @references Zhu, X., Gao, F., Liu, D., Chen, J., 2012. A modified
 #' neighborhood similar pixel interpolator approach for removing thick clouds 
@@ -290,7 +291,7 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
                          num_class=4, min_pixel=20, max_pixel=1000, 
                          cloud_nbh=10, DN_min=0, DN_max=10000, 
                          idl="C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
-                         verbose=FALSE, byblock=TRUE, overwrite=FALSE) {
+                         verbose=FALSE, byblock=TRUE, overwrite=FALSE, ...) {
     if (!(algorithm %in% c('CLOUD_REMOVE', 'CLOUD_REMOVE_FAST', 'teamlucc', 
                            'simple'))) {
         stop('algorithm must be one of "CLOUD_REMOVE", "CLOUD_REMOVE_FAST", "teamlucc", or "simple"')
@@ -333,12 +334,12 @@ cloud_remove <- function(cloudy, clear, cloud_mask, out_name=NULL,
         filled <- cloud_remove_IDL(cloudy, clear, cloud_mask, out_name,
                                    algorithm, num_class, min_pixel, max_pixel, 
                                    cloud_nbh, DN_min, DN_max, verbose, idl, 
-                                   byblock, overwrite)
+                                   byblock, overwrite, ...)
     } else if (algorithm %in% c('teamlucc', 'simple')) {
         filled <- cloud_remove_R(cloudy, clear, cloud_mask, out_name, 
                                  algorithm, num_class, min_pixel, max_pixel, 
                                  cloud_nbh, DN_min, DN_max, verbose, byblock, 
-                                 overwrite)
+                                 overwrite, ...)
     } else {
         stop(paste0('unrecognized cloud fill algorithm "', algorithm, '"'))
     }

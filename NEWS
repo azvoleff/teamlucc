@@ -1,6 +1,8 @@
 teamlucc 0.32
 =============
 * Support passing additional arguments to glcm in auto_calc_predictors.
+* Support passing additional arguments to cloud_remove_R or cloud_remove_IDL in 
+  cloud_remove.
 
 teamlucc 0.30
 =============
