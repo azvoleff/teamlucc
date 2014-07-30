@@ -7,7 +7,7 @@ cloud_remove(cloudy, clear, cloud_mask, out_name = NULL,
   algorithm = "simple", num_class = 4, min_pixel = 20, max_pixel = 1000,
   cloud_nbh = 10, DN_min = 0, DN_max = 10000,
   idl = "C:/Program Files/Exelis/IDL83/bin/bin.x86_64/idl.exe",
-  verbose = FALSE, byblock = TRUE, overwrite = FALSE)
+  verbose = FALSE, byblock = TRUE, overwrite = FALSE, ...)
 }
 \arguments{
 \item{cloudy}{the cloudy image (base image) as a \code{Raster*}}
@@ -53,6 +53,8 @@ detailed status messages.}
 routine to consume a large amount of memory.}
 
 \item{overwrite}{whether to overwrite \code{out_name} if it already exists}
+
+\item{...}{additional arguments passed to the chosen cloud fill routine}
 }
 \value{
 \code{Raster*} with cloud-filled image

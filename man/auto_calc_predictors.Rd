@@ -4,7 +4,7 @@
 \title{Calculate predictor layers for a classification}
 \usage{
 auto_calc_predictors(x, dem, slopeaspect, output_path = NULL, ext = "tif",
-  cleartmp = FALSE, overwrite = FALSE, notify = print)
+  cleartmp = FALSE, overwrite = FALSE, notify = print, ...)
 }
 \arguments{
 \item{x}{path to a preprocessed image as output by
@@ -24,6 +24,9 @@ output file format).}
 
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
+
+\item{...}{additional arguments passed to \code{\link{glcm}}, such as
+\code{n_grey}, \code{window}, or \code{shift}}
 
 \item{notify}{notifier to use (defaults to \code{print} function). See the
 \code{notifyR} package for one way of sending notifications from R. The
