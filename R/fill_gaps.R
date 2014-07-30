@@ -103,9 +103,7 @@ fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, ext="tif",
                                 DN_max, patch_long, idl, algorithm, ext, 
                                 verbose)
     } else {
-        filled <- fill_gaps_R(slc_off, fill, timeseries, out_base, sample_size, 
-                              size_wind, class_num, DN_min, DN_max, patch_long, 
-                              idl, algorithm, verbose)
+        stop("Native R gap filling not yet supported")
     }
 
     return(filled)
@@ -196,10 +194,4 @@ fill_gaps_idl <- function(slc_off, fill, timeseries, out_base, sample_size,
                                overwrite=TRUE, datatype=orig_datatype)
 
     return(list(filled=filled, uncertainty=uncertainty))
-}
-
-fill_gaps_R <- function(slc_off, fill, timeseries, out_base, sample_size, 
-                        size_wind, class_num, DN_min, DN_max, patch_long, 
-                        algorithm, verbose) {
-    stop("fill_gaps_R not yet supported")
 }
