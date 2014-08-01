@@ -45,7 +45,6 @@
 #' output images will be saved alongside the input images in the same folder).
 #' @param ext file extension to use when saving output rasters (determines 
 #' output file format).
-#' @param cleartmp whether to clear temp files on each run through the loop
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
 #' @param ...  additional arguments passed to \code{\link{glcm}}, such as
@@ -54,8 +53,8 @@
 #' \code{notifyR} package for one way of sending notifications from R. The 
 #' \code{notify} function should accept a string as the only argument.
 auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL, 
-                                 ext='tif', cleartmp=FALSE, overwrite=FALSE, 
-                                 notify=print, ...) {
+                                 ext='tif', overwrite=FALSE, notify=print,
+                                 ...) {
     if (!file_test("-f", x)) {
         stop(paste("input image", x, "does not exist"))
     }
@@ -123,15 +122,21 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
     # they are not in the dotted args, assume the defaults (since glcm will use 
     # the defaults if these parameters are not supplied).
     dots <- list(...)
-    if (!("window" %in% names(dots))) window <- c(3, 3)
-    if (!("shift" %in% names(dots))) shift <- c(1, 1)
-    edge <- calc_glcm_edge(shift, window)
+    if (!("window" %in% names(dots))) {
+        dots$window <- c(3, 3)
+    }
+    if (!("shift" %in% names(dots))) {
+        dots$shift <- c(1, 1)
+    }
+    edge <- calc_glcm_edge(dots$shift, dots$window)
     # Note the min_x and max_x are given for MSAVI2 that has been scaled by 
     # 10,000
-    MSAVI2_glcm <- do.call(apply_windowed, list(MSAVI2_layer=x, fun=glcm, edge=edge,
-                           min_x=0, max_x=10000, filename=MSAVI2_glcm_filename, 
-                           overwrite=overwrite, statistics=glcm_statistics, 
-                           na_opt='center', as.list(dots)))
+    apply_windowed_args <- list(x=MSAVI2_layer, fun=glcm, edge=edge, min_x=0, 
+                             max_x=10000, filename=MSAVI2_glcm_filename, 
+                             overwrite=overwrite, statistics=glcm_statistics, 
+                             na_opt='center')
+    apply_windowed_args <- c(apply_windowed_args, dots)
+    MSAVI2_glcm <- do.call(apply_windowed, apply_windowed_args)
     names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
     timer <- stop_timer(timer, label='Calculating GLCM textures')
 
@@ -198,8 +203,6 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
                               datatype=dataType(mask_stack)[1])
 
     timer <- stop_timer(timer, label='Writing predictors')
-
-    if (cleartmp) removeTmpFiles(h=1)
 
     timer <- stop_timer(timer, label='Predictor calculation')
 
