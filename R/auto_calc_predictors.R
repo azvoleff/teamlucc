@@ -119,17 +119,19 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
                          'dissimilarity', 'entropy', 'second_moment', 
                          'correlation')
     MSAVI2_layer[image_mask] <- NA
-    # Note the min_x and max_x are given for MSAVI2 that has been 
-    # scaled by 10,000
-    if (missing(window)) window <- c(3, 3)
-    if (missing(shift)) shift <- c(1, 1)
+    # Need to know window and shift to calculate edge for apply_windowed. So if 
+    # they are not in the dotted args, assume the defaults (since glcm will use 
+    # the defaults if these parameters are not supplied).
+    dots <- list(...)
+    if (!("window" %in% names(dots))) window <- c(3, 3)
+    if (!("shift" %in% names(dots))) shift <- c(1, 1)
     edge <- calc_glcm_edge(shift, window)
-    MSAVI2_glcm <- apply_windowed(MSAVI2_layer, glcm, edge=edge,
-                                  min_x=0, max_x=10000, 
-                                  filename=MSAVI2_glcm_filename, 
-                                  overwrite=overwrite, 
-                                  statistics=glcm_statistics, na_opt='center', 
-                                  ...)
+    # Note the min_x and max_x are given for MSAVI2 that has been scaled by 
+    # 10,000
+    MSAVI2_glcm <- do.call(apply_windowed, list(MSAVI2_layer=x, fun=glcm, edge=edge,
+                           min_x=0, max_x=10000, filename=MSAVI2_glcm_filename, 
+                           overwrite=overwrite, statistics=glcm_statistics, 
+                           na_opt='center', as.list(dots)))
     names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
     timer <- stop_timer(timer, label='Calculating GLCM textures')
 
