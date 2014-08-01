@@ -121,7 +121,10 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
     MSAVI2_layer[image_mask] <- NA
     # Note the min_x and max_x are given for MSAVI2 that has been 
     # scaled by 10,000
-    MSAVI2_glcm <- apply_windowed(MSAVI2_layer, glcm, edge=c(1, 3), 
+    if (missing(window)) window <- c(3, 3)
+    if (missing(shift)) shift <- c(1, 1)
+    edge <- calc_glcm_edge(shift, window)
+    MSAVI2_glcm <- apply_windowed(MSAVI2_layer, glcm, edge=edge,
                                   min_x=0, max_x=10000, 
                                   filename=MSAVI2_glcm_filename, 
                                   overwrite=overwrite, 
