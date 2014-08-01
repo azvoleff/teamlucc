@@ -20,8 +20,6 @@
 #' @return integer threshold value
 #' @references Huang, L.-K., and M.-J. J. Wang. 1995. Image thresholding by 
 #' minimizing the measures of fuzziness. Pattern recognition 28 (1):41--51.
-#' @examples
-#' threshold(L5TSR_1986)
 threshold <- function(x, method="huang", by=1, maxpixels=100000) {
     stopifnot(method %in% c("huang"))
 

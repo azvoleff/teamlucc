@@ -29,9 +29,6 @@ http:#www.mecourse.com/landinig/software/autothreshold/autothreshold.html
 This function will run in parallel if a parallel backend is registered with
 \code{\link{foreach}}.
 }
-\examples{
-threshold(L5TSR_1986)
-}
 \references{
 Huang, L.-K., and M.-J. J. Wang. 1995. Image thresholding by
 minimizing the measures of fuzziness. Pattern recognition 28 (1):41--51.
