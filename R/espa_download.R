@@ -59,8 +59,11 @@ download_ESPA_file <- function(espa_url, output_path) {
 #' @param email address used to place the order
 #' @param order_ID the ESPA order ID
 #' @param output_folder the folder to save output data in
+#' @param username your USGS EarthExplorer username
+#' @param password your USGS EarthExplorer password
 #' @return used for the side effect of downloading Landsat scenes
-espa_download <- function(email, order_ID, output_folder) {
+espa_download <- function(email, order_ID, output_folder, username,
+                          password) {
     stop("Due to changes in the ESPA system, espa_download is not working as of 7/1/2014")
     email_re <- '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$'
     if (!grepl(email_re, email, ignore.case=TRUE)) {
@@ -88,7 +91,23 @@ espa_download <- function(email, order_ID, output_folder) {
     }
 
     # Parse ESPA page for download links
+    # TODO: Rewrite using httr - see http://bit.ly/1m8ZWXf
     email_noat <- gsub('@', '%40', email)
+    options(RCurlOptions=list(cainfo=system.file("CurlSSL", "cacert.pem", 
+                                                 package="RCurl")))
+    curl=getCurlHandle()
+    login_page <- unlist(strsplit(getURL('https://espa.cr.usgs.gov/login/', curl=curl), '\n'))
+    csrfmiddlewaretoken <- login_page[grepl("csrfmiddlewaretoken", login_page)]
+    csrfmiddlewaretoken <- gsub("(value=)|(')", '',
+                                str_extract(csrfmiddlewaretoken, 
+                                            "value='[a-zA-Z0-9]*'"))
+    params <- list('username'=username,
+                   'password'=password,
+                   'submit'="Log In",
+                   'next'="",
+                   'csrfmiddlewaretoken'=csrfmiddlewaretoken)
+    post_res <- postForm('https://espa.cr.usgs.gov/login',
+                         .params=params, style="POST", curl=curl)
     tryCatch(espa_page <- getURL(paste0("http://espa.cr.usgs.gov/ordering/status/", email_noat, 
                              "-", order_ID, curl=curl)),
              error=function(e) stop('error loading order - check order ID and email'))

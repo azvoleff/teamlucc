@@ -4,7 +4,7 @@
 \title{Calculate predictor layers for a classification}
 \usage{
 auto_calc_predictors(x, dem, slopeaspect, output_path = NULL, ext = "tif",
-  cleartmp = FALSE, overwrite = FALSE, notify = print, ...)
+  overwrite = FALSE, notify = print, ...)
 }
 \arguments{
 \item{x}{path to a preprocessed image as output by
@@ -19,8 +19,6 @@ output images will be saved alongside the input images in the same folder).}
 
 \item{ext}{file extension to use when saving output rasters (determines
 output file format).}
-
-\item{cleartmp}{whether to clear temp files on each run through the loop}
 
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
