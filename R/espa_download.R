@@ -54,7 +54,7 @@ download_ESPA_file <- function(espa_url, output_path) {
 #' ID and the email that placed the ESPA order.
 #' 
 #' @export
-#' @importFrom RCurl getURL
+#' @importFrom RCurl getURL getCurlHandle postForm
 #' @importFrom stringr str_extract
 #' @param email address used to place the order
 #' @param order_ID the ESPA order ID
