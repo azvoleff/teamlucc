@@ -1,9 +1,10 @@
 #' Automatically determine value for image thresholding
 #'
 #' The only method currently implemented is Huang's fuzzy thresholding method.  
-#' The code for Huang's method was ported to C++ for teamluc from the code in 
-#' the Auto_threshold imageJ plugin by Gabriel Landini. See original code at:
-#' http:#www.mecourse.com/landinig/software/autothreshold/autothreshold.html
+#' The code for Huang's method was ported to C++ for \code{teamlucc} from the 
+#' code in the Auto_threshold imageJ plugin by Gabriel Landini. See original 
+#' code at:
+#' http://www.mecourse.com/landinig/software/autothreshold/autothreshold.html
 #'
 #' This function will run in parallel if a parallel backend is registered with 
 #' \code{\link{foreach}}.
@@ -23,6 +24,10 @@
 threshold <- function(x, method="huang", by=1, maxpixels=100000) {
     stopifnot(method %in% c("huang"))
 
+    if (ncell(x) > maxpixels) {
+        x <- sampleRegular(x, maxpixels, useGDAL=TRUE, asRaster=TRUE)
+    }
+
     x <- stack(x)
     x <- setMinMax(x)
     mins <- minValue(x)
@@ -40,4 +45,3 @@ threshold <- function(x, method="huang", by=1, maxpixels=100000) {
 
     return(thresholds)
 }
-

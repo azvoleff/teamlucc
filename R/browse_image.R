@@ -1,5 +1,7 @@
 plotprep <- function(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=NULL) {
-    x <- sampleRegular(x, size=maxpixels, asRaster=TRUE, useGDAL=TRUE)
+    if (ncell(x) > maxpixels) {
+        x <- sampleRegular(x, size=maxpixels, asRaster=TRUE, useGDAL=TRUE)
+    }
     x <- calc(x, fun=function(vals) {
         vals[vals < DN_min] <- DN_min
         vals[vals > DN_max] <- DN_max
