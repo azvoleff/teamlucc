@@ -3,7 +3,7 @@
 \alias{threshold}
 \title{Automatically determine value for image thresholding}
 \usage{
-threshold(x, method = "huang", by = 1, maxpixels = 1e+05)
+threshold(x, method = "huang", n_bin = 1000, maxpixels = 1e+05)
 }
 \arguments{
 \item{x}{the input image, as a matrix or raster}
@@ -11,7 +11,7 @@ threshold(x, method = "huang", by = 1, maxpixels = 1e+05)
 \item{method}{the thresholding method. Currently only "huang" is
 implemented.}
 
-\item{by}{step size to use when calculating histogram}
+\item{n_bin}{number of bins to use when calculating histogram}
 
 \item{maxpixels}{maximum number of pixels size to use when calculating
 histogram}
@@ -21,9 +21,10 @@ integer threshold value
 }
 \description{
 The only method currently implemented is Huang's fuzzy thresholding method.
-The code for Huang's method was ported to C++ for teamluc from the code in
-the Auto_threshold imageJ plugin by Gabriel Landini. See original code at:
-http:#www.mecourse.com/landinig/software/autothreshold/autothreshold.html
+The code for Huang's method was ported to C++ for \code{teamlucc} from the
+code in the Auto_threshold imageJ plugin by Gabriel Landini. See original
+code at:
+http://www.mecourse.com/landinig/software/autothreshold/autothreshold.html
 }
 \details{
 This function will run in parallel if a parallel backend is registered with

@@ -15,13 +15,13 @@
 #' @param x the input image, as a matrix or raster
 #' @param method the thresholding method. Currently only "huang" is 
 #' implemented.
-#' @param by step size to use when calculating histogram
+#' @param n_bin number of bins to use when calculating histogram
 #' @param maxpixels maximum number of pixels size to use when calculating 
 #' histogram
 #' @return integer threshold value
 #' @references Huang, L.-K., and M.-J. J. Wang. 1995. Image thresholding by 
 #' minimizing the measures of fuzziness. Pattern recognition 28 (1):41--51.
-threshold <- function(x, method="huang", by=1, maxpixels=100000) {
+threshold <- function(x, method="huang", n_bin=1000, maxpixels=100000) {
     stopifnot(method %in% c("huang"))
 
     if (ncell(x) > maxpixels) {
@@ -33,9 +33,12 @@ threshold <- function(x, method="huang", by=1, maxpixels=100000) {
     mins <- minValue(x)
     maxs <- maxValue(x)
 
+    bys <- (maxs - mins) / (n_bin)
+
     bandnum=minval=maxval=NULL
     thresholds <- foreach(bandnum=iter(1:nlayers(x)), minval=iter(mins), 
-                          maxval=iter(maxs), .packages=c('teamlucc'),
+                          maxval=iter(maxs), by=iter(bys),
+                          .packages=c('teamlucc'),
                           .combine=c) %dopar% {
         image_hist <- hist(x[[bandnum]], breaks=seq(minval, maxval+by, by=by), 
                            plot=FALSE, maxpixels=maxpixels)
