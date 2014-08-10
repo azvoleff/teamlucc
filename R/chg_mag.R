@@ -28,6 +28,16 @@
 #' Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector analysis in 
 #' posterior probability space: a new method for land cover change detection.  
 #' IEEE Geoscience and Remote Sensing Letters 8:317-321.
+#' @examples
+#' \dontrun{
+#' t0_train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",training=.6)
+#' t0_model <- train_classifier(t0_train_data)
+#' t0_preds <- classify(L5TSR_1986, t0_model)
+#' t1_train_data <- get_pixels(L5TSR_2001, L5TSR_1986_2001_training, "class_2001", training=.6)
+#' t1_model <- train_classifier(t1_train_data)
+#' t1_preds <- classify(L5TSR_2001, t1_model)
+#' t0_t1_chgmag <- chg_mag(t0_preds$probs, t1_preds$probs)
+#' }
 chg_mag <- function(t1p, t2p, filename, overwrite=FALSE, ...) {
     if (proj4string(t1p) != proj4string(t2p)) {
         stop('t0 and t1 coordinate systems do not match')

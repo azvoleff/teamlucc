@@ -34,6 +34,17 @@ Window Flexible Pace Search method, from Chen et al. 2003) or
 This function will run in parallel if a parallel backend is registered with
 \code{\link{foreach}}.
 }
+\examples{
+\dontrun{
+t0_train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",training=.6)
+t0_model <- train_classifier(t0_train_data)
+t0_preds <- classify(L5TSR_1986, t0_model)
+t1_train_data <- get_pixels(L5TSR_2001, L5TSR_1986_2001_training, "class_2001", training=.6)
+t1_model <- train_classifier(t1_train_data)
+t1_preds <- classify(L5TSR_2001, t1_model)
+t0_t1_chgmag <- chg_mag(t0_preds$probs, t1_preds$probs)
+}
+}
 \references{
 Chen, J., P. Gong, C. He, R. Pu, and P. Shi. 2003.
 Land-use/land-cover change detection using improved change-vector analysis.
