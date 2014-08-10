@@ -3,11 +3,12 @@
 \alias{chg_traj}
 \title{Calculate change-trajectory image}
 \usage{
-chg_traj(initial, chg_mag, chg_dir, chg_threshold, filename,
-  classnames = NULL, overwrite = FALSE, ...)
+chg_traj(lut, chg_mag, chg_dir, chg_threshold, filename, overwrite = FALSE,
+  ...)
 }
 \arguments{
-\item{initial}{initial cover class as \code{RasterLayer}}
+\item{lut}{a change trajectory lookup table (LUT) as output by
+\code{traj_lut}}
 
 \item{chg_mag}{change magnitude \code{RasterLayer} from \code{CVAPS}}
 
@@ -19,18 +20,13 @@ areas (can use \code{DFPS} to determine this value).}
 \item{filename}{filename to save the output \code{RasterLayer} to disk
 (optional)}
 
-\item{classnames}{an optional vector of classnames to output with the
-returned trajectory lookup table}
-
 \item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
 
 \item{...}{additional parameters to pass to rasterEngine}
 }
 \value{
-a table of all possible trajectories, with their \code{classnames}
-(if specified) and the integer codes used to indicate specific trajectories
-in the output image.
+a {RasterLayer} of change trajectories, coded as in \code{lut}
 }
 \description{
 This function will calculate trajectories of land cover change using the
@@ -44,8 +40,29 @@ This function will run in parallel if a parallel backend is registered with
 
 Processing can be done in parallel using all using the cluster
 facilities in the \code{spatial.tools} package. To enable clustering, call
-\code{beginCluster} before running \code{classify}.  To stop the
-cluster when finished, call \code{endCluster}.
+\code{beginCluster} before running \code{classify}.  To stop the cluster
+when finished, call \code{endCluster}.
+}
+\examples{
+\dontrun{
+t0_train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986",training=.6)
+t0_model <- train_classifier(t0_train_data)
+t0_preds <- classify(L5TSR_1986, t0_model)
+t1_train_data <- get_pixels(L5TSR_2001, L5TSR_1986_2001_training, "class_2001", training=.6)
+t1_model <- train_classifier(t1_train_data)
+t1_preds <- classify(L5TSR_2001, t1_model)
+t0_t1_chgmag <- chg_mag(t0_preds$probs, t1_preds$probs)
+t0_t1_chgdir <- chg_dir(t0_preds$probs, t1_preds$probs)
+
+lut <- traj_lut(t0_preds$codes$code, t0_preds$codes$class)
+t0_t1_chgtraj <- chg_traj(lut, t0_t1_chgmag, t0_t1_chgdir, .5)
+
+# Change areas are coded following the above lookup-table (lut):
+plot(t0_t1_chgtraj)
+
+# No change areas are NA:
+plot(is.na(t0_t1_chgtraj))
+}
 }
 \references{
 Chen, J., P. Gong, C.  He, R.  Pu, and P.  Shi.  2003.
