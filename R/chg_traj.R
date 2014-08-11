@@ -39,8 +39,6 @@ traj_lut <- function(class_codes, class_names=NULL) {
 #'
 #' @export
 #' @importFrom spatial.tools rasterEngine
-#' @param lut a change trajectory lookup table (LUT) as output by 
-#' \code{traj_lut}
 #' @param chg_mag change magnitude \code{RasterLayer} from \code{CVAPS}
 #' @param chg_dir change direction \code{RasterLayer} from \code{CVAPS}
 #' @param chg_threshold the threshold to use as a minimum when determining change 
@@ -50,7 +48,8 @@ traj_lut <- function(class_codes, class_names=NULL) {
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
 #' @param ... additional parameters to pass to rasterEngine
-#' @return a {RasterLayer} of change trajectories, coded as in \code{lut}
+#' @return a {RasterLayer} of change trajectories, with change trajectories 
+#' coded as in the \code{lut} output by \code{traj_lut}
 #' @details Processing can be done in parallel using all using the cluster 
 #' facilities in the \code{spatial.tools} package. To enable clustering, call 
 #' \code{beginCluster} before running \code{classify}.  To stop the cluster 

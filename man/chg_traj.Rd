@@ -7,9 +7,6 @@ chg_traj(lut, chg_mag, chg_dir, chg_threshold, filename, overwrite = FALSE,
   ...)
 }
 \arguments{
-\item{lut}{a change trajectory lookup table (LUT) as output by
-\code{traj_lut}}
-
 \item{chg_mag}{change magnitude \code{RasterLayer} from \code{CVAPS}}
 
 \item{chg_dir}{change direction \code{RasterLayer} from \code{CVAPS}}
@@ -26,7 +23,8 @@ will be raised)}
 \item{...}{additional parameters to pass to rasterEngine}
 }
 \value{
-a {RasterLayer} of change trajectories, coded as in \code{lut}
+a {RasterLayer} of change trajectories, with change trajectories
+coded as in the \code{lut} output by \code{traj_lut}
 }
 \description{
 This function will calculate trajectories of land cover change using the
