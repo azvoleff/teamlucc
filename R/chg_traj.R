@@ -81,7 +81,7 @@ traj_lut <- function(class_codes, class_names=NULL) {
 #' # No change areas are NA:
 #' plot(is.na(t0_t1_chgtraj))
 #' }
-chg_traj <- function(lut, chg_mag, chg_dir, chg_threshold, filename, 
+chg_traj <- function(chg_mag, chg_dir, chg_threshold, filename, 
                      overwrite=FALSE, ...) {
     if (nlayers(chg_mag) > 1) stop('chg_mag has more than 1 layer')
     if (nlayers(chg_dir) > 1) stop('chg_dir has more than 1 layer')

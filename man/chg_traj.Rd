@@ -3,8 +3,7 @@
 \alias{chg_traj}
 \title{Calculate change-trajectory image}
 \usage{
-chg_traj(lut, chg_mag, chg_dir, chg_threshold, filename, overwrite = FALSE,
-  ...)
+chg_traj(chg_mag, chg_dir, chg_threshold, filename, overwrite = FALSE, ...)
 }
 \arguments{
 \item{chg_mag}{change magnitude \code{RasterLayer} from \code{CVAPS}}
