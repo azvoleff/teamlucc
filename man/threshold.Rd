@@ -3,7 +3,7 @@
 \alias{threshold}
 \title{Automatically determine value for image thresholding}
 \usage{
-threshold(x, method = "huang", n_bin = 1000, maxpixels = 1e+05)
+threshold(x, method = "huang", n_bin = 1000, maxpixels = 5e+05)
 }
 \arguments{
 \item{x}{the input image, as a matrix or raster}
