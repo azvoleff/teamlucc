@@ -1,3 +1,11 @@
+teamlucc 0.34
+=============
+* Fix calculation of change direction in chg_dir.
+* Support alreting shift and window size for GLCM calculation in 
+  auto_calc_predictors.
+* Specify number of bins in threshold code rather than "by" size.
+* Misc R CMD check fixes.
+
 teamlucc 0.32
 =============
 * Support passing additional arguments to glcm in auto_calc_predictors.
