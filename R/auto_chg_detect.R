@@ -70,16 +70,10 @@ auto_chg_detect <- function(t1_classes, t1_probs, t2_probs, output_path,
 
     chg_traj_filename <- file.path(output_path,
                                    paste0(output_basename, '_chgtraj.', ext))
-    chg_traj_out <- chg_traj(t1_classes, chg_mag_image, chg_dir_image, 
-                              classnames=levels(t1_classes),
-                              chg_threshold=chg_threshold, overwrite=overwrite, 
-                              filename=chg_traj_filename)
+    chg_traj_out <- chg_traj(chg_mag_image, chg_dir_image, 
+                             chg_threshold=chg_threshold, overwrite=overwrite, 
+                             filename=chg_traj_filename)
     timer <- stop_timer(timer, label='Change trajectories')
-
-    chg_traj_lut_filename <- file.path(output_path,
-                                   paste(output_basename, 'chgtraj_lut.csv', 
-                                         sep='_'))
-    write.csv(chg_traj_out$lut, file=chg_traj_lut_filename, row.names=FALSE)
 
     timer <- stop_timer(timer, label='Change detection')
 }
