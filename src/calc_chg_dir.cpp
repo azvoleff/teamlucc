@@ -48,6 +48,7 @@ arma::ivec calc_chg_dir(arma::mat t1p, arma::mat t2p) {
         for (unsigned int i = 0; i < dP.n_elem; i++) {
             if (!is_finite(dP(i))) {
                 has_na = true;
+                break;
             }
         }
         if (has_na) {
