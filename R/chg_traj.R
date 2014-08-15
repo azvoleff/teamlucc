@@ -32,7 +32,8 @@ traj_lut <- function(class_codes, class_names=NULL) {
 #' This function will calculate trajectories of land cover change using the 
 #' Change Vector Analysis in Posterior Probability Space (CVAPS) approach of 
 #' comparing posterior probabilities of class membership with an automatically 
-#' determined threshold.
+#' determined threshold. Areas of no change are coded as -1. A lookup table for 
+#' the codes output by \code{chg_traj} can be calculated with \code{traj_lut}.
 #'
 #' This function will run in parallel if a parallel backend is registered with 
 #' \code{\link{foreach}}.
@@ -78,8 +79,8 @@ traj_lut <- function(class_codes, class_names=NULL) {
 #' # Change areas are coded following the above lookup-table (lut):
 #' plot(t0_t1_chgtraj)
 #' 
-#' # No change areas are NA:
-#' plot(is.na(t0_t1_chgtraj))
+#' # No change areas are -1:
+#' plot(t0_t1_chgtraj == -1)
 #' }
 chg_traj <- function(chg_mag, chg_dir, chg_threshold, filename, 
                      overwrite=FALSE, ...) {
@@ -93,13 +94,18 @@ chg_traj <- function(chg_mag, chg_dir, chg_threshold, filename,
     calc_chg_traj <- function(chg_mag, chg_dir, chg_threshold, ...) {
         # Trajectories in chg_dir were coded by summing t0 and t1 classes after 
         # multiplying t1 class by the number of classes
-        chg_dir[chg_mag < chg_threshold] <- NA
+        chg_dir[chg_mag < chg_threshold] <- -1
+        chg_dir[is.na(chg_dir)] <- -2
         chg_dir <- array(chg_dir, dim=c(dim(chg_mag)[1], dim(chg_mag)[2], 1))
         return(chg_dir)
     }
     out <- rasterEngine(chg_mag=chg_mag, chg_dir=chg_dir, fun=calc_chg_traj,
                         args=list(chg_threshold=chg_threshold),
                         datatype='INT2S', ...)
+
+    # spatial.tools doesn't properly handle NA values for integer layers, so 
+    # they were coded as -2 above - now recode them as NA
+    out[out == -2] <- NA
 
     # spatial.tools can only output the raster package grid format - so output 
     # to a tempfile in that format then copy over to the requested final output 

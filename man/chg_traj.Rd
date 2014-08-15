@@ -29,7 +29,8 @@ coded as in the \code{lut} output by \code{traj_lut}
 This function will calculate trajectories of land cover change using the
 Change Vector Analysis in Posterior Probability Space (CVAPS) approach of
 comparing posterior probabilities of class membership with an automatically
-determined threshold.
+determined threshold. Areas of no change are coded as -1. A lookup table for
+the codes output by \code{chg_traj} can be calculated with \code{traj_lut}.
 }
 \details{
 This function will run in parallel if a parallel backend is registered with
@@ -57,8 +58,8 @@ t0_t1_chgtraj <- chg_traj(lut, t0_t1_chgmag, t0_t1_chgdir, .5)
 # Change areas are coded following the above lookup-table (lut):
 plot(t0_t1_chgtraj)
 
-# No change areas are NA:
-plot(is.na(t0_t1_chgtraj))
+# No change areas are -1:
+plot(t0_t1_chgtraj == -1)
 }
 }
 \references{
