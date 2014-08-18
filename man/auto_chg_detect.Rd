@@ -4,7 +4,7 @@
 \title{Perform change detection for two Landsat CDR surface reflectance images}
 \usage{
 auto_chg_detect(t1_classes, t1_probs, t2_probs, output_path, output_basename,
-  ext = "tif", overwrite = FALSE, by = 0.005, notify = print)
+  ext = "tif", overwrite = FALSE, chg_threshold = NULL, notify = print)
 }
 \arguments{
 \item{t1_classes}{cover classes as output from \code{auto_classify_image}
@@ -24,14 +24,17 @@ for time 1 image}
 \item{ext}{file extension to use when saving output rasters (determines
 output file format).}
 
-\item{overwrite}{whether to overwrite existing files (otherwise an error
+\item{overwrite}{whether to overwrite existing files (otherwise an err#'
 will be raised)}
 
-\item{by}{step size to use when calculating histogram from change magnitude
-image using \code{\link{threshold}}}
+\item{chg_threshold}{the threshold to use determining change and no-change
+areas from the change magnitude image (see \code{\link{chg_mag}}. If
+\code{NULL}, then \code{\link{threshold}} will be used to dermine this
+threshold value automatically. A threshold in the range of .75-1 is
+recommended as a starting point.}
 
-\item{notify}{notifier to use (defaults to \code{print} function). See the
-\code{notifyR} package for one way of sending notifications from R. The
+\item{notify}{notifier to use (defaults to \code{print} function).  See the
+\code{notifyR} package for one way of sending notifications from R.  The
 \code{notify} function should accept a string as the only argument.}
 }
 \value{
@@ -41,9 +44,10 @@ nothing - used for the side effect of performing change detection
 This image automates the change detection process using the Change Vector
 Analysis in Posterior Probability Space (CVAPS) algorithm. The threshold for
 change/no-change mapping is determined using Huang's algorithm (see
-\code{\link{threshold}}. First the images should be classified using the
-\code{auto_classify} function (or any other classification approach that
-yields per-pixel probabilities of class membership).
+\code{\link{threshold}} or can be specified manually. First the images
+should be classified using the \code{auto_classify} function (or any other
+classification approach that yields per-pixel probabilities of class
+membership).
 }
 \references{
 Chen, J., X. Chen, X. Cui, and J. Chen. 2011. Change vector
