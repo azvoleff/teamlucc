@@ -3,8 +3,8 @@
 \alias{auto_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, dem_path = NULL,
-  aoi = NULL, output_path = NULL, mask_type = "fmask",
+auto_preprocess_landsat(image_dirs, prefix, img_type = "CDR", tc = FALSE,
+  dem_path = NULL, aoi = NULL, output_path = NULL, mask_type = "fmask",
   mask_output = FALSE, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
   of = "GTiff", ext = "tif", notify = print, verbose = FALSE)
 }
@@ -13,6 +13,12 @@ auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, dem_path = NULL,
 format}
 
 \item{prefix}{string to use as a prefix for all filenames}
+
+\item{img_type}{type of Landsat imagery to preprocess. Can be "CDR" for
+Landsat Climate Data Record (CDR) imagery in HDR format, or "L1T" for
+Standard Terrain Correction (Level 1T) imagery. Note that if L1T imagery is
+used, fmask must be run locally (see https://code.google.com/p/fmask) prior
+to using \code{auto_preprocess_landsat}.}
 
 \item{tc}{whether to topographically correct imagery (if \code{TRUE}, then
 \code{dem_path} must be specified)}
@@ -80,7 +86,8 @@ as fill (fill_QA=255), cloud (cloud_QA=255), cloud shadow
 "fmask" option masks out any areas coded as fill (fmask=255), cloud
 (fmask=4) or cloud shadow (fmask=2).  The combined option combines the "6S"
 and "fmask" approaches to masks out areas coded as fill, cloud, cloud
-shadow, or adjacent to cloud using either method.
+shadow, or adjacent to cloud using either method. Note that "fmask" is the
+only supported option when \code{img_type} is L1T.
 
 Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}}
 should be used to extract the original zipfiles supplied by USGS. To perform

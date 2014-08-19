@@ -1,8 +1,56 @@
 get_gdalinfo_item <- function(item, gdalinfo_text) {
-    gdalinfo_text <- gdalinfo_text[grepl(item, gdalinfo_text)]
+    gdalinfo_text <- gdalinfo_text[grepl(paste0('^[ ]*', item), gdalinfo_text)]
     if (length(gdalinfo_text) > 1) stop('more than one item found')
     gdalinfo_text <- gsub(paste0('[ ]*', item, '='), '', gdalinfo_text)
     return(gdalinfo_text)
+}
+
+get_mtl_item <- function(item, mtl_txt) {
+    mtl_txt <- mtl_txt[grepl(paste0('^[ ]*', item), mtl_txt)]
+    if (length(mtl_txt) > 1) stop('more than one item found')
+    mtl_txt <- gsub(paste0('[ ]*', item, ' = '), '', mtl_txt)
+    # Strip leading/following quotes
+    mtl_txt <- gsub('^"', '', mtl_txt)
+    mtl_txt <- gsub('"$', '', mtl_txt)
+    return(mtl_txt)
+}
+
+#' @importFrom stringr str_extract
+#' @importFrom gdalUtils gdalinfo
+get_metadata <- function(ls_file, img_type) {
+    meta <- list()
+    if (img_type == "CDR") {
+        ls_file_gdalinfo <- gdalinfo(ls_file)
+        aq_date <- get_gdalinfo_item('AcquisitionDate', ls_file_gdalinfo)
+        meta$aq_date <- strptime(aq_date, format="%Y-%m-%dT%H:%M:%OSZ", tz="UTC")
+        meta$WRS_Path <- sprintf('%03i', as.numeric(get_gdalinfo_item('WRS_Path', ls_file_gdalinfo)))
+        meta$WRS_Row <- sprintf('%03i', as.numeric(get_gdalinfo_item('WRS_Row', ls_file_gdalinfo)))
+        meta$sunelev <- 90 - as.numeric(get_gdalinfo_item('SolarZenith', ls_file_gdalinfo))
+        meta$sunazimuth <- as.numeric(get_gdalinfo_item('SolarAzimuth', ls_file_gdalinfo))
+        meta$short_name  <- get_gdalinfo_item('ShortName', ls_file_gdalinfo)
+    } else if (img_type == "L1T") {
+        if (!grepl("_MTL.txt$", ls_file)) {
+            stop("ls_file must be a *_MTL.txt file")
+        }
+        mtl_txt <- readLines(ls_file, warn=FALSE)
+        aq_date <- get_mtl_item('DATE_ACQUIRED', mtl_txt)
+        aq_time <- get_mtl_item('SCENE_CENTER_TIME', mtl_txt)
+        meta$aq_date <- strptime(paste0(aq_date, "T", aq_time), format="%Y-%m-%dT%H:%M:%OSZ", tz="UTC")
+        meta$WRS_Path <- sprintf('%03i', as.numeric(get_mtl_item('WRS_PATH', mtl_txt)))
+        meta$WRS_Row <- sprintf('%03i', as.numeric(get_mtl_item('WRS_ROW', mtl_txt)))
+        meta$sunelev <- as.numeric(get_mtl_item('SUN_ELEVATION', mtl_txt))
+        meta$sunazimuth <- as.numeric(get_mtl_item('SUN_AZIMUTH', mtl_txt))
+        # Build a shortname based on satellite and img_type that is consistent 
+        # with the format of the CDR image shortnames
+        satellite <- str_extract(get_mtl_item('SPACECRAFT_ID', mtl_txt), '[4578]')
+        sensor_string <- str_extract(basename(ls_file), '^((LT[45])|(LE7)|(LC8))')
+        meta$short_name  <- paste0(substr(sensor_string, 1, 1),
+                                   substr(sensor_string, 3, 3),
+                                   substr(sensor_string, 2, 2), img_type)
+    } else {
+        stop(paste(img_type, "is not a recognized img_type"))
+    }
+    return(meta)
 }
 
 calc_cloud_mask <- function(mask_stack, mask_type, ...) {
@@ -47,6 +95,70 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
     return(cloud_mask)
 }
 
+#' @importFrom gdalUtils get_subdatasets gdalbuildvrt
+build_band_vrt <- function(ls_file, band_vrt_file, img_type) {
+    image_bands <- c('band1', 'band2', 'band3', 'band4', 'band5', 'band7')
+    if (img_type == "CDR") {
+        sds <- get_subdatasets(ls_file)
+        band_sds <- sds[grepl(paste0(':(', paste(image_bands, collapse='|'), ')$'), sds)]
+        gdalbuildvrt(band_sds, band_vrt_file, separate=TRUE)
+    } else if (img_type == "L1T") {
+        if (!grepl("_MTL.txt$", ls_file)) {
+            stop("ls_file must be a *_MTL.txt file")
+        }
+        ls_file_base <- gsub("_MTL.txt", "", ls_file)
+        ls_files <- dir(dirname(ls_file_base),
+                        pattern=paste0(basename(ls_file_base), '_B[123457].((TIF)|(tif))$'),
+                        full.names=TRUE)
+        gdalbuildvrt(ls_files, band_vrt_file, separate=TRUE)
+
+    } else {
+        stop(paste(img_type, "is not a recognized img_type"))
+    }
+    return(image_bands)
+}
+
+#' @importFrom gdalUtils get_subdatasets gdalbuildvrt
+build_mask_vrt <- function(ls_file, mask_vrt_file, img_type) {
+    if (img_type == "CDR") {
+        mask_bands <- c('fill_QA', 'fmask_band', 'cloud_QA', 'cloud_shadow_QA', 
+                        'adjacent_cloud_QA')
+        sds <- get_subdatasets(ls_file)
+        mask_sds <- sds[grepl(paste0(':(', paste(mask_bands, collapse='|'), ')$'), sds)]
+        gdalbuildvrt(mask_sds, mask_vrt_file, separate=TRUE, srcnodata='None')
+    } else if (img_type == "L1T") {
+        mask_bands <- c('fill_QA', 'fmask_band')
+        if (!grepl("_MTL.txt$", ls_file)) {
+            stop("ls_file must be a *_MTL.txt file")
+        }
+        ls_file_base <- gsub("_MTL.txt", "", ls_file)
+
+        fmask_file <- dir(dirname(ls_file_base),
+                          pattern=paste0(basename(ls_file_base), '_MTLFmask$'),
+                          full.names=TRUE)
+
+        # Calculate a QA mask file from the fmask file, since teamlucc expects 
+        # this file as part of the mask stack.
+        qa_mask_file <- extension(rasterTmpFile(), '.tif')
+        # TODO: Check if this is proper coding - should it be reversed?
+        qa_mask <- calc(raster(fmask_file),
+                        fun=function(x) {
+                            out <- x == 255
+                            out[x == 255] <- 255
+                            return(out)
+                        }, datatype="INT1U", filename=qa_mask_file)
+
+        # Note that allow_projection_difference is used below as GDAL thinks 
+        # the two images have different projection systems, even though they 
+        # are in identical projection systems.
+        gdalbuildvrt(c(qa_mask_file, fmask_file), mask_vrt_file, 
+                     separate=TRUE, allow_projection_difference=TRUE)
+    } else {
+        stop(paste(img_type, "is not a recognized img_type"))
+    }
+    return(mask_bands)
+}
+
 #' Preprocess surface reflectance imagery from the Landsat CDR archive
 #'
 #' This function preprocesses surface reflectance imagery from the Landsat 
@@ -65,7 +177,8 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' "fmask" option masks out any areas coded as fill (fmask=255), cloud 
 #' (fmask=4) or cloud shadow (fmask=2).  The combined option combines the "6S" 
 #' and "fmask" approaches to masks out areas coded as fill, cloud, cloud 
-#' shadow, or adjacent to cloud using either method.
+#' shadow, or adjacent to cloud using either method. Note that "fmask" is the 
+#' only supported option when \code{img_type} is L1T.
 #'
 #' Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}} 
 #' should be used to extract the original zipfiles supplied by USGS. To perform 
@@ -80,11 +193,16 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' @importFrom rgeos gIntersection
 #' @importFrom wrspathrow pathrow_poly
 #' @importFrom tools file_path_sans_ext
-#' @importFrom gdalUtils gdalwarp get_subdatasets gdalinfo gdalbuildvrt
+#' @importFrom gdalUtils gdalwarp
 #' @importFrom sp is.projected
 #' @param image_dirs list of paths to a set of Landsat CDR image files in HDF 
 #' format
 #' @param prefix string to use as a prefix for all filenames
+#' @param img_type type of Landsat imagery to preprocess. Can be "CDR" for 
+#' Landsat Climate Data Record (CDR) imagery in HDR format, or "L1T" for 
+#' Standard Terrain Correction (Level 1T) imagery. Note that if L1T imagery is 
+#' used, fmask must be run locally (see https://code.google.com/p/fmask) prior 
+#' to using \code{auto_preprocess_landsat}.
 #' @param tc whether to topographically correct imagery (if \code{TRUE}, then 
 #' \code{dem_path} must be specified)
 #' @param dem_path path to a set of DEMs as output by \code{auto_setup_dem} 
@@ -120,12 +238,16 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' @return nothing - used for the side effect of preprocessing imagery
 #' @seealso \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}}, 
 #' \code{\link{auto_setup_dem}}
-auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
-                                    dem_path=NULL, aoi=NULL, output_path=NULL, 
-                                    mask_type='fmask', mask_output=FALSE, 
-                                    n_cpus=1, cleartmp=FALSE,  overwrite=FALSE, 
+auto_preprocess_landsat <- function(image_dirs, prefix, img_type="CDR", 
+                                    tc=FALSE, dem_path=NULL, aoi=NULL, 
+                                    output_path=NULL, mask_type='fmask', 
+                                    mask_output=FALSE, n_cpus=1, 
+                                    cleartmp=FALSE,  overwrite=FALSE, 
                                     of="GTiff", ext='tif', notify=print, 
                                     verbose=FALSE) {
+    if (grepl('_', prefix)) {
+        stop('prefix cannot contain underscores (_)')
+    }
     if (tc && is.null(dem_path)) {
         stop('dem_path must be supplied if tc=TRUE')
     }
@@ -141,43 +263,46 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         }
         stopifnot(is.projected(aoi))
     }
-    stopifnot(mask_type %in% c('fmask', '6S', 'both'))
 
     ext <- gsub('^[.]', '', ext)
 
     # Setup a regex to identify Landsat CDR images
-    lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}.hdf$'
+    if (img_type == "CDR") {
+        ls_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}.hdf$'
+    } else if (img_type == "L1T") {
+        ls_regex <- '((LT[45])|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}_MTL.txt$'
+    } else {
+        stop(paste(img_type, "is not a recognized img_type"))
+    }
 
-    image_bands <- c('band1', 'band2', 'band3', 'band4', 'band5', 'band7')
-    mask_bands <- c('fill_QA', 'fmask_band', 'cloud_QA', 'cloud_shadow_QA', 
-                    'adjacent_cloud_QA')
+    if (img_type == "CDR") {
+        stopifnot(mask_type %in% c('fmask', '6S', 'both'))
+    } else if (img_type == "L1T") {
+        stopifnot(mask_type == 'fmask')
+    }
 
-    lndsr_files <- c()
+    ls_files <- c()
     for (image_dir in image_dirs) {
         if (!file_test("-d", image_dir)) {
             stop(paste(image_dir, "does not exist"))
         }
-        lndsr_files <- c(lndsr_files, dir(image_dir, pattern=lndsr_regex, full.names=TRUE))
+        ls_files <- c(ls_files, dir(image_dir, pattern=ls_regex, full.names=TRUE))
     }
 
-    if (length(lndsr_files) == 0) {
-        stop('no Landsat CDR HDF files found')
+    if (length(ls_files) == 0) {
+        stop(paste0('No Landsat files found using img_type="', img_type, '".'))
     }
 
-    for (lndsr_file in lndsr_files) {
+    for (ls_file in ls_files) {
         ######################################################################
         # Determine image basename for use in naming subsequent files
-        lndsr_file_gdalinfo <- gdalinfo(lndsr_file)
-        aq_date <- get_gdalinfo_item('AcquisitionDate', lndsr_file_gdalinfo)
-        aq_date <- strptime(aq_date, format="%Y-%m-%dT%H:%M:%OSZ")
-        short_name  <- get_gdalinfo_item('ShortName', lndsr_file_gdalinfo)
-        WRS_Path <- sprintf('%03i', as.numeric(get_gdalinfo_item('WRS_Path', lndsr_file_gdalinfo)))
-        WRS_Row <- sprintf('%03i', as.numeric(get_gdalinfo_item('WRS_Row', lndsr_file_gdalinfo)))
-        image_basename <- paste0(WRS_Path, '-', WRS_Row, '_',
-                                 format(aq_date, '%Y-%j'), '_', short_name)
+        meta <- get_metadata(ls_file, img_type)
+
+        image_basename <- paste0(meta$WRS_Path, '-', meta$WRS_Row, '_',
+                                 format(meta$aq_date, '%Y-%j'), '_', meta$short_name)
 
         if (is.null(output_path)) {
-            this_output_path <- dirname(lndsr_file)
+            this_output_path <- dirname(ls_file)
         } else {
             this_output_path  <- output_path
         }
@@ -208,18 +333,13 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         # supplied), or the UTM zone of the centroid of this path and row.
         if (verbose) timer <- start_timer(timer, label='cropping and reprojecting')
 
-        sds <- get_subdatasets(lndsr_file)
-
-        band_sds <- sds[grepl(paste0(':(', paste(image_bands, collapse='|'), ')$'), sds)]
         band_vrt_file <- extension(rasterTmpFile(), '.vrt')
-        gdalbuildvrt(band_sds, band_vrt_file, separate=TRUE)
-
-        mask_sds <- sds[grepl(paste0(':(', paste(mask_bands, collapse='|'), ')$'), sds)]
+        band_names <- build_band_vrt(ls_file, band_vrt_file, img_type)
         mask_vrt_file <- extension(rasterTmpFile(), '.vrt')
-        gdalbuildvrt(mask_sds, mask_vrt_file, separate=TRUE, srcnodata='None')
+        mask_band_names <- build_mask_vrt(ls_file, mask_vrt_file, img_type)
 
-        this_pathrow_poly <- pathrow_poly(as.numeric(WRS_Path), 
-                                          as.numeric(WRS_Row))
+        this_pathrow_poly <- pathrow_poly(as.numeric(meta$WRS_Path), 
+                                          as.numeric(meta$WRS_Row))
         if (!is.null(aoi)) {
             to_srs <- proj4string(aoi)
         } else {
@@ -250,9 +370,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                 r='cubicspline', output_Raster=TRUE, of=of, 
                                 multi=TRUE, wo=paste0("NUM_THREADS=", n_cpus), 
                                 overwrite=overwrite, ot='Int16')
-        # Can't just directly assign image_bands as the names since the bands 
-        # may have been read in different order from the HDF file
-        names(image_stack) <- gsub('^:', '', str_extract(band_sds, ':[a-zA-Z0-9_]*$'))
+        names(image_stack) <- band_names
 
         mask_stack_reproj_file <- extension(rasterTmpFile(), paste0('.', ext))
         mask_stack <- gdalwarp(mask_vrt_file,
@@ -263,22 +381,9 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
                                overwrite=overwrite, ot='Int16')
         # Can't just directly assign mask_bands as the names since the bands 
         # may have been read in different order from the HDF file
-        names(mask_stack) <- gsub('^:', '', str_extract(mask_sds, ':[a-zA-Z0-9_]*$'))
+        names(mask_stack) <- mask_band_names
 
         if (verbose) timer <- stop_timer(timer, label='cropping and reprojecting')
-
-        ######################################################################
-        # Mask out clouds and missing values
-        if (verbose) timer <- start_timer(timer, label='calculating masks')
-
-        mask_stack_path <- paste0(file_path_sans_ext(output_filename), 
-                                  '_masks.', ext)
-        mask_stack <- writeRaster(stack(mask_stack$fill_QA,
-                                        mask_stack$fmask_band),
-                                  filename=mask_stack_path, 
-                                  overwrite=overwrite, datatype='INT2S')
-        names(mask_stack) <- c('fill_QA', 'fmask_band')
-        if (verbose) timer <- stop_timer(timer, label='calculating masks')
 
         ######################################################################
         # Perform topographic correction if tc=TRUE
@@ -289,7 +394,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             # Load dem, slope, and aspect
             slopeaspect_filename <- file.path(dem_path,
                                               paste0('slopeaspect_', 
-                                                     WRS_Path, '-', WRS_Row, '.', ext))
+                                                     meta$WRS_Path, '-', meta$WRS_Row, '.', ext))
             slopeaspect <- brick(slopeaspect_filename)
 
             if (!proj4comp(proj4string(image_stack), proj4string(slopeaspect))) {
@@ -323,11 +428,9 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             # used in auto_setup_dem
             slopeaspect_flt <- stack(raster(slopeaspect, layer=1) / 10000,
                                      raster(slopeaspect, layer=2) / 1000)
-            sunelev <- 90 - as.numeric(get_gdalinfo_item('SolarZenith', lndsr_file_gdalinfo))
-            sunazimuth <- as.numeric(get_gdalinfo_item('SolarAzimuth', lndsr_file_gdalinfo))
             image_stack_tc <- topographic_corr(image_stack_masked, 
-                                               slopeaspect_flt, sunelev, 
-                                               sunazimuth, 
+                                               slopeaspect_flt, meta$sunelev, 
+                                               meta$sunazimuth, 
                                                method='minnaert_full', 
                                                asinteger=TRUE, 
                                                sampleindices=sampleindices)
@@ -341,8 +444,21 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
             if (verbose) timer <- stop_timer(timer, label='topocorr')
         }
 
+        ######################################################################
+        # Write final data
+        if (verbose) timer <- start_timer(timer, label='writing data')
+
+        mask_stack_path <- paste0(file_path_sans_ext(output_filename), 
+                                  '_masks.', ext)
+        mask_stack <- writeRaster(stack(mask_stack$fill_QA,
+                                        mask_stack$fmask_band),
+                                  filename=mask_stack_path, 
+                                  overwrite=overwrite, datatype='INT2S')
+        names(mask_stack) <- c('fill_QA', 'fmask_band')
+
         image_stack <- writeRaster(image_stack, filename=output_filename, 
                                    overwrite=overwrite, datatype='INT2S')
+        if (verbose) timer <- stop_timer(timer, label='writing data')
 
         timer <- stop_timer(timer, label=paste('Preprocessing', image_basename))
 

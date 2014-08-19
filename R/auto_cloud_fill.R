@@ -61,7 +61,12 @@ pct_clouds <- function(cloud_mask) {
 #' for \code{ext} when \code{auto_preprocess_landsat} was run).
 #' @param sensors choose the sensors to include when selecting images (useful 
 #' for excluding images from a particular satellite if desired). Can be any of 
-#' "L4T", "L5T", "L7E", and/or "L8E".
+#' "L4T", "L5T", "L7E", and/or "L8C".
+#' @param img_type type of Landsat imagery to preprocess. Can be "CDR" for 
+#' Landsat Climate Data Record (CDR) imagery in HDR format, or "L1T" for 
+#' Standard Terrain Correction (Level 1T) imagery. Note that if L1T imagery is 
+#' used, fmask must be run locally (see https://code.google.com/p/fmask) prior 
+#' to using \code{auto_preprocess_landsat}.
 #' @param threshold maximum percent cloud cover allowable in base image. Cloud 
 #' fill will iterate until percent cloud cover in base image is below this 
 #' value, or until \code{max_iter} iterations have been run
@@ -85,9 +90,9 @@ pct_clouds <- function(cloud_mask) {
 #' doi:10.1109/LGRS.2011.2173290
 auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date, 
                             out_name, base_date=NULL, tc=TRUE, ext='tif',
-                            sensors=c('L4T', 'L5T', 'L7E', 'L8E'),
-                            threshold=1, max_iter=5, notify=print, verbose=1, 
-                            overwrite=FALSE, ...) {
+                            sensors=c('L4T', 'L5T', 'L7E', 'L8C'), 
+                            img_type="CDR", threshold=1, max_iter=5, 
+                            notify=print, verbose=1, overwrite=FALSE, ...) {
     if (!file_test('-d', data_dir)) {
         stop('data_dir does not exist')
     }
@@ -104,8 +109,8 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     if (file_test('-f', output_file) & !overwrite) {
         stop(paste0('output file "', output_file, '" already exists'))
     }
-    if (!all(sensors %in% c('L4T', 'L5T', 'L7E', 'L8E'))) {
-        stop('"sensors" must be a list of one or more of: "L4T", "L5T", "L7E", "L8E"')
+    if (!all(sensors %in% c('L4T', 'L5T', 'L7E', 'L8C'))) {
+        stop('"sensors" must be a list of one or more of: "L4T", "L5T", "L7E", "L8C"')
     }
 
     log_file <- file(paste0(out_name, '_log.txt'), open="wt")
@@ -128,7 +133,13 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #pathrow_re <-"[012][0-9]{2}-[012][0-9]{2}"
     pathrow_re <- paste(wrspath, wrsrow, sep='-')
     date_re <-"((19)|(2[01]))[0-9]{2}-[0123][0-9]{2}"
-    sensor_re <- paste0('(', paste0(paste0('(', sensors,')'), collapse='|'), ')', "SR")
+    if (img_type == "CDR") {
+        sensor_re <- paste0('(', paste0(paste0('(', sensors,')'), collapse='|'), ')', "SR")
+    } else if (img_type == "L1T") {
+        sensor_re <- paste0('(', paste0(paste0('(', sensors,')'), collapse='|'), ')', "L1T")
+    } else {
+        stop(paste(img_type, "is not a recognized img_type"))
+    }
     if (tc) {
         suffix_re <- paste0('_tc.', ext, '$')
     } else {

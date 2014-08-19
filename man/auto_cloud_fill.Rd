@@ -5,8 +5,8 @@
 \usage{
 auto_cloud_fill(data_dir, wrspath, wrsrow, start_date, end_date, out_name,
   base_date = NULL, tc = TRUE, ext = "tif", sensors = c("L4T", "L5T",
-  "L7E", "L8E"), threshold = 1, max_iter = 5, notify = print,
-  verbose = 1, overwrite = FALSE, ...)
+  "L7E", "L8C"), img_type = "CDR", threshold = 1, max_iter = 5,
+  notify = print, verbose = 1, overwrite = FALSE, ...)
 }
 \arguments{
 \item{data_dir}{folder where input images are located, with filenames as
@@ -45,7 +45,13 @@ for \code{ext} when \code{auto_preprocess_landsat} was run).}
 
 \item{sensors}{choose the sensors to include when selecting images (useful
 for excluding images from a particular satellite if desired). Can be any of
-"L4T", "L5T", "L7E", and/or "L8E".}
+"L4T", "L5T", "L7E", and/or "L8C".}
+
+\item{img_type}{type of Landsat imagery to preprocess. Can be "CDR" for
+Landsat Climate Data Record (CDR) imagery in HDR format, or "L1T" for
+Standard Terrain Correction (Level 1T) imagery. Note that if L1T imagery is
+used, fmask must be run locally (see https://code.google.com/p/fmask) prior
+to using \code{auto_preprocess_landsat}.}
 
 \item{threshold}{maximum percent cloud cover allowable in base image. Cloud
 fill will iterate until percent cloud cover in base image is below this
