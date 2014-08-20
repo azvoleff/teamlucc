@@ -51,10 +51,6 @@ traj_lut <- function(class_codes, class_names=NULL) {
 #' @param ... additional parameters to pass to rasterEngine
 #' @return a {RasterLayer} of change trajectories, with change trajectories 
 #' coded as in the \code{lut} output by \code{traj_lut}
-#' @details Processing can be done in parallel using all using the cluster 
-#' facilities in the \code{spatial.tools} package. To enable clustering, call 
-#' \code{beginCluster} before running \code{classify}.  To stop the cluster 
-#' when finished, call \code{endCluster}.
 #' @references Chen, J., P. Gong, C.  He, R.  Pu, and P.  Shi.  2003.
 #' Land-use/land-cover change detection using improved change-vector analysis.
 #' Photogrammetric Engineering and Remote Sensing 69:369-380.

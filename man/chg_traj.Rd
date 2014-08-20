@@ -35,11 +35,6 @@ the codes output by \code{chg_traj} can be calculated with \code{traj_lut}.
 \details{
 This function will run in parallel if a parallel backend is registered with
 \code{\link{foreach}}.
-
-Processing can be done in parallel using all using the cluster
-facilities in the \code{spatial.tools} package. To enable clustering, call
-\code{beginCluster} before running \code{classify}.  To stop the cluster
-when finished, call \code{endCluster}.
 }
 \examples{
 \dontrun{

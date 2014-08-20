@@ -24,9 +24,7 @@ a \code{Raster*} of \code{y} normalized to \code{x}
 \description{
 Performs relative normalization on two rasters using model II regression.
 Based on the approach in the \code{relnorm} function in the \code{landsat}
-package. Will use \code{foreach} to run in parallel over the bands in a
-\code{RasterStack} or \code{RasterBrick} if \code{makeCluster()} is called
-prior to calling \code{normalize}.
+package.
 }
 \details{
 This function will run in parallel if a parallel backend is registered with
