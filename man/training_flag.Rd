@@ -17,7 +17,7 @@ training_flag(x, classes = levels(x@y)) <- value
 
 \item{classes}{specifies a subset of classes in \code{x}}
 
-\item{value}{a new \code{training_flag} to assign for pixels in \code{x}}
+\item{value}{training flag to assign for pixels in \code{x}}
 }
 \description{
 Get or set training_flag for a pixel_data object

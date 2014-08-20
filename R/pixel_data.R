@@ -104,9 +104,16 @@ rbind.pixel_data <- function(x, ...) {
     return(x)
 }
 
+#' Extract part of pixel_data class
+#'
 #' @method [ pixel_data
-setMethod("[", signature(x="pixel_data", i='character'),
-function(x, i, ...) {
+#' @rdname extract-methods
+#' @param x a \code{pixel_data} object
+#' @param i a class or list of classes to extract
+#' @param j unused
+#' @param ... additional arguments (none implemented)
+setMethod("[", signature(x="pixel_data", i='character', j="ANY"),
+function(x, i, j, ...) {
     if (!(i %in% levels(x@y))) {
         stop(paste0('"', i, '"', ' is not a class in this pixel_data object'))
     }
@@ -254,15 +261,15 @@ function(x, classes) {
     }
 })
 
-#' @export
 #' @rdname training_flag
-#' @param value a new \code{training_flag} to assign for pixels in \code{x}
+#' @export
+#' @param value training flag to assign for pixels in \code{x}
 setGeneric("training_flag<-", function(x, classes=levels(x@y), value) {
     standardGeneric("training_flag<-")
 })
 
 #' @method training_flag<- pixel_data
-setMethod("training_flag<-", signature(x="pixel_data"),
+setMethod("training_flag<-", signature(x="pixel_data", classes="character"),
 function(x, classes=levels(x@y), value) {
     if (identical(classes, levels(x@y))) {
         # More efficiently handle special case of reassigning flags for all 
