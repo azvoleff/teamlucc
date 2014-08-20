@@ -221,6 +221,32 @@ function(x, classes) {
     }
 })
 
+#' @rdname training_flag
+#' @export
+#' @param value training flag to assign for pixels in \code{x}
+setGeneric("training_flag<-", function(x, classes=levels(x@y), value) {
+    standardGeneric("training_flag<-")
+})
+
+#' @rdname training_flag
+setMethod("training_flag<-", signature(x="pixel_data"),
+function(x, classes=levels(x@y), value) {
+    if (identical(classes, levels(x@y))) {
+        # More efficiently handle special case of reassigning flags for all 
+        # classes in x.
+        if (length(value) == 1) value <- rep(value, length(x@training_flag))
+        stopifnot(length(value) == length(x@training_flag))
+        x@training_flag <- value
+        return(x)
+    } else {
+        sel_rows <- which(x@y %in% classes)
+        if (length(value) == 1) value <- rep(value, length(sel_rows))
+        stopifnot(length(value) == length(sel_rows))
+        x@training_flag[sel_rows] <- value
+        return(x)
+    }
+})
+
 #' Get number of testing pixels in a pixel_data object
 #'
 #' @export n_test
@@ -261,32 +287,6 @@ function(x, classes) {
     }
 })
 
-#' @rdname training_flag
-#' @export
-#' @param value training flag to assign for pixels in \code{x}
-setGeneric("training_flag<-", function(x, classes=levels(x@y), value) {
-    standardGeneric("training_flag<-")
-})
-
-#' @method training_flag<- pixel_data
-setMethod("training_flag<-", signature(x="pixel_data"),
-function(x, classes=levels(x@y), value) {
-    if (identical(classes, levels(x@y))) {
-        # More efficiently handle special case of reassigning flags for all 
-        # classes in x.
-        if (length(value) == 1) value <- rep(value, length(x@training_flag))
-        stopifnot(length(value) == length(x@training_flag))
-        x@training_flag <- value
-        return(x)
-    } else {
-        sel_rows <- which(x@y %in% classes)
-        if (length(value) == 1) value <- rep(value, length(sel_rows))
-        stopifnot(length(value) == length(sel_rows))
-        x@training_flag[sel_rows] <- value
-        return(x)
-    }
-})
-
 #' Get or set src_name for a pixel_data object
 #'
 #' @export src_name
@@ -312,7 +312,7 @@ function(x, classes) {
 #' @param value a new \code{src_name} to assign for pixels in \code{x}
 setGeneric("src_name<-", function(x, value) standardGeneric("src_name<-"))
 
-#' @method src_name<- pixel_data
+#' @rdname src_name
 setMethod("src_name<-", signature(x="pixel_data"),
 function(x, value) {
     if (length(value) == 1) {
