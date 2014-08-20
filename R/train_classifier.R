@@ -24,6 +24,9 @@
 #' @param use_rfe whether to use Recursive Feature Extraction (RFE) as 
 #' implemented in the \code{caret} package to select a subset of the input 
 #' features to be used in the classification. NOT YET SUPPORTED.
+#' @param factors a character vector giving the names of predictors (layer 
+#' names from the images used to build \code{train_data}) that should be 
+#' treated as factors
 #' @param ... additional arguments (such as \code{ntree} for random forest 
 #' classifier) to pass to \code{train}
 #' @return a trained model (as a \code{train} object from the  \code{caret} 
@@ -34,16 +37,20 @@
 #' model <- train_classifier(train_data)
 train_classifier <- function(train_data, type='rf', use_training_flag=TRUE, 
                              train_control=NULL, tune_grid=NULL,
-                             use_rfe=FALSE, ...) {
+                             use_rfe=FALSE, factors=c(), ...) {
     stopifnot(type %in% c('svm', 'rf'))
 
-    if (is.null(train_control)) {
-        train_control <- trainControl(method="oob", classProbs=TRUE)
+    predictor_names <- names(train_data@x)
+
+    # Indicate which predictors should be converted to factors
+    stopifnot(length(factors) == 0 || all(factors %in% predictor_names))
+    for (factor_var in factors) {
+        pred_index <- which(predictor_names == factor_var)
+        predictor_names[pred_index] <- paste0("factor(", predictor_names[pred_index], ")")
     }
 
     # Build the formula, excluding the training flag column (if it exists) from 
     # the model formula
-    predictor_names <- names(train_data@x)
     model_formula <- formula(paste('y ~', paste(predictor_names,
                                                 collapse=' + ')))
 
@@ -84,10 +91,16 @@ train_classifier <- function(train_data, type='rf', use_training_flag=TRUE,
                         poly_ID=train_data@pixel_src$ID)
 
     if (type == 'rf') {
+        if (is.null(train_control)) {
+            train_control <- trainControl(method="oob", classProbs=TRUE)
+        }
         model <- train(model_formula, data=train_data, method="rf",
                        preProc=c('range'), subset=train_data$training_flag,
                        trControl=train_control, tuneGrid=tune_grid, ...)
     } else if (type == 'svm') {
+        if (is.null(train_control)) {
+            train_control <- trainControl(method="cv", classProbs=TRUE)
+        }
         model <- train(model_formula, data=train_data, method="svmRadial",
                        preProc=c('center', 'scale'), subset=train_data$training_flag,
                        trControl=train_control, tuneGrid=tune_grid, ...)
