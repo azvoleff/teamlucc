@@ -269,7 +269,7 @@ setGeneric("training_flag<-", function(x, classes=levels(x@y), value) {
 })
 
 #' @method training_flag<- pixel_data
-setMethod("training_flag<-", signature(x="pixel_data", classes="character"),
+setMethod("training_flag<-", signature(x="pixel_data"),
 function(x, classes=levels(x@y), value) {
     if (identical(classes, levels(x@y))) {
         # More efficiently handle special case of reassigning flags for all 
