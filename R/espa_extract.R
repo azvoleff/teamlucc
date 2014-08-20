@@ -25,7 +25,7 @@
 #' @param end_date end date of period from which images will be extracted
 #' to (as \code{Date} object)
 #' @param sensors a list of the sensors to include (can be any of "LT4", "LT5", 
-#' "LE7", or "LE8")
+#' "LE7", or "LC8")
 #' @return nothing (used for side effect of unzipping Landsat CDR tarballs)
 #' @examples
 #' \dontrun{
@@ -70,7 +70,7 @@ espa_extract <- function(in_folder, out_folder, pathrows=NULL, start_date=NULL,
     }
 
     # Filter by pathrow
-    img_pathrows <- gsub('(LT[45])|(LE[78])', '', str_extract(zipfiles, '((LT[45])|(LE[78]))[0-9]{6}'))
+    img_pathrows <- gsub('(LT[45])|(LE7)|(LC8)', '', str_extract(zipfiles, '((LT[45])|(LE7)|(LC8))[0-9]{6}'))
     if (!is.null(pathrows)) {
         stopifnot(!is.na(str_extract(pathrows, '[0-9]{6}')))
         inc_pathrows <- img_pathrows %in% pathrows
@@ -80,9 +80,9 @@ espa_extract <- function(in_folder, out_folder, pathrows=NULL, start_date=NULL,
     }
 
     # Filter by sensor
-    img_sensors <- str_extract(zipfiles, '^((LT[45])|(LE)[78])')
+    img_sensors <- str_extract(zipfiles, '^((LT[45])|(LE7)|(LC8))')
     if (!is.null(sensors)) {
-        stopifnot(!is.na(str_extract(sensors, '^((LT[45])|(LE)[78])$')))
+        stopifnot(!is.na(str_extract(sensors, '^((LT[45])|(LE7)|(LC8))$')))
         inc_sensors <- img_sensors %in% sensors
         zipfiles <- zipfiles[inc_sensors]
         img_pathrows <- img_pathrows[inc_sensors]

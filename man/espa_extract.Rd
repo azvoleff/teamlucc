@@ -23,7 +23,7 @@ to (as \code{Date} object).}
 to (as \code{Date} object)}
 
 \item{sensors}{a list of the sensors to include (can be any of "LT4", "LT5",
-"LE7", or "LE8")}
+"LE7", or "LC8")}
 }
 \value{
 nothing (used for side effect of unzipping Landsat CDR tarballs)

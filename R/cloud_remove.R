@@ -25,7 +25,7 @@ format_IDL_param <- function(varname, varvalue) {
 
 # Function to prepare fmask band as a cloud mask
 prep_fmask <- function(image_dir) {
-    lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
+    lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
     lndsr_files <- file.path(image_dir, dir(image_dir, pattern=lndsr_regex))
     fmask_band <- raster(lndsr_files[grepl('fmask_band.tif$', lndsr_files)])
 

@@ -25,7 +25,7 @@ get_freq <- function(band, value, freq_table) {
 #' @param aoi an area of interest (AOI) to crop from each image
 #' @return a \code{data.frame}
 auto_QA_stats <- function(image_dirs, aoi) {
-    lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LE8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
+    lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
     mask_bands <- c('fill_QA', 'fmask_band')
 
     out <- c()

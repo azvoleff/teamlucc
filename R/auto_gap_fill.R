@@ -88,7 +88,7 @@ auto_gap_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     #pathrow_re <-"[012][0-9]{2}-[012][0-9]{2}"
     pathrow_re <- paste(wrspath, wrsrow, sep='-')
     date_re <-"((19)|(2[01]))[0-9]{2}-[0123][0-9]{2}"
-    sensor_re <-"((L[45]T)|(L[78]E))SR"
+    sensor_re <-"((L[45]T)|(L7E)|(L8C))SR"
     if (tc) {
         suffix_re <- '_tc.tif$'
     } else {
