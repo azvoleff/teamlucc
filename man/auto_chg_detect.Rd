@@ -24,7 +24,7 @@ for time 1 image}
 \item{ext}{file extension to use when saving output rasters (determines
 output file format).}
 
-\item{overwrite}{whether to overwrite existing files (otherwise an err#'
+\item{overwrite}{whether to overwrite existing files (otherwise an error
 will be raised)}
 
 \item{chg_threshold}{the threshold to use determining change and no-change

@@ -20,7 +20,7 @@
 #' \code{auto_chg_detect} (without an extension)
 #' @param ext file extension to use when saving output rasters (determines 
 #' output file format).
-#' @param overwrite whether to overwrite existing files (otherwise an err#' 
+#' @param overwrite whether to overwrite existing files (otherwise an error
 #' will be raised)
 #' @param chg_threshold the threshold to use determining change and no-change 
 #' areas from the change magnitude image (see \code{\link{chg_mag}}. If 
