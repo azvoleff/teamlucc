@@ -26,18 +26,20 @@ ls_catalog <- function(in_folder) {
             inner_item_full <- file.path(outer_item_full, inner_item)
             # Check to ensure inner item is a Landsat HDF file
             if (!file_test('-f', inner_item_full) ||
-                !grepl('^(lndsr.)?((LT4)|(LT5)|(LE7))[0-9]{13}[A-Z]{3}[0-9]{2}.hdf$', 
+                !grepl('^(lndsr.)?((LT4)|(LT5)|(LE7)|(LC8))[0-9]{13}[A-Z]{3}[0-9]{2}.hdf$', 
                        inner_item)) {
                 next
             }
             metadata_string <- str_extract(inner_item, 
-                                           '((LT4)|(LT5)|(LE7))[0-9]{13}')
+                                           '((LT4)|(LT5)|(LE7)|(LC8))[0-9]{13}')
             if (grepl('^LT4', metadata_string)) {
                 sensor <- 'LT4'
             } else if (grepl('^LT5', metadata_string)) {
                 sensor <- 'LT5'
             } else if (grepl('^LE7', metadata_string)) {
                 sensor <- 'LE7'
+            } else if (grepl('^LC8', metadata_string)) {
+                sensor <- 'LC8'
             } else {
                 message(paste('Skipping', inner_item,
                               '- cannot determine sensor from filename.'))
