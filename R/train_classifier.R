@@ -1,4 +1,4 @@
-#' Trains a classifier
+#' Train a random forest or SVM classifier
 #'
 #' This function trains a Support Vector Machine (SVM) or Random Forest (RF) 
 #' classifier for use in an image classification.
@@ -7,8 +7,11 @@
 #' columns: ".sigma" and ".C". For \code{type='rf'}, must be a 
 #' \code{data.frame} with one column: '.mtry'.
 #'
+#' This function will run in parallel if a parallel backend is registered with 
+#' \code{\link{foreach}}.
+#'
 #' @export
-#' @import caret randomForest
+#' @import caret randomForest e1071 kernlab
 #' @param train_data a \code{link{pixel_data}} object
 #' @param type either "svm" (to fit a support vector machine) or "rf" (to fit a
 #' random forest).
@@ -24,12 +27,13 @@
 #' @param use_rfe whether to use Recursive Feature Extraction (RFE) as 
 #' implemented in the \code{caret} package to select a subset of the input 
 #' features to be used in the classification. NOT YET SUPPORTED.
-#' @param factors a character vector giving the names of predictors (layer 
-#' names from the images used to build \code{train_data}) that should be 
-#' treated as factors
+#' @param factors a list of character vector giving the names of predictors 
+#' (layer names from the images used to build \code{train_data}) that should be 
+#' treated as factors, and specifying the levels of each factor. For example, 
+#' \code{factors=list(year=c(1990, 1995, 2000, 2005, 2010))}.
 #' @param ... additional arguments (such as \code{ntree} for random forest 
 #' classifier) to pass to \code{train}
-#' @return a trained model (as a \code{train} object from the  \code{caret} 
+#' @return a trained model (as a \code{train} object from the \code{caret} 
 #' package)
 #' @examples
 #' train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
@@ -37,22 +41,23 @@
 #' model <- train_classifier(train_data)
 train_classifier <- function(train_data, type='rf', use_training_flag=TRUE, 
                              train_control=NULL, tune_grid=NULL,
-                             use_rfe=FALSE, factors=c(), ...) {
+                             use_rfe=FALSE, factors=list(), ...) {
     stopifnot(type %in% c('svm', 'rf'))
 
     predictor_names <- names(train_data@x)
 
-    # Indicate which predictors should be converted to factors
-    stopifnot(length(factors) == 0 || all(factors %in% predictor_names))
-    for (factor_var in factors) {
+    # Convert predictors in training data to factors as necessary
+    stopifnot(length(factors) == 0 || all(names(factors) %in% predictor_names))
+    stopifnot(length(unique(names(factors))) == length(factors))
+    for (factor_var in names(factors)) {
         pred_index <- which(predictor_names == factor_var)
-        predictor_names[pred_index] <- paste0("factor(", predictor_names[pred_index], ")")
+        train_data@x[, pred_index] <- factor(train_data@x[, pred_index], 
+                                             levels=factors[[factor_var]])
     }
 
     # Build the formula, excluding the training flag column (if it exists) from 
     # the model formula
-    model_formula <- formula(paste('y ~', paste(predictor_names,
-                                                collapse=' + ')))
+    model_formula <- formula(paste('y ~', paste(predictor_names, collapse=' + ')))
 
     if (use_rfe) {
         stop('recursive feature extraction not yet supported')
@@ -95,7 +100,7 @@ train_classifier <- function(train_data, type='rf', use_training_flag=TRUE,
             train_control <- trainControl(method="oob", classProbs=TRUE)
         }
         model <- train(model_formula, data=train_data, method="rf",
-                       preProc=c('range'), subset=train_data$training_flag,
+                       subset=train_data$training_flag,
                        trControl=train_control, tuneGrid=tune_grid, ...)
     } else if (type == 'svm') {
         if (is.null(train_control)) {

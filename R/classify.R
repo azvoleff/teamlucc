@@ -1,19 +1,19 @@
-#' Classifies an image using a trained random forest classifier
+#' Classify an image using a trained classifier
 #'
 #' This function will produce two outputs - a prediction image and a 
-#' probability image. The prediction image contains the predicted classes from 
-#' the random forest classifier, and the probability image contains the 
-#' per-pixel predicted probabilities of occurrence of each class.
+#' probability image. The prediction image contains the predicted classes, the 
+#' and the probability image contains the per-pixel predicted probabilities of 
+#' occurrence of each class.
 #'
 #' This function will run in parallel if a parallel backend is registered with 
 #' \code{\link{foreach}}.
 #'
 #' @export
-#' @import caret randomForest e1071 kernlab
+#' @import caret
 #' @importFrom spatial.tools rasterEngine predict_rasterEngine
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
-#' @param model a trained random forest model as output by 
+#' @param model a trained classifier as output by 
 #' \code{\link{train_classifier}}
 #' @param classes_file filename for predicted classes (or missing)
 #' @param prob_file filename for predicted probabilities (or missing) CURRENTLY 
@@ -38,15 +38,29 @@ classify <- function(x, model, classes_file, prob_file, overwrite=FALSE) {
         stop(paste('output file', classes_file, 'already exists and overwrite=FALSE'))
     }
 
-    probs <- predict_rasterEngine(object=model, newdata=x, type='prob')
-
+    # probs <- predict_rasterEngine(object=model, newdata=x, type='prob')
+    #
     # spatial.tools can only output the raster package grid format - so output 
     # to a tempfile in that format then copy over to the requested final output 
     # format if a filename was supplied
-    if (!missing(prob_file)) {
-        probs <- writeRaster(probs, filename=prob_file, overwrite=overwrite, 
-                             datatype='FLT4S')
+    # if (!missing(prob_file)) {
+    #     probs <- writeRaster(probs, filename=prob_file, overwrite=overwrite, 
+    #                          datatype='FLT4S')
+    # }
+
+    if (missing(prob_file)) {
+        prob_file <- rasterTmpFile()
     }
+    probs <- predict(x, model,  type="prob", progress='text', 
+                     index=c(1:nlevels(model)), filename=prob_file, 
+                     overwrite=overwrite, datatype="FLT4S")
+
+    # probs <- predict(x, model,  type="prob", progress='text',
+    #                  factors=list(aspect=c(1, 2, 3, 4),
+    #                               year=c(1990, 1995, 2000, 2005, 2010)),
+    #                  index=c(1:nlevels(model)), filename=prob_file, 
+    #                  overwrite=overwrite, datatype="FLT4S")
+
     names(probs) <- levels(model)
 
     # Calculate the highest probability class from the class probabilities
