@@ -25,7 +25,7 @@ get_freq <- function(band, value, freq_table) {
 #' @param aoi an area of interest (AOI) to crop from each image
 #' @return a \code{data.frame}
 auto_QA_stats <- function(image_dirs, aoi) {
-    lndsr_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
+    lndsr_regex <- '^(lndsr.)?((LT4)|(LT5)|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}'
     mask_bands <- c('fill_QA', 'fmask_band')
 
     out <- c()
@@ -40,8 +40,8 @@ auto_QA_stats <- function(image_dirs, aoi) {
         for (image_basename in image_basenames) {
             message(paste0('Processing ', image_basename, '...'))
             metadata_string <- str_extract(image_basename, 
-                                           '((LT4)|(LT5)|(LE7))[0-9]{13}')
-            sensor <- str_extract(metadata_string, '^(LT[45])|(LE7)')
+                                           '((LT4)|(LT5)|(LE7)|(LC8))[0-9]{13}')
+            sensor <- str_extract(metadata_string, '^((LT[45])|(LE7)|(LC8))')
             year <- substr(metadata_string, 10, 13)
             julian_day <- substr(metadata_string, 14, 16)
             img_path <- substr(metadata_string, 4, 6)

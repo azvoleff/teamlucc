@@ -268,7 +268,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, img_type="CDR",
 
     # Setup a regex to identify Landsat CDR images
     if (img_type == "CDR") {
-        ls_regex <- '^lndsr.((LT4)|(LT5)|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}.hdf$'
+        ls_regex <- '^(lndsr.)?((LT4)|(LT5)|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}.hdf$'
     } else if (img_type == "L1T") {
         ls_regex <- '((LT[45])|(LE7)|(LC8))[0-9]{6}[12][0-9]{6}[a-zA-Z]{3}[0-9]{2}_MTL.txt$'
     } else {
