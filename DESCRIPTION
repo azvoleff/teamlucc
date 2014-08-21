@@ -44,7 +44,8 @@ Suggests:
 LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: To perform gap filling of Landsat 7 SLC-off images or
     Landsat scenes with heavy clouds using the IDL code by Xiaolin Zhu at the
-    Ohio State University requires licenses for both EXELIS IDL and ENVI.
+    Ohio State University requires licenses for both EXELIS IDL and ENVI, and
+    ENVI version 5 or greater.
 Description: teamlucc is a set of routines to support analyzing land use and
     cover change (LUCC) in R. The package was designed to support analyzing
     LUCC in the Zone of Interaction (ZOIs) of monitoring sites in the Tropical

@@ -1,3 +1,14 @@
+# Function to test if ENVI will load in IDL
+check_ENVI_IDL <- function(idl) {
+    idl_out <- system(paste(shQuote(idl), '-e "e=ENVI(/HEADLESS)"'), 
+                      intern=TRUE)
+    if (sum(grepl("Restored file: ENVI", idl_out)) > 0) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+
 # Function to ensure only character variables handed to IDL are quoted
 format_IDL_param <- function(varname, varvalue) {
     if (is.character(varvalue)) {
@@ -55,6 +66,10 @@ cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
     
     if (!(file_test('-x', idl) || file_test('-f', idl))) {
         stop('IDL not found - check "idl" parameter')
+    }
+
+    if (!check_ENVI_IDL(idl)) {
+        stop("Unable to load ENVI in IDL - do you have ENVI and IDL licenses, and ENVI >= 5.0?")
     }
 
     if (!byblock) {

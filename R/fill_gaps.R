@@ -121,6 +121,10 @@ fill_gaps_idl <- function(slc_off, fill, timeseries, out_base, sample_size,
         stop('IDL not found - check "idl" parameter')
     }
 
+    if (!check_ENVI_IDL(idl)) {
+        stop("Unable to load ENVI in IDL - do you have ENVI and IDL licenses, and ENVI >= 5.0?")
+    }
+
     # Save proj4string and extend to ensure the same proj4string and extent is 
     # returned even if they are changed by IDL
     orig_proj <- proj4string(slc_off)
