@@ -1,3 +1,12 @@
+teamlucc 0.36
+=============
+* For IDL dependent functions, add test if ENVI and IDL will load.
+* Add support for Landsat 8 files that have been processed through fmask.
+* Fix sensor strings to grep for "LC8" rather than "LE8" for Landsat 8.
+* Make "lndsr." at beginning of HDF files optional as recent ESPA files don't 
+  have this prefix (thanks to Stanley Okoro).
+* Add support for factors to train_classifier and classify.
+
 teamlucc 0.34
 =============
 * Fix calculation of change direction in chg_dir.
