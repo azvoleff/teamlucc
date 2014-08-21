@@ -1,4 +1,4 @@
-context("train_classifier")
+context("train_and_classify")
 
 train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
                          training=.6)

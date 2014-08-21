@@ -3,7 +3,8 @@
 \alias{classify}
 \title{Classify an image using a trained classifier}
 \usage{
-classify(x, model, classes_file, prob_file, overwrite = FALSE)
+classify(x, model, classes_file, prob_file, factors = list(),
+  overwrite = FALSE)
 }
 \arguments{
 \item{x}{a \code{Raster*} image with the predictor layer(s) for the
@@ -14,8 +15,12 @@ classification}
 
 \item{classes_file}{filename for predicted classes (or missing)}
 
-\item{prob_file}{filename for predicted probabilities (or missing) CURRENTLY
-IGNORED}
+\item{prob_file}{filename for predicted probabilities (or missing)}
+
+\item{factors}{a list of character vector giving the names of predictors
+(layer names from the images used to build \code{train_data}) that should be
+treated as factors, and specifying the levels of each factor. For example,
+\code{factors=list(year=c(1990, 1995, 2000, 2005, 2010))}.}
 
 \item{overwrite}{whether to overwrite \code{out_name} if it already exists}
 }
