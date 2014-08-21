@@ -31,7 +31,7 @@ occurrence of each class.
 }
 \details{
 This function will run in parallel if a parallel backend is registered with
-\code{\link{foreach}}.
+\code{\link{foreach}} - TEMPORARILY DISABLED.
 }
 \examples{
 \dontrun{

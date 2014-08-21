@@ -35,7 +35,7 @@ variability and change, land cover and land use change, and other threats.
 * Calculation of vegetation indices and image texture measures from grey-level 
   co-occurrence matrices (GLCMs)
 
-* Image classification using random forests
+* Image classification using random forests or support vector machines
 
 * Change detection using the Change Vector Analysis in Posterior Probability 
   Space (CVAPS) and Double Window Flexible Pace Search (DFPS) algorithms (Chen 

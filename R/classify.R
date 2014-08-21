@@ -6,7 +6,7 @@
 #' occurrence of each class.
 #'
 #' This function will run in parallel if a parallel backend is registered with 
-#' \code{\link{foreach}}.
+#' \code{\link{foreach}} - TEMPORARILY DISABLED.
 #'
 #' @export
 #' @import caret
@@ -16,8 +16,11 @@
 #' @param model a trained classifier as output by 
 #' \code{\link{train_classifier}}
 #' @param classes_file filename for predicted classes (or missing)
-#' @param prob_file filename for predicted probabilities (or missing) CURRENTLY 
-#' IGNORED
+#' @param prob_file filename for predicted probabilities (or missing)
+#' @param factors a list of character vector giving the names of predictors 
+#' (layer names from the images used to build \code{train_data}) that should be 
+#' treated as factors, and specifying the levels of each factor. For example, 
+#' \code{factors=list(year=c(1990, 1995, 2000, 2005, 2010))}.
 #' @param overwrite whether to overwrite \code{out_name} if it already exists
 #' @return a list with 2 elements: the predicted classes as a 
 #' \code{RasterLayer} and the class probabilities as a \code{RasterBrick}
@@ -30,7 +33,8 @@
 #' plot(preds$classes)
 #' plot(preds$probs)
 #' }
-classify <- function(x, model, classes_file, prob_file, overwrite=FALSE) {
+classify <- function(x, model, classes_file, prob_file, factors=list(), 
+                     overwrite=FALSE) {
     if (!missing(prob_file) && file_test('-f', prob_file) && !overwrite) {
         stop(paste('output file', prob_file, 'already exists and overwrite=FALSE'))
     }
@@ -38,11 +42,13 @@ classify <- function(x, model, classes_file, prob_file, overwrite=FALSE) {
         stop(paste('output file', classes_file, 'already exists and overwrite=FALSE'))
     }
 
+    # # Below is currently disabled due to issues handling factors in
+    # # predict_rasterEngine
     # probs <- predict_rasterEngine(object=model, newdata=x, type='prob')
     #
-    # spatial.tools can only output the raster package grid format - so output 
-    # to a tempfile in that format then copy over to the requested final output 
-    # format if a filename was supplied
+    # # spatial.tools can only output the raster package grid format - so output 
+    # # to a tempfile in that format then copy over to the requested final output 
+    # # format if a filename was supplied
     # if (!missing(prob_file)) {
     #     probs <- writeRaster(probs, filename=prob_file, overwrite=overwrite, 
     #                          datatype='FLT4S')
@@ -51,15 +57,9 @@ classify <- function(x, model, classes_file, prob_file, overwrite=FALSE) {
     if (missing(prob_file)) {
         prob_file <- rasterTmpFile()
     }
-    probs <- predict(x, model,  type="prob", progress='text', 
-                     index=c(1:nlevels(model)), filename=prob_file, 
-                     overwrite=overwrite, datatype="FLT4S")
-
-    # probs <- predict(x, model,  type="prob", progress='text',
-    #                  factors=list(aspect=c(1, 2, 3, 4),
-    #                               year=c(1990, 1995, 2000, 2005, 2010)),
-    #                  index=c(1:nlevels(model)), filename=prob_file, 
-    #                  overwrite=overwrite, datatype="FLT4S")
+    probs <- predict(x, model, type="prob", index=c(1:nlevels(model)), 
+                     factors=factors, filename=prob_file, overwrite=overwrite, 
+                     datatype="FLT4S")
 
     names(probs) <- levels(model)
 
