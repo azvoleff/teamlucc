@@ -38,7 +38,7 @@
 #' plot(training_polys, add=TRUE)
 #' }
 sample_raster <- function(x, size, strata=NULL, side=xres(x), fields=c(), 
-                            na.rm=TRUE, exp=5) {
+                          na.rm=TRUE, exp=5) {
     if (!is.null(strata)) {
         stratified <- TRUE
         if (proj4string(strata) != proj4string(x)) {
