@@ -5,11 +5,6 @@
 #' default settings, the output polygons will be perfectly aligned with the 
 #' pixels in the input raster.
 #'
-#' The \code{validate} parameter allows excluding no data areas from the output 
-#' polygons (though the simple method this function uses to enforce this means 
-#' that pixels within the border areas of the image will have a slightly lower 
-#' probability of selection than those in the interior).
-#'
 #' @export
 #' @importFrom rgdal writeOGR
 #' @param x a \code{Raster*}
@@ -26,7 +21,7 @@
 #' loss of sample polygons lost because they contain NAs, and, for stratified 
 #' sampling, to account for classes that occur very infrequently in the data.  
 #' Increase this value if the final sample has fewer sample polygons than 
-#' desire.
+#' desired.
 #' @return a \code{SpatialPolygonsDataFrame}
 #' @examples
 #' \dontrun{

@@ -9,8 +9,8 @@
 #' @slot x a \code{data.frame} of independent variables (usually pixel values)
 #' @slot y a \code{data.frame} of the dependent variable (usually land cover 
 #' classes)
-#' @slot pixel_src a data.framevector used to link pixels in \code{x} and 
-#' \code{y} to an input polygon
+#' @slot pixel_src a data.frame used to link pixels in \code{x} and \code{y} to 
+#' an input polygon
 #' @slot training_flag a binary vector of length equal to \code{nrow(x)} 
 #' indicating each row in x should be used in training (TRUE) or in testing 
 #' (FALSE)

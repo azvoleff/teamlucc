@@ -16,8 +16,8 @@ classificaion, or testing data used for testing a classification.
 \item{\code{y}}{a \code{data.frame} of the dependent variable (usually land cover
 classes)}
 
-\item{\code{pixel_src}}{a data.framevector used to link pixels in \code{x} and
-\code{y} to an input polygon}
+\item{\code{pixel_src}}{a data.frame used to link pixels in \code{x} and \code{y} to
+an input polygon}
 
 \item{\code{training_flag}}{a binary vector of length equal to \code{nrow(x)}
 indicating each row in x should be used in training (TRUE) or in testing
