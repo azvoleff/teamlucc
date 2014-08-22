@@ -70,13 +70,13 @@ cloud fill. \code{algorithm} must be one of: "CLOUD_REMOVE",
 "CLOUD_REMOVE" the script uses a (slightly modified to be called from R)
 version of  Xiaolin Zhu's NSPI IDL code. If set to "CLOUD_REMOVE_FAST", the
 algorithm uses the "fast" version of Xiaolin's code. Both of these two
-algorithms require an IDL license to run (and therkkkkkkkkkefore
-\code{idl_path} must be set).  The "teamlucc" algorithm uses a version of
-the NSPI algorithm (based on the CLOUD_REMOVE code) that is coded in C++ and
-can be run from R without an IDL license. The "simple" algorithm uses a
-cloud fill model that is based on fitting a linear model to the surface
-reflectance from the clear image in a window around each cloud, and using
-this linear model to predict reflectance in unobserved (cloudy) areas.
+algorithms require an IDL license to run (and therefore \code{idl_path} must
+be set).  The "teamlucc" algorithm uses a version of the NSPI algorithm
+(based on the CLOUD_REMOVE code) that is coded in C++ and  can be run from R
+without an IDL license. The "simple" algorithm uses a cloud fill model that
+is based on fitting a linear model to the surface reflectance from the clear
+image in a window around each cloud, and using this linear model to predict
+reflectance in unobserved (cloudy) areas.
 }
 \examples{
 \dontrun{
