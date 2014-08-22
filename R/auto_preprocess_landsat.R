@@ -152,7 +152,8 @@ build_mask_vrt <- function(ls_file, mask_vrt_file, img_type) {
         # the two images have different projection systems, even though they 
         # are in identical projection systems.
         gdalbuildvrt(c(qa_mask_file, fmask_file), mask_vrt_file, 
-                     separate=TRUE, allow_projection_difference=TRUE)
+                     separate=TRUE, allow_projection_difference=TRUE,
+                     srcnodata='None')
     } else {
         stop(paste(img_type, "is not a recognized img_type"))
     }
