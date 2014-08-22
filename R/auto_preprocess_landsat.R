@@ -146,7 +146,7 @@ build_mask_vrt <- function(ls_file, mask_vrt_file, img_type) {
                             out <- x == 255
                             out[x == 255] <- 255
                             return(out)
-                        }, datatype="INT1U", filename=qa_mask_file)
+                        }, datatype="INT2S", filename=qa_mask_file)
 
         # Note that allow_projection_difference is used below as GDAL thinks 
         # the two images have different projection systems, even though they 
