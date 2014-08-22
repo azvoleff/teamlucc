@@ -17,10 +17,10 @@ using namespace arma;
 //' This function is called by the \code{\link{cloud_remove}} function. It is
 //' not intended to be used directly.
 //'
-//' @param cloudy the cloudy image, with pixels in columns (in column-major 
-//' order) and with number of columns equal to number of bands
-//' @param clear the clear image, with pixels in columns (in column-major 
-//' order) and with number of columns equal to number of bands
+//' @param cloudy the cloudy image as a matrix, with pixels in columns (in 
+//' column-major order) and with number of columns equal to number of bands
+//' @param clear the clear image as a matrix, with pixels in columns (in 
+//' column-major order) and with number of columns equal to number of bands
 //' @param cloud_mask the cloud mask image as a vector (in column-major order), 
 //' with clouds coded with unique integer codes starting at 1, and with areas 
 //' that are clear in both images  coded as 0. Areas that are missing in the 

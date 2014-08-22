@@ -7,11 +7,11 @@ cloud_fill(cloudy, clear, cloud_mask, dims, num_class, min_pixel, max_pixel,
   cloud_nbh, DN_min, DN_max, verbose = FALSE)
 }
 \arguments{
-\item{cloudy}{the cloudy image, with pixels in columns (in column-major
-order) and with number of columns equal to number of bands}
+\item{cloudy}{the cloudy image as a matrix, with pixels in columns (in
+column-major order) and with number of columns equal to number of bands}
 
-\item{clear}{the clear image, with pixels in columns (in column-major
-order) and with number of columns equal to number of bands}
+\item{clear}{the clear image as a matrix, with pixels in columns (in
+column-major order) and with number of columns equal to number of bands}
 
 \item{cloud_mask}{the cloud mask image as a vector (in column-major order),
 with clouds coded with unique integer codes starting at 1, and with areas
