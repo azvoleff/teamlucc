@@ -6,6 +6,7 @@ teamlucc 0.36
 * Make "lndsr." at beginning of HDF files optional as recent ESPA files don't 
   have this prefix (thanks to Stanley Okoro).
 * Add support for factors to train_classifier and classify.
+* Minor doc fixes.
 
 teamlucc 0.34
 =============
