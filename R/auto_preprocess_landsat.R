@@ -121,10 +121,16 @@ build_band_vrt <- function(ls_file, band_vrt_file, img_type) {
 #' @importFrom gdalUtils get_subdatasets gdalbuildvrt
 build_mask_vrt <- function(ls_file, mask_vrt_file, img_type) {
     if (img_type == "CDR") {
-        mask_bands <- c('fill_QA', 'fmask_band', 'cloud_QA', 'cloud_shadow_QA', 
+        mask_bands <- c('fill_QA', 'cfmask_band', 'cloud_QA', 'cloud_shadow_QA', 
                         'adjacent_cloud_QA')
         sds <- get_subdatasets(ls_file)
+        # Below is to support CDR imagery downloaded prior to late August 2014
+        if (any(grepl("fmask_band", sds))) {
+            warning('Using "fmask_band" instead of newer "cfmask_band" band name')
+            mask_bands[grepl("^cfmask_band$", mask_bands)] <- "fmask_band"
+        }
         mask_sds <- sds[grepl(paste0(':(', paste(mask_bands, collapse='|'), ')$'), sds)]
+        stopifnot(length(mask_sds) == 5)
         gdalbuildvrt(mask_sds, mask_vrt_file, separate=TRUE, srcnodata='None')
     } else if (img_type == "L1T") {
         mask_bands <- c('fill_QA', 'fmask_band')
