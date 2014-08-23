@@ -1,5 +1,7 @@
 context("train_and_classify")
 
+set.seed(0)
+
 train_data <- get_pixels(L5TSR_1986, L5TSR_1986_2001_training, "class_1986", 
                          training=.6)
 
@@ -26,9 +28,19 @@ test_that("can run classify on both SVM and random forest models", {
     expect_equal(svm_cl$codes, expected_codes)
 })
 
+calc_mean_diff <- function(p1, p2) {
+    mean(abs(cellStats(p1 - p2, "mean")))
+}
+
+test_that("SVM random forest models roughly match", {
+    expect_less_than(calc_mean_diff(svm_cl$probs, rf_cl$probs), .05)
+    expect_less_than(calc_mean_diff(svm_cl$classes, rf_cl$classes), .07)
+})
 
 ################################################################################
 # Test training and classifying with models with a factor predictor variable
+
+set.seed(0)
 
 # Add a "year" layer to L5TSR_1986
 L5TSR_1986_year <- L5TSR_1986
@@ -40,7 +52,7 @@ train_data_factor <- get_pixels(L5TSR_1986_year, L5TSR_1986_2001_training,
 rf_m_factor <- train_classifier(train_data_factor, 
                                 factors=list(year=fac_levels))
 svm_m_factor <- train_classifier(train_data_factor, type="svm",
-                                factors=list(year=fac_levels))
+                                 factors=list(year=fac_levels))
 
 # Also check that factor is not encoded unless levels are explicitly supplied 
 # to train_classifier
@@ -68,4 +80,11 @@ test_that("can run classify on both SVM and random forest models", {
     expect_equivalent(class(svm_cl_factor$classes), "RasterLayer")
     expect_equivalent(class(svm_cl_factor$probs), "RasterBrick")
     expect_equal(svm_cl_factor$codes, expected_codes)
+})
+
+test_that("SVM random forest models roughly match with factors", {
+    expect_less_than(calc_mean_diff(svm_cl$classes, svm_cl_factor$classes), .12)
+    expect_less_than(calc_mean_diff(rf_cl$classes, rf_cl_factor$classes), 16)
+    expect_less_than(calc_mean_diff(svm_cl$probs, svm_cl_factor$probs), .12)
+    expect_less_than(calc_mean_diff(rf_cl$probs, rf_cl_factor$probs), .11)
 })

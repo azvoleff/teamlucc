@@ -10,7 +10,7 @@
 #'
 #' @export
 #' @import caret
-#' @importFrom spatial.tools rasterEngine predict_rasterEngine
+#' @importFrom spatial.tools rasterEngine
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
 #' classification
 #' @param model a trained classifier as output by 
@@ -35,6 +35,9 @@
 #' }
 classify <- function(x, model, classes_file, prob_file, factors=list(), 
                      overwrite=FALSE) {
+    # TODO: Check with Jonathan why below fix is needed
+    if (!("RasterBrick" %in% class(x))) x <- brick(x)
+
     if (!missing(prob_file) && file_test('-f', prob_file) && !overwrite) {
         stop(paste('output file', prob_file, 'already exists and overwrite=FALSE'))
     }
@@ -42,36 +45,56 @@ classify <- function(x, model, classes_file, prob_file, factors=list(),
         stop(paste('output file', classes_file, 'already exists and overwrite=FALSE'))
     }
 
-    # # Below is currently disabled due to issues handling factors in
-    # # predict_rasterEngine
-    # probs <- predict_rasterEngine(object=model, newdata=x, type='prob')
-    #
-    # # spatial.tools can only output the raster package grid format - so output 
-    # # to a tempfile in that format then copy over to the requested final output 
-    # # format if a filename was supplied
-    # if (!missing(prob_file)) {
-    #     probs <- writeRaster(probs, filename=prob_file, overwrite=overwrite, 
-    #                          datatype='FLT4S')
-    # }
+    make_preds <- function(inrast, model, factors, ...) {
+        # First, preserve the names:
+        band_names <- dimnames(inrast)[3][[1]]
 
-    if (missing(prob_file)) {
-        prob_file <- rasterTmpFile()
+        # Flatten the array to a matrix (we lose the names here)
+        inrast_mat <- inrast
+        dim(inrast_mat) <- c(dim(inrast)[1]*dim(inrast)[2], dim(inrast)[3])
+        inrast_df <- as.data.frame(inrast_mat)
+        names(inrast_df) <- band_names
+
+        # Make sure any factor variables are converted to factors and that the 
+        # proper levels are assigned
+        if (length(factors) > 0) {
+            for (n in 1:length(factors)) {
+                factor_var <- names(factors)[n]
+                factor_col <- which(names(inrast_df) == factor_var)
+                inrast_df[, factor_col] <- factor(inrast_df[, factor_col], 
+                                                  levels=factors[[n]])
+            }
+        }
+
+        preds <- predict(model, inrast_df, type="prob")
+
+        preds_array <- array(as.matrix(preds),
+                             dim=c(dim(inrast)[1], dim(inrast)[2], nlevels(model)))
+        return(preds_array)
     }
-    probs <- predict(x, model, type="prob", index=c(1:nlevels(model)), 
-                     factors=factors, filename=prob_file, overwrite=overwrite, 
-                     datatype="FLT4S")
-
+    probs <- rasterEngine(inrast=x, fun=make_preds,
+                          args=list(model=model, factors=factors),
+                          filename=rasterTmpFile(), overwrite=overwrite, 
+                          datatype="FLT4S", .packages=c("randomForest"),
+                          setMinMax=TRUE)
+    # spatial.tools can only output the raster package grid format - so output 
+    # to a tempfile in that format then copy over to the requested final output 
+    # format if a filename was supplied
+    if (!missing(prob_file)) {
+        probs <- writeRaster(probs, filename=prob_file, overwrite=overwrite, 
+                             datatype='FLT4S')
+    }
     names(probs) <- levels(model)
 
     # Calculate the highest probability class from the class probabilities
     if (missing(classes_file)) classes_file <- rasterTmpFile()
     classes <- calc(probs, fun=function(vals) {
-        # Subtract 1 below as software like ENVI starts class codes at zero
-        out <- as.numeric(which(vals == max(vals))) - 1
-        #TODO: Need to handle case of ties (length(out) > 1)
-        if (length(out) != 1) out <- NA
-        return(out)
-    }, datatype='INT2S', filename=classes_file, overwrite=overwrite)
+            # Subtract 1 below as software like ENVI starts class codes at zero
+            out <- as.numeric(which(vals == max(vals))) - 1
+            #TODO: Need to handle case of ties (length(out) > 1)
+            if (length(out) != 1) out <- NA
+            return(out)
+        }, datatype='INT2S', filename=classes_file, overwrite=overwrite)
     names(classes) <- 'prediction'
 
     codes <- data.frame(code=seq(0, (nlevels(model) - 1)), class=levels(model))
