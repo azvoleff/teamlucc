@@ -37,6 +37,21 @@ test_that("SVM random forest models roughly match", {
     expect_less_than(calc_mean_diff(svm_cl$classes, rf_cl$classes), .07)
 })
 
+L5TSR_1986_some_NA <- L5TSR_1986
+L5TSR_1986_some_NA$b1[1:100, 1:100] <- NA
+rf_cl_some_NA <- classify(L5TSR_1986_some_NA, rf_m)
+test_that("classify works with some NAs", {
+    expect_equal(cellStats(is.na(rf_cl_some_NA$classes), "sum"), 10015)
+})
+
+L5TSR_1986_all_NA <- L5TSR_1986
+L5TSR_1986_all_NA$b1 <- NA
+rf_cl_all_NA <- classify(L5TSR_1986_all_NA, rf_m)
+test_that("classify works with ALL NAs", {
+    expect_equal(cellStats(is.na(rf_cl_all_NA$classes), "sum"), 
+                 ncell(L5TSR_1986_all_NA))
+})
+
 ################################################################################
 # Test training and classifying with models with a factor predictor variable
 

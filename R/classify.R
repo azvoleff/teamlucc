@@ -66,10 +66,15 @@ classify <- function(x, model, classes_file, prob_file, factors=list(),
             }
         }
 
-        preds <- predict(model, inrast_df, type="prob")
+        good_obs <- complete.cases(inrast_df)
+        preds <- matrix(NA, nrow=nrow(inrast_df), ncol=nlevels(model))
+        if (sum(good_obs) > 0) {
+            good_preds <- predict(model, inrast_df[good_obs, ], type="prob")
+            preds[which(good_obs), ] <- as.matrix(good_preds)
+        }
 
-        preds_array <- array(as.matrix(preds),
-                             dim=c(dim(inrast)[1], dim(inrast)[2], nlevels(model)))
+        preds_array <- array(preds, dim=c(dim(inrast)[1], dim(inrast)[2], 
+                                          nlevels(model)))
         return(preds_array)
     }
     probs <- rasterEngine(inrast=x, fun=make_preds,
