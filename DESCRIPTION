@@ -1,6 +1,6 @@
 Package: teamlucc
-Version: 0.37
-Date: 2014-08-22
+Version: 0.38
+Date: 2014-08-24
 Title: TEAM land use and cover change data processing toolkit
 Authors@R: c(person("Alex", "Zvoleff", email="azvoleff@conservation.org",
     role=c("aut", "cre")), person("Sarah", "Goslee", role = "ctb"),
