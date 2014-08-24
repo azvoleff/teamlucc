@@ -1,3 +1,10 @@
+teamlucc 0.38
+=============
+* Fix NA handling in classify, and allow parallel classification.
+* Update for new "cfmask" band name in latest CDR imagery.
+* Fix output datatype for fmasks from L1T imagery in auto_preprocess_landsat.
+* Misc doc fixes.
+
 teamlucc 0.36
 =============
 * For IDL dependent functions, add test if ENVI and IDL will load.
