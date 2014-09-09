@@ -305,6 +305,12 @@ auto_preprocess_landsat <- function(image_dirs, prefix, img_type="CDR",
         # Determine image basename for use in naming subsequent files
         meta <- get_metadata(ls_file, img_type)
 
+        if (meta$sensor_string == "LC8") {
+            warning(paste("Cannot process", ls_file,
+                          "- Landsat 8 imagery not yet supported"))
+            next
+        }
+
         image_basename <- paste0(meta$WRS_Path, '-', meta$WRS_Row, '_',
                                  format(meta$aq_date, '%Y-%j'), '_', meta$short_name)
 
