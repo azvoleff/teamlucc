@@ -132,9 +132,9 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
     # Note the min_x and max_x are given for MSAVI2 that has been scaled by 
     # 10,000
     apply_windowed_args <- list(x=MSAVI2_layer, fun=glcm, edge=edge, min_x=0, 
-                             max_x=10000, filename=MSAVI2_glcm_filename, 
-                             overwrite=overwrite, statistics=glcm_statistics, 
-                             na_opt='center')
+                                max_x=10000, filename=MSAVI2_glcm_filename, 
+                                overwrite=overwrite, 
+                                statistics=glcm_statistics, na_opt='center')
     apply_windowed_args <- c(apply_windowed_args, dots)
     MSAVI2_glcm <- do.call(apply_windowed, apply_windowed_args)
     names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')

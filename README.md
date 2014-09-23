@@ -138,7 +138,7 @@ examples of a number of specific applications of `teamlucc`, including:
 * [Image 
   classification](http://www.azvoleff.com/articles/image-classification-with-teamlucc)
 
-## Installing `teamlucc` development version
+## Installing `teamlucc` Development Version
 
 If you want the very latest version of `teamlucc`, you can install the 
 development version. Be aware this version might not install as it is not as 

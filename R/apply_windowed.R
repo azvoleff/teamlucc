@@ -1,7 +1,7 @@
 #' Apply a raster function with edge effects over a series of blocks
 #'
 #' This function can be useful when applying windowed functions over a raster, 
-#' as with \code{glcm}. This function allows windows functions that have edge 
+#' as with \code{glcm}. This function allows windowed functions that have edge 
 #' effects to be applied over a raster in block-by-block fashion.  
 #' \code{apply_windowed} avoids the striping that would result if the edge 
 #' effects were ignored.
@@ -9,8 +9,8 @@
 #' @export
 #' @param x a \code{Raster*}
 #' @param fun the function to apply
-#' @param edge length 2 numberic with number of rows on top and bottom with 
-#' edge effects, defined as c(top, bottom)
+#' @param edge length 2 numeric with number of rows on top and bottom with edge 
+#' effects, defined as c(top, bottom)
 #' @param chunksize the number of rows to read per block (passed to 
 #' \code{raster} \code{blockSize} function.
 #' @param filename file on disk to save \code{Raster*} to (optional)
