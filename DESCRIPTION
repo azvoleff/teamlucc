@@ -20,7 +20,7 @@ Imports:
     rgeos,
     rgdal,
     mgcv,
-    dplyr,
+    dplyr (>= 0.3.0.2),
     lmodel2,
     reshape2,
     ggplot2,

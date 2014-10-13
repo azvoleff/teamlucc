@@ -159,7 +159,7 @@ setGeneric("subsample", function(x, size, strata="sources", type="training",
 
 #' @rdname subsample
 #' @aliases subsample,pixel_data,numeric-method
-#' @importFrom dplyr group_by sample_frac
+#' @importFrom dplyr group_by sample_frac sample_n
 setMethod("subsample", signature(x="pixel_data", size="numeric"),
 function(x, size, strata, type, flag, classes) {
     row_IDs <- data.frame(y=x@y,
@@ -182,9 +182,9 @@ function(x, size, strata, type, flag, classes) {
         row_IDs <- group_by(row_IDs, y)
     }
     if (size < 1) {
-        samp_rows <- dplyr:::sample_frac.grouped_df(row_IDs, size)$row_num
+        samp_rows <- sample_frac.grouped_df(row_IDs, size)$row_num
     } else {
-        samp_rows <- dplyr:::sample_n.grouped_df(row_IDs, size)$row_num
+        samp_rows <- sample_n.grouped_df(row_IDs, size)$row_num
     }
     if (flag) {
         if (type == 'testing') {
