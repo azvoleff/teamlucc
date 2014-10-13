@@ -112,21 +112,3 @@ apply_windowed <- function(x, fun, edge=c(0, 0), chunksize=NULL, filename='',
 
     return(out)
 }
-
-calc_glcm_edge <- function(shift, window) {
-    if ((length(shift) == 2) && is.numeric(shift)) shift <- list(shift)
-    if ((!(is.vector(shift) && all(lapply(shift, length) == 2)) &&
-         !(is.matrix(shift) && ncol(shift) == 2)) ||
-        !(all(floor(unlist(shift)) == unlist(shift)))) {
-        stop('shift must be a list of length 2 integer vectors, or a 2 column matrix')
-    }
-    if (!is.matrix(shift)) {
-        shift <- matrix(unlist(shift), ncol=2, byrow=TRUE)
-    }
-    neg_shifts <- shift[, 2][shift[, 2] < 0]
-    pos_shifts <- shift[, 2][shift[, 2] > 0]
-    if (length(neg_shifts) == 0) neg_shifts <- 0
-    if (length(pos_shifts) == 0) pos_shifts <- 0
-    return(c(abs(min(neg_shifts)) + ceiling(window[2] / 2) - 1,
-             abs(max(pos_shifts)) + ceiling(window[2] / 2) - 1))
-}

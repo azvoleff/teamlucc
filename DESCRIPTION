@@ -15,7 +15,7 @@ Imports:
     sp,
     foreach,
     iterators,
-    glcm,
+    glcm (>= 1.0),
     wrspathrow,
     rgeos,
     rgdal,
