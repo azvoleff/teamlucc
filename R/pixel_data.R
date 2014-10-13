@@ -182,9 +182,9 @@ function(x, size, strata, type, flag, classes) {
         row_IDs <- group_by(row_IDs, y)
     }
     if (size < 1) {
-        samp_rows <- sample_frac.grouped_df(row_IDs, size)$row_num
+        samp_rows <- sample_frac(row_IDs, size)$row_num
     } else {
-        samp_rows <- sample_n.grouped_df(row_IDs, size)$row_num
+        samp_rows <- sample_n(row_IDs, size)$row_num
     }
     if (flag) {
         if (type == 'testing') {
@@ -412,6 +412,7 @@ get_pixels <- function(x, polys, class_col, training=1, src='none') {
         stop('"training" must be a column name, vector of same length as polys, or length 1 numeric')
     }
     pixels <- extract(x, polys, small=TRUE)
+    n <- NULL # fix for R CMD check
     pixels <- foreach (n=1:length(pixels), .combine=rbind) %do% {
         pixel_set <- data.frame(pixels[[n]])
         pixel_set <- cbind(ID=polys$ID[n], pixel_set)
