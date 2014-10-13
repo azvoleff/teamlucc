@@ -10,7 +10,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
-#' @import foreach
+#' @importFrom foreach foreach %dopar%
 #' @importFrom iterators iter
 #' @param x the input image, as a matrix or raster
 #' @param method the thresholding method. Currently only "huang" is 

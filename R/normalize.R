@@ -9,7 +9,7 @@
 #'
 #' @export
 #' @importFrom iterators iter
-#' @import foreach
+#' @importFrom foreach foreach %dopar%
 #' @importFrom lmodel2 lmodel2
 #' @param x a \code{Raster*} to use as the base image
 #' @param y a \code{Raster*} to normalize to the base image

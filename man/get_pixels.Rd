@@ -11,7 +11,8 @@ The data will be extracted from each layer in a \code{RasterBrick} or
 \code{RasterStack}.}
 
 \item{polys}{a \code{SpatialPolygonsDataFrame} with polygons, each of which
-has been assigned to a particular class (using the \code{class_col}}
+has been assigned to a particular class (using the values in
+\code{class_col})}
 
 \item{class_col}{the name of the column containing the response variable
 (for example the land cover type of each pixel)}

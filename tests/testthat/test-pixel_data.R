@@ -16,7 +16,7 @@ test_that("basic pixel_data methods work", {
     expect_equal(n_test(train_data, 'Forest'), 20)
 })
 
-test_that("pixel_data extract methods works", {
+test_that("pixel_data extract methods work", {
     expect_equal(length(train_data['Forest']), 68)
     expect_equal(length(train_data['NonForest']), 52)
 })

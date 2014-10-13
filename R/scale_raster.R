@@ -57,7 +57,7 @@ setMethod("scale_raster", signature(x="RasterLayer"),
     }
 )
 
-#' @import foreach
+#' @importFrom foreach foreach %dopar%
 scale_stack_or_brick <- function(x, power_of, max_out, round_output, do_scaling) {
     unscaled_layer=NULL
     if (do_scaling) {

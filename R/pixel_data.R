@@ -338,11 +338,13 @@ function(x, value) {
 #' Extract observed data for use in a classification (training or testing)
 #'
 #' @export
+#' @importFrom foreach foreach %do%
 #' @param x a \code{Raster*} object from which observed data will be extracted.  
 #' The data will be extracted from each layer in a \code{RasterBrick} or 
 #' \code{RasterStack}.
 #' @param polys a \code{SpatialPolygonsDataFrame} with polygons, each of which 
-#' has been assigned to a particular class (using the \code{class_col}
+#' has been assigned to a particular class (using the values in 
+#' \code{class_col})
 #' @param class_col the name of the column containing the response variable 
 #' (for example the land cover type of each pixel)
 #' @param training indicator of which polygons to use in training. Can be: 1) a 
@@ -409,8 +411,11 @@ get_pixels <- function(x, polys, class_col, training=1, src='none') {
     } else {
         stop('"training" must be a column name, vector of same length as polys, or length 1 numeric')
     }
-    pixels <- extract(x, polys, small=TRUE, df=TRUE)
-
+    pixels <- extract(x, polys, small=TRUE)
+    pixels <- foreach (n=1:length(pixels), .combine=rbind) %do% {
+        pixel_set <- data.frame(pixels[[n]])
+        pixel_set <- cbind(ID=polys$ID[n], pixel_set)
+    }
     poly_rows <- pixels$ID
     pixels <- pixels[!(names(pixels) == 'ID')]
 

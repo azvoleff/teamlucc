@@ -10,7 +10,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
-#' @import foreach
+#' @importFrom foreach foreach %dopar%
 #' @param x an image to correct
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 
 #' layers.  The first layer should be the slope, the second layer should be 

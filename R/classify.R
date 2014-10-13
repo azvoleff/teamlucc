@@ -6,7 +6,7 @@
 #' occurrence of each class.
 #'
 #' This function will run in parallel if a parallel backend is registered with 
-#' \code{\link{foreach}} - TEMPORARILY DISABLED.
+#' \code{\link{foreach}}.
 #'
 #' @export
 #' @import caret
