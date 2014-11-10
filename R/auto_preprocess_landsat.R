@@ -565,7 +565,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         
         return(data.frame(file_base=file_base, file_format=file_format, 
                           bands_file=output_filename, 
-                          masks_file=mask_stack_path))
+                          masks_file=mask_stack_path, stringsAsFactors=FALSE))
     }
 
     return(ret)
