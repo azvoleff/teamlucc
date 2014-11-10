@@ -3,22 +3,16 @@
 \alias{auto_preprocess_landsat}
 \title{Preprocess surface reflectance imagery from the Landsat CDR archive}
 \usage{
-auto_preprocess_landsat(image_dirs, prefix, img_type = "CDR", tc = FALSE,
-  dem_path = NULL, aoi = NULL, output_path = NULL, mask_type = "fmask",
+auto_preprocess_landsat(image_dirs, prefix, tc = FALSE, dem_path = NULL,
+  aoi = NULL, output_path = NULL, mask_type = "fmask",
   mask_output = FALSE, n_cpus = 1, cleartmp = FALSE, overwrite = FALSE,
   of = "GTiff", ext = "tif", notify = print, verbose = FALSE)
 }
 \arguments{
-\item{image_dirs}{list of paths to a set of Landsat CDR image files in HDF
-format}
+\item{image_dirs}{list of paths to a set of Landsat CDR image files as
+downloaded from ESPA and extracted by \code{\link{espa_extract}}}
 
 \item{prefix}{string to use as a prefix for all filenames}
-
-\item{img_type}{type of Landsat imagery to preprocess. Can be "CDR" for
-Landsat Climate Data Record (CDR) imagery in HDR format, or "L1T" for
-Standard Terrain Correction (Level 1T) imagery. Note that if L1T imagery is
-used, fmask must be run locally (see https://code.google.com/p/fmask) prior
-to using \code{auto_preprocess_landsat}.}
 
 \item{tc}{whether to topographically correct imagery (if \code{TRUE}, then
 \code{dem_path} must be specified)}
@@ -87,7 +81,9 @@ as fill (fill_QA=255), cloud (cloud_QA=255), cloud shadow
 (fmask=4) or cloud shadow (fmask=2).  The combined option combines the "6S"
 and "fmask" approaches to masks out areas coded as fill, cloud, cloud
 shadow, or adjacent to cloud using either method. Note that "fmask" is the
-only supported option when \code{img_type} is L1T.
+only supported option when \code{file_format} is L1T. Further, if  L1T imagery
+is used, fmask must be run locally (see https://code.google.com/p/fmask)
+prior to using \code{auto_preprocess_landsat}.
 
 Prior to running \code{auto_preprocess_landsat}, \code{\link{espa_extract}}
 should be used to extract the original zipfiles supplied by USGS. To perform
@@ -95,8 +91,8 @@ topographic correction with \code{auto_preprocess_landsat}, first run
 \code{\link{auto_setup_dem}} to preprocess a set of DEM tiles. Then run
 \code{auto_preprocess_landsat} with the \code{tc=TRUE} option.
 
-If topographic correction is being performed, it will be run in parallel if
-a parallel backend is registered with \code{\link{foreach}}.
+This function will run in parallel if a parallel backend is registered with
+\code{\link{foreach}}.
 }
 \seealso{
 \code{\link{espa_extract}}, \code{\link{unstack_ledapscdr}},
