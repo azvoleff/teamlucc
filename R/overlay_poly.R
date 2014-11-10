@@ -4,6 +4,7 @@
 #' a satellite image.
 #'
 #' @export
+#' @import raster
 #' @importFrom grid unit
 #' @import ggplot2
 #' @param x image as a \code{Raster*} object

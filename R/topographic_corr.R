@@ -10,6 +10,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
+#' @import raster
 #' @importFrom foreach foreach %dopar%
 #' @param x an image to correct
 #' @param slopeaspect a \code{RasterBrick} or \code{RasterStack} with two 

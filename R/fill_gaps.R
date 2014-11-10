@@ -109,6 +109,7 @@ fill_gaps <- function(slc_off, fill, timeseries=c(), out_base=NULL, ext="tif",
     return(filled)
 }
 
+#' @import raster
 fill_gaps_idl <- function(slc_off, fill, timeseries, out_base, sample_size, 
                           size_wind, class_num, DN_min, DN_max, patch_long, 
                           idl, algorithm, ext, verbose) {

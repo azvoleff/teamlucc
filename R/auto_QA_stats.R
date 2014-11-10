@@ -19,6 +19,7 @@ get_freq <- function(band, value, freq_table) {
 #' Calculate statistics on imagery within an AOI
 #'
 #' @export
+#' @import raster
 #' @importFrom stringr str_extract
 #' @param image_dirs list of paths to a set of Landsat CDR image files in 
 #' GeoTIFF format as output by the \code{unstack_ledapscdr} function.

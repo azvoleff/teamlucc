@@ -34,6 +34,7 @@ format_IDL_param <- function(varname, varvalue) {
     return(param)
 }
 
+#' @import raster
 #' @importFrom tools file_path_sans_ext
 cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              algorithm, num_class, min_pixel, max_pixel, 
@@ -164,6 +165,7 @@ call_cpp_cloud_fill <- function(cloudy, clear, cloud_mask, algorithm, dims,
     return(filled)
 }
 
+#' @import raster
 #' @importFrom spatial.tools rasterEngine
 cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm, 
                            num_class, min_pixel, max_pixel, cloud_nbh, DN_min, 
@@ -248,6 +250,7 @@ cloud_remove_R <- function(cloudy, clear, cloud_mask, out_name, algorithm,
 #' reflectance in unobserved (cloudy) areas.
 #'
 #' @export
+#' @import raster
 #' @param cloudy the cloudy image (base image) as a \code{Raster*}
 #' @param clear the clear image as a \code{Raster*} to use for filling 
 #' \code{img_cloudy}

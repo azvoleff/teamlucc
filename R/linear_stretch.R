@@ -14,6 +14,7 @@
 #' range between zero and \code{max_val} (default of \code{max_val} is 1).
 #'
 #' @export
+#' @import raster
 #' @param x image to stretch
 #' @param pct percent stretch
 #' @param max_val maximum value of final output (image will be rescaled to 

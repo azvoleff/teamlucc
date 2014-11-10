@@ -10,6 +10,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
+#' @import raster
 #' @importFrom foreach foreach %dopar%
 #' @importFrom iterators iter
 #' @param x the input image, as a matrix or raster

@@ -6,6 +6,7 @@
 #' pixels in the input raster.
 #'
 #' @export
+#' @import raster
 #' @importFrom rgdal writeOGR
 #' @param x a \code{Raster*}
 #' @param size the sample size (number of sample polygons to return)

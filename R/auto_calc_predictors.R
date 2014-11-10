@@ -35,6 +35,7 @@
 #'     4: \tab west facing (225-315 degrees) \cr
 #' }
 #' @export
+#' @import raster
 #' @importFrom glcm glcm
 #' @importFrom stringr str_extract
 #' @param x path to a preprocessed image as output by 

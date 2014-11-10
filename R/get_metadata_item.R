@@ -3,7 +3,7 @@
 #' GDAL PAM format metadata files end in ".aux.xml".
 #'
 #' @export
-#' @importFrom raster extension
+#' @import raster
 #' @importFrom XML xmlInternalTreeParse xpathApply xmlValue
 #' @param x an image file that has an accompanying GDAL PAM format metadata 
 #' file (ending in .aux.xml)

@@ -1,6 +1,7 @@
 #' Assign class labels to classification file
 #'
 #' @export
+#' @import raster
 #' @importFrom rgdal writeGDAL
 #' @importFrom sp SpatialPixelsDataFrame
 #' @param x classified image as \code{RasterLayer}

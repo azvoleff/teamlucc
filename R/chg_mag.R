@@ -12,6 +12,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
+#' @import raster
 #' @importFrom spatial.tools rasterEngine
 #' @param t1p time 0 posterior probability \code{Raster*}
 #' @param t2p time 1 posterior probability \code{Raster*}

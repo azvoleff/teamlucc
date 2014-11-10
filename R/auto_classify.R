@@ -5,6 +5,7 @@
 #' the \code{auto_generate_predictors} function.
 #'
 #' @export
+#' @import raster
 #' @importFrom rgdal readOGR
 #' @importFrom sp spTransform
 #' @importFrom tools file_path_sans_ext

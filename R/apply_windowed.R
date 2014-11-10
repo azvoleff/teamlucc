@@ -7,6 +7,7 @@
 #' effects were ignored.
 #'
 #' @export
+#' @import raster
 #' @param x a \code{Raster*}
 #' @param fun the function to apply
 #' @param edge length 2 numeric with number of rows on top and bottom with edge 

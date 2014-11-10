@@ -13,6 +13,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
+#' @import raster
 #' @importFrom foreach foreach %dopar%
 #' @importFrom tools file_path_sans_ext
 #' @param image_files list of filenames for images to normalize

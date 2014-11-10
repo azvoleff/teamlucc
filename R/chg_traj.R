@@ -5,6 +5,7 @@
 #' using the "singleband pseudocolor" band rendering option.
 #'
 #' @export
+#' @import raster
 #' @param x a lookup table as output by \code{traj_lut}
 #' @param out_file filename for the output file
 #' @param color_codes an (optional) list of colors to use in the color table. Should 

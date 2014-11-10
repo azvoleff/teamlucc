@@ -8,6 +8,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
+#' @import raster
 #' @importFrom iterators iter
 #' @importFrom foreach foreach %dopar%
 #' @importFrom lmodel2 lmodel2

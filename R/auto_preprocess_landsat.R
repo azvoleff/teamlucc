@@ -315,6 +315,7 @@ build_mask_vrt <- function(file_base, mask_vrt_file, file_format) {
 #' \code{\link{foreach}}.
 #'
 #' @export
+#' @import raster
 #' @importFrom foreach foreach %dopar%
 #' @importFrom rgeos gIntersection
 #' @importFrom wrspathrow pathrow_poly

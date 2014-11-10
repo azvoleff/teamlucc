@@ -312,6 +312,7 @@ setMethod("accuracy", signature(x="train", test_data="ANY", pop="ANY", class_col
     }
 )
 
+#' @import raster
 #' @rdname accuracy
 #' @aliases accuracy,RasterLayer,pixel_data,ANY,missing,ANY-method
 setMethod("accuracy", signature(x="RasterLayer", test_data="pixel_data", pop="ANY", class_col="missing", reclass_mat="ANY"),

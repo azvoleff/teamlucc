@@ -38,7 +38,7 @@ setMethod("NDVI", signature(red="matrix", nir="matrix"),
 
 #' @rdname NDVI
 #' @aliases NDVI,RasterLayer,RasterLayer,RasterLayer-method
-#' @importFrom raster overlay
+#' @import raster
 setMethod("NDVI", signature(red="RasterLayer", nir="RasterLayer"),
     function(red, nir, ...) {
         ret  <- overlay(red, nir, fun=function(red, nir) {
@@ -51,7 +51,7 @@ setMethod("NDVI", signature(red="RasterLayer", nir="RasterLayer"),
 #' Calculates the Enhanced Vegetation Index (EVI)
 #'
 #' @export EVI
-#' @importFrom raster overlay
+#' @import raster
 #' @param blue blue
 #' @param red red
 #' @param nir near-infrared
@@ -93,7 +93,7 @@ setMethod("EVI", signature(blue="matrix", red="matrix", nir="matrix"),
 
 #' @rdname EVI
 #' @aliases EVI,RasterLayer,RasterLayer,RasterLayer-method
-#' @importFrom raster overlay
+#' @import raster
 setMethod("EVI", signature(blue="RasterLayer", red="RasterLayer", 
                            nir="RasterLayer"),
     function(blue, red, nir, ...) {
@@ -110,7 +110,7 @@ setMethod("EVI", signature(blue="RasterLayer", red="RasterLayer",
 #' MSAVI2 from Qi et al. (1994).
 #'
 #' @export MSAVI2
-#' @importFrom raster overlay
+#' @import raster
 #' @param red red
 #' @param nir near-infrared
 #' @param ... additional arguments as for \code{\link{writeRaster}}
@@ -149,7 +149,7 @@ setMethod("MSAVI2", signature(red="matrix", nir="matrix"),
 
 #' @rdname MSAVI2
 #' @aliases MSAVI2,RasterLayer,RasterLayer,RasterLayer-method
-#' @importFrom raster overlay
+#' @import raster
 setMethod("MSAVI2", signature(red="RasterLayer", nir="RasterLayer"),
     function(red, nir, ...) {
         ret  <- overlay(red, nir, fun=function(red, nir) {
@@ -162,7 +162,7 @@ setMethod("MSAVI2", signature(red="RasterLayer", nir="RasterLayer"),
 #' Calculates the Atmospherically Resistant Vegetation Index (ARVI)
 #'
 #' @export ARVI
-#' @importFrom raster overlay
+#' @import raster
 #' @param blue blue
 #' @param red red
 #' @param nir near-infrared
@@ -203,7 +203,7 @@ setMethod("ARVI", signature(blue="matrix", red="matrix", nir="matrix"),
 
 #' @rdname ARVI
 #' @aliases ARVI,RasterLayer,RasterLayer,RasterLayer-method
-#' @importFrom raster overlay
+#' @import raster
 setMethod("ARVI", signature(blue="RasterLayer", red="RasterLayer", 
                             nir="RasterLayer"),
     function(blue, red, nir, ...) {

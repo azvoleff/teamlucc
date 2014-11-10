@@ -25,6 +25,7 @@
 #' details on the parameters.
 #'
 #' @export
+#' @import raster
 #' @param x image as a \code{RasterLayer}
 #' @param slope the slope in radians as a \code{RasterLayer}
 #' @param aspect the aspect in radians as a \code{RasterLayer}

@@ -338,6 +338,7 @@ function(x, value) {
 #' Extract observed data for use in a classification (training or testing)
 #'
 #' @export
+#' @import raster
 #' @importFrom foreach foreach %do%
 #' @param x a \code{Raster*} object from which observed data will be extracted.  
 #' The data will be extracted from each layer in a \code{RasterBrick} or 

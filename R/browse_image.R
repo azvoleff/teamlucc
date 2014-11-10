@@ -1,3 +1,4 @@
+#' @import raster
 plotprep <- function(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=NULL) {
     if (ncell(x) > maxpixels) {
         x <- sampleRegular(x, size=maxpixels, asRaster=TRUE, useGDAL=TRUE)
@@ -17,6 +18,7 @@ plotprep <- function(x, maxpixels=500000, DN_min=0, DN_max=255, x_fun=NULL) {
 #' Simple function to make small preview plot from large raster image
 #'
 #' @export
+#' @import raster
 #' @param x input \code{RasterBrick} or \code{RasterStack} with at least three 
 #' bands
 #' @param m an optional mask \code{RasterLayer} to output below the browse 

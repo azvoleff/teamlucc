@@ -1,6 +1,7 @@
 #' Function to convert TIMESAT .tts binary format to an R dataframe.
 #'
 #' @export
+#' @import raster
 #' @param x A .tts file output by TIMESAT
 #' @return A data.frame containing 'row' and 'col' columns giving the the row 
 #' and column of a pixel in the input image to timesat, and then a number of 

@@ -1,3 +1,4 @@
+#' @import raster
 pct_clouds <- function(cloud_mask) {
     num_clouds <- cellStats(cloud_mask == 1, stat='sum', na.rm=TRUE)
     num_clear <- cellStats(cloud_mask == 0, stat='sum', na.rm=TRUE)
@@ -30,6 +31,7 @@ pct_clouds <- function(cloud_mask) {
 #' \code{auto_cloud_fill} script.
 #'
 #' @export
+#' @import raster
 #' @importFrom tools file_path_sans_ext
 #' @importFrom lubridate as.duration new_interval
 #' @importFrom stringr str_extract

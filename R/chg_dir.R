@@ -8,6 +8,7 @@
 #' map areas of change and no-change.
 #'
 #' @export
+#' @import raster
 #' @importFrom spatial.tools rasterEngine
 #' @importFrom tools file_path_sans_ext
 #' @param t1p time 0 posterior probability \code{Raster*}

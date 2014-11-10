@@ -1,6 +1,7 @@
 #' Function to convert TIMESAT tts data.frame an R raster.
 #'
 #' @export
+#' @import raster
 #' @param x A TTS data.frame as output by tts2df
 #' @param base_image A string giving the location of a raster file to use 
 #' for georeferencing the output raster. Use one of the original raster files 

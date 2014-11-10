@@ -27,6 +27,7 @@ normalize_extent <- function(te, res=c(30, 30)) {
 #' your operating system.
 #'
 #' @export
+#' @import raster
 #' @importFrom wrspathrow pathrow_num
 #' @importFrom rgdal readOGR writeOGR
 #' @importFrom sp spTransform is.projected

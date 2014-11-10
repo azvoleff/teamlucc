@@ -9,6 +9,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export scale_raster
+#' @import raster
 #' @import methods
 #' @seealso \code{\link{dataType}}
 #' @param x a \code{Raster*} object

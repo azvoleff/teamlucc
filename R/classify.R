@@ -9,6 +9,7 @@
 #' \code{\link{foreach}}.
 #'
 #' @export
+#' @import raster
 #' @import caret
 #' @importFrom spatial.tools rasterEngine
 #' @param x a \code{Raster*} image with the predictor layer(s) for the 
