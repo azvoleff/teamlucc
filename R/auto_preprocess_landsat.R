@@ -188,13 +188,21 @@ build_band_vrt <- function(file_base, band_vrt_file, file_format) {
             sds[grepl(paste0(':(', image_band, ')$'), sds)]
         }
         gdalbuildvrt(band_sds, band_vrt_file, separate=TRUE)
-    } else if (file_format %in% c("ESPA_CDR_ENVI", "ESPA_CDR_TIFF", "ESPA_CDR_HDF")) {
+    } else if (file_format == "ESPA_CDR_HDF") {
         ls_file <- paste0(file_base, '.hdf')
         sds <- get_subdatasets(ls_file)
         band_sds <- foreach(image_band=image_bands) %do% {
             sds[grepl(paste0(image_band, '$'), sds)]
         }
         gdalbuildvrt(band_sds, band_vrt_file, separate=TRUE)
+    } else if (file_format == "ESPA_CDR_ENVI") {
+        envi_files <- paste0(paste(file_base, image_bands, sep='_sr_'), '.img')
+        stopifnot(all(file_test('-f', envi_files)))
+        gdalbuildvrt(envi_files, band_vrt_file, separate=TRUE)
+    } else if (file_format == "ESPA_CDR_TIFF") {
+        tiff_files <- paste0(paste(file_base, image_bands, sep='_sr_'), '.tif')
+        stopifnot(all(file_test('-f', tiff_files)))
+        gdalbuildvrt(tiff_files, band_vrt_file, separate=TRUE)
     } else if (file_format == "L1T") {
         ls_files <- dir(dirname(file_base),
                         pattern=paste0(basename(file_base), '_B[123457].((TIF)|(tif))$'),
@@ -225,10 +233,23 @@ build_mask_vrt <- function(file_base, mask_vrt_file, file_format) {
         }
         stopifnot(length(mask_sds) == 5)
         gdalbuildvrt(mask_sds, mask_vrt_file, separate=TRUE, srcnodata='None')
-    } else if (file_format %in% c("ESPA_CDR_ENVI", "ESPA_CDR_TIFF", "ESPA_CDR_HDF")) {
+    } else if (file_format == "ESPA_CDR_TIFF") {
+        mask_bands <- c('sr_fill_qa', 'cfmask', 'sr_cloud_qa', 
+                        'sr_cloud_shadow_qa', 'sr_adjacent_cloud_qa')
+        tiff_files <- paste0(paste(file_base, mask_bands, sep='_'), '.tif')
+        stopifnot(all(file_test('-f', tiff_files)))
+        gdalbuildvrt(tiff_files, mask_vrt_file, separate=TRUE, srcnodata='None')
+        
+    } else if (file_format == "ESPA_CDR_ENVI") {
+        mask_bands <- c('sr_fill_qa', 'cfmask', 'sr_cloud_qa', 
+                        'sr_cloud_shadow_qa', 'sr_adjacent_cloud_qa')
+        envi_files <- paste0(paste(file_base, mask_bands, sep='_'), '.img')
+        stopifnot(all(file_test('-f', envi_files)))
+        gdalbuildvrt(envi_files, mask_vrt_file, separate=TRUE, srcnodata='None')
+    } else if (file_format == "ESPA_CDR_HDF") {
         ls_file <- paste0(file_base, '.hdf')
-        mask_bands <- c('sr_fill_qa', 'cfmask', 'sr_cloud_qa', 'sr_cloud_shadow_qa', 
-                        'sr_adjacent_cloud_qa')
+        mask_bands <- c('sr_fill_qa', 'cfmask', 'sr_cloud_qa', 
+                        'sr_cloud_shadow_qa', 'sr_adjacent_cloud_qa')
         sds <- get_subdatasets(ls_file)
         mask_sds <- foreach(mask_band=mask_bands) %do% {
             sds[grepl(paste0(':(', mask_band, ')$'), sds)]
