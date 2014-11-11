@@ -1,3 +1,19 @@
+teamlucc 0.42
+=============
+* Fix for "invalid multibyte read" error in ee_read on Linux (reported by 
+  Martin Wegmann).
+
+teamlucc 0.40
+=============
+* Support all current ESPA CDR output formats for surface reflectance imagery 
+  (ENVI, HDF-EOS2, and GeoTIFF).
+* "auto_preprocess_landsat" now returns a list of the processed datafiles.
+* Depend on glcm >= 1.0 (which properly handles images that can't fit in 
+  memory).
+* Warn when preprocessing of Landsat 8 images is attempted.
+* Lots of R CMD check adjustments.
+* Misc doc fixes.
+
 teamlucc 0.38
 =============
 * Fix NA handling in classify, and allow parallel classification.
