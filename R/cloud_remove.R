@@ -36,6 +36,7 @@ format_IDL_param <- function(varname, varvalue) {
 
 #' @import raster
 #' @importFrom tools file_path_sans_ext
+#' @importFrom sp proj4string proj4string<-
 cloud_remove_IDL <- function(cloudy, clear, cloud_mask, out_name,
                              algorithm, num_class, min_pixel, max_pixel, 
                              cloud_nbh, DN_min, DN_max, 

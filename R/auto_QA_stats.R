@@ -20,6 +20,7 @@ get_freq <- function(band, value, freq_table) {
 #'
 #' @export
 #' @import raster
+#' @importFrom sp CRS
 #' @importFrom stringr str_extract
 #' @param image_dirs list of paths to a set of Landsat CDR image files in 
 #' GeoTIFF format as output by the \code{unstack_ledapscdr} function.

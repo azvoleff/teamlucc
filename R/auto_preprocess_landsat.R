@@ -126,7 +126,7 @@ get_metadata <- function(file_base, file_format) {
         # Build a shortname based on satellite and file_format that is consistent 
         # with the format of the CDR image shortnames
         satellite <- str_extract(get_mtl_item('SPACECRAFT_ID', mtl_txt), '[4578]')
-        sensor_string <- str_extract(basename(ls_file), '^((LT[45])|(LE7)|(LC8))')
+        sensor_string <- str_extract(basename(file_base), '^((LT[45])|(LE7)|(LC8))')
         meta$short_name  <- paste0(substr(sensor_string, 1, 1),
                                    substr(sensor_string, 3, 3),
                                    substr(sensor_string, 2, 2), file_format)
@@ -181,6 +181,7 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
 #' @importFrom gdalUtils get_subdatasets gdalbuildvrt
 build_band_vrt <- function(file_base, band_vrt_file, file_format) {
     image_bands <- c('band1', 'band2', 'band3', 'band4', 'band5', 'band7')
+    image_band <- NULL # keep R CMD check happy
     if (file_format == "ESPA_CDR_OLD") {
         ls_file <- paste0(file_base, '.hdf')
         sds <- get_subdatasets(ls_file)
@@ -259,7 +260,7 @@ build_mask_vrt <- function(file_base, mask_vrt_file, file_format) {
     } else if (file_format == "L1T") {
         mask_bands <- c('fill_QA', 'fmask_band')
         fmask_file <- dir(dirname(file_base),
-                          pattern=paste0(basename(ls_file_base), '_MTLFmask$'),
+                          pattern=paste0(basename(file_base), '_MTLFmask$'),
                           full.names=TRUE)
         # Calculate a QA mask file from the fmask file, since teamlucc expects 
         # this file as part of the mask stack.
@@ -321,7 +322,7 @@ build_mask_vrt <- function(file_base, mask_vrt_file, file_format) {
 #' @importFrom wrspathrow pathrow_poly
 #' @importFrom tools file_path_sans_ext
 #' @importFrom gdalUtils gdalwarp
-#' @importFrom sp is.projected
+#' @importFrom sp is.projected CRS proj4string bbox proj4string<-
 #' @param image_dirs list of paths to a set of Landsat CDR image files as 
 #' downloaded from ESPA and extracted by \code{\link{espa_extract}}
 #' @param prefix string to use as a prefix for all filenames
@@ -404,6 +405,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
         stopifnot(mask_type %in% c('fmask', '6S', 'both'))
     }
 
+    file_base <- file_format <- NULL # keep R CMD check happy
     ret <- foreach (file_base=ls_files$file_bases, 
                     file_format=ls_files$file_formats,
                     .packages=c('rgeos', 'wrspathrow', 'tools',

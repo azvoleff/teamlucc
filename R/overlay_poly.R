@@ -6,6 +6,7 @@
 #' @export
 #' @import raster
 #' @importFrom grid unit
+#' @importFrom sp CRS proj4string
 #' @import ggplot2
 #' @param x image as a \code{Raster*} object
 #' @param y polygon to overlay, as \code{SpatialPolygonDataFrame}

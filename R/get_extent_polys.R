@@ -6,6 +6,7 @@
 #'
 #' @export
 #' @import raster
+#' @importFrom sp proj4string proj4string<- spChFIDs
 #' @importFrom maptools spRbind
 #' @param rast_list a \code{Raster*} object, or \code{list} of\code{Raster*} objects
 #' @return \code{SpatialPolygonDataFrame} with the extent of each raster object 

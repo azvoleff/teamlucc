@@ -7,6 +7,7 @@
 #'
 #' @export
 #' @import raster
+#' @importFrom sp CRS
 #' @importFrom rgdal CRSargs
 #' @importFrom stringr str_extract
 #' @param x a proj4string to compare with \code{y}

@@ -48,6 +48,8 @@
 #' output file format).
 #' @param overwrite whether to overwrite existing files (otherwise an error 
 #' will be raised)
+#' @param glcm_statistics list of glcm statistics to calculate (see 
+#' \code{\link{glcm}})
 #' @param ...  additional arguments passed to \code{\link{glcm}}, such as
 #' \code{n_grey}, \code{window}, or \code{shift}
 #' @param notify notifier to use (defaults to \code{print} function). See the 
@@ -55,7 +57,8 @@
 #' \code{notify} function should accept a string as the only argument.
 auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL, 
                                  ext='tif', overwrite=FALSE, notify=print,
-                                 ...) {
+                                 glcm_statistics=c('mean', 'variance', 
+                                                   'dissimilarity'), ...) {
     if (!file_test("-f", x)) {
         stop(paste("input image", x, "does not exist"))
     }
@@ -116,8 +119,8 @@ auto_calc_predictors <- function(x, dem, slopeaspect, output_path=NULL,
     # Note the min_x and max_x are given for MSAVI2 that has been scaled by 
     # 10,000
     MSAVI2_glcm <- glcm(MSAVI2_layer,
-                        statistics=c('mean', 'variance', 'dissimilarity'), 
-                        min_x=0, max_x=10000,  na_opt='center')
+                        statistics=glcm_statistics, 
+                        min_x=0, max_x=10000,  na_opt='center', ...)
     names(MSAVI2_glcm) <- paste('glcm', glcm_statistics, sep='_')
     timer <- stop_timer(timer, label='Calculating GLCM textures')
 

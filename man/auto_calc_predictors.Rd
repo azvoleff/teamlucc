@@ -4,7 +4,8 @@
 \title{Calculate predictor layers for a classification}
 \usage{
 auto_calc_predictors(x, dem, slopeaspect, output_path = NULL, ext = "tif",
-  overwrite = FALSE, notify = print, ...)
+  overwrite = FALSE, notify = print, glcm_statistics = c("mean",
+  "variance", "dissimilarity"), ...)
 }
 \arguments{
 \item{x}{path to a preprocessed image as output by
@@ -26,6 +27,9 @@ will be raised)}
 \item{notify}{notifier to use (defaults to \code{print} function). See the
 \code{notifyR} package for one way of sending notifications from R. The
 \code{notify} function should accept a string as the only argument.}
+
+\item{glcm_statistics}{list of glcm statistics to calculate (see
+\code{\link{glcm}})}
 
 \item{...}{additional arguments passed to \code{\link{glcm}}, such as
 \code{n_grey}, \code{window}, or \code{shift}}

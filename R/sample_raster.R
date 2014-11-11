@@ -7,6 +7,7 @@
 #'
 #' @export
 #' @import raster
+#' @importFrom sp proj4string Polygon Polygons SpatialPolygons CRS
 #' @importFrom rgdal writeOGR
 #' @param x a \code{Raster*}
 #' @param size the sample size (number of sample polygons to return)
