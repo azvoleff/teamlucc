@@ -1,17 +1,18 @@
 #' Read EarthExplorer CSV format scene list
 #'
 #' This function reads in a CSV file of Landsat CDR Surface Reflectance images 
-#' as output from USGS EarthExplorer. param x a \code{data.frame} with a list 
-#' of Landsat scenes as output from the save metadata function on 
+#' as output from USGS EarthExplorer.
 #'
 #' @export
 #' @param x path to a CSV file with a list of Landsat scenes as output from the 
 #' save metadata function on http://earthexplorer.usgs.gov
+#' @param fileEncoding encoding of the ESPA file, passed to
+#' \code{\link{read.csv}} (you shouldn't need to change this).
 #' @return x a \code{data.frame} with a list of Landsat scenes and their 
 #' associated metadata
-ee_read <- function(x) {
+ee_read <- function(x, fileEncoding="latin1") {
     scenes <- read.csv(x, stringsAsFactors=FALSE, quote="", 
-                          na.strings=c('NA', ' '))
+                       na.strings=c('NA', ' '), fileEncoding="latin1")
 
     scenes$Sensor <- substr(scenes$Landsat.Scene.Identifier, 1, 3)
     scenes$Sensor <- factor(scenes$Sensor)

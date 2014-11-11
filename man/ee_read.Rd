@@ -3,11 +3,14 @@
 \alias{ee_read}
 \title{Read EarthExplorer CSV format scene list}
 \usage{
-ee_read(x)
+ee_read(x, fileEncoding = "latin1")
 }
 \arguments{
 \item{x}{path to a CSV file with a list of Landsat scenes as output from the
 save metadata function on http://earthexplorer.usgs.gov}
+
+\item{fileEncoding}{encoding of the ESPA file, passed to
+\code{\link{read.csv}} (you shouldn't need to change this).}
 }
 \value{
 x a \code{data.frame} with a list of Landsat scenes and their
@@ -15,7 +18,6 @@ associated metadata
 }
 \description{
 This function reads in a CSV file of Landsat CDR Surface Reflectance images
-as output from USGS EarthExplorer. param x a \code{data.frame} with a list
-of Landsat scenes as output from the save metadata function on
+as output from USGS EarthExplorer.
 }
 
