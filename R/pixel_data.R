@@ -111,9 +111,10 @@ rbind.pixel_data <- function(x, ...) {
 #' @param x a \code{pixel_data} object
 #' @param i a class or list of classes to extract
 #' @param j unused
+#' @param drop unused
 #' @param ... additional arguments (none implemented)
-setMethod("[", signature(x="pixel_data", i='character', j="ANY"),
-function(x, i, j, ...) {
+setMethod("[", signature(x="pixel_data", i='character', j="ANY", drop="ANY"),
+function(x, i, j, ..., drop) {
     if (!(i %in% levels(x@y))) {
         stop(paste0('"', i, '"', ' is not a class in this pixel_data object'))
     }

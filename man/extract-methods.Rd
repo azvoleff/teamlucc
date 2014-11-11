@@ -14,6 +14,8 @@
 \item{j}{unused}
 
 \item{...}{additional arguments (none implemented)}
+
+\item{drop}{unused}
 }
 \description{
 Extract part of pixel_data class
