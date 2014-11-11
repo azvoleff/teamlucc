@@ -219,6 +219,7 @@ build_band_vrt <- function(file_base, band_vrt_file, file_format) {
 #' @importFrom foreach foreach %do%
 #' @importFrom gdalUtils get_subdatasets gdalbuildvrt
 build_mask_vrt <- function(file_base, mask_vrt_file, file_format) {
+    mask_band <- NULL # keep R CMD check happy
     if (file_format == "ESPA_CDR_OLD") {
         ls_file <- paste0(file_base, '.hdf')
         mask_bands <- c('fill_QA', 'cfmask_band', 'cloud_QA', 'cloud_shadow_QA', 
