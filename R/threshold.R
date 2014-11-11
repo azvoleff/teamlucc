@@ -12,7 +12,6 @@
 #' @export
 #' @import raster
 #' @importFrom foreach foreach %dopar%
-#' @importFrom iterators iter
 #' @param x the input image, as a matrix or raster
 #' @param method the thresholding method. Currently only "huang" is 
 #' implemented.
@@ -37,8 +36,8 @@ threshold <- function(x, method="huang", n_bin=1000, maxpixels=5e5) {
     bys <- (maxs - mins) / (n_bin)
 
     bandnum=minval=maxval=NULL
-    thresholds <- foreach(bandnum=iter(1:nlayers(x)), minval=iter(mins), 
-                          maxval=iter(maxs), by=iter(bys),
+    thresholds <- foreach(bandnum=1:nlayers(x), minval=mins, 
+                          maxval=maxs, by=bys,
                           .packages=c('teamlucc'),
                           .combine=c) %dopar% {
         image_hist <- hist(x[[bandnum]], breaks=seq(minval, maxval+by, by=by), 
