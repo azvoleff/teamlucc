@@ -15,6 +15,7 @@ get_mtl_item <- function(item, mtl_txt) {
     return(mtl_txt)
 }
 
+#' @importFrom foreach %do%
 #' @importFrom stringr str_extract
 #' @importFrom tools file_path_sans_ext
 detect_ls_files <- function(folder) {
@@ -23,38 +24,40 @@ detect_ls_files <- function(folder) {
     file_bases <- file_path_sans_ext(dir(folder, pattern=ls_regex, full.names=TRUE))
     # Select only unique file basenames
     file_bases <- file.path(folder, unique(str_extract(basename(file_bases), ls_regex)))
-    formats <- c()
-    for (file_base in file_bases) {
+    file_base <- NULL # keep R CMD check happy
+    out <- foreach (file_base=file_bases, .combine=rbind) %do% {
         if (file_test('-f', paste0(file_base, ".xml")) & 
             file_test('-f', paste0(file_base, "_sr_band1.img"))) {
             # ENVI file format
-            formats <- c(formats, "ESPA_CDR_ENVI")
+            file_format <- "ESPA_CDR_ENVI"
         } else if (file_test('-f', paste0(file_base, ".xml")) &
                    file_test('-f', paste0(file_base, "_sr_band1_hdf.img")) &
                    file_test('-f', paste0(file_base, ".hdf"))) {
             # HDF-EOS2 format (post-August 2014)
-            formats <- c(formats, "ESPA_CDR_HDF")
+            file_format <- "ESPA_CDR_HDF"
         } else if (file_test('-f', paste0(file_base, ".xml")) &
                    file_test('-f', paste0(file_base, "_sr_band1.tif"))) {
             # TIFF format
-            formats <- c(formats, "ESPA_CDR_TIFF")
+            file_format <- "ESPA_CDR_TIFF"
         } else if (grepl('^lndsr\\.', basename(file_base)) &
                    file_test('-f', paste0(file_base, ".hdf")) &
                    file_test('-f', paste0(file_base, ".hdf.hdr")) &
                    file_test('-f', paste0(file_base, ".txt"))) {
             # Old format HDF (pre-August 2013)
-            formats <- c(formats, "ESPA_CDR_OLD")
+            file_format <- "ESPA_CDR_OLD"
         } else {
             warning(paste0("Failed to detect image format for:", file_base))
+            file_format <- NULL
         }
         # TODO: Autodetect L1T images
         # } else if (TODO)
         #     # L1T terrain corrected image
         #     formats <- c(formats, "L1T")
         # }
+        return(data.frame(file_formats=file_format, file_bases=file_base,
+                          stringsAsFactors=FALSE))
     }
-
-    return(list(file_bases=file_bases, file_formats=formats))
+    return(out)
 }
 
 #' @importFrom stringr str_extract
@@ -396,12 +399,12 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
 
     ext <- gsub('^[.]', '', ext)
 
-    ls_files <- c()
-    for (image_dir in image_dirs) {
+    image_dir <- NULL # Keep R CMD check happy
+    ls_files <- foreach (image_dir=image_dirs, .combine=rbind) %do% {
         if (!file_test("-d", image_dir)) {
             stop(paste(image_dir, "does not exist"))
         }
-        ls_files <- detect_ls_files(image_dir)
+        detect_ls_files(image_dir)
     }
     if (length(ls_files$file_bases) == 0) {
         stop('No Landsat files found')

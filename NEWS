@@ -1,3 +1,8 @@
+teamlucc 0.44
+=============
+* Fix for bug where auto_preprocess_landsat only preprocessed the last image if 
+  it detected multiple images.
+
 teamlucc 0.42
 =============
 * Fix for "invalid multibyte read" error in ee_read on Linux (reported by 
