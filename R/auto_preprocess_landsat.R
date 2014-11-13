@@ -136,7 +136,7 @@ get_metadata <- function(file_base, file_format) {
     return(meta)
 }
 
-calc_cloud_mask <- function(mask_stack, mask_type, ...) {
+calc_cloud_mask <- function(mask_stack, mask_type, file_format, ...) {
     if (mask_type == 'fmask') {
         # Make a mask where clouds and gaps are coded as 1, clear as 0
         # fmask_band key:
@@ -146,28 +146,34 @@ calc_cloud_mask <- function(mask_stack, mask_type, ...) {
         # 	3 = snow
         # 	4 = cloud
         # 	255 = fill value
-        cloud_mask <- calc(mask_stack$fmask_band,
+        cloud_mask <- calc(mask_stack[[2]],
             fun=function(fmask) {
                 return((fmask == 2) | (fmask == 4) | (fmask == 255))
             }, datatype='INT2S', ...)
     } else if (mask_type == '6S') {
+        if (file_format == c('L1T')) {
+            stop("can't use mask_type=\"6S\" with L1T imagery")
+        }
         # This cloud mask includes the cloud_QA, cloud_shadow_QA, and 
         # adjacent_cloud_QA layers. Pixels in cloud, cloud shadow, or 
         # adjacent cloud are coded as 1.
-        cloud_mask <- overlay(mask_stack$fill_QA,
-                              mask_stack$cloud_QA, 
-                              mask_stack$cloud_shadow_QA, 
-                              mask_stack$adjacent_cloud_QA,
+        cloud_mask <- overlay(mask_stack[[1]], # fill_QA,
+                              mask_stack[[3]], # cloud_QA, 
+                              mask_stack[[4]], # cloud_shadow_QA, 
+                              mask_stack[[5]], # adjacent_cloud_QA,
             fun=function(fill, clo, sha, adj) {
                 return((fill == 255) | (clo == 255) | (sha == 255) | 
                        (adj == 255))
             }, datatype='INT2S', ...)
 
     } else if (mask_type == 'both') {
-        cloud_mask <- overlay(mask_stack$fmask_band, 
-                              mask_stack$cloud_QA, 
-                              mask_stack$cloud_shadow_QA, 
-                              mask_stack$adjacent_cloud_QA,
+        if (file_format == c('L1T')) {
+            stop("can't use mask_type=\"both\" with L1T imagery")
+        }
+        cloud_mask <- overlay(mask_stack[[2]], # fmask,
+                              mask_stack[[3]], # cloud_QA, 
+                              mask_stack[[4]], # cloud_shadow_QA, 
+                              mask_stack[[5]], # adjacent_cloud_QA,
             fun=function(fmask, clo, sha, adj) {
                 return((fmask == 2) | (fmask == 4) | (fmask == 255) | 
                        (clo == 255) | (sha == 255) | (adj == 255))
@@ -240,13 +246,14 @@ build_mask_vrt <- function(file_base, mask_vrt_file, file_format) {
                         'sr_cloud_shadow_qa', 'sr_adjacent_cloud_qa')
         tiff_files <- paste0(paste(file_base, mask_bands, sep='_'), '.tif')
         stopifnot(all(file_test('-f', tiff_files)))
+        stopifnot(length(tiff_files) == 5)
         gdalbuildvrt(tiff_files, mask_vrt_file, separate=TRUE, srcnodata='None')
-        
     } else if (file_format == "ESPA_CDR_ENVI") {
         mask_bands <- c('sr_fill_qa', 'cfmask', 'sr_cloud_qa', 
                         'sr_cloud_shadow_qa', 'sr_adjacent_cloud_qa')
         envi_files <- paste0(paste(file_base, mask_bands, sep='_'), '.img')
         stopifnot(all(file_test('-f', envi_files)))
+        stopifnot(length(envi_files) == 5)
         gdalbuildvrt(envi_files, mask_vrt_file, separate=TRUE, srcnodata='None')
     } else if (file_format == "ESPA_CDR_HDF") {
         ls_file <- paste0(file_base, '.hdf')
@@ -533,7 +540,7 @@ auto_preprocess_landsat <- function(image_dirs, prefix, tc=FALSE,
 
             compareRaster(slopeaspect, image_stack, orig=TRUE)
 
-            image_stack_mask <- calc_cloud_mask(mask_stack, mask_type)
+            image_stack_mask <- calc_cloud_mask(mask_stack, mask_type, file_format)
 
             image_stack_masked <- image_stack
             image_stack_masked[image_stack_mask] <- NA
