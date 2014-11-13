@@ -2,6 +2,8 @@ teamlucc 0.42
 =============
 * Fix for "invalid multibyte read" error in ee_read on Linux (reported by 
   Martin Wegmann).
+* Fix for bug in auto_preprocess_landsat with tc=TRUE for latest ESPA CDR image 
+  formats.
 
 teamlucc 0.40
 =============
