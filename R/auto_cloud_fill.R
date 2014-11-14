@@ -160,7 +160,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     img_files <- file.path(data_dir, img_files[which_files])
 
     if (length(img_files) == 0) {
-        stop('no images found - check date_dir, check wrspath, wrsrow, start_date, and end_date')
+        stop('no images found - check data_dir, wrspath, wrsrow, start_date, and end_date')
     } else if (length(img_files) < 2) {
         stop(paste('Only', length(img_files),
                    'image(s) found. Need at least two images to perform cloud fill'))
