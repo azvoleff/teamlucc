@@ -40,8 +40,10 @@
 #' @importFrom stringr str_extract
 #' @param x path to a preprocessed image as output by 
 #' \code{auto_preprocess_landsat} or \code{auto_cloud_fill}.
-#' @param dem DEM \code{RasterLayer} as output by \code{auto_setup_dem}
-#' @param slopeaspect \code{RasterStack} as output by \code{auto_setup_dem}
+#' @param dem DEM \code{RasterLayer} as output by \code{auto_setup_dem} (or 
+#' missing to exclude DEM from output)
+#' @param slopeaspect \code{RasterStack} as output by \code{auto_setup_dem} (or 
+#' missing to exclude slope and aspect from output)
 #' @param output_path the path to use for the output (optional - if NULL then 
 #' output images will be saved alongside the input images in the same folder).
 #' @param ext file extension to use when saving output rasters (determines 
