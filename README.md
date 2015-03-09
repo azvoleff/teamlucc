@@ -69,7 +69,7 @@ To install `devtools` type:
 install.packages('devtools')
 ```
 
-at the R command prompt. This will fecth the latest version of `devtools` from 
+at the R command prompt. This will fetch the latest version of `devtools` from 
 CRAN. After installing `devtools` type:
 
 ```R

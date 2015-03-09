@@ -16,10 +16,10 @@ normalize_extent <- function(te, res=c(30, 30)) {
 
 #' Setup the DEM mosaic for a given AOI
 #'
-#' This function will setup a set of DEM tiles for each the Landsat path/row 
-#' needed to cover a given AOI. The tiles can optionally be cropped to cover 
-#' only the portion of each path/row that is included in the AOI, or can cover 
-#' the full scene for each path/row needed to cover the AOI.
+#' This function will setup a set of DEM tiles for each Landsat path/row needed 
+#' to cover a given AOI. The tiles can optionally be cropped to cover only the 
+#' portion of each path/row that is included in the AOI, or can cover the full 
+#' scene for each path/row needed to cover the AOI.
 #'
 #' This function uses \code{gdalUtils}, which requires a local GDAL 
 #' installation.  See http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries 
