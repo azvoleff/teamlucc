@@ -7,7 +7,7 @@ pct_clouds <- function(cloud_mask) {
 
 #' Automated removal of clouds from Landsat CDR imagery
 #'
-#' Uses one of four cloud reomval algorithms (see \code{\link{cloud_remove}}) 
+#' Uses one of four cloud removal algorithms (see \code{\link{cloud_remove}}) 
 #' to remove thick clouds from Landsat imagery. In hilly areas, topographic 
 #' correction should be done before cloud fill.
 #'
@@ -43,9 +43,11 @@ pct_clouds <- function(cloud_mask) {
 #' @param wrspath World Reference System (WRS) path
 #' @param wrsrow World Reference System (WRS) row
 #' @param start_date start date of period from which images will be chosen to 
-#' fill cloudy areas in the base image (as \code{Date} object)
+#' fill cloudy areas in the base image (as \code{Date} object, inclusive, so 
+#' images can be on or after this date)
 #' @param end_date end date of period from which images will be chosen to fill 
-#' cloudy areas in the the base image (as \code{Date} object)
+#' cloudy areas in the the base image (as \code{Date} object, not inclusive, so 
+#' images must be from before this date to be considered)
 #' @param base_date ideal date for base image (base image will be chosen as the 
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
