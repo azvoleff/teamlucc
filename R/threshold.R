@@ -2,7 +2,7 @@
 #'
 #' The only method currently implemented is Huang's fuzzy thresholding method.  
 #' The code for Huang's method was ported to C++ for \code{teamlucc} from the 
-#' code in the Auto_threshold imageJ plugin by Gabriel Landini. See original 
+#' code in the Auto_Threshold imageJ plugin by Gabriel Landini. See original 
 #' code at:
 #' http://www.mecourse.com/landinig/software/autothreshold/autothreshold.html
 #'
