@@ -43,11 +43,9 @@ pct_clouds <- function(cloud_mask) {
 #' @param wrspath World Reference System (WRS) path
 #' @param wrsrow World Reference System (WRS) row
 #' @param start_date start date of period from which images will be chosen to 
-#' fill cloudy areas in the base image (as \code{Date} object, inclusive, so 
-#' images can be on or after this date)
+#' fill cloudy areas in the base image (as \code{Date} object)
 #' @param end_date end date of period from which images will be chosen to fill 
-#' cloudy areas in the the base image (as \code{Date} object, not inclusive, so 
-#' images must be from before this date to be considered)
+#' cloudy areas in the the base image (as \code{Date} object)
 #' @param base_date ideal date for base image (base image will be chosen as the 
 #' image among the available images that is closest to this date). If NULL, 
 #' then the base image will be the image with the lowest cloud cover.
@@ -162,7 +160,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     img_files <- file.path(data_dir, img_files[which_files])
 
     if (length(img_files) == 0) {
-        stop('no images found - check data_dir, wrspath, wrsrow, start_date, and end_date')
+        stop('no images found - check date_dir, check wrspath, wrsrow, start_date, and end_date')
     } else if (length(img_files) < 2) {
         stop(paste('Only', length(img_files),
                    'image(s) found. Need at least two images to perform cloud fill'))
@@ -211,8 +209,7 @@ auto_cloud_fill <- function(data_dir, wrspath, wrsrow, start_date, end_date,
     # percent clear
     if (is.null(base_date)) {
         clear_row <- which(freq_table$value == 0)
-        base_img_index <- which(freq_table[clear_row, -1] == 
-                                max(freq_table[clear_row, -1]))
+        base_img_index <- which.max(freq_table[clear_row, -1])
     } else {
         base_date_diff <- lapply(img_dates, function(x) 
                                  as.duration(new_interval(x, base_date)))
