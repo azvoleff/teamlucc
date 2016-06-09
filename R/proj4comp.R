@@ -21,8 +21,8 @@ proj4comp <- function(x, y) {
         y <- CRSargs(CRS(y))
     }
 
-    x_proj <- str_extract(x, '+proj=[a-zA-Z0-9]*')
-    y_proj <- str_extract(y, '+proj=[a-zA-Z0-9]*')
+    x_proj <- str_extract(x, '\\+proj=[a-zA-Z0-9]*')
+    y_proj <- str_extract(y, '\\+proj=[a-zA-Z0-9]*')
     if (sum(is.na(c(x_proj, y_proj))) > 0) {
         stop('proj string is missing')
     } else {
@@ -31,8 +31,8 @@ proj4comp <- function(x, y) {
         }
     }
 
-    x_ellps <- str_extract(x, '+ellps=[a-zA-Z0-9]*')
-    y_ellps <- str_extract(y, '+ellps=[a-zA-Z0-9]*')
+    x_ellps <- str_extract(x, '\\+ellps=[a-zA-Z0-9]*')
+    y_ellps <- str_extract(y, '\\+ellps=[a-zA-Z0-9]*')
     if (sum(is.na(c(x_ellps, y_ellps))) > 0) {
         stop('ellps string is missing')
     } else if (x_ellps != y_ellps) {
@@ -41,15 +41,15 @@ proj4comp <- function(x, y) {
 
 
     if (grepl('utm', tolower(x_proj))) {
-        x_zone <- str_extract(x, '+zone=[a-zA-Z0-9]*')
-        y_zone <- str_extract(y, '+zone=[a-zA-Z0-9]*')
+        x_zone <- str_extract(x, '\\+zone=[a-zA-Z0-9]*')
+        y_zone <- str_extract(y, '\\+zone=[a-zA-Z0-9]*')
         if (sum(is.na(c(x_zone, y_zone))) > 0) {
             stop('utm zone must be specified for utm projections')
         } else if (x_zone != y_zone) {
             return(FALSE)
         }
-        x_south <- str_extract(tolower(x), '+south')
-        y_south <- str_extract(tolower(y), '+south')
+        x_south <- str_extract(tolower(x), '\\+south')
+        y_south <- str_extract(tolower(y), '\\+south')
         if (!is.na(x_south) || !is.na(y_south)) {
             # Get here if one or more of x_south and y_south is not NA
             if (xor(is.na(x_south), is.na(y_south)) || (x_south != y_south)) {
@@ -60,14 +60,14 @@ proj4comp <- function(x, y) {
         }
     }
 
-    x_datum <- str_extract(x, '+datum=[a-zA-Z0-9]*')
-    y_datum <- str_extract(y, '+datum=[a-zA-Z0-9]*')
+    x_datum <- str_extract(x, '\\+datum=[a-zA-Z0-9]*')
+    y_datum <- str_extract(y, '\\+datum=[a-zA-Z0-9]*')
     if ((!is.na(x_datum) && !is.na(y_datum)) & (x_datum != y_datum)) {
         return(FALSE)
     }
     
-    x_units <- str_extract(x, '+units=[a-zA-Z0-9]*')
-    y_units <- str_extract(y, '+units=[a-zA-Z0-9]*')
+    x_units <- str_extract(x, '\\+units=[a-zA-Z0-9]*')
+    y_units <- str_extract(y, '\\+units=[a-zA-Z0-9]*')
     if ((!is.na(x_units) && !is.na(y_units)) & (x_units != y_units)) {
         return(FALSE)
     }
