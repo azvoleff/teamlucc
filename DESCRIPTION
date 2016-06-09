@@ -54,3 +54,4 @@ License: GPL (>= 3)
 URL: https://www.azvoleff.com/teamlucc
 BugReports: https://github.com/azvoleff/teamlucc/issues
 LazyData: true
+RoxygenNote: 5.0.1
