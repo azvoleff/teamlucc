@@ -1,3 +1,10 @@
+teamlucc 0.46
+=============
+* Fix U_REGEX_RULE_SYNTAX error in proj4comp due to stringr update.
+* Add option in linear_stretch to do a standard deviation stretch.
+* Fix base_img_index selection in auto_cloud_fill.
+* Misc doc fixes and roxygenize.
+
 teamlucc 0.44
 =============
 * Fix for bug where auto_preprocess_landsat only preprocessed the last image if 
